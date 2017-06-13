@@ -11,4 +11,4 @@ set COREDIR=%CD%
 popd
 set COREJAR=datafordeler-core.jar
 
-set PLUGINJAR=datafordeler-plugin-cvr-1.0-SNAPSHOT.jar
+set PLUGINJAR=datafordeler-plugin-cpr-1.0-SNAPSHOT.jar
