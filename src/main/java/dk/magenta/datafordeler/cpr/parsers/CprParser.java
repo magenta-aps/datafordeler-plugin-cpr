@@ -14,7 +14,6 @@ import java.util.List;
 public class CprParser {
 
     @Autowired
-    @SuppressWarnings("SpringJavaAutowiringInspection")
     private PersonParser personParser;
 
     // TODO: Add more parsers
@@ -26,7 +25,7 @@ public class CprParser {
 
     @PostConstruct
     protected void postConstruct() {
-        this.subParsers = new ArrayList<CprSubParser>();
+        this.subParsers = new ArrayList<>();
         this.subParsers.add(this.personParser);
     }
 
