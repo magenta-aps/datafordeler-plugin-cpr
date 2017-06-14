@@ -1,6 +1,5 @@
-package dk.magenta.datafordeler.cpr.data;
+package dk.magenta.datafordeler.cpr.parsers;
 
-import dk.magenta.datafordeler.cpr.data.person.PersonRegister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,21 +11,23 @@ import java.util.List;
  * Created by lars on 18-12-14.
  */
 @Component
-public class CprRegister extends LineRegister {
+public class CprParser {
 
     @Autowired
     @SuppressWarnings("SpringJavaAutowiringInspection")
-    private PersonRegister personRegister;
+    private PersonParser personParser;
 
-    private List<CprSubRegister> subRegisters;
+    // TODO: Add more parsers
 
-    public CprRegister() {
+    private List<CprSubParser> subParsers;
+
+    public CprParser() {
     }
 
     @PostConstruct
     protected void postConstruct() {
-        this.subRegisters = new ArrayList<CprSubRegister>();
-        this.subRegisters.add(this.personRegister);
+        this.subParsers = new ArrayList<CprSubParser>();
+        this.subParsers.add(this.personParser);
     }
 
 }

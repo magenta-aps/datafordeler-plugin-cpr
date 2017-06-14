@@ -7,8 +7,6 @@ import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-
 /**
  * Created by lars on 16-05-17.
  */
@@ -20,12 +18,6 @@ public class CprPlugin extends Plugin {
 
     @Autowired
     private CprRegisterManager registerManager;
-
-
-    @PostConstruct
-    public void init() {
-
-    }
 
     @Override
     public String getName() {

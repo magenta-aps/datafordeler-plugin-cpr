@@ -1,24 +1,28 @@
-package dk.magenta.datafordeler.cpr.data;
+package dk.magenta.datafordeler.cpr.parsers;
 
-import dk.magenta.datafordeler.cpr.data.records.Record;
+import dk.magenta.datafordeler.cpr.records.Record;
 import org.apache.log4j.Logger;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by lars on 15-12-14.
  */
-public abstract class LineRegister {
+public abstract class LineParser {
 
-    protected Logger log = Logger.getLogger(LineRegister.class);
+    protected Logger log = Logger.getLogger(LineParser.class);
 
-    public LineRegister() {
+    public LineParser() {
+    }
+
+    // Maybe override in subclass?
+    protected String getEncoding() {
+        return null;
     }
 
     public List<Record> parse(InputStream input) {
@@ -46,37 +50,33 @@ public abstract class LineRegister {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputstream, encoding.toUpperCase()));
 
             this.log.info("Reading data");
-            int i = 0, j = 0;
+            int batchSize = 0, batchCount = 0;
 
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                if (line != null) {
-                    line = line.trim();
-                    if (line.length() > 3) {
-                        try {
-                            Record record = this.parseTrimmedLine(line);
-                            if (record != null) {
-                                records.add(record);
-                            }
-                        } catch (OutOfMemoryError e) {
-                            System.out.println(line);
+                line = line.trim();
+                if (line.length() > 3) {
+                    try {
+                        Record record = this.parseLine(line);
+                        if (record != null) {
+                            records.add(record);
                         }
+                    } catch (OutOfMemoryError e) {
+                        System.out.println(line);
                     }
                 }
-                i++;
-                if (i >= 100000) {
-                    j++;
+                batchSize++;
+                if (batchSize >= 100000) {
+                    batchCount++;
                     System.gc();
-                    this.log.trace("    parsed " + (j * i) + " lines");
-                    i = 0;
+                    this.log.trace("    parsed " + (batchCount * batchSize) + " lines");
+                    batchSize = 0;
                 }
             }
-            this.log.trace("    parsed " + (j * 100000 + i) + " lines");
+            this.log.trace("    parsed " + (batchCount * 100000 + batchSize) + " lines");
             int count = records.size();
             this.log.info("Parse complete (" + count + " usable entries found)");
             return records;
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,12 +84,6 @@ public abstract class LineRegister {
         return null;
     }
 
-    protected Record parseTrimmedLine(String line) {
-        return null;
-    }
+    protected abstract Record parseLine(String line);
 
-    // Maybe override in subclass?
-    protected String getEncoding() {
-        return null;
-    }
 }

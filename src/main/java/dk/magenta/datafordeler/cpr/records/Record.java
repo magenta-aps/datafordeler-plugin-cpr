@@ -1,4 +1,4 @@
-package dk.magenta.datafordeler.cpr.data.records;
+package dk.magenta.datafordeler.cpr.records;
 
 import java.util.HashMap;
 

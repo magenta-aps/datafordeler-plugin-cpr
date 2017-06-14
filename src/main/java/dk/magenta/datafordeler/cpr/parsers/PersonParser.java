@@ -1,11 +1,7 @@
-package dk.magenta.datafordeler.cpr.data.person;
+package dk.magenta.datafordeler.cpr.parsers;
 
-import dk.magenta.datafordeler.cpr.data.CprSubRegister;
-import dk.magenta.datafordeler.cpr.data.records.CprRecord;
+import dk.magenta.datafordeler.cpr.records.CprRecord;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -15,8 +11,7 @@ import java.text.ParseException;
  * Created by lars on 04-11-14.
  */
 @Component
-public class PersonRegister extends CprSubRegister {
-
+public class PersonParser extends CprSubParser {
 
     /*
     * Inner classes for parsed data
@@ -24,7 +19,7 @@ public class PersonRegister extends CprSubRegister {
 
     public abstract class PersonDataRecord extends CprRecord {
         public static final String RECORDTYPE_EXAMPLE = "001";
-        // Add one for each data type
+        // TODO: Add one for each data type
 
         public PersonDataRecord(String line) throws ParseException {
             super(line);
@@ -54,33 +49,15 @@ public class PersonRegister extends CprSubRegister {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    /*
-    * Constructors
-    * */
-
-    public PersonRegister() {
+    public PersonParser() {
     }
 
-    private static Logger log = Logger.getLogger(PersonRegister.class);
-
-    /*
-    * Data source spec
-    * */
-
-    @Autowired
-    private ConfigurableApplicationContext ctx;
-
-    public Resource getRecordResource() {
-        return this.ctx.getResource("classpath:/data/cprVejregister.zip");
-    }
+    private static Logger log = Logger.getLogger(PersonParser.class);
 
 
-    /*
-    * Parse definition
-    * */
-
-    protected CprRecord parseTrimmedLine(String recordType, String line) {
-        CprRecord r = super.parseTrimmedLine(recordType, line);
+    @Override
+    protected CprRecord parseLine(String recordType, String line) {
+        CprRecord r = super.parseLine(recordType, line);
         if (r != null) {
             return r;
         }
@@ -88,7 +65,7 @@ public class PersonRegister extends CprSubRegister {
             if (recordType.equals(PersonDataRecord.RECORDTYPE_EXAMPLE)) {
                 return new ExampleData(line);
             }
-            // Add one for each type...
+            // TODO: Add one of these for each type...
 
         } catch (ParseException e) {
             e.printStackTrace();

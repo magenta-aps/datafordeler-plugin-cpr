@@ -1,4 +1,4 @@
-package dk.magenta.datafordeler.cpr.data.records;
+package dk.magenta.datafordeler.cpr.records;
 
 import java.text.ParseException;
 import java.util.regex.Pattern;
