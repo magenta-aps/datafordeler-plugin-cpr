@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
+import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.fapi.QueryField;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprQuery;
@@ -46,9 +47,9 @@ public class PersonQuery extends CprQuery<PersonEntity> {
     }
 
     @Override
-    public void setFromParameters(ListHashMap<String, String> listHashMap) {
-        this.setFirstName(listHashMap.getFirst(FIRSTNAME));
-        this.setLastName(listHashMap.getFirst(LASTNAME));
+    public void setFromParameters(ParameterMap parameters) {
+        this.setFirstName(parameters.getFirst(FIRSTNAME));
+        this.setLastName(parameters.getFirst(LASTNAME));
     }
 
     @Override

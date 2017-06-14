@@ -7,20 +7,6 @@ import java.util.HashMap;
  */
 public abstract class Record extends HashMap<String, String> {
 
-    private boolean visited;
-    public boolean getVisited() {
-        return visited;
-    }
-    public void setVisited(boolean visited) {
-        this.visited = visited;
-    }
-    public void setVisited() {
-        this.setVisited(true);
-    }
-    public void resetVisited() {
-        this.visited = false;
-    }
-
     public String getRecordType() {
         return null;
     }

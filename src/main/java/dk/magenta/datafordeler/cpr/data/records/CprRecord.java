@@ -18,7 +18,6 @@ public abstract class CprRecord extends Record {
         if (line == null) {
             throw new ParseException("Invalid NULL input.", 0);
         }
-        this.setVisited(false);
         this.line = line;
         this.obtain("type", 1, 3, false);
         String thisType = this.getRecordType();

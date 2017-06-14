@@ -5,6 +5,7 @@ import dk.magenta.datafordeler.cpr.data.CprData;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
+import javax.persistence.Entity;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,18 +13,18 @@ import java.util.Map;
 /**
  * Created by lars on 16-05-17.
  */
-@javax.persistence.Entity
+@Entity
 @Table(name="cpr_person_data")
 public class PersonData extends CprData<PersonEffect, PersonData> {
 
     @Column(unique = true, nullable = false, insertable = true, updatable = false)
-    @JsonProperty(value = "brancheKode")
-    @XmlElement(name = "brancheKode")
+    @JsonProperty(value = "firstName")
+    @XmlElement(name = "firstName")
     private String firstName;
 
     @Column(unique = true, nullable = false, insertable = true, updatable = false)
-    @JsonProperty(value = "brancheTekst")
-    @XmlElement(name = "brancheTekst")
+    @JsonProperty(value = "lastName")
+    @XmlElement(name = "lastName")
     private String lastName;
 
     /**
