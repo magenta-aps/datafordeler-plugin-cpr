@@ -7,6 +7,7 @@ import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,28 +27,38 @@ public abstract class LineParser {
     }
 
     public List<Record> parse(InputStream input) {
+        BufferedInputStream inputstream = new BufferedInputStream(input);
+
+        String encoding = this.getEncoding();
+        if (encoding != null) {
+            this.log.info("Using explicit encoding " + encoding);
+        } else {
+            // Try to guess the encoding based on the stream contents
+            CharsetDetector detector = new CharsetDetector();
+            try {
+                detector.setText(inputstream);
+            } catch (IOException e) {
+                e.printStackTrace();
+                this.log.warn("Parse failed");
+                return null;
+            }
+            CharsetMatch match = detector.detect();
+            if (match != null) {
+                encoding = match.getName();
+                this.log.info("Interpreting data as " + encoding);
+            } else {
+                encoding = "UTF-8";
+                this.log.info("Falling back to default encoding " + encoding);
+            }
+        }
+        return this.parse(inputstream, encoding);
+    }
+
+    public List<Record> parse(InputStream input, String encoding) {
         try {
-            BufferedInputStream inputstream = new BufferedInputStream(input);
             ArrayList<Record> records = new ArrayList<>();
 
-            String encoding = this.getEncoding();
-            if (encoding != null) {
-                this.log.info("Using explicit encoding " + encoding);
-            } else {
-                // Try to guess the encoding based on the stream contents
-                CharsetDetector detector = new CharsetDetector();
-                detector.setText(inputstream);
-                CharsetMatch match = detector.detect();
-                if (match != null) {
-                    encoding = match.getName();
-                    this.log.info("Interpreting data as " + encoding);
-                } else {
-                    encoding = "UTF-8";
-                    this.log.info("Falling back to default encoding " + encoding);
-                }
-            }
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputstream, encoding.toUpperCase()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(input, encoding.toUpperCase()));
 
             this.log.info("Reading data");
             int batchSize = 0, batchCount = 0;

@@ -23,6 +23,7 @@ public abstract class CprSubParser extends LineParser {
     }
 
     protected CprRecord parseLine(String recordType, String line) {
+        System.out.println(recordType);
         try {
             if (recordType.equals(CprRecord.RECORDTYPE_START)) {
                 return new CprStartRecord(line);
