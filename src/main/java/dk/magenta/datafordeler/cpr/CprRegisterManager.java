@@ -1,11 +1,14 @@
 package dk.magenta.datafordeler.cpr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.magenta.datafordeler.core.plugin.Communicator;
-import dk.magenta.datafordeler.core.plugin.HttpCommunicator;
-import dk.magenta.datafordeler.core.plugin.Plugin;
-import dk.magenta.datafordeler.core.plugin.RegisterManager;
+import dk.magenta.datafordeler.core.exception.DataFordelerException;
+import dk.magenta.datafordeler.core.exception.DataStreamException;
+import dk.magenta.datafordeler.core.io.Event;
+import dk.magenta.datafordeler.core.plugin.*;
+import dk.magenta.datafordeler.core.util.CloseDetectInputStream;
+import dk.magenta.datafordeler.core.util.ItemInputStream;
 import dk.magenta.datafordeler.core.util.ListHashMap;
+import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
@@ -24,7 +28,7 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class CprRegisterManager extends RegisterManager {
 
-    private HttpCommunicator commonFetcher;
+    private FtpCommunicator commonFetcher;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -38,16 +42,14 @@ public class CprRegisterManager extends RegisterManager {
     private Logger log = LogManager.getLogger("CprRegisterManager");
 
     public CprRegisterManager() {
-        this.commonFetcher = new HttpCommunicator();
+
     }
 
     @PostConstruct
     public void init() {
-        try {
-            this.baseEndpoint = new URI(this.configurationManager.getConfiguration().getRegisterAddress());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+
+        CprConfiguration configuration = this.configurationManager.getConfiguration();
+        this.commonFetcher = new FtpCommunicator(configuration.getFtpUsername(), configuration.getFtpPassword(), configuration.getFtps());
     }
 
     @Override
@@ -64,7 +66,12 @@ public class CprRegisterManager extends RegisterManager {
 
     @Override
     public URI getBaseEndpoint() {
-        return this.baseEndpoint;
+        try {
+            return new URI(this.configurationManager.getConfiguration().getRegisterAddress());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
@@ -81,7 +88,7 @@ public class CprRegisterManager extends RegisterManager {
 
     @Override
     protected URI getEventInterface() {
-        return expandBaseURI(this.getBaseEndpoint(), "/getNewEvents");
+        return expandBaseURI(this.getBaseEndpoint(), "/cprdata.txt");
     }
 
     @Override
@@ -102,11 +109,50 @@ public class CprRegisterManager extends RegisterManager {
     }
 
     public String getPullCronSchedule() {
-        System.out.println(this);
-        System.out.println(this.configurationManager);
-        System.out.println(this.configurationManager.getConfiguration());
-        System.out.println(this.configurationManager.getConfiguration().getPullCronSchedule());
         return this.configurationManager.getConfiguration().getPullCronSchedule();
+    }
+
+    @Override
+    protected ItemInputStream<Event> parseEventResponse(InputStream responseContent) throws DataFordelerException {
+        PipedInputStream inputStream = new PipedInputStream();
+        final BufferedReader dataStream = new BufferedReader(new InputStreamReader(responseContent));
+        try {
+            final PipedOutputStream outputStream = new PipedOutputStream(inputStream);
+            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String line;
+                        while ((line = dataStream.readLine()) != null) {
+                            objectOutputStream.writeObject(CprRegisterManager.this.parseLine(line));
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            objectOutputStream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                            dataStream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            t.start();
+            return new ItemInputStream<Event>(inputStream);
+        } catch (IOException e) {
+            throw new DataStreamException(e);
+        }
+    }
+
+    private Event parseLine(String line) {
+        return new Event();
     }
 
 }

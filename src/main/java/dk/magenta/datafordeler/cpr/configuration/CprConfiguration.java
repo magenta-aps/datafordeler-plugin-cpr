@@ -22,7 +22,16 @@ public class CprConfiguration implements Configuration {
     private String pullCronSchedule = "0 0 * * * ?";
 
     @Column
-    private String registerAddress = "http://localhost:8000";
+    private String registerAddress = "ftp://localhost:2101";
+
+    @Column
+    private String ftpUsername = "username";
+
+    @Column
+    private String ftpPassword = "password";
+
+    @Column
+    private boolean ftps = true;
 
     public String getPullCronSchedule() {
         return this.pullCronSchedule;
@@ -30,5 +39,26 @@ public class CprConfiguration implements Configuration {
 
     public String getRegisterAddress() {
         return this.registerAddress;
+    }
+
+    public String getFtpUsername() {
+        return this.ftpUsername;
+    }
+
+    public String getFtpPassword() {
+        return this.ftpPassword;
+    }
+
+    public boolean getFtps() {
+        return this.ftps;
+    }
+
+    /**
+     * For testing - test methods will set this, but not save the entity to DB
+     * @param registerAddress
+     */
+    public void setRegisterAddress(String registerAddress) {
+        System.out.println("setting registerAddress: " + registerAddress);
+        this.registerAddress = registerAddress;
     }
 }

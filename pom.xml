@@ -67,6 +67,14 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.ftpserver</groupId>
+            <artifactId>ftpserver</artifactId>
+            <version>1.1.1</version>
+            <scope>test</scope>
+            <type>pom</type>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
