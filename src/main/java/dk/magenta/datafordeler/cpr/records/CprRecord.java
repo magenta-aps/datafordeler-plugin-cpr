@@ -1,5 +1,8 @@
 package dk.magenta.datafordeler.cpr.records;
 
+import dk.magenta.datafordeler.core.util.DoubleHashMap;
+import dk.magenta.datafordeler.cpr.data.person.PersonBaseData;
+
 import java.text.ParseException;
 import java.util.regex.Pattern;
 
@@ -31,13 +34,13 @@ public abstract class CprRecord extends Record {
     }
 
     protected void obtain(String key, int position, int length) {
-        this.obtain(key, position, length, true);
+        this.obtain(key, position, length, false);
     }
 
     protected void obtain(String key, int position, int length, boolean truncateLeadingZeroes) {
         String value = this.substr(this.line, position, length);
         if (truncateLeadingZeroes) {
-            value = leadingZero.matcher(value).replaceFirst("");
+            value = leadingZero.matcher(value).replaceAll("");
         }
         this.put(key, value);
     }
@@ -46,4 +49,17 @@ public abstract class CprRecord extends Record {
         this.line = null;
     }
 
+    public abstract DoubleHashMap<String,String,PersonBaseData> getDataEffects(String timestamp);
+
+    protected static String normalizeDate(String date) {
+        if (date == null || date.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            if (Integer.parseInt(date) == 0) {
+                return null;
+            }
+        } catch (Exception e) {}
+        return date;
+    }
 }

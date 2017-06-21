@@ -1,5 +1,8 @@
 package dk.magenta.datafordeler.cpr.records;
 
+import dk.magenta.datafordeler.core.util.DoubleHashMap;
+import dk.magenta.datafordeler.cpr.data.person.PersonBaseData;
+
 import java.text.ParseException;
 
 /**
@@ -15,6 +18,11 @@ public class CprStartRecord extends CprRecord {
         super(line);
         this.put("opgaveNr", substr(line,4,6));
         this.put("prodDato", substr(line,10,8));
+    }
+
+    @Override
+    public DoubleHashMap<String, String, PersonBaseData> getDataEffects(String timestamp) {
+        return null;
     }
 
 }

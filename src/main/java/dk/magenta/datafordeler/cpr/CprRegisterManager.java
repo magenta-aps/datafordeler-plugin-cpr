@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 /**
  * Created by lars on 16-05-17.
@@ -152,7 +153,17 @@ public class CprRegisterManager extends RegisterManager {
     }
 
     private Event parseLine(String line) {
-        return new Event();
+        Event event = new Event();
+        event.setEventID(UUID.randomUUID().toString());
+        event.setBeskedVersion("1.0");
+
+        // Find the relevant class and parse the line into it
+        String skema = "skema";
+        String data = line;
+
+        event.setDataskema(skema);
+        event.setObjektData(data);
+        return event;
     }
 
 }

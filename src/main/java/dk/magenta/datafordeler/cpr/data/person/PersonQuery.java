@@ -2,8 +2,6 @@ package dk.magenta.datafordeler.cpr.data.person;
 
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.fapi.QueryField;
-import dk.magenta.datafordeler.core.util.ListHashMap;
-import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.CprQuery;
 
 import java.util.HashMap;
@@ -60,7 +58,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
 
     @Override
     public Class getDataClass() {
-        return PersonData.class;
+        return PersonBaseData.class;
     }
 
 }
