@@ -62,4 +62,5 @@ public abstract class CprRecord extends Record {
         } catch (Exception e) {}
         return date;
     }
+
 }

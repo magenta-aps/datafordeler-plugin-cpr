@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.parsers;
 
 import dk.magenta.datafordeler.core.util.DoubleHashMap;
+import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.person.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprRecord;
 import org.apache.log4j.Logger;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 
@@ -22,7 +22,8 @@ public class PersonParser extends CprSubParser {
     * Inner classes for parsed data
     * */
 
-    public abstract class PersonDataRecord extends CprRecord {
+    public abstract class PersonDataRecord<B extends CprData> extends CprRecord {
+
         public static final String RECORDTYPE_PERSON = "001";
         // TODO: Add one for each data type
 
@@ -41,9 +42,22 @@ public class PersonParser extends CprSubParser {
         public HashSet<String> getTimestamps() {
             return new HashSet<>();
         }
+
+        protected B getBaseDataItem(DoubleHashMap<String, String, B> data, String effectStart, String effectEnd) {
+            effectStart = CprRecord.normalizeDate(effectStart);
+            effectEnd = CprRecord.normalizeDate(effectEnd);
+            B personBaseData = data.get(effectStart, effectEnd);
+            if (personBaseData == null) {
+                personBaseData = this.createEmptyBaseData();
+                data.put(effectStart, effectEnd, personBaseData);
+            }
+            return personBaseData;
+        }
+
+        protected abstract B createEmptyBaseData();
     }
 
-    public class PersonData extends PersonDataRecord {
+    public class PersonData extends PersonDataRecord<PersonBaseData> {
         public PersonData(String line) throws ParseException {
             super(line);
             this.obtain("pnr", 4, 10);
@@ -90,18 +104,6 @@ public class PersonParser extends CprSubParser {
             this.obtain("far_dok_mynkod", 348, 4);
             this.obtain("far_dok_ts", 352, 12);
             this.obtain("far_dok", 364, 3);
-        }
-
-
-        private PersonBaseData getBaseDataItem(DoubleHashMap<String, String, PersonBaseData> data, String effectStart, String effectEnd) {
-            effectStart = CprRecord.normalizeDate(effectStart);
-            effectEnd = CprRecord.normalizeDate(effectEnd);
-            PersonBaseData personBaseData = data.get(effectStart, effectEnd);
-            if (personBaseData == null) {
-                personBaseData = new PersonBaseData();
-                data.put(effectStart, effectEnd, personBaseData);
-            }
-            return personBaseData;
         }
 
         /**
@@ -172,8 +174,9 @@ public class PersonParser extends CprSubParser {
             return data;
         }
 
-        protected int getTimestampStart() {
-            return 22;
+        @Override
+        protected PersonBaseData createEmptyBaseData() {
+            return new PersonBaseData();
         }
 
         @Override
