@@ -1,9 +1,13 @@
 package dk.magenta.datafordeler.cpr.records;
 
 import dk.magenta.datafordeler.core.util.DoubleHashMap;
+import dk.magenta.datafordeler.core.util.ListHashMap;
+import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -49,7 +53,8 @@ public abstract class CprRecord extends Record {
         this.line = null;
     }
 
-    public abstract DoubleHashMap<String,String,PersonBaseData> getDataEffects(String timestamp);
+    //public abstract DoubleHashMap<String,String,PersonBaseData> getDataEffects(String timestamp);
+    public abstract ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String registrationFrom);
 
     protected static String normalizeDate(String date) {
         if (date == null || date.trim().isEmpty()) {

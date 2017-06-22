@@ -13,6 +13,11 @@ import java.time.temporal.TemporalAccessor;
 @javax.persistence.Entity
 @Table(name="cpr_person_effect")
 public class PersonEffect extends Effect<PersonRegistration, PersonEffect, PersonBaseData> {
+
+    private boolean uncertainFrom;
+
+    private boolean uncertainTo;
+
     public PersonEffect() {
     }
 
@@ -26,5 +31,25 @@ public class PersonEffect extends Effect<PersonRegistration, PersonEffect, Perso
 
     public PersonEffect(PersonRegistration registration, String effectFrom, String effectTo) {
         super(registration, effectFrom, effectTo);
+    }
+
+    public boolean isUncertainFrom() {
+        return this.uncertainFrom;
+    }
+
+    public void setUncertainFrom(boolean uncertainFrom) {
+        this.uncertainFrom = uncertainFrom;
+    }
+
+    public boolean isUncertainTo() {
+        return this.uncertainTo;
+    }
+
+    public void setUncertainTo(boolean uncertainTo) {
+        this.uncertainTo = uncertainTo;
+    }
+
+    public void setRegistration(PersonRegistration registration) {
+        super.setRegistration(registration);
     }
 }

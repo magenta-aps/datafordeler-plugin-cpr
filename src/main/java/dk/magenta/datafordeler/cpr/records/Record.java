@@ -1,8 +1,8 @@
 package dk.magenta.datafordeler.cpr.records;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import dk.magenta.datafordeler.cpr.parsers.CprParser;
+
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
@@ -109,6 +109,19 @@ public abstract class Record extends HashMap<String, String> {
                 } catch (DateTimeParseException e) {
                 }
             }
+        }
+        return null;
+    }
+
+    public OffsetDateTime getOffsetDateTime(String key) {
+        LocalDateTime dateTime = this.getDateTime(key);
+        if (dateTime != null) {
+            return OffsetDateTime.from(
+                    ZonedDateTime.of(
+                            dateTime,
+                            CprParser.CPR_TIMEZONE
+                    )
+            );
         }
         return null;
     }

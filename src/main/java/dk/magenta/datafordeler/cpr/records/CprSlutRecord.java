@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records;
 
-import dk.magenta.datafordeler.core.util.DoubleHashMap;
+import dk.magenta.datafordeler.core.util.ListHashMap;
+import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
 import java.text.ParseException;
@@ -20,7 +21,7 @@ public class CprSlutRecord extends CprRecord {
     }
 
     @Override
-    public DoubleHashMap<String, String, PersonBaseData> getDataEffects(String timestamp) {
+    public ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String timestamp) {
         return null;
     }
 }

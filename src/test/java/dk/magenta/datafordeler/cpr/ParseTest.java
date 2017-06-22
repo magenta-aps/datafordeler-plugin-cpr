@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
+import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
@@ -104,19 +105,17 @@ System.out.println("registration from "+registrationFrom+": "+registration);
                 // Each record sets its own basedata
                 for (PersonParser.PersonDataRecord record : ajourRecords.get(timestamp)) {
                     // Take what we need from the record and put it into dataitems
-                    DoubleHashMap<String, String, PersonBaseData> dataItems = record.getDataEffects(timestamp);
+                    ListHashMap<PersonEffect, PersonBaseData> dataItems = record.getDataEffects(timestamp);
                     if (dataItems != null) {
-                        for (String from : dataItems.keySet()) {
-                            OffsetDateTime effectFrom = CprParser.parseTimestamp(from);
-                            HashMap<String, PersonBaseData> inner = dataItems.get(from);
-                            for (String to : inner.keySet()) {
-                                OffsetDateTime effectTo = CprParser.parseTimestamp(to);
-                                PersonBaseData data = inner.get(to);
-                                PersonEffect effect = registration.getEffect(effectFrom, effectTo);
-                                if (effect == null) {
+                        for (PersonEffect effect : dataItems.keySet()) {
+                            for (PersonBaseData data : dataItems.get(effect)) {
+                                effect.setRegistration(registration);
+                                data.addEffect(effect);
+                                //PersonEffect effect = registration.getEffect(effectFrom, effectTo);
+                                /*if (effect == null) {
                                     effect = new PersonEffect(registration, effectFrom, effectTo);
                                 }
-                                data.addEffect(effect);
+                                data.addEffect(effect);*/
                             }
                         }
                     }

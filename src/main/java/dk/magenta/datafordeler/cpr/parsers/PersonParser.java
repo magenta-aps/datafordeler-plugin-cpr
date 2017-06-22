@@ -1,14 +1,19 @@
 package dk.magenta.datafordeler.cpr.parsers;
 
 import dk.magenta.datafordeler.core.util.DoubleHashMap;
+import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprData;
+import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprRecord;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import javax.lang.model.type.NullType;
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
 
 
@@ -55,6 +60,23 @@ public class PersonParser extends CprSubParser {
                 personBaseData = this.createEmptyBaseData();
                 data.put(effectStart, effectEnd, personBaseData);
             }
+            return personBaseData;
+        }
+
+        protected B getBaseDataItem(ListHashMap<PersonEffect, B> data) {
+            return this.getBaseDataItem(data, null, false,null, false);
+        }
+
+        protected B getBaseDataItem(ListHashMap<PersonEffect, B> data, OffsetDateTime effectFrom, boolean effectFromUncertain) {
+            return this.getBaseDataItem(data, effectFrom, effectFromUncertain,null, false);
+        }
+
+        protected B getBaseDataItem(ListHashMap<PersonEffect, B> data, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
+            B personBaseData = this.createEmptyBaseData();
+            PersonEffect effect = new PersonEffect(null, effectFrom, effectTo);
+            effect.setUncertainFrom(effectFromUncertain);
+            effect.setUncertainTo(effectToUncertain);
+            data.add(effect, personBaseData);
             return personBaseData;
         }
 
@@ -111,21 +133,21 @@ public class PersonParser extends CprSubParser {
 
         /**
          * Create a set of populated PersonBaseData objects, each with its own unique effect period
-         * @param timestamp
+         * @param registrationFrom
          * @return
          */
         @Override
-        public DoubleHashMap<String, String, PersonBaseData> getDataEffects(String timestamp) {
-            DoubleHashMap<String, String, PersonBaseData> data = new DoubleHashMap<>();
+        public ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String registrationFrom) {
+            ListHashMap<PersonEffect, PersonBaseData> data = new ListHashMap<>();
             PersonBaseData personBaseData;
 
-            if (timestamp.equals(this.get("status_ts"))) {
-                personBaseData = this.getBaseDataItem(data, this.get("statushaenstart"), null);
+            if (registrationFrom.equals(this.get("status_ts"))) {
+                personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("statushaenstart"), this.getBoolean("statusdto_umrk"));
                 personBaseData.setStatus(this.get("status"));
             }
 
-            if (timestamp.equals(this.get("mor_ts"))) {
-                personBaseData = this.getBaseDataItem(data, null, null);
+            if (registrationFrom.equals(this.get("mor_ts"))) {
+                personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"));
                 personBaseData.setMother(
                         this.get("mornvn"),
                         this.getBoolean("mornvn_mrk"),
@@ -136,8 +158,8 @@ public class PersonParser extends CprSubParser {
                 );
             }
 
-            if (timestamp.equals(this.get("far_ts"))) {
-                personBaseData = this.getBaseDataItem(data, this.get("far_dt"), null);
+            if (registrationFrom.equals(this.get("far_ts"))) {
+                personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"));
                 personBaseData.setFather(
                         this.get("farnvn"),
                         this.getBoolean("farnvn_mrk"),
@@ -148,33 +170,33 @@ public class PersonParser extends CprSubParser {
                 );
             }
 
-            if (timestamp.equals(this.get("mor_dok_ts"))) {
-                personBaseData = this.getBaseDataItem(data, null, null);
+            if (registrationFrom.equals(this.get("mor_dok_ts"))) {
+                personBaseData = this.getBaseDataItem(data);
                 personBaseData.setMotherVerification(
                         this.getInt("mor_dok_mynkod"),
                         this.getBoolean("mor_dok")
                 );
             }
 
-            if (timestamp.equals(this.get("far_dok_ts"))) {
-                personBaseData = this.getBaseDataItem(data, null, null);
+            if (registrationFrom.equals(this.get("far_dok_ts"))) {
+                personBaseData = this.getBaseDataItem(data);
                 personBaseData.setFatherVerification(
                         this.getInt("far_dok_mynkod"),
                         this.getBoolean("far_dok")
                 );
             }
 
-            if (timestamp.equals(this.get("stilling_ts"))) {
-                personBaseData = this.getBaseDataItem(data, null, null);
+            if (registrationFrom.equals(this.get("stilling_ts"))) {
+                personBaseData = this.getBaseDataItem(data);
                 personBaseData.setPosition(
                         this.getInt("stilling_mynkod"),
                         this.get("stilling")
                 );
             }
 
-            if (timestamp.equals(this.get("start_ts-person"))) {
+            if (registrationFrom.equals(this.get("start_ts-person"))) {
 
-                personBaseData = this.getBaseDataItem(data, this.get("start_dt-person"), null);
+                personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
                 personBaseData.setBirth(
                         LocalDateTime.of(this.getDate("foed_dt"), this.getTime("foed_tm")),
                         this.getBoolean("foed_dt_umrk"),
@@ -255,11 +277,11 @@ public class PersonParser extends CprSubParser {
         }
 
         @Override
-        public DoubleHashMap<String, String, PersonBaseData> getDataEffects(String timestamp) {
-            DoubleHashMap<String, String, PersonBaseData> data = new DoubleHashMap<>();
+        public ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String registrationFrom) {
+            ListHashMap<PersonEffect, PersonBaseData> data = new ListHashMap<>();
             PersonBaseData personBaseData;
-            if (timestamp.equals(this.get("adr_ts"))) {
-                personBaseData = this.getBaseDataItem(data, this.get("tilflydto"), null);
+            if (registrationFrom.equals(this.get("adr_ts"))) {
+                personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"));
                 personBaseData.setAddress(
                         this.getInt("start_mynkod-personbolig"),
                         this.getInt("komkod"),
@@ -277,12 +299,12 @@ public class PersonParser extends CprSubParser {
                         this.get("adr5-supladr")
                 );
             }
-            if (timestamp.equals(this.get("convn_ts"))) {
-                personBaseData = this.getBaseDataItem(data, null, null);
+            if (registrationFrom.equals(this.get("convn_ts"))) {
+                personBaseData = this.getBaseDataItem(data, null, false);
                 personBaseData.setCoName(this.get("convn"));
             }
-            if (timestamp.equals(this.get("tilfra_ts"))) {
-                personBaseData = this.getBaseDataItem(data, null, null);
+            if (registrationFrom.equals(this.get("tilfra_ts"))) {
+                personBaseData = this.getBaseDataItem(data, null, false);
                 personBaseData.setMoveMunicipality(
                         this.getInt("tilfra_mynkod"),
                         this.getDateTime("tilflykomdto"),
@@ -338,11 +360,11 @@ public class PersonParser extends CprSubParser {
         }
 
         @Override
-        public DoubleHashMap<String, String, PersonBaseData> getDataEffects(String timestamp) {
-            DoubleHashMap<String, String, PersonBaseData> data = new DoubleHashMap<>();
+        public ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String timestamp) {
+            ListHashMap<PersonEffect, PersonBaseData> data = new ListHashMap<>();
             PersonBaseData personBaseData;
             if (timestamp.equals(this.get("nvn_ts"))) {
-                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), null);
+                personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("nvnhaenstart"), this.getBoolean("haenstart_umrk-navne"));
                 personBaseData.setName(
                         this.getInt("start_mynkod-navne"),
                         this.get("fornvn"),
@@ -357,21 +379,21 @@ public class PersonParser extends CprSubParser {
                 );
             }
             if (timestamp.equals(this.get("adrnvn_ts"))) {
-                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), null);
+                personBaseData = this.getBaseDataItem(data);
                 personBaseData.setAddressName(
                         this.getInt("adrnvn_mynkod"),
                         this.get("adrnvn")
                 );
             }
             if (timestamp.equals(this.get("dok_ts-navne"))) {
-                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), null);
+                personBaseData = this.getBaseDataItem(data);
                 personBaseData.setNameVerification(
                         this.getInt("dok_mynkod-navne"),
                         this.getBoolean("dok-navne")
                 );
             }
             if (timestamp.equals(this.get("myntxt_ts-navne"))) {
-                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), null);
+                personBaseData = this.getBaseDataItem(data);
                 personBaseData.setNameAuthorityText(
                         this.getInt("myntxt_mynkod-navne"),
                         this.get("myntxt-navne")
@@ -430,11 +452,17 @@ public class PersonParser extends CprSubParser {
         }
 
         @Override
-        public DoubleHashMap<String, String, PersonBaseData> getDataEffects(String timestamp) {
-            DoubleHashMap<String, String, PersonBaseData> data = new DoubleHashMap<>();
+        public ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String registrationFrom) {
+            ListHashMap<PersonEffect, PersonBaseData> data = new ListHashMap<>();
             PersonBaseData personBaseData;
-            if (timestamp.equals(this.get("nvn_ts"))) {
-                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), this.get("nvnhaenslut"));
+
+            OffsetDateTime effectFrom = this.getOffsetDateTime("nvnhaenstart");
+            OffsetDateTime effectTo = this.getOffsetDateTime("nvnhaenslut");
+            boolean effectFromUncertain = this.getBoolean("haenstart_umrk-navne");
+            boolean effectToUncertain = this.getBoolean("haenslut_umrk-navne");
+
+            if (registrationFrom.equals(this.get("nvn_ts"))) {
+                personBaseData = this.getBaseDataItem(data, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
                 personBaseData.setName(
                         this.getInt("start_mynkod-navne"),
                         this.get("fornvn"),
@@ -448,22 +476,22 @@ public class PersonParser extends CprSubParser {
                         false
                 );
             }
-            if (timestamp.equals(this.get("adrnvn_ts"))) {
-                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), this.get("nvnhaenslut"));
+            if (registrationFrom.equals(this.get("adrnvn_ts"))) {
+                personBaseData = this.getBaseDataItem(data, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
                 personBaseData.setAddressName(
                         this.getInt("adrnvn_mynkod"),
                         this.get("adrnvn")
                 );
             }
-            if (timestamp.equals(this.get("dok_ts-navne"))) {
-                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), this.get("nvnhaenslut"));
+            if (registrationFrom.equals(this.get("dok_ts-navne"))) {
+                personBaseData = this.getBaseDataItem(data, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
                 personBaseData.setNameVerification(
                         this.getInt("dok_mynkod-navne"),
                         this.getBoolean("dok-navne")
                 );
             }
-            if (timestamp.equals(this.get("myntxt_ts-navne"))) {
-                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), this.get("nvnhaenslut"));
+            if (registrationFrom.equals(this.get("myntxt_ts-navne"))) {
+                personBaseData = this.getBaseDataItem(data, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
                 personBaseData.setNameAuthorityText(
                         this.getInt("myntxt_mynkod-navne"),
                         this.get("myntxt-navne")
