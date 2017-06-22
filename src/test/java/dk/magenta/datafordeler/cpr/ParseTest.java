@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
@@ -55,9 +56,11 @@ public class ParseTest {
                 recordMap.add(cprNumber, personDataRecord);
             }
         }
+        System.out.println("recordMap: "+recordMap);
 
         Session session = sessionManager.getSessionFactory().openSession();
         for (int cprNumber : recordMap.keySet()) {
+            System.out.println("cprNumber: "+cprNumber);
             List<PersonParser.PersonDataRecord> recordList = recordMap.get(cprNumber);
             PersonEntity entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
             if (entity == null) {
@@ -82,18 +85,21 @@ public class ParseTest {
             ArrayList<PersonRegistration> registrations = new ArrayList<>();
             PersonRegistration lastRegistration = null;
             for (String timestamp : sortedTimestamps) {
+                OffsetDateTime registrationFrom = CprParser.parseTimestamp(timestamp);
 
-
-                PersonRegistration registration;
-
-                if (lastRegistration == null) {
-                    registration = new PersonRegistration();
-                } else {
-                    registration = this.cloneRegistration(lastRegistration);
+                PersonRegistration registration = entity.getRegistration(registrationFrom);
+System.out.println("registration from "+registrationFrom+": "+registration);
+                if (registration == null) {
+                    if (lastRegistration == null) {
+                        registration = new PersonRegistration();
+                    } else {
+                        registration = this.cloneRegistration(lastRegistration);
+                    }
+                    registration.setRegistrationFrom(registrationFrom);
+                    System.out.println("created new registration at "+registrationFrom);
                 }
-
-                OffsetDateTime time = CprParser.parseTimestamp(timestamp);
-                registration.setRegistrationFrom(time);
+                registration.setEntity(entity);
+                entity.addRegistration(registration);
 
                 // Each record sets its own basedata
                 for (PersonParser.PersonDataRecord record : ajourRecords.get(timestamp)) {
@@ -117,14 +123,19 @@ public class ParseTest {
                 }
 
                 if (lastRegistration != null) {
-                    lastRegistration.setRegistrationTo(time);
+                    lastRegistration.setRegistrationTo(registrationFrom);
 
                 }
                 lastRegistration = registration;
                 registrations.add(registration);
 
+
             }
-            System.out.println("registrations: "+registrations);
+            try {
+                System.out.println("registrations: "+objectMapper.writeValueAsString(registrations));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
     }
 

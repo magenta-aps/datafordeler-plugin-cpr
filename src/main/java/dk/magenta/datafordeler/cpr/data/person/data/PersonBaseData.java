@@ -18,16 +18,6 @@ import java.util.Map;
 @Table(name="cpr_person_data")
 public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
-    @Column(unique = true, nullable = false, insertable = true, updatable = false)
-    @JsonProperty(value = "firstName")
-    @XmlElement(name = "firstName")
-    private String firstName;
-
-    @Column(unique = true, nullable = false, insertable = true, updatable = false)
-    @JsonProperty(value = "lastName")
-    @XmlElement(name = "lastName")
-    private String lastName;
-
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private PersonCoreData coreData;
 
@@ -51,6 +41,11 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private PersonBirthData birthData;
+
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonAddressData addressData;
+
+
 
     public void setCurrentCprNumber(int cprNumber) {
         if (this.coreData == null) {
@@ -141,6 +136,29 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.birthData.setBirthSequence(birthSequence);
     }
 
+    public void setAddress(int authority, int municipalityCode, int roadCode,
+                           String houseNumber, String floor, String door, String bNumber,
+                           int addressTextType, int startAuthority,
+                           String supplementaryAddress1, String supplementaryAddress2, String supplementaryAddress3, String supplementaryAddress4, String supplementaryAddress5) {
+        if (this.addressData == null) {
+            this.addressData = new PersonAddressData();
+        }
+        this.addressData.setAuthority(authority);
+        this.addressData.setMunicipalityCode(municipalityCode);
+        this.addressData.setRoadCode(roadCode);
+        this.addressData.setHouseNumber(houseNumber);
+        this.addressData.setFloor(floor);
+        this.addressData.setDoor(door);
+        this.addressData.setbNumber(bNumber);
+        this.addressData.setAddressTextType(addressTextType);
+        this.addressData.setStartAuthority(startAuthority);
+        this.addressData.setSupplementaryAddress1(supplementaryAddress1);
+        this.addressData.setSupplementaryAddress2(supplementaryAddress2);
+        this.addressData.setSupplementaryAddress3(supplementaryAddress3);
+        this.addressData.setSupplementaryAddress4(supplementaryAddress4);
+        this.addressData.setSupplementaryAddress5(supplementaryAddress5);
+    }
+
 
     /**
      * Return a map of attributes, including those from the superclass
@@ -172,6 +190,9 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
         if (this.birthData != null) {
             map.put("birth", this.birthData);
+        }
+        if (this.addressData != null) {
+            map.put("address", this.addressData);
         }
 
         return map;

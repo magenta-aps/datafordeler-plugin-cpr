@@ -25,10 +25,12 @@ public class PersonParser extends CprSubParser {
     public abstract class PersonDataRecord<B extends CprData> extends CprRecord {
 
         public static final String RECORDTYPE_PERSON = "001";
+        public static final String RECORDTYPE_DOMESTIC_ADDRESS = "025";
         // TODO: Add one for each data type
 
         public PersonDataRecord(String line) throws ParseException {
             super(line);
+            this.obtain("pnr", 4, 10);
         }
 
         protected int getTimestampStart() {
@@ -60,7 +62,6 @@ public class PersonParser extends CprSubParser {
     public class PersonData extends PersonDataRecord<PersonBaseData> {
         public PersonData(String line) throws ParseException {
             super(line);
-            this.obtain("pnr", 4, 10);
             this.obtain("pnrgaeld", 14, 10);
             this.obtain("status_ts", 24, 12);
             this.obtain("status", 36, 2);
@@ -208,6 +209,84 @@ public class PersonParser extends CprSubParser {
         }
     }
 
+    public class AddressData extends PersonDataRecord<PersonBaseData> {
+        public AddressData(String line) throws ParseException {
+            super(line);
+            this.obtain("start_mynkod-personbolig", 14, 4);
+            this.obtain("adr_ts", 18, 12);
+            this.obtain("komkod", 30, 4);
+            this.obtain("vejkod", 34, 4);
+            this.obtain("husnr", 38, 4);
+            this.obtain("etage", 42, 2);
+            this.obtain("sidedoer", 44, 4);
+            this.obtain("bnr", 48, 4);
+            this.obtain("convn", 52, 34);
+            this.obtain("convn_ts", 86, 12);
+            this.obtain("tilflydto", 98, 12);
+            this.obtain("tilflydto_umrk", 110, 1);
+            this.obtain("tilfra_mynkod", 111, 4);
+            this.obtain("tilfra_ts", 115, 12);
+            this.obtain("tilflykomdto", 127, 12);
+            this.obtain("tilflykomdt_umrk", 139, 1);
+            this.obtain("fraflykomkod", 140, 4);
+            this.obtain("fraflykomdto", 144, 12);
+            this.obtain("fraflykomdt_umrk", 156, 1);
+            this.obtain("adrtxttype", 157, 4);
+            this.obtain("start_mynkod-adrtxt", 161, 4);
+            this.obtain("adr1-supladr", 165, 34);
+            this.obtain("adr2-supladr", 199, 34);
+            this.obtain("adr3-supladr", 233, 34);
+            this.obtain("adr4-supladr", 267, 34);
+            this.obtain("adr5-supladr", 301, 34);
+            this.obtain("start_dt-adrtxt", 335, 10);
+            this.obtain("slet_dt-adrtxt", 345, 10);
+        }
+
+        @Override
+        public String getRecordType() {
+            return RECORDTYPE_DOMESTIC_ADDRESS;
+        }
+
+        @Override
+        protected PersonBaseData createEmptyBaseData() {
+            return new PersonBaseData();
+        }
+
+        @Override
+        public DoubleHashMap<String, String, PersonBaseData> getDataEffects(String timestamp) {
+            DoubleHashMap<String, String, PersonBaseData> data = new DoubleHashMap<>();
+            PersonBaseData personBaseData;
+            if (timestamp.equals(this.get("adr_ts"))) {
+                personBaseData = this.getBaseDataItem(data, this.get("tilflydto"), null);
+                personBaseData.setAddress(
+                        this.getInt("start_mynkod-personbolig"),
+                        this.getInt("komkod"),
+                        this.getInt("vejkod"),
+                        this.get("husnr"),
+                        this.get("etage"),
+                        this.get("sidedoer"),
+                        this.get("bnr"),
+                        this.getInt("adrtxttype"),
+                        this.getInt("start_mynkod-adrtxt"),
+                        this.get("adr1-supladr"),
+                        this.get("adr2-supladr"),
+                        this.get("adr3-supladr"),
+                        this.get("adr4-supladr"),
+                        this.get("adr5-supladr")
+                );
+            }
+            return data;
+        }
+
+        @Override
+        public HashSet<String> getTimestamps() {
+            HashSet<String> timestamps = super.getTimestamps();
+            timestamps.add(this.get("adr_ts"));
+            timestamps.add(this.get("convn_ts"));
+            timestamps.add(this.get("tilfra_ts"));
+            return timestamps;
+        }
+    }
 
 
     //------------------------------------------------------------------------------------------------------------------
@@ -228,6 +307,8 @@ public class PersonParser extends CprSubParser {
             switch (recordType) {
                 case PersonDataRecord.RECORDTYPE_PERSON:
                     return new PersonData(line);
+                case PersonDataRecord.RECORDTYPE_DOMESTIC_ADDRESS:
+                    return new AddressData(line);
                 // TODO: Add one of these for each type...
             }
         } catch (ParseException e) {
