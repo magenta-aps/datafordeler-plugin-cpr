@@ -1,11 +1,9 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.person.*;
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -50,6 +48,18 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private PersonMoveMunicipalityData moveMunicipalityData;
+
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonNameData nameData;
+
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonAddressNameData addressNameData;
+
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonNameVerificationData nameVerificationData;
+
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonNameAuthorityTextData nameAuthorityTextData;
 
 
 
@@ -184,6 +194,50 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.moveMunicipalityData.setMoveFromDateUncertain(moveFromDateUncertain);
     }
 
+    public void setName(int authority, String firstName, boolean firstNameMarking, String middleName, boolean middleNameMarking,
+                        String lastName, boolean lastNameMarking, String ownLastName, boolean ownLastNameMarking, boolean reportNames) {
+        if (this.nameData == null) {
+            this.nameData = new PersonNameData();
+        }
+        this.nameData.setAuthority(authority);
+        this.nameData.setFirstName(firstName);
+        this.nameData.setFirstNameMarking(firstNameMarking);
+        this.nameData.setMiddleName(middleName);
+        this.nameData.setMiddleNameMarking(middleNameMarking);
+        this.nameData.setLastName(lastName);
+        this.nameData.setLastNameMarking(lastNameMarking);
+        this.nameData.setOwnLastName(ownLastName);
+        this.nameData.setOwnLastNameMarking(ownLastNameMarking);
+        this.nameData.setReportNames(reportNames);
+    }
+
+    public void setAddressName(int authority, String addressName) {
+        if (this.addressNameData == null) {
+            this.addressNameData = new PersonAddressNameData();
+        }
+        this.addressNameData.setAuthority(authority);
+        this.addressNameData.setAddressName(addressName);
+        System.out.println("this.addressNameData: "+this.addressNameData);
+    }
+
+    public void setNameVerification(int authority, boolean verification) {
+        if (this.nameVerificationData == null) {
+            this.nameVerificationData = new PersonNameVerificationData();
+        }
+        this.nameVerificationData.setAuthority(authority);
+        this.nameVerificationData.setVerification(verification);
+    }
+
+    public void setNameAuthorityText(int authority, String text) {
+        if (this.nameAuthorityTextData == null) {
+            this.nameAuthorityTextData = new PersonNameAuthorityTextData();
+        }
+        this.nameAuthorityTextData.setAuthority(authority);
+        this.nameAuthorityTextData.setText(text);
+    }
+
+
+
 
     /**
      * Return a map of attributes, including those from the superclass
@@ -218,6 +272,18 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
         if (this.addressData != null) {
             map.put("address", this.addressData);
+        }
+        if (this.nameData != null) {
+            map.put("name", this.nameData);
+        }
+        if (this.addressNameData != null) {
+            map.put("addressNameData", this.addressNameData);
+        }
+        if (this.nameVerificationData != null) {
+            map.put("nameVerification", this.nameVerificationData);
+        }
+        if (this.nameAuthorityTextData != null) {
+            map.put("nameAuthority", this.nameAuthorityTextData);
         }
 
         return map;

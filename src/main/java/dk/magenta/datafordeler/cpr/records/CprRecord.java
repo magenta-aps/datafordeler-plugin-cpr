@@ -63,4 +63,9 @@ public abstract class CprRecord extends Record {
         return date;
     }
 
+    protected boolean getMarking(String key) {
+        String value = this.get(key);
+        return value != null && value.equals("*");
+    }
+
 }
