@@ -46,6 +46,9 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private PersonAddressData addressData;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonAddressConameData coNameData;
+
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
     private PersonMoveMunicipalityData moveMunicipalityData;
 
 
@@ -160,6 +163,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.addressData.setSupplementaryAddress3(supplementaryAddress3);
         this.addressData.setSupplementaryAddress4(supplementaryAddress4);
         this.addressData.setSupplementaryAddress5(supplementaryAddress5);
+    }
+
+    public void setCoName(String coName) {
+        if (this.coNameData == null) {
+            this.coNameData = new PersonAddressConameData();
+        }
+        this.coNameData.setCoName(coName);
     }
 
     public void setMoveMunicipality(int authority, LocalDateTime moveToDate, boolean moveToDateUncertain, int moveFromMunicipality, LocalDateTime moveFromDate, boolean moveFromDateUncertain) {
