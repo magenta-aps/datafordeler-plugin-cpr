@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
 import dk.magenta.datafordeler.core.database.Effect;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
 import javax.persistence.Table;
 import java.time.OffsetDateTime;

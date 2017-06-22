@@ -2,7 +2,7 @@ package dk.magenta.datafordeler.cpr.parsers;
 
 import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.cpr.data.CprData;
-import dk.magenta.datafordeler.cpr.data.person.PersonBaseData;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprRecord;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;

@@ -1,8 +1,8 @@
-package dk.magenta.datafordeler.cpr.data.person;
+package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.data.CprData;
-import dk.magenta.datafordeler.cpr.records.CprRecord;
+import dk.magenta.datafordeler.cpr.data.person.*;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;

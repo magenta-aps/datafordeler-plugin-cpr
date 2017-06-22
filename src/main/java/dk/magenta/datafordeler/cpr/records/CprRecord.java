@@ -1,7 +1,7 @@
 package dk.magenta.datafordeler.cpr.records;
 
 import dk.magenta.datafordeler.core.util.DoubleHashMap;
-import dk.magenta.datafordeler.cpr.data.person.PersonBaseData;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
 import java.text.ParseException;
 import java.util.regex.Pattern;

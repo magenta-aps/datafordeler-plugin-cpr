@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.data.person;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.fapi.QueryField;
 import dk.magenta.datafordeler.cpr.data.CprQuery;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
 import java.util.HashMap;
 import java.util.Map;
