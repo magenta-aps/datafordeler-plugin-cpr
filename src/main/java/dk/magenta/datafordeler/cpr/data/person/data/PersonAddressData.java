@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -230,6 +231,21 @@ public class PersonAddressData extends DetailData {
 
     @Override
     public Map<String, Object> asMap() {
-        return null;
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("authority", this.authority);
+        map.put("municipalityCode", this.municipalityCode);
+        map.put("roadCode", this.roadCode);
+        map.put("houseNumber", this.houseNumber);
+        map.put("floor", this.floor);
+        map.put("door", this.door);
+        map.put("bNumber", this.bNumber);
+        map.put("addressTextType", this.addressTextType);
+        map.put("startAuthority", this.startAuthority);
+        map.put("supplementaryAddress1", this.supplementaryAddress1);
+        map.put("supplementaryAddress2", this.supplementaryAddress2);
+        map.put("supplementaryAddress3", this.supplementaryAddress3);
+        map.put("supplementaryAddress4", this.supplementaryAddress4);
+        map.put("supplementaryAddress5", this.supplementaryAddress5);
+        return map;
     }
 }

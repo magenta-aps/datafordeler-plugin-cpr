@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -112,6 +113,13 @@ public class PersonMoveMunicipalityData extends DetailData {
 
     @Override
     public Map<String, Object> asMap() {
-        return null;
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("authority", this.authority);
+        map.put("moveToDate", this.moveToDate);
+        map.put("moveToDateUncertain", this.moveToDateUncertain);
+        map.put("moveFromMunicipality", this.moveFromMunicipality);
+        map.put("moveFromDate", this.moveFromDate);
+        map.put("moveFromDateUncertain", this.moveFromDateUncertain);
+        return map;
     }
 }

@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
+import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.person.*;
 
@@ -287,6 +288,60 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
 
         return map;
+    }
+
+
+    @Override
+    public LookupDefinition getLookupDefinition() {
+        LookupDefinition lookupDefinition = new LookupDefinition();
+        lookupDefinition.setMatchNulls(true);
+
+        if (this.coreData != null) {
+            lookupDefinition.putAll("coreData", this.coreData.databaseFields());
+        }
+        if (this.statusData != null) {
+            lookupDefinition.putAll("statusData", this.statusData.databaseFields());
+        }
+        if (this.motherData != null) {
+            lookupDefinition.putAll("motherData", this.motherData.databaseFields());
+        }
+        if (this.fatherData != null) {
+            lookupDefinition.putAll("fatherData", this.fatherData.databaseFields());
+        }
+        if (this.motherVerificationData != null) {
+            lookupDefinition.putAll("motherVerificationData", this.motherVerificationData.databaseFields());
+        }
+        if (this.fatherVerificationData != null) {
+            lookupDefinition.putAll("fatherVerificationData", this.fatherVerificationData.databaseFields());
+        }
+        if (this.positionData != null) {
+            lookupDefinition.putAll("positionData", this.positionData.databaseFields());
+        }
+        if (this.birthData != null) {
+            lookupDefinition.putAll("birthData", this.birthData.databaseFields());
+        }
+        if (this.addressData != null) {
+            lookupDefinition.putAll("addressData", this.addressData.databaseFields());
+        }
+        if (this.coNameData != null) {
+            lookupDefinition.putAll("coNameData", this.coNameData.databaseFields());
+        }
+        if (this.moveMunicipalityData != null) {
+            lookupDefinition.putAll("moveMunicipalityData", this.moveMunicipalityData.databaseFields());
+        }
+        if (this.nameData != null) {
+            lookupDefinition.putAll("nameData", this.nameData.databaseFields());
+        }
+        if (this.addressNameData != null) {
+            lookupDefinition.putAll("addressNameData", this.addressNameData.databaseFields());
+        }
+        if (this.nameVerificationData != null) {
+            lookupDefinition.putAll("nameVerificationData", this.nameVerificationData.databaseFields());
+        }
+        if (this.nameAuthorityTextData != null) {
+            lookupDefinition.putAll("nameAuthorityTextData", this.nameAuthorityTextData.databaseFields());
+        }
+        return lookupDefinition;
     }
 
 }

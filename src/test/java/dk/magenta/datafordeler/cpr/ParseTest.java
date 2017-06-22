@@ -89,7 +89,6 @@ public class ParseTest {
                 OffsetDateTime registrationFrom = CprParser.parseTimestamp(timestamp);
 
                 PersonRegistration registration = entity.getRegistration(registrationFrom);
-System.out.println("registration from "+registrationFrom+": "+registration);
                 if (registration == null) {
                     if (lastRegistration == null) {
                         registration = new PersonRegistration();
@@ -123,11 +122,9 @@ System.out.println("registration from "+registrationFrom+": "+registration);
 
                 if (lastRegistration != null) {
                     lastRegistration.setRegistrationTo(registrationFrom);
-
                 }
                 lastRegistration = registration;
                 registrations.add(registration);
-
 
             }
             System.out.println(registrations);
@@ -135,6 +132,13 @@ System.out.println("registration from "+registrationFrom+": "+registration);
                 System.out.println("registrations: "+objectMapper.writeValueAsString(registrations));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
+            }
+            for (PersonRegistration registration : registrations) {
+                try {
+                    queryManager.saveRegistration(session, entity, registration);
+                } catch (DataFordelerException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
