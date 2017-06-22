@@ -275,6 +275,17 @@ public class PersonParser extends CprSubParser {
                         this.get("adr5-supladr")
                 );
             }
+            if (timestamp.equals(this.get("tilfra_ts"))) {
+                personBaseData = this.getBaseDataItem(data, null, null);
+                personBaseData.setMoveMunicipality(
+                        this.getInt("tilfra_mynkod"),
+                        this.getDateTime("tilflykomdto"),
+                        this.getBoolean("tilflykomdt_umrk"),
+                        this.getInt("fraflykomkod"),
+                        this.getDateTime("fraflykomdto"),
+                        this.getBoolean("fraflykomdt_umrk")
+                );
+            }
             return data;
         }
 

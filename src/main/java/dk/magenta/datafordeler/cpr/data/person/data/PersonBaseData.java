@@ -45,6 +45,9 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private PersonAddressData addressData;
 
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonMoveMunicipalityData moveMunicipalityData;
+
 
 
     public void setCurrentCprNumber(int cprNumber) {
@@ -157,6 +160,18 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.addressData.setSupplementaryAddress3(supplementaryAddress3);
         this.addressData.setSupplementaryAddress4(supplementaryAddress4);
         this.addressData.setSupplementaryAddress5(supplementaryAddress5);
+    }
+
+    public void setMoveMunicipality(int authority, LocalDateTime moveToDate, boolean moveToDateUncertain, int moveFromMunicipality, LocalDateTime moveFromDate, boolean moveFromDateUncertain) {
+        if (this.moveMunicipalityData == null) {
+            this.moveMunicipalityData = new PersonMoveMunicipalityData();
+        }
+        this.moveMunicipalityData.setAuthority(authority);
+        this.moveMunicipalityData.setMoveToDate(moveToDate);
+        this.moveMunicipalityData.setMoveToDateUncertain(moveToDateUncertain);
+        this.moveMunicipalityData.setMoveFromMunicipality(moveFromMunicipality);
+        this.moveMunicipalityData.setMoveFromDate(moveFromDate);
+        this.moveMunicipalityData.setMoveFromDateUncertain(moveFromDateUncertain);
     }
 
 

@@ -131,6 +131,7 @@ System.out.println("registration from "+registrationFrom+": "+registration);
 
 
             }
+            System.out.println(registrations);
             try {
                 System.out.println("registrations: "+objectMapper.writeValueAsString(registrations));
             } catch (JsonProcessingException e) {

@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -88,6 +89,23 @@ public abstract class Record extends HashMap<String, String> {
             for (DateTimeFormatter parser : timeParsers) {
                 try {
                     return LocalTime.parse(value, parser);
+                } catch (DateTimeParseException e) {
+                }
+            }
+        }
+        return null;
+    }
+
+    private static DateTimeFormatter[] datetimeParsers = {
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+            DateTimeFormatter.ofPattern("uuuuMMddHHmmss")
+    };
+    public LocalDateTime getDateTime(String key) {
+        String value = this.get(key);
+        if (value != null && !value.isEmpty()) {
+            for (DateTimeFormatter parser : datetimeParsers) {
+                try {
+                    return LocalDateTime.parse(value, parser);
                 } catch (DateTimeParseException e) {
                 }
             }
