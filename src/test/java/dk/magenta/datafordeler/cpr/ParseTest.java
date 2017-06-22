@@ -6,6 +6,7 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.util.ListHashMap;
+import dk.magenta.datafordeler.cpr.data.person.PersonQuery;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
@@ -15,6 +16,7 @@ import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.PersonDataRecord;
 import dk.magenta.datafordeler.cpr.records.Record;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,12 +62,14 @@ public class ParseTest {
         System.out.println("recordMap: "+recordMap);
 
         Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
         for (int cprNumber : recordMap.keySet()) {
             System.out.println("cprNumber: "+cprNumber);
             List<PersonDataRecord> recordList = recordMap.get(cprNumber);
             PersonEntity entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
             if (entity == null) {
-                entity = new PersonEntity();
+
+                entity = new PersonEntity(UUID.randomUUID(), "test");
                 entity.setCprNumber(cprNumber);
             }
 
@@ -87,6 +91,8 @@ public class ParseTest {
             PersonRegistration lastRegistration = null;
             for (String timestamp : sortedTimestamps) {
                 OffsetDateTime registrationFrom = CprParser.parseTimestamp(timestamp);
+                System.out.println("timestamp: "+timestamp);
+                System.out.println("registrationFrom: "+registrationFrom);
 
                 PersonRegistration registration = entity.getRegistration(registrationFrom);
                 if (registration == null) {
@@ -140,6 +146,20 @@ public class ParseTest {
                     e.printStackTrace();
                 }
             }
+        }
+        transaction.commit();
+        session.close();
+
+        session = sessionManager.getSessionFactory().openSession();
+
+        PersonQuery query = new PersonQuery();
+        query.setCprNumber("121008217");
+
+        try {
+            List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
+            System.out.println(entities);
+        } catch (DataFordelerException e) {
+            e.printStackTrace();
         }
     }
 
