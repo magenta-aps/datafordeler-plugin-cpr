@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,10 @@ public class CprParser {
     @Autowired
     private PersonParser personParser;
 
-    public static final DateTimeFormatter CPR_DATETIME = DateTimeFormatter.ofPattern("uuuuMMddHHmm");
+    public static final DateTimeFormatter[] DATETIME_PARSERS = {
+            DateTimeFormatter.ofPattern("uuuuMMddHHmm"),
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME
+    };
 
     public static final ZoneId CPR_TIMEZONE = ZoneId.of("Europe/Copenhagen");
 
@@ -36,12 +40,27 @@ public class CprParser {
     }
 
     public static OffsetDateTime parseTimestamp(String timestamp) {
-        return OffsetDateTime.from(
-            ZonedDateTime.of(
-                LocalDateTime.parse(timestamp, CprParser.CPR_DATETIME),
-                CprParser.CPR_TIMEZONE
-            )
-        );
+        if (timestamp != null) {
+            LocalDateTime dateTime = parseDateTime(timestamp);
+            if (dateTime != null) {
+                return OffsetDateTime.from(
+                        ZonedDateTime.of(
+                                dateTime,
+                                CprParser.CPR_TIMEZONE
+                        )
+                );
+            }
+        }
+        return null;
+    }
+
+    private static LocalDateTime parseDateTime(String timestamp) {
+        for (DateTimeFormatter parser : DATETIME_PARSERS) {
+            try {
+                return LocalDateTime.parse(timestamp, parser);
+            } catch (DateTimeParseException e) {}
+        }
+        return null;
     }
 
 }

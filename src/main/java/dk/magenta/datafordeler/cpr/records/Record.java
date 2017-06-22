@@ -71,7 +71,6 @@ public abstract class Record extends HashMap<String, String> {
                 try {
                     return LocalDate.parse(value, parser);
                 } catch (DateTimeParseException e) {
-                    System.out.println("Could not parse date "+value+" with parser "+parser);
                 }
             }
         }
@@ -90,7 +89,6 @@ public abstract class Record extends HashMap<String, String> {
                 try {
                     return LocalTime.parse(value, parser);
                 } catch (DateTimeParseException e) {
-                    System.out.println("Could not parse time "+value+" with parser "+parser);
                 }
             }
         }

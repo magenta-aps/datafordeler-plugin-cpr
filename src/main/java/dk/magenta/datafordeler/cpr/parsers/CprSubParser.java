@@ -3,6 +3,8 @@ package dk.magenta.datafordeler.cpr.parsers;
 import dk.magenta.datafordeler.cpr.records.CprRecord;
 import dk.magenta.datafordeler.cpr.records.CprSlutRecord;
 import dk.magenta.datafordeler.cpr.records.CprStartRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -17,13 +19,15 @@ public abstract class CprSubParser extends LineParser {
     public CprSubParser() {
     }
 
+    private Logger log = LogManager.getLogger("CprSubParser");
+
     @Override
     protected CprRecord parseLine(String line) {
         return this.parseLine(line.substring(0, 3), line);
     }
 
     protected CprRecord parseLine(String recordType, String line) {
-        System.out.println(recordType);
+        log.info("Parsing record of type "+recordType);
         try {
             if (recordType.equals(CprRecord.RECORDTYPE_START)) {
                 return new CprStartRecord(line);
@@ -32,7 +36,7 @@ public abstract class CprSubParser extends LineParser {
                 return new CprSlutRecord(line);
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error(e);
         }
         return null;
     }

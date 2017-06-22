@@ -114,14 +114,15 @@ public class PersonParser extends CprSubParser {
         @Override
         public DoubleHashMap<String, String, PersonBaseData> getDataEffects(String timestamp) {
             DoubleHashMap<String, String, PersonBaseData> data = new DoubleHashMap<>();
+            PersonBaseData personBaseData;
+
             if (timestamp.equals(this.get("status_ts"))) {
-
-                PersonBaseData personBaseData;
-
                 personBaseData = this.getBaseDataItem(data, this.get("statushaenstart"), null);
                 personBaseData.setStatus(this.get("status"));
+            }
 
-                personBaseData = this.getBaseDataItem(data, this.get("mor_ts"), null);
+            if (timestamp.equals(this.get("mor_ts"))) {
+                personBaseData = this.getBaseDataItem(data, null, null);
                 personBaseData.setMother(
                         this.get("mornvn"),
                         this.getBoolean("mornvn_mrk"),
@@ -130,8 +131,10 @@ public class PersonParser extends CprSubParser {
                         this.getBoolean("mor_foed_dt_umrk"),
                         this.getInt("mor_mynkod")
                 );
+            }
 
-                personBaseData = this.getBaseDataItem(data, this.get("far_ts"), null);
+            if (timestamp.equals(this.get("far_ts"))) {
+                personBaseData = this.getBaseDataItem(data, this.get("far_dt"), null);
                 personBaseData.setFather(
                         this.get("farnvn"),
                         this.getBoolean("farnvn_mrk"),
@@ -140,25 +143,33 @@ public class PersonParser extends CprSubParser {
                         this.getBoolean("far_foed_dt_umrk"),
                         this.getInt("far_mynkod")
                 );
+            }
 
-                personBaseData = this.getBaseDataItem(data, this.get("mor_dok_ts"), null);
+            if (timestamp.equals(this.get("mor_dok_ts"))) {
+                personBaseData = this.getBaseDataItem(data, null, null);
                 personBaseData.setMotherVerification(
                         this.getInt("mor_dok_mynkod"),
                         this.getBoolean("mor_dok")
                 );
+            }
 
-
-                personBaseData = this.getBaseDataItem(data, this.get("far_dok_ts"), null);
+            if (timestamp.equals(this.get("far_dok_ts"))) {
+                personBaseData = this.getBaseDataItem(data, null, null);
                 personBaseData.setFatherVerification(
                         this.getInt("far_dok_mynkod"),
                         this.getBoolean("far_dok")
                 );
+            }
 
-                personBaseData = this.getBaseDataItem(data, this.get("stilling_ts"), null);
+            if (timestamp.equals(this.get("stilling_ts"))) {
+                personBaseData = this.getBaseDataItem(data, null, null);
                 personBaseData.setPosition(
                         this.getInt("stilling_mynkod"),
                         this.get("stilling")
                 );
+            }
+
+            if (timestamp.equals(this.get("start_ts-person"))) {
 
                 personBaseData = this.getBaseDataItem(data, this.get("start_dt-person"), null);
                 personBaseData.setBirth(
@@ -169,8 +180,8 @@ public class PersonParser extends CprSubParser {
                 personBaseData.setCurrentCprNumber(this.getInt("pnrgaeld"));
                 personBaseData.setGender(this.get("koen"));
                 personBaseData.setStartAuthority(this.getInt("start_mynkod-person"));
-
             }
+
             return data;
         }
 
