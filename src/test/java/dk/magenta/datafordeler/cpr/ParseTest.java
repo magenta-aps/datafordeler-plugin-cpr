@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
-import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
@@ -13,6 +12,7 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.person.PersonRegistration;
 import dk.magenta.datafordeler.cpr.parsers.CprParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
+import dk.magenta.datafordeler.cpr.records.PersonDataRecord;
 import dk.magenta.datafordeler.cpr.records.Record;
 import org.hibernate.Session;
 import org.junit.Test;
@@ -49,10 +49,10 @@ public class ParseTest {
         InputStream testData = ParseTest.class.getResourceAsStream("/cprdata.txt");
         List<Record> records = personParser.parse(testData, "utf-8");
 
-        ListHashMap<Integer, PersonParser.PersonDataRecord> recordMap = new ListHashMap<>();
+        ListHashMap<Integer, PersonDataRecord> recordMap = new ListHashMap<>();
         for (Record record : records) {
-            if (record instanceof PersonParser.PersonDataRecord) {
-                PersonParser.PersonDataRecord personDataRecord = (PersonParser.PersonDataRecord) record;
+            if (record instanceof PersonDataRecord) {
+                PersonDataRecord personDataRecord = (PersonDataRecord) record;
                 int cprNumber = personDataRecord.getCprNumber();
                 recordMap.add(cprNumber, personDataRecord);
             }
@@ -62,16 +62,16 @@ public class ParseTest {
         Session session = sessionManager.getSessionFactory().openSession();
         for (int cprNumber : recordMap.keySet()) {
             System.out.println("cprNumber: "+cprNumber);
-            List<PersonParser.PersonDataRecord> recordList = recordMap.get(cprNumber);
+            List<PersonDataRecord> recordList = recordMap.get(cprNumber);
             PersonEntity entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
             if (entity == null) {
                 entity = new PersonEntity();
                 entity.setCprNumber(cprNumber);
             }
 
-            ListHashMap<String, PersonParser.PersonDataRecord> ajourRecords = new ListHashMap<>();
+            ListHashMap<String, PersonDataRecord> ajourRecords = new ListHashMap<>();
             TreeSet<String> sortedTimestamps = new TreeSet<>();
-            for (PersonParser.PersonDataRecord record : recordList) {
+            for (PersonDataRecord record : recordList) {
                 System.out.println("record: "+record);
                 Set<String> timestamps = record.getTimestamps();
                 for (String timestamp : timestamps) {
@@ -102,7 +102,7 @@ public class ParseTest {
                 entity.addRegistration(registration);
 
                 // Each record sets its own basedata
-                for (PersonParser.PersonDataRecord record : ajourRecords.get(timestamp)) {
+                for (PersonDataRecord record : ajourRecords.get(timestamp)) {
                     // Take what we need from the record and put it into dataitems
                     ListHashMap<PersonEffect, PersonBaseData> dataItems = record.getDataEffects(timestamp);
                     if (dataItems != null) {
