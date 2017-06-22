@@ -26,6 +26,7 @@ public class PersonParser extends CprSubParser {
 
         public static final String RECORDTYPE_PERSON = "001";
         public static final String RECORDTYPE_CURRENT_NAME = "020";
+        public static final String RECORDTYPE_HISTORIC_NAME = "021";
         public static final String RECORDTYPE_DOMESTIC_ADDRESS = "025";
         // TODO: Add one for each data type
 
@@ -395,6 +396,98 @@ public class PersonParser extends CprSubParser {
         }
     }
 
+    public class HistoricAddressData extends PersonDataRecord<PersonBaseData> {
+
+        public HistoricAddressData(String line) throws ParseException {
+            super(line);
+            this.obtain("annkor", 14, 1);
+            this.obtain("start_mynkod-navne", 15, 4);
+            this.obtain("nvn_ts", 19, 12);
+            this.obtain("fornvn", 31, 50);
+            this.obtain("fornvn_mrk", 81, 1);
+            this.obtain("melnvn", 82, 40);
+            this.obtain("melnvn_mrk", 122, 1);
+            this.obtain("efternvn", 123, 40);
+            this.obtain("efternvn_mrk", 163, 1);
+            this.obtain("slægtnvn", 164, 40);
+            this.obtain("slægtnvn_mrk", 204, 1);
+            this.obtain("nvnhaenstart", 205, 12);
+            this.obtain("haenstart_umrk-navne", 217, 1);
+            this.obtain("nvnhaenslut", 218, 12);
+            this.obtain("haenslut_umrk-navne", 230, 1);
+            this.obtain("dok_mynkod-navne", 231, 4);
+            this.obtain("dok_ts-navne", 235, 12);
+            this.obtain("dok-navne", 247, 3);
+            this.obtain("myntxt_mynkod-navne", 250, 4);
+            this.obtain("myntxt_ts-navne", 254, 12);
+            this.obtain("myntxt-navne", 266, 20);
+        }
+
+
+        @Override
+        protected PersonBaseData createEmptyBaseData() {
+            return new PersonBaseData();
+        }
+
+        @Override
+        public DoubleHashMap<String, String, PersonBaseData> getDataEffects(String timestamp) {
+            DoubleHashMap<String, String, PersonBaseData> data = new DoubleHashMap<>();
+            PersonBaseData personBaseData;
+            if (timestamp.equals(this.get("nvn_ts"))) {
+                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), this.get("nvnhaenslut"));
+                personBaseData.setName(
+                        this.getInt("start_mynkod-navne"),
+                        this.get("fornvn"),
+                        this.getMarking("fornvn_mrk"),
+                        this.get("melnvn"),
+                        this.getMarking("melnvn_mrk"),
+                        this.get("efternvn"),
+                        this.getMarking("efternvn_mrk"),
+                        this.get("slægtsnvn"),
+                        this.getMarking("slægtsnvn_mrk"),
+                        false
+                );
+            }
+            if (timestamp.equals(this.get("adrnvn_ts"))) {
+                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), this.get("nvnhaenslut"));
+                personBaseData.setAddressName(
+                        this.getInt("adrnvn_mynkod"),
+                        this.get("adrnvn")
+                );
+            }
+            if (timestamp.equals(this.get("dok_ts-navne"))) {
+                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), this.get("nvnhaenslut"));
+                personBaseData.setNameVerification(
+                        this.getInt("dok_mynkod-navne"),
+                        this.getBoolean("dok-navne")
+                );
+            }
+            if (timestamp.equals(this.get("myntxt_ts-navne"))) {
+                personBaseData = this.getBaseDataItem(data, this.get("nvnhaenstart"), this.get("nvnhaenslut"));
+                personBaseData.setNameAuthorityText(
+                        this.getInt("myntxt_mynkod-navne"),
+                        this.get("myntxt-navne")
+                );
+            }
+            return data;
+        }
+
+        @Override
+        public String getRecordType() {
+            return RECORDTYPE_HISTORIC_NAME;
+        }
+
+        @Override
+        public HashSet<String> getTimestamps() {
+            HashSet<String> timestamps = super.getTimestamps();
+            timestamps.add(this.get("nvn_ts"));
+            timestamps.add(this.get("adrnvn_ts"));
+            timestamps.add(this.get("dok_ts-navne"));
+            timestamps.add(this.get("myntxt_ts-navne"));
+            return timestamps;
+        }
+    }
+
 
 
             //------------------------------------------------------------------------------------------------------------------
@@ -419,6 +512,8 @@ public class PersonParser extends CprSubParser {
                     return new NameData(line);
                 case PersonDataRecord.RECORDTYPE_DOMESTIC_ADDRESS:
                     return new AddressData(line);
+                case PersonDataRecord.RECORDTYPE_HISTORIC_NAME:
+                    return new HistoricAddressData(line);
                 // TODO: Add one of these for each type...
             }
         } catch (ParseException e) {

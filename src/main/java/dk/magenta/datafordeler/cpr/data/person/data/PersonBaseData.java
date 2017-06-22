@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,7 +61,6 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private PersonNameAuthorityTextData nameAuthorityTextData;
-
 
 
     public void setCurrentCprNumber(int cprNumber) {
