@@ -69,6 +69,7 @@ public class ParseTest {
             ListHashMap<String, PersonParser.PersonDataRecord> ajourRecords = new ListHashMap<>();
             TreeSet<String> sortedTimestamps = new TreeSet<>();
             for (PersonParser.PersonDataRecord record : recordList) {
+                System.out.println("record: "+record);
                 Set<String> timestamps = record.getTimestamps();
                 for (String timestamp : timestamps) {
                     if (timestamp != null && !timestamp.isEmpty()) {
@@ -83,7 +84,14 @@ public class ParseTest {
             PersonRegistration lastRegistration = null;
             for (String timestamp : sortedTimestamps) {
 
-                PersonRegistration registration = new PersonRegistration();
+
+                PersonRegistration registration;
+
+                if (lastRegistration == null) {
+                    registration = new PersonRegistration();
+                } else {
+                    registration = this.cloneRegistration(lastRegistration);
+                }
 
                 OffsetDateTime time = CprParser.parseTimestamp(timestamp);
                 registration.setRegistrationFrom(time);
@@ -98,10 +106,11 @@ public class ParseTest {
                             HashMap<String, PersonBaseData> inner = dataItems.get(from);
                             for (String to : inner.keySet()) {
                                 OffsetDateTime effectTo = CprParser.parseTimestamp(to);
-                                System.out.println("effect: "+from + " / " + to);
                                 PersonBaseData data = inner.get(to);
-                                System.out.println("PersonBaseData: "+data);
-                                PersonEffect effect = new PersonEffect(registration, effectFrom, effectTo);
+                                PersonEffect effect = registration.getEffect(effectFrom, effectTo);
+                                if (effect == null) {
+                                    effect = new PersonEffect(registration, effectFrom, effectTo);
+                                }
                                 data.addEffect(effect);
                             }
                         }
@@ -118,5 +127,16 @@ public class ParseTest {
             }
             System.out.println("registrations: "+registrations);
         }
+    }
+
+    private PersonRegistration cloneRegistration(PersonRegistration originalRegistration) {
+        PersonRegistration newRegistration = new PersonRegistration();
+        for (PersonEffect originalEffect : originalRegistration.getEffects()) {
+            PersonEffect newEffect = new PersonEffect(newRegistration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
+            for (PersonBaseData originalData : originalEffect.getDataItems()) {
+                originalData.addEffect(newEffect);
+            }
+        }
+        return newRegistration;
     }
 }
