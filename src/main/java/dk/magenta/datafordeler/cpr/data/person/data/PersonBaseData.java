@@ -63,6 +63,9 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private PersonNameAuthorityTextData nameAuthorityTextData;
 
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonProtectionData protectionData;
+
 
     public void setCurrentCprNumber(int cprNumber) {
         if (this.coreData == null) {
@@ -237,8 +240,14 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.nameAuthorityTextData.setText(text);
     }
 
-
-
+    public void setProtection(int authority, int protectionType, boolean reportMarking) {
+        if (this.protectionData == null) {
+            this.protectionData = new PersonProtectionData();
+        }
+        this.protectionData.setAuthority(authority);
+        this.protectionData.setProtectionType(protectionType);
+        this.protectionData.setReportMarking(reportMarking);
+    }
 
     /**
      * Return a map of attributes, including those from the superclass
@@ -285,6 +294,9 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
         if (this.nameAuthorityTextData != null) {
             map.put("nameAuthority", this.nameAuthorityTextData);
+        }
+        if (this.protectionData != null) {
+            map.put("protection", this.protectionData);
         }
 
         return map;
@@ -340,6 +352,9 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
         if (this.nameAuthorityTextData != null) {
             lookupDefinition.putAll("nameAuthorityTextData", this.nameAuthorityTextData.databaseFields());
+        }
+        if (this.protectionData != null) {
+            lookupDefinition.putAll("protectionData", this.protectionData.databaseFields());
         }
         return lookupDefinition;
     }

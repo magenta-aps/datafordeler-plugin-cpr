@@ -109,6 +109,10 @@ public abstract class Record extends HashMap<String, String> {
                 } catch (DateTimeParseException e) {
                 }
             }
+            LocalDate localDate = this.getDate(key);
+            if (localDate != null) {
+                return LocalDateTime.of(localDate, LocalTime.MIDNIGHT);
+            }
         }
         return null;
     }

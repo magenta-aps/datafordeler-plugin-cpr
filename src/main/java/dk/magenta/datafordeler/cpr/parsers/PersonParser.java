@@ -29,6 +29,8 @@ public class PersonParser extends CprSubParser {
             switch (recordType) {
                 case PersonDataRecord.RECORDTYPE_PERSON:
                     return new PersonData(line);
+                case PersonDataRecord.RECORDTYPE_PROTECTION:
+                    return new ProtectionRecord(line);
                 case PersonDataRecord.RECORDTYPE_CURRENT_NAME:
                     return new NameData(line);
                 case PersonDataRecord.RECORDTYPE_DOMESTIC_ADDRESS:

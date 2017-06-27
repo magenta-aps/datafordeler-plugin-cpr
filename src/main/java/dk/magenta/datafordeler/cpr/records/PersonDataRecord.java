@@ -15,6 +15,7 @@ import java.util.HashSet;
 public abstract class PersonDataRecord<B extends CprData> extends CprRecord {
 
     public static final String RECORDTYPE_PERSON = "001";
+    public static final String RECORDTYPE_PROTECTION = "015";
     public static final String RECORDTYPE_CURRENT_NAME = "020";
     public static final String RECORDTYPE_HISTORIC_NAME = "021";
     public static final String RECORDTYPE_DOMESTIC_ADDRESS = "025";
