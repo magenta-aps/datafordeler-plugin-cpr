@@ -28,15 +28,15 @@ public class PersonParser extends CprSubParser {
         try {
             switch (recordType) {
                 case PersonDataRecord.RECORDTYPE_PERSON:
-                    return new PersonData(line);
+                    return new PersonRecord(line);
                 case PersonDataRecord.RECORDTYPE_PROTECTION:
                     return new ProtectionRecord(line);
                 case PersonDataRecord.RECORDTYPE_CURRENT_NAME:
-                    return new NameData(line);
+                    return new NameRecord(line);
                 case PersonDataRecord.RECORDTYPE_DOMESTIC_ADDRESS:
-                    return new AddressData(line);
+                    return new AddressRecord(line);
                 case PersonDataRecord.RECORDTYPE_HISTORIC_NAME:
-                    return new HistoricAddressData(line);
+                    return new HistoricAddressRecord(line);
                 // TODO: Add one of these for each type...
             }
         } catch (ParseException e) {

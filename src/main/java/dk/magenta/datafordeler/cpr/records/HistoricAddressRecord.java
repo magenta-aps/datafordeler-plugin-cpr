@@ -11,9 +11,9 @@ import java.util.HashSet;
 /**
  * Created by lars on 22-06-17.
  */
-public class HistoricAddressData extends PersonDataRecord<PersonBaseData> {
+public class HistoricAddressRecord extends PersonDataRecord<PersonBaseData> {
 
-    public HistoricAddressData(String line) throws ParseException {
+    public HistoricAddressRecord(String line) throws ParseException {
         super(line);
         this.obtain("annkor", 14, 1);
         this.obtain("start_mynkod-navne", 15, 4);

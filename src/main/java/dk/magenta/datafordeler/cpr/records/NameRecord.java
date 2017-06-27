@@ -10,8 +10,8 @@ import java.util.HashSet;
 /**
  * Created by lars on 22-06-17.
  */
-public class NameData extends PersonDataRecord<PersonBaseData> {
-    public NameData(String line) throws ParseException {
+public class NameRecord extends PersonDataRecord<PersonBaseData> {
+    public NameRecord(String line) throws ParseException {
         super(line);
         this.obtain("start_mynkod-navne", 14, 4);
         this.obtain("nvn_ts", 18, 12);

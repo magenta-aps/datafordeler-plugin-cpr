@@ -10,8 +10,8 @@ import java.util.HashSet;
 /**
  * Created by lars on 22-06-17.
  */
-public class AddressData extends PersonDataRecord<PersonBaseData> {
-    public AddressData(String line) throws ParseException {
+public class AddressRecord extends PersonDataRecord<PersonBaseData> {
+    public AddressRecord(String line) throws ParseException {
         super(line);
         this.obtain("start_mynkod-personbolig", 14, 4);
         this.obtain("adr_ts", 18, 12);

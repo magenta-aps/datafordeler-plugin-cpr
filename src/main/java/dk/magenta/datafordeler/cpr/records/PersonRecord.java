@@ -11,8 +11,8 @@ import java.util.HashSet;
 /**
  * Created by lars on 22-06-17.
  */
-public class PersonData extends PersonDataRecord<PersonBaseData> {
-    public PersonData(String line) throws ParseException {
+public class PersonRecord extends PersonDataRecord<PersonBaseData> {
+    public PersonRecord(String line) throws ParseException {
         super(line);
         this.obtain("pnrgaeld", 14, 10);
         this.obtain("status_ts", 24, 12);
