@@ -66,6 +66,12 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private PersonProtectionData protectionData;
 
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonEmigrationData emigrationData;
+
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonForeignAddressData foreignAddressData;
+
 
     public void setCurrentCprNumber(int cprNumber) {
         if (this.coreData == null) {
@@ -249,6 +255,26 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.protectionData.setReportMarking(reportMarking);
     }
 
+    public void setEmigration(int authority, int countryCode) {
+        if (this.emigrationData == null) {
+            this.emigrationData = new PersonEmigrationData();
+        }
+        this.emigrationData.setAuthority(authority);
+        this.emigrationData.setCountryCode(countryCode);;
+    }
+
+    public void setForeignAddress(int authority, String addressLine1, String addressLine2, String addressLine3, String addressLine4, String addressLine5) {
+        if (this.foreignAddressData == null) {
+            this.foreignAddressData = new PersonForeignAddressData();
+        }
+        this.foreignAddressData.setAuthority(authority);
+        this.foreignAddressData.setAddressLine1(addressLine1);
+        this.foreignAddressData.setAddressLine2(addressLine2);
+        this.foreignAddressData.setAddressLine3(addressLine3);
+        this.foreignAddressData.setAddressLine4(addressLine4);
+        this.foreignAddressData.setAddressLine5(addressLine5);
+    }
+
     /**
      * Return a map of attributes, including those from the superclass
      * @return
@@ -297,6 +323,12 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
         if (this.protectionData != null) {
             map.put("protection", this.protectionData);
+        }
+        if (this.emigrationData != null) {
+            map.put("emigration", this.emigrationData);
+        }
+        if (this.foreignAddressData != null) {
+            map.put("foreignAddress", this.foreignAddressData);
         }
 
         return map;
@@ -355,6 +387,12 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
         if (this.protectionData != null) {
             lookupDefinition.putAll("protectionData", this.protectionData.databaseFields());
+        }
+        if (this.emigrationData != null) {
+            lookupDefinition.putAll("emigrationData", this.emigrationData.databaseFields());
+        }
+        if (this.foreignAddressData != null) {
+            lookupDefinition.putAll("foreignAddressData", this.foreignAddressData.databaseFields());
         }
         return lookupDefinition;
     }

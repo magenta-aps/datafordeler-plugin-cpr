@@ -98,7 +98,8 @@ public abstract class Record extends HashMap<String, String> {
 
     private static DateTimeFormatter[] datetimeParsers = {
             DateTimeFormatter.ISO_LOCAL_DATE_TIME,
-            DateTimeFormatter.ofPattern("uuuuMMddHHmmss")
+            DateTimeFormatter.ofPattern("uuuuMMddHHmmss"),
+            DateTimeFormatter.ofPattern("uuuuMMddHHmm")
     };
     public LocalDateTime getDateTime(String key) {
         String value = this.get(key);
@@ -118,7 +119,9 @@ public abstract class Record extends HashMap<String, String> {
     }
 
     public OffsetDateTime getOffsetDateTime(String key) {
+        System.out.println("parsing "+this.get(key)+" as offsetdatetime");
         LocalDateTime dateTime = this.getDateTime(key);
+        System.out.println("dateTime: "+dateTime);
         if (dateTime != null) {
             return OffsetDateTime.from(
                     ZonedDateTime.of(

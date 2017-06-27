@@ -1,11 +1,11 @@
 package dk.magenta.datafordeler.cpr.records;
 
+import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 
-import java.text.ParseException;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 
@@ -19,6 +19,7 @@ public abstract class PersonDataRecord<B extends CprData> extends CprRecord {
     public static final String RECORDTYPE_CURRENT_NAME = "020";
     public static final String RECORDTYPE_HISTORIC_NAME = "021";
     public static final String RECORDTYPE_DOMESTIC_ADDRESS = "025";
+    public static final String RECORDTYPE_FOREIGN_ADDRESS = "028";
     // TODO: Add one for each data type
 
     public PersonDataRecord(String line) throws ParseException {

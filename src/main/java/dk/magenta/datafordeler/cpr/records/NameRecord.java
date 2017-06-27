@@ -1,10 +1,10 @@
 package dk.magenta.datafordeler.cpr.records;
 
+import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
-import java.text.ParseException;
 import java.util.HashSet;
 
 /**

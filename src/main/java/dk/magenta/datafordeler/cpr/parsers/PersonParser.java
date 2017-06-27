@@ -1,10 +1,9 @@
 package dk.magenta.datafordeler.cpr.parsers;
 
+import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.records.*;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
-
-import java.text.ParseException;
 
 
 /**
@@ -37,6 +36,8 @@ public class PersonParser extends CprSubParser {
                     return new AddressRecord(line);
                 case PersonDataRecord.RECORDTYPE_HISTORIC_NAME:
                     return new HistoricAddressRecord(line);
+                case PersonDataRecord.RECORDTYPE_FOREIGN_ADDRESS:
+                    return new ForeignAddressRecord(line);
                 // TODO: Add one of these for each type...
             }
         } catch (ParseException e) {

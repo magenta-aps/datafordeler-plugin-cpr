@@ -1,13 +1,10 @@
 package dk.magenta.datafordeler.cpr.records;
 
-import dk.magenta.datafordeler.core.util.DoubleHashMap;
+import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -23,13 +20,13 @@ public abstract class CprRecord extends Record {
 
     public CprRecord(String line) throws ParseException {
         if (line == null) {
-            throw new ParseException("Invalid NULL input.", 0);
+            throw new ParseException("Invalid NULL input.");
         }
         this.line = line;
         this.obtain("type", 1, 3, false);
         String thisType = this.getRecordType();
         if (!this.get("type").equals(thisType)) {
-            throw new ParseException("Invalid recordtype "+this.get("type")+" for class "+this.getClass().getName()+", was expecting the input to begin with "+thisType+". Input was "+line+".", 0);
+            throw new ParseException("Invalid recordtype "+this.get("type")+" for class "+this.getClass().getName()+", was expecting the input to begin with "+thisType+". Input was "+line+".");
         }
     }
 
