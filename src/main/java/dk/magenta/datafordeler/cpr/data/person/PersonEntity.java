@@ -8,6 +8,8 @@ import dk.magenta.datafordeler.core.database.Identification;
 import javax.persistence.Column;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.UUID;
 
@@ -16,6 +18,7 @@ import java.util.UUID;
  */
 @javax.persistence.Entity
 @Table(name="cpr_person_entity", indexes = {@Index(name = "cprNumber", columnList = "cprNumber")})
+@XmlAccessorType(XmlAccessType.FIELD)
 public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {
 
     public PersonEntity() {

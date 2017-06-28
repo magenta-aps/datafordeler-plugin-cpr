@@ -25,8 +25,6 @@ public class PersonParentData extends DetailData {
     @XmlTransient
     private boolean isMother;
 
-    @JsonIgnore
-    @XmlTransient
     public boolean isMother() {
         return this.isMother;
     }
