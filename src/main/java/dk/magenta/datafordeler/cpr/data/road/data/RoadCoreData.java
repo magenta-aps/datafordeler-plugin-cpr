@@ -17,7 +17,7 @@ import java.util.Map;
  * Created by lars on 16-05-17.
  */
 @Entity
-@Table(name="cpr_person_data")
+@Table(name="cpr_road_core")
 public class RoadCoreData extends DetailData {
 
 

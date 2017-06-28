@@ -42,9 +42,7 @@ public abstract class PersonDataRecord<B extends CprData> extends CprDataRecord<
         return new HashSet<>();
     }
 
-    protected B getBaseDataItem(DoubleHashMap<String, String, B> data, String effectStart, String effectEnd) {
-        effectStart = CprRecord.normalizeDate(effectStart);
-        effectEnd = CprRecord.normalizeDate(effectEnd);
+    protected B getBaseDataItem(DoubleHashMap<OffsetDateTime, OffsetDateTime, B> data, OffsetDateTime effectStart, OffsetDateTime effectEnd) {
         B personBaseData = data.get(effectStart, effectEnd);
         if (personBaseData == null) {
             personBaseData = this.createEmptyBaseData();

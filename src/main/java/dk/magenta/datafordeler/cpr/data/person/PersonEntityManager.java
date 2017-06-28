@@ -8,9 +8,11 @@ import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.fapi.FapiService;
+import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
 import dk.magenta.datafordeler.cpr.parsers.CprParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
@@ -85,14 +87,22 @@ public class PersonEntityManager extends CprEntityManager {
         Transaction transaction = session.beginTransaction();
         TreeSet<String> sortedTimestamps = new TreeSet<>();
 
+
+        HashMap<Integer, PersonEntity> entityCache = new HashMap<>();
+
         for (Record record : records) {
             if (record instanceof PersonDataRecord) {
                 PersonDataRecord personDataRecord = (PersonDataRecord) record;
                 int cprNumber = personDataRecord.getCprNumber();
-                PersonEntity entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
+
+                PersonEntity entity = entityCache.get(cprNumber);
                 if (entity == null) {
-                    entity = new PersonEntity(UUID.randomUUID(), "test");
-                    entity.setCprNumber(cprNumber);
+                    entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
+                    if (entity == null) {
+                        entity = new PersonEntity(UUID.randomUUID(), "test");
+                        entity.setCprNumber(cprNumber);
+                    }
+                    entityCache.put(cprNumber, entity);
                 }
                 recordMap.add(entity, personDataRecord);
             }

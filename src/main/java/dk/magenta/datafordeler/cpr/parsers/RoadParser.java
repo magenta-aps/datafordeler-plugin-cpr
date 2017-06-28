@@ -4,6 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.records.CprRecord;
 import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.road.RoadDataRecord;
+import dk.magenta.datafordeler.cpr.records.road.RoadMemoRecord;
 import dk.magenta.datafordeler.cpr.records.road.RoadRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +33,8 @@ public class RoadParser extends CprSubParser {
             switch (recordType) {
                 case RoadDataRecord.RECORDTYPE_ROAD:
                     return new RoadRecord(line);
+                case RoadDataRecord.RECORDTYPE_ROADMEMO:
+                    return new RoadMemoRecord(line);
                 // TODO: Add one of these for each type...
             }
         } catch (ParseException e) {

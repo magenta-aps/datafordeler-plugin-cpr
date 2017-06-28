@@ -8,6 +8,7 @@ import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.fapi.FapiService;
+import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
@@ -106,23 +107,31 @@ public class RoadEntityManager extends CprEntityManager {
 
     @Override
     public List<RoadRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
-        ArrayList<RoadRegistration> registrations = new ArrayList<>();
+        ArrayList<RoadRegistration> allRegistrations = new ArrayList<>();
         List<Record> records = roadParser.parse(registrationData, "utf-8");
         ListHashMap<RoadEntity, RoadDataRecord> recordMap = new ListHashMap<>();
         Session session = sessionManager.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
 
+        DoubleHashMap<Integer, Integer, RoadEntity> entityCache = new DoubleHashMap<>();
+
         for (Record record : records) {
             if (record instanceof RoadDataRecord) {
                 RoadDataRecord roadDataRecord = (RoadDataRecord) record;
                 HashMap<String, Object> lookup = new HashMap<>();
-                lookup.put("municipalityCode", roadDataRecord.getMunicipalityCode());
-                lookup.put("roadCode", roadDataRecord.getRoadCode());
-                RoadEntity entity = queryManager.getItem(session, RoadEntity.class, lookup);
+                int municipalityCode = roadDataRecord.getMunicipalityCode();
+                int roadcode = roadDataRecord.getRoadCode();
+                lookup.put("municipalityCode", municipalityCode);
+                lookup.put("roadCode", roadcode);
+                RoadEntity entity = entityCache.get(municipalityCode, roadcode);
                 if (entity == null) {
-                    entity = new RoadEntity(UUID.randomUUID(), "test");
-                    entity.setMunicipalityCode(roadDataRecord.getMunicipalityCode());
-                    entity.setRoadCode(roadDataRecord.getRoadCode());
+                    entity = queryManager.getItem(session, RoadEntity.class, lookup);
+                    if (entity == null) {
+                        entity = new RoadEntity(UUID.randomUUID(), "test");
+                        entity.setMunicipalityCode(roadDataRecord.getMunicipalityCode());
+                        entity.setRoadCode(roadDataRecord.getRoadCode());
+                    }
+                    entityCache.put(municipalityCode, roadcode, entity);
                 }
                 recordMap.add(entity, roadDataRecord);
             }
@@ -130,6 +139,7 @@ public class RoadEntityManager extends CprEntityManager {
         System.out.println("recordMap: "+recordMap);
 
         for (RoadEntity entity : recordMap.keySet()) {
+            ArrayList<RoadRegistration> entityRegistrations = new ArrayList<>();
             ListHashMap<String, RoadDataRecord> ajourRecords = new ListHashMap<>();
             List<RoadDataRecord> recordList = recordMap.get(entity);
 
@@ -154,6 +164,7 @@ public class RoadEntityManager extends CprEntityManager {
 
                 RoadRegistration registration = entity.getRegistration(registrationFrom);
                 if (registration == null) {
+                    System.out.println("Did not find existing registration");
                     if (lastRegistration == null) {
                         registration = new RoadRegistration();
                     } else {
@@ -168,7 +179,8 @@ public class RoadEntityManager extends CprEntityManager {
                     }
                     registration.setRegistrationFrom(registrationFrom);
                     System.out.println("created new registration at "+registrationFrom);
-                }
+                } else
+                    System.out.println("Found existing registration");
                 registration.setEntity(entity);
                 entity.addRegistration(registration);
 
@@ -195,26 +207,27 @@ public class RoadEntityManager extends CprEntityManager {
                     lastRegistration.setRegistrationTo(registrationFrom);
                 }
                 lastRegistration = registration;
-                registrations.add(registration);
+                entityRegistrations.add(registration);
 
             }
-            System.out.println(registrations);
+            System.out.println(entityRegistrations);
             try {
-                System.out.println("registrations: "+objectMapper.writeValueAsString(registrations));
+                System.out.println("registrations: "+objectMapper.writeValueAsString(entityRegistrations));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-            for (RoadRegistration registration : registrations) {
+            for (RoadRegistration registration : entityRegistrations) {
                 try {
                     queryManager.saveRegistration(session, entity, registration);
                 } catch (DataFordelerException e) {
                     e.printStackTrace();
                 }
             }
+            allRegistrations.addAll(entityRegistrations);
         }
         transaction.commit();
         session.close();
-        return registrations;
+        return allRegistrations;
     }
 
 

@@ -19,6 +19,7 @@ import java.util.HashSet;
 public abstract class RoadDataRecord<B extends CprData> extends CprDataRecord<RoadEffect, RoadBaseData> {
 
     public static final String RECORDTYPE_ROAD = "001";
+    public static final String RECORDTYPE_ROADMEMO = "005";
     // TODO: Add one for each data type
 
     public RoadDataRecord(String line) throws ParseException {
@@ -43,16 +44,16 @@ public abstract class RoadDataRecord<B extends CprData> extends CprDataRecord<Ro
         return new HashSet<>();
     }
 
-    protected B getBaseDataItem(DoubleHashMap<String, String, B> data, String effectStart, String effectEnd) {
-        effectStart = CprRecord.normalizeDate(effectStart);
-        effectEnd = CprRecord.normalizeDate(effectEnd);
-        B personBaseData = data.get(effectStart, effectEnd);
-        if (personBaseData == null) {
-            personBaseData = this.createEmptyBaseData();
-            data.put(effectStart, effectEnd, personBaseData);
+    protected B getBaseDataItem(DoubleHashMap<OffsetDateTime, OffsetDateTime, B> data, OffsetDateTime effectStart, OffsetDateTime effectEnd) {
+        B baseData = data.get(effectStart, effectEnd);
+        if (baseData == null) {
+            baseData = this.createEmptyBaseData();
+            data.put(effectStart, effectEnd, baseData);
         }
-        return personBaseData;
+        return baseData;
     }
+
+
 
     protected B getBaseDataItem(ListHashMap<RoadEffect, B> data) {
         return this.getBaseDataItem(data, null, false, null, false);
