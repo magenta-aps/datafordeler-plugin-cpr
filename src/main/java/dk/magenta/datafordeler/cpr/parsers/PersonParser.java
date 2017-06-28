@@ -2,7 +2,8 @@ package dk.magenta.datafordeler.cpr.parsers;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.records.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 
@@ -15,7 +16,7 @@ public class PersonParser extends CprSubParser {
     public PersonParser() {
     }
 
-    private static Logger log = Logger.getLogger(PersonParser.class);
+    private static Logger log = LogManager.getLogger(PersonParser.class);
 
 
     @Override
