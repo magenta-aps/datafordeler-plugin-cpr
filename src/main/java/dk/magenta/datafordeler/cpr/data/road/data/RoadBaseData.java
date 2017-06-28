@@ -19,8 +19,8 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     private RoadCoreData coreData;
 
 
-    private void setCore(int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode, int fromRoadCode, String addressingName, String name) {
-        if (this.coreData != null) {
+    public void setCore(int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode, int fromRoadCode, String addressingName, String name) {
+        if (this.coreData == null) {
             this.coreData = new RoadCoreData();
         }
         this.coreData.setToMunicipalityCode(toMunicipalityCode);

@@ -6,6 +6,8 @@ import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
+import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
+import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import dk.magenta.datafordeler.cpr.records.CprRecord;
 
 import java.time.OffsetDateTime;
@@ -14,7 +16,7 @@ import java.util.HashSet;
 /**
  * Created by lars on 22-06-17.
  */
-public abstract class RoadDataRecord<B extends CprData> extends CprRecord {
+public abstract class RoadDataRecord<B extends CprData> extends CprDataRecord<RoadEffect, RoadBaseData> {
 
     public static final String RECORDTYPE_ROAD = "001";
     // TODO: Add one for each data type
@@ -27,6 +29,10 @@ public abstract class RoadDataRecord<B extends CprData> extends CprRecord {
 
     protected int getTimestampStart() {
         return 21;
+    }
+
+    public int getMunicipalityCode() {
+        return this.getInt("komkod");
     }
 
     public int getRoadCode() {

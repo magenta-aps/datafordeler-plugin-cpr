@@ -16,6 +16,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
 
     public static final String CODE = "code";
     public static final String NAME = "name";
+    public static final String MUNICIPALITY_CODE = "municipality_code";
 
     @QueryField(type = QueryField.FieldType.INT)
     private String code;
@@ -39,11 +40,23 @@ public class RoadQuery extends CprQuery<RoadEntity> {
         this.name = name;
     }
 
+    @QueryField(type = QueryField.FieldType.INT)
+    private String municipalityCode;
+
+    public String getMunicipality_code() {
+        return municipalityCode;
+    }
+
+    public void setMunicipalityCode(String municipalityCode) {
+        this.municipalityCode = municipalityCode;
+    }
+
     @Override
     public Map<String, Object> getSearchParameters() {
         HashMap<String, Object> map = new HashMap<>();
         map.put(CODE, this.code);
         map.put(NAME, this.name);
+        map.put(MUNICIPALITY_CODE, this.municipalityCode);
         return map;
     }
 
@@ -51,6 +64,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
     public void setFromParameters(ParameterMap parameters) {
         this.setCode(parameters.getFirst(CODE));
         this.setName(parameters.getFirst(NAME));
+        this.setMunicipalityCode(parameters.getFirst(MUNICIPALITY_CODE));
     }
 
     @Override
@@ -68,10 +82,13 @@ public class RoadQuery extends CprQuery<RoadEntity> {
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = new LookupDefinition(this);
         if (this.code != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".code", this.code);
+            lookupDefinition.put(LookupDefinition.entityref + ".roadCode", this.code);
         }
         if (this.name != null) {
             lookupDefinition.put("coreData.name", this.name);
+        }
+        if (this.municipalityCode != null) {
+            lookupDefinition.put(LookupDefinition.entityref + ".municipalityCode", this.name);
         }
         return lookupDefinition;
     }

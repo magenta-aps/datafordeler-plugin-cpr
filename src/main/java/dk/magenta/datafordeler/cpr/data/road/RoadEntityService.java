@@ -15,7 +15,7 @@ import javax.ws.rs.Path;
 @Path("")
 @Component
 @WebService
-public class RoadEntityService extends FapiService<PersonEntity, PersonQuery> {
+public class RoadEntityService extends FapiService<RoadEntity, RoadQuery> {
 
     @Override
     public int getVersion() {
@@ -28,8 +28,8 @@ public class RoadEntityService extends FapiService<PersonEntity, PersonQuery> {
     }
 
     @Override
-    protected Class<PersonEntity> getEntityClass() {
-        return PersonEntity.class;
+    protected Class<RoadEntity> getEntityClass() {
+        return RoadEntity.class;
     }
 
     @Override
@@ -37,8 +37,8 @@ public class RoadEntityService extends FapiService<PersonEntity, PersonQuery> {
     }
 
     @Override
-    protected PersonQuery getEmptyQuery() {
-        return new PersonQuery();
+    protected RoadQuery getEmptyQuery() {
+        return new RoadQuery();
     }
 
 }

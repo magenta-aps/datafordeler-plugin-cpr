@@ -1,7 +1,9 @@
 package dk.magenta.datafordeler.cpr.records;
 
+import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.ListHashMap;
+import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
@@ -51,7 +53,7 @@ public abstract class CprRecord extends Record {
     }
 
     //public abstract DoubleHashMap<String,String,PersonBaseData> getDataEffects(String timestamp);
-    public abstract ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String registrationFrom);
+    public abstract ListHashMap<? extends Effect, ? extends CprData> getDataEffects(String registrationFrom);
 
     protected static String normalizeDate(String date) {
         if (date == null || date.trim().isEmpty()) {

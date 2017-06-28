@@ -80,29 +80,28 @@ public class PersonEntityManager extends CprEntityManager {
     public List<PersonRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
         ArrayList<PersonRegistration> registrations = new ArrayList<>();
         List<Record> records = personParser.parse(registrationData, "utf-8");
-        ListHashMap<Integer, PersonDataRecord> recordMap = new ListHashMap<>();
+        ListHashMap<PersonEntity, PersonDataRecord> recordMap = new ListHashMap<>();
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        TreeSet<String> sortedTimestamps = new TreeSet<>();
+
         for (Record record : records) {
             if (record instanceof PersonDataRecord) {
                 PersonDataRecord personDataRecord = (PersonDataRecord) record;
                 int cprNumber = personDataRecord.getCprNumber();
-                recordMap.add(cprNumber, personDataRecord);
+                PersonEntity entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
+                if (entity == null) {
+                    entity = new PersonEntity(UUID.randomUUID(), "test");
+                    entity.setCprNumber(cprNumber);
+                }
+                recordMap.add(entity, personDataRecord);
             }
         }
-        System.out.println("recordMap: "+recordMap);
 
-        Session session = sessionManager.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        for (int cprNumber : recordMap.keySet()) {
-            System.out.println("cprNumber: "+cprNumber);
-            List<PersonDataRecord> recordList = recordMap.get(cprNumber);
-            PersonEntity entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
-            if (entity == null) {
-                entity = new PersonEntity(UUID.randomUUID(), "test");
-                entity.setCprNumber(cprNumber);
-            }
-
+        for (PersonEntity entity : recordMap.keySet()) {
             ListHashMap<String, PersonDataRecord> ajourRecords = new ListHashMap<>();
-            TreeSet<String> sortedTimestamps = new TreeSet<>();
+            List<PersonDataRecord> recordList = recordMap.get(entity);
+
             for (PersonDataRecord record : recordList) {
                 System.out.println("record: "+record);
                 Set<String> timestamps = record.getTimestamps();

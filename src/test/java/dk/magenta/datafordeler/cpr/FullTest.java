@@ -55,7 +55,7 @@ public class FullTest {
             configuration.setRegisterAddress("ftp://localhost:" + port);
             String username = configuration.getFtpUsername();
             String password = configuration.getFtpPassword();
-            InputStream contents = FullTest.class.getResourceAsStream("/cprdata.txt");
+            InputStream contents = FullTest.class.getResourceAsStream("/persondata.txt");
             tempFile = File.createTempFile("cprdata", "txt");
             tempFile.createNewFile();
             FileUtils.copyInputStreamToFile(contents, tempFile);

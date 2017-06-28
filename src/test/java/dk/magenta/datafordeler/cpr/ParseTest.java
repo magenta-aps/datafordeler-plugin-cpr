@@ -5,6 +5,9 @@ import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.*;
+import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
+import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
+import dk.magenta.datafordeler.cpr.data.road.RoadQuery;
 import org.hibernate.Session;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,11 +35,14 @@ public class ParseTest {
     @Autowired
     private PersonEntityManager personEntityManager;
 
+    @Autowired
+    private RoadEntityManager roadEntityManager;
+
     @Test
-    public void testParse() throws IOException, ParseException {
+    public void testParsePerson() throws IOException, ParseException {
         Session session = null;
         try {
-            InputStream testData = ParseTest.class.getResourceAsStream("/cprdata.txt");
+            InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
             personEntityManager.parseRegistration(testData);
 
             PersonQuery query = new PersonQuery();
@@ -46,6 +52,32 @@ public class ParseTest {
 
             try {
                 List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
+                System.out.println(entities);
+            } catch (DataFordelerException e) {
+                e.printStackTrace();
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    @Test
+    public void testParseRoad() throws IOException, ParseException {
+        Session session = null;
+        try {
+            InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+            roadEntityManager.parseRegistration(testData);
+
+            RoadQuery query = new RoadQuery();
+            //query.setMunicipalityCode("0730");
+            //query.setCode("0012");
+            query.setName("Aalborggade");
+            session = sessionManager.getSessionFactory().openSession();
+
+            try {
+                List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
                 System.out.println(entities);
             } catch (DataFordelerException e) {
                 e.printStackTrace();

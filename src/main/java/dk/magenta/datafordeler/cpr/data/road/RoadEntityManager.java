@@ -12,6 +12,7 @@ import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprParser;
+import dk.magenta.datafordeler.cpr.parsers.RoadParser;
 import dk.magenta.datafordeler.cpr.records.Record;
 import dk.magenta.datafordeler.cpr.records.road.RoadDataRecord;
 import org.hibernate.Session;
@@ -48,6 +49,34 @@ public class RoadEntityManager extends CprEntityManager {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private static class RoadIdentifier {
+        public int municipalityCode;
+        public int roadCode;
+
+        public RoadIdentifier(int municipalityCode, int roadCode) {
+            this.municipalityCode = municipalityCode;
+            this.roadCode = roadCode;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            RoadIdentifier that = (RoadIdentifier) o;
+
+            if (municipalityCode != that.municipalityCode) return false;
+            return roadCode == that.roadCode;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = municipalityCode;
+            result = 31 * result + roadCode;
+            return result;
+        }
+    }
+
     public RoadEntityManager() {
         this.managedEntityClass = RoadEntity.class;
         this.managedEntityReferenceClass = RoadEntityReference.class;
@@ -79,28 +108,31 @@ public class RoadEntityManager extends CprEntityManager {
     public List<RoadRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
         ArrayList<RoadRegistration> registrations = new ArrayList<>();
         List<Record> records = roadParser.parse(registrationData, "utf-8");
-        ListHashMap<Integer, RoadDataRecord> recordMap = new ListHashMap<>();
+        ListHashMap<RoadEntity, RoadDataRecord> recordMap = new ListHashMap<>();
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+
         for (Record record : records) {
             if (record instanceof RoadDataRecord) {
                 RoadDataRecord roadDataRecord = (RoadDataRecord) record;
-                int cprNumber = roadDataRecord.getCprNumber();
-                recordMap.add(cprNumber, roadDataRecord);
+                HashMap<String, Object> lookup = new HashMap<>();
+                lookup.put("municipalityCode", roadDataRecord.getMunicipalityCode());
+                lookup.put("roadCode", roadDataRecord.getRoadCode());
+                RoadEntity entity = queryManager.getItem(session, RoadEntity.class, lookup);
+                if (entity == null) {
+                    entity = new RoadEntity(UUID.randomUUID(), "test");
+                    entity.setMunicipalityCode(roadDataRecord.getMunicipalityCode());
+                    entity.setRoadCode(roadDataRecord.getRoadCode());
+                }
+                recordMap.add(entity, roadDataRecord);
             }
         }
         System.out.println("recordMap: "+recordMap);
 
-        Session session = sessionManager.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        for (int cprNumber : recordMap.keySet()) {
-            System.out.println("cprNumber: "+cprNumber);
-            List<RoadDataRecord> recordList = recordMap.get(cprNumber);
-            RoadEntity entity = queryManager.getItem(session, RoadEntity.class, Collections.singletonMap("cprNumber", cprNumber));
-            if (entity == null) {
-                entity = new RoadEntity(UUID.randomUUID(), "test");
-                entity.setCprNumber(cprNumber);
-            }
-
+        for (RoadEntity entity : recordMap.keySet()) {
             ListHashMap<String, RoadDataRecord> ajourRecords = new ListHashMap<>();
+            List<RoadDataRecord> recordList = recordMap.get(entity);
+
             TreeSet<String> sortedTimestamps = new TreeSet<>();
             for (RoadDataRecord record : recordList) {
                 System.out.println("record: "+record);
