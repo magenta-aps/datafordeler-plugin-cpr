@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.parsers;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.records.*;
+import dk.magenta.datafordeler.cpr.records.person.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;

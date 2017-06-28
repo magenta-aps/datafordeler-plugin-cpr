@@ -1,4 +1,4 @@
-package dk.magenta.datafordeler.cpr.records;
+package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.ListHashMap;

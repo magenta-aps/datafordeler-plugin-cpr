@@ -1,10 +1,11 @@
-package dk.magenta.datafordeler.cpr.records;
+package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
+import dk.magenta.datafordeler.cpr.records.CprRecord;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;

@@ -1,4 +1,4 @@
-package dk.magenta.datafordeler.cpr.data.person;
+package dk.magenta.datafordeler.cpr.data.road;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,11 +10,10 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprParser;
-import dk.magenta.datafordeler.cpr.parsers.PersonParser;
-import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
 import dk.magenta.datafordeler.cpr.records.Record;
+import dk.magenta.datafordeler.cpr.records.road.RoadDataRecord;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +31,13 @@ import java.util.*;
  * Created by lars on 16-05-17.
  */
 @Component
-public class PersonEntityManager extends CprEntityManager {
+public class RoadEntityManager extends CprEntityManager {
 
     @Autowired
-    private PersonEntityService personEntityService;
+    private RoadEntityService roadEntityService;
 
     @Autowired
-    private PersonParser personParser;
+    private RoadParser roadParser;
 
     @Autowired
     private SessionManager sessionManager;
@@ -49,11 +48,11 @@ public class PersonEntityManager extends CprEntityManager {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public PersonEntityManager() {
-        this.managedEntityClass = PersonEntity.class;
-        this.managedEntityReferenceClass = PersonEntityReference.class;
-        this.managedRegistrationClass = PersonRegistration.class;
-        this.managedRegistrationReferenceClass = PersonRegistrationReference.class;
+    public RoadEntityManager() {
+        this.managedEntityClass = RoadEntity.class;
+        this.managedEntityReferenceClass = RoadEntityReference.class;
+        this.managedRegistrationClass = RoadRegistration.class;
+        this.managedRegistrationReferenceClass = RoadRegistrationReference.class;
     }
 
     @Override
@@ -63,29 +62,29 @@ public class PersonEntityManager extends CprEntityManager {
 
     @Override
     public FapiService getEntityService() {
-        return this.personEntityService;
+        return this.roadEntityService;
     }
 
     @Override
     public String getSchema() {
-        return PersonEntity.schema;
+        return RoadEntity.schema;
     }
 
     @Override
-    public List<PersonRegistration> parseRegistration(String registrationData) throws IOException, ParseException {
+    public List<RoadRegistration> parseRegistration(String registrationData) throws IOException, ParseException {
         return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override
-    public List<PersonRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
-        ArrayList<PersonRegistration> registrations = new ArrayList<>();
-        List<Record> records = personParser.parse(registrationData, "utf-8");
-        ListHashMap<Integer, PersonDataRecord> recordMap = new ListHashMap<>();
+    public List<RoadRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
+        ArrayList<RoadRegistration> registrations = new ArrayList<>();
+        List<Record> records = roadParser.parse(registrationData, "utf-8");
+        ListHashMap<Integer, RoadDataRecord> recordMap = new ListHashMap<>();
         for (Record record : records) {
-            if (record instanceof PersonDataRecord) {
-                PersonDataRecord personDataRecord = (PersonDataRecord) record;
-                int cprNumber = personDataRecord.getCprNumber();
-                recordMap.add(cprNumber, personDataRecord);
+            if (record instanceof RoadDataRecord) {
+                RoadDataRecord roadDataRecord = (RoadDataRecord) record;
+                int cprNumber = roadDataRecord.getCprNumber();
+                recordMap.add(cprNumber, roadDataRecord);
             }
         }
         System.out.println("recordMap: "+recordMap);
@@ -94,16 +93,16 @@ public class PersonEntityManager extends CprEntityManager {
         Transaction transaction = session.beginTransaction();
         for (int cprNumber : recordMap.keySet()) {
             System.out.println("cprNumber: "+cprNumber);
-            List<PersonDataRecord> recordList = recordMap.get(cprNumber);
-            PersonEntity entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
+            List<RoadDataRecord> recordList = recordMap.get(cprNumber);
+            RoadEntity entity = queryManager.getItem(session, RoadEntity.class, Collections.singletonMap("cprNumber", cprNumber));
             if (entity == null) {
-                entity = new PersonEntity(UUID.randomUUID(), "test");
+                entity = new RoadEntity(UUID.randomUUID(), "test");
                 entity.setCprNumber(cprNumber);
             }
 
-            ListHashMap<String, PersonDataRecord> ajourRecords = new ListHashMap<>();
+            ListHashMap<String, RoadDataRecord> ajourRecords = new ListHashMap<>();
             TreeSet<String> sortedTimestamps = new TreeSet<>();
-            for (PersonDataRecord record : recordList) {
+            for (RoadDataRecord record : recordList) {
                 System.out.println("record: "+record);
                 Set<String> timestamps = record.getTimestamps();
                 for (String timestamp : timestamps) {
@@ -115,22 +114,22 @@ public class PersonEntityManager extends CprEntityManager {
             }
 
             // Create one Registration per unique timestamp
-            PersonRegistration lastRegistration = null;
+            RoadRegistration lastRegistration = null;
             for (String timestamp : sortedTimestamps) {
                 OffsetDateTime registrationFrom = CprParser.parseTimestamp(timestamp);
                 System.out.println("timestamp: "+timestamp);
                 System.out.println("registrationFrom: "+registrationFrom);
 
-                PersonRegistration registration = entity.getRegistration(registrationFrom);
+                RoadRegistration registration = entity.getRegistration(registrationFrom);
                 if (registration == null) {
                     if (lastRegistration == null) {
-                        registration = new PersonRegistration();
+                        registration = new RoadRegistration();
                     } else {
                         //registration = this.cloneRegistration(lastRegistration);
-                        registration = new PersonRegistration();
-                        for (PersonEffect originalEffect : lastRegistration.getEffects()) {
-                            PersonEffect newEffect = new PersonEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
-                            for (PersonBaseData originalData : originalEffect.getDataItems()) {
+                        registration = new RoadRegistration();
+                        for (RoadEffect originalEffect : lastRegistration.getEffects()) {
+                            RoadEffect newEffect = new RoadEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
+                            for (RoadBaseData originalData : originalEffect.getDataItems()) {
                                 originalData.addEffect(newEffect);
                             }
                         }
@@ -142,17 +141,17 @@ public class PersonEntityManager extends CprEntityManager {
                 entity.addRegistration(registration);
 
                 // Each record sets its own basedata
-                for (PersonDataRecord record : ajourRecords.get(timestamp)) {
+                for (RoadDataRecord record : ajourRecords.get(timestamp)) {
                     // Take what we need from the record and put it into dataitems
-                    ListHashMap<PersonEffect, PersonBaseData> dataItems = record.getDataEffects(timestamp);
+                    ListHashMap<RoadEffect, RoadBaseData> dataItems = record.getDataEffects(timestamp);
                     if (dataItems != null) {
-                        for (PersonEffect effect : dataItems.keySet()) {
-                            for (PersonBaseData data : dataItems.get(effect)) {
+                        for (RoadEffect effect : dataItems.keySet()) {
+                            for (RoadBaseData data : dataItems.get(effect)) {
                                 effect.setRegistration(registration);
                                 data.addEffect(effect);
-                                //PersonEffect effect = registration.getEffect(effectFrom, effectTo);
+                                //RoadEffect effect = registration.getEffect(effectFrom, effectTo);
                                 /*if (effect == null) {
-                                    effect = new PersonEffect(registration, effectFrom, effectTo);
+                                    effect = new RoadEffect(registration, effectFrom, effectTo);
                                 }
                                 data.addEffect(effect);*/
                             }
@@ -173,7 +172,7 @@ public class PersonEntityManager extends CprEntityManager {
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
-            for (PersonRegistration registration : registrations) {
+            for (RoadRegistration registration : registrations) {
                 try {
                     queryManager.saveRegistration(session, entity, registration);
                 } catch (DataFordelerException e) {
@@ -190,7 +189,7 @@ public class PersonEntityManager extends CprEntityManager {
 
     @Override
     protected RegistrationReference createRegistrationReference(URI uri) {
-        return new PersonRegistrationReference(uri);
+        return new RoadRegistrationReference(uri);
     }
 
 }

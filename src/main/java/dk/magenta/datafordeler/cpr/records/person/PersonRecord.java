@@ -1,4 +1,4 @@
-package dk.magenta.datafordeler.cpr.records;
+package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.ListHashMap;
@@ -19,17 +19,17 @@ public class PersonRecord extends PersonDataRecord<PersonBaseData> {
         this.obtain("status", 36, 2);
         this.obtain("statushaenstart", 38, 12);
         this.obtain("statusdto_umrk", 50, 1);
-        this.obtain("start_mynkod-person", 51, 4);
-        this.obtain("start_ts-person", 55, 12);
+        this.obtain("start_mynkod-road", 51, 4);
+        this.obtain("start_ts-road", 55, 12);
         this.obtain("koen", 67, 1);
         this.obtain("foed_dt", 68, 10);
         this.obtain("foed_dt_umrk", 78, 1);
         this.obtain("foed_tm", 79, 8);
         this.obtain("foedsekvens", 87, 4);
-        this.obtain("start_dt-person", 91, 10);
-        this.obtain("start_dt_umrk-person", 101, 1);
-        this.obtain("slut_dt-person", 102, 10);
-        this.obtain("slut_dt_umrk-person", 112, 1);
+        this.obtain("start_dt-road", 91, 10);
+        this.obtain("start_dt_umrk-road", 101, 1);
+        this.obtain("slut_dt-road", 102, 10);
+        this.obtain("slut_dt_umrk-road", 112, 1);
         this.obtain("stilling_mynkod", 113, 4);
         this.obtain("stilling_ts", 117, 12);
         this.obtain("stilling", 129, 34);
@@ -123,9 +123,9 @@ public class PersonRecord extends PersonDataRecord<PersonBaseData> {
             );
         }
 
-        if (registrationFrom.equals(this.get("start_ts-person"))) {
+        if (registrationFrom.equals(this.get("start_ts-road"))) {
 
-            personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
+            personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("start_dt-road"), this.getBoolean("start_dt_umrk-road"), this.getOffsetDateTime("slut_dt-road"), this.getBoolean("slut_dt_umrk-road"));
             personBaseData.setBirth(
                     LocalDateTime.of(this.getDate("foed_dt"), this.getTime("foed_tm")),
                     this.getBoolean("foed_dt_umrk"),
@@ -133,7 +133,7 @@ public class PersonRecord extends PersonDataRecord<PersonBaseData> {
             );
             personBaseData.setCurrentCprNumber(this.getInt("pnrgaeld"));
             personBaseData.setGender(this.get("koen"));
-            personBaseData.setStartAuthority(this.getInt("start_mynkod-person"));
+            personBaseData.setStartAuthority(this.getInt("start_mynkod-road"));
         }
 
         return data;

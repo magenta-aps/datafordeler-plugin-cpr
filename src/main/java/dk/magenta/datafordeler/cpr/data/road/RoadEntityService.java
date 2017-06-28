@@ -1,4 +1,4 @@
-package dk.magenta.datafordeler.cpr.data.person;
+package dk.magenta.datafordeler.cpr.data.road;
 
 import dk.magenta.datafordeler.core.exception.AccessDeniedException;
 import dk.magenta.datafordeler.core.exception.AccessRequiredException;
@@ -15,7 +15,7 @@ import javax.ws.rs.Path;
 @Path("")
 @Component
 @WebService
-public class PersonEntityService extends FapiService<PersonEntity, PersonQuery> {
+public class RoadEntityService extends FapiService<PersonEntity, PersonQuery> {
 
     @Override
     public int getVersion() {
