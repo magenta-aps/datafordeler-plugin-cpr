@@ -2,7 +2,6 @@ package dk.magenta.datafordeler.cpr.data.road;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.scenario.effect.Offset;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
@@ -223,12 +222,7 @@ public class RoadEntityManager extends CprEntityManager {
                 entityRegistrations.add(registration);
 
             }
-            System.out.println(entityRegistrations);
-            try {
-                System.out.println("registrations: "+objectMapper.writeValueAsString(entityRegistrations));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+
             for (RoadRegistration registration : entityRegistrations) {
                 try {
                     queryManager.saveRegistration(session, entity, registration);
@@ -238,6 +232,12 @@ public class RoadEntityManager extends CprEntityManager {
                     e.printStackTrace();
                 }
             }
+            //try {
+                //System.out.println("registrations: "+objectMapper.writeValueAsString(entityRegistrations));
+                System.out.println("registrations: "+entityRegistrations);
+            //} catch (JsonProcessingException e) {
+            //    e.printStackTrace();
+            //}
             allRegistrations.addAll(entityRegistrations);
         }
         transaction.commit();

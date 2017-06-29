@@ -31,10 +31,10 @@ public class RoadParser extends CprSubParser {
             switch (recordType) {
                 case RoadDataRecord.RECORDTYPE_ROAD:
                     return new RoadRecord(line);
-                //case RoadDataRecord.RECORDTYPE_ROADMEMO:
-                //    return new RoadMemoRecord(line);
-                //case RoadDataRecord.RECORDTYPE_ROADPOSTCODE:
-                //    return new RoadPostcodeRecord(line);
+                case RoadDataRecord.RECORDTYPE_ROADMEMO:
+                    return new RoadMemoRecord(line);
+                case RoadDataRecord.RECORDTYPE_ROADPOSTCODE:
+                    return new RoadPostcodeRecord(line);
                 case RoadDataRecord.RECORDTYPE_ROADCITY:
                     return new RoadCityRecord(line);
                 // TODO: Add one of these for each type...

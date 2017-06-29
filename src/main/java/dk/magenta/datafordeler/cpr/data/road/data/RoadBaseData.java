@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.road.data;
 
 import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.cpr.data.CprData;
+import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.unversioned.PostCode;
 
@@ -99,7 +100,15 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         if (this.coreData != null) {
             lookupDefinition.putAll("coreData", this.coreData.databaseFields());
         }
-
+        if (this.memoData != null) {
+            lookupDefinition.putAll("memoData", DetailData.listDatabaseFields(this.memoData));
+        }
+        if (this.postcodeData != null) {
+            lookupDefinition.putAll("postcodeData", DetailData.listDatabaseFields(this.postcodeData));
+        }
+        if (this.cityData != null) {
+            lookupDefinition.putAll("cityData", DetailData.listDatabaseFields(this.cityData));
+        }
         return lookupDefinition;
     }
 
