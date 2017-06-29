@@ -29,4 +29,12 @@ public class PersonEffect extends CprEffect<PersonRegistration, PersonEffect, Pe
         super(registration, effectFrom, effectTo);
     }
 
+
+    public PersonEffect(PersonRegistration registration, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
+        this(registration, effectFrom, effectTo);
+        this.setUncertainFrom(effectFromUncertain);
+        this.setUncertainTo(effectToUncertain);
+    }
+
+
 }

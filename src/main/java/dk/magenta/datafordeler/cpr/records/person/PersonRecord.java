@@ -1,12 +1,15 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
+import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import org.hibernate.Session;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by lars on 22-06-17.
@@ -19,17 +22,17 @@ public class PersonRecord extends PersonDataRecord {
         this.obtain("status", 36, 2);
         this.obtain("statushaenstart", 38, 12);
         this.obtain("statusdto_umrk", 50, 1);
-        this.obtain("start_mynkod-road", 51, 4);
-        this.obtain("start_ts-road", 55, 12);
+        this.obtain("start_mynkod-person", 51, 4);
+        this.obtain("start_ts-person", 55, 12);
         this.obtain("koen", 67, 1);
         this.obtain("foed_dt", 68, 10);
         this.obtain("foed_dt_umrk", 78, 1);
         this.obtain("foed_tm", 79, 8);
         this.obtain("foedsekvens", 87, 4);
-        this.obtain("start_dt-road", 91, 10);
-        this.obtain("start_dt_umrk-road", 101, 1);
-        this.obtain("slut_dt-road", 102, 10);
-        this.obtain("slut_dt_umrk-road", 112, 1);
+        this.obtain("start_dt-person", 91, 10);
+        this.obtain("start_dt_umrk-person", 101, 1);
+        this.obtain("slut_dt-person", 102, 10);
+        this.obtain("slut_dt_umrk-person", 112, 1);
         this.obtain("stilling_mynkod", 113, 4);
         this.obtain("stilling_ts", 117, 12);
         this.obtain("stilling", 129, 34);
@@ -62,21 +65,19 @@ public class PersonRecord extends PersonDataRecord {
     /**
      * Create a set of populated PersonBaseData objects, each with its own unique effect period
      *
-     * @param registrationFrom
+     * @param effect
+     * @param registrationTime
      * @return
      */
     @Override
-    public void getDataEffects(HashMap<PersonEffect, PersonBaseData> data, String registrationFrom) {
-        PersonBaseData personBaseData;
+    public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
 
-        if (registrationFrom.equals(this.get("status_ts"))) {
-            personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("statushaenstart"), this.getBoolean("statusdto_umrk"));
-            personBaseData.setStatus(this.get("status"));
+        if (registrationTime.equals(this.getOffsetDateTime("status_ts")) && effect.compareRange(this.getOffsetDateTime("statushaenstart"), this.getBoolean("statusdto_umrk"), null, false)) {
+            data.setStatus(this.get("status"));
         }
 
-        if (registrationFrom.equals(this.get("mor_ts"))) {
-            personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"));
-            personBaseData.setMother(
+        if (registrationTime.equals(this.getOffsetDateTime("mor_ts")) && effect.compareRange(this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false)) {
+            data.setMother(
                     this.get("mornvn"),
                     this.getBoolean("mornvn_mrk"),
                     this.getInt("pnrmor"),
@@ -86,9 +87,8 @@ public class PersonRecord extends PersonDataRecord {
             );
         }
 
-        if (registrationFrom.equals(this.get("far_ts"))) {
-            personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"));
-            personBaseData.setFather(
+        if (registrationTime.equals(this.getOffsetDateTime("far_ts")) && effect.compareRange(this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false)) {
+            data.setFather(
                     this.get("farnvn"),
                     this.getBoolean("farnvn_mrk"),
                     this.getInt("pnrfar"),
@@ -98,41 +98,37 @@ public class PersonRecord extends PersonDataRecord {
             );
         }
 
-        if (registrationFrom.equals(this.get("mor_dok_ts"))) {
-            personBaseData = this.getBaseDataItem(data);
-            personBaseData.setMotherVerification(
+        if (registrationTime.equals(this.getOffsetDateTime("mor_dok_ts")) && effect.compareRange(null, false, null, false)) {
+            data.setMotherVerification(
                     this.getInt("mor_dok_mynkod"),
                     this.getBoolean("mor_dok")
             );
         }
 
-        if (registrationFrom.equals(this.get("far_dok_ts"))) {
-            personBaseData = this.getBaseDataItem(data);
-            personBaseData.setFatherVerification(
+        if (registrationTime.equals(this.getOffsetDateTime("far_dok_ts")) && effect.compareRange(null, false, null, false)) {
+            data.setFatherVerification(
                     this.getInt("far_dok_mynkod"),
                     this.getBoolean("far_dok")
             );
         }
 
-        if (registrationFrom.equals(this.get("stilling_ts"))) {
-            personBaseData = this.getBaseDataItem(data);
-            personBaseData.setPosition(
+        if (registrationTime.equals(this.getOffsetDateTime("stilling_ts")) && effect.compareRange(null, false, null, false)) {
+            data.setPosition(
                     this.getInt("stilling_mynkod"),
                     this.get("stilling")
             );
         }
 
-        if (registrationFrom.equals(this.get("start_ts-road"))) {
+        if (registrationTime.equals(this.getOffsetDateTime("start_ts-person")) && effect.compareRange( this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"))) {
 
-            personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("start_dt-road"), this.getBoolean("start_dt_umrk-road"), this.getOffsetDateTime("slut_dt-road"), this.getBoolean("slut_dt_umrk-road"));
-            personBaseData.setBirth(
+            data.setBirth(
                     LocalDateTime.of(this.getDate("foed_dt"), this.getTime("foed_tm")),
                     this.getBoolean("foed_dt_umrk"),
                     this.getInt("foedsekvens")
             );
-            personBaseData.setCurrentCprNumber(this.getInt("pnrgaeld"));
-            personBaseData.setGender(this.get("koen"));
-            personBaseData.setStartAuthority(this.getInt("start_mynkod-road"));
+            data.setCurrentCprNumber(this.getInt("pnrgaeld"));
+            data.setGender(this.get("koen"));
+            data.setStartAuthority(this.getInt("start_mynkod-person"));
         }
     }
 
@@ -147,14 +143,26 @@ public class PersonRecord extends PersonDataRecord {
     }
 
     @Override
-    public HashSet<String> getTimestamps() {
-        HashSet<String> timestamps = super.getTimestamps();
-        timestamps.add(this.get("status_ts"));
-        timestamps.add(this.get("mor_ts"));
-        timestamps.add(this.get("stilling_ts"));
-        timestamps.add(this.get("far_ts"));
-        timestamps.add(this.get("mor_dok_ts"));
-        timestamps.add(this.get("far_dok_ts"));
+    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
+        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
+        timestamps.add(this.getOffsetDateTime("status_ts"));
+        timestamps.add(this.getOffsetDateTime("mor_ts"));
+        timestamps.add(this.getOffsetDateTime("stilling_ts"));
+        timestamps.add(this.getOffsetDateTime("far_ts"));
+        timestamps.add(this.getOffsetDateTime("mor_dok_ts"));
+        timestamps.add(this.getOffsetDateTime("far_dok_ts"));
         return timestamps;
+    }
+
+
+    @Override
+    public Set<PersonEffect> getEffects() {
+        HashSet<PersonEffect> effects = new HashSet<>();
+        effects.add(new PersonEffect(null, this.getOffsetDateTime("statushaenstart"), this.getBoolean("statusdto_umrk"), null, false));
+        effects.add(new PersonEffect(null, this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false));
+        effects.add(new PersonEffect(null, this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false));
+        effects.add(new PersonEffect(null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person")));
+        effects.add(new PersonEffect(null, null, false, null, false));
+        return effects;
     }
 }

@@ -11,6 +11,6 @@
     <property name="hibernate.hbm2ddl.auto">create</property>
 
     <!-- DB schema will be updated if needed -->
-    <!-- <property name="hbm2ddl.auto">update</property> -->
+    <!-- <propetextname="hbm2ddl.auto">update</property> -->
   </session-factory>
 </hibernate-configuration>

@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.road;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.scenario.effect.Offset;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
@@ -140,15 +141,15 @@ public class RoadEntityManager extends CprEntityManager {
 
         for (RoadEntity entity : recordMap.keySet()) {
             ArrayList<RoadRegistration> entityRegistrations = new ArrayList<>();
-            ListHashMap<String, RoadDataRecord> ajourRecords = new ListHashMap<>();
+            ListHashMap<OffsetDateTime, RoadDataRecord> ajourRecords = new ListHashMap<>();
             List<RoadDataRecord> recordList = recordMap.get(entity);
 
-            TreeSet<String> sortedTimestamps = new TreeSet<>();
+            TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
             for (RoadDataRecord record : recordList) {
                 System.out.println("record: "+record);
-                Set<String> timestamps = record.getTimestamps();
-                for (String timestamp : timestamps) {
-                    if (timestamp != null && !timestamp.isEmpty()) {
+                Set<OffsetDateTime> timestamps = record.getRegistrationTimestamps();
+                for (OffsetDateTime timestamp : timestamps) {
+                    if (timestamp != null) {
                         ajourRecords.add(timestamp, record);
                         sortedTimestamps.add(timestamp);
                     }
@@ -157,9 +158,7 @@ public class RoadEntityManager extends CprEntityManager {
 
             // Create one Registration per unique timestamp
             RoadRegistration lastRegistration = null;
-            for (String timestamp : sortedTimestamps) {
-                OffsetDateTime registrationFrom = CprParser.parseTimestamp(timestamp);
-                System.out.println("timestamp: "+timestamp);
+            for (OffsetDateTime registrationFrom : sortedTimestamps) {
                 System.out.println("registrationFrom: "+registrationFrom);
 
                 RoadRegistration registration = entity.getRegistration(registrationFrom);
@@ -172,6 +171,8 @@ public class RoadEntityManager extends CprEntityManager {
                         registration = new RoadRegistration();
                         for (RoadEffect originalEffect : lastRegistration.getEffects()) {
                             RoadEffect copyEffect = new RoadEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
+                            copyEffect.setUncertainFrom(originalEffect.isUncertainFrom());
+                            copyEffect.setUncertainTo(originalEffect.isUncertainTo());
                             for (RoadBaseData originalData : originalEffect.getDataItems()) {
                                 originalData.addEffect(copyEffect);
                             }
@@ -188,21 +189,32 @@ public class RoadEntityManager extends CprEntityManager {
 
 
                 // Each record sets its own basedata
-                HashMap<RoadEffect, RoadBaseData> data = new HashMap<>();
-                for (RoadDataRecord record : ajourRecords.get(timestamp)) {
+                for (RoadDataRecord record : ajourRecords.get(registrationFrom)) {
                     // Take what we need from the record and put it into dataitems
-                    record.getDataEffects(data, timestamp);
-                    for (RoadEffect effect : data.keySet()) {
-                        RoadBaseData dataItem = data.get(effect);
-                        effect.setRegistration(registration);
-                        dataItem.addEffect(effect);
-                        //RoadEffect effect = registration.getEffect(effectFrom, effectTo);
-                        /*if (effect == null) {
-                            effect = new RoadEffect(registration, effectFrom, effectTo);
+                    Set<RoadEffect> effects = record.getEffects();
+                    for (RoadEffect effect : effects) {
+
+                        RoadEffect realEffect = registration.getEffect(effect.getEffectFrom(), effect.isUncertainFrom(), effect.getEffectTo(), effect.isUncertainTo());
+                        if (realEffect != null) {
+                            effect = realEffect;
+                            System.out.println("Using old effect");
+                        } else {
+                            effect.setRegistration(registration);
                         }
-                        data.addEffect(effect);*/
+
+                        //if (effect.getDataItems().isEmpty()) {
+                            System.out.println("Creating new baseData for effect "+effect.getEffectFrom()+"/"+effect.getEffectTo());
+                            RoadBaseData baseData = new RoadBaseData();
+                            baseData.addEffect(effect);
+                        //}
+                        //for (RoadBaseData baseData : effect.getDataItems()) {
+                            System.out.println("Populating baseData for effect "+effect.getEffectFrom()+"/"+effect.getEffectTo());
+                            // There really should be only one item for each effect right now
+                            record.populateBaseData(baseData, effect, registrationFrom, this.queryManager, session);
+                        //}
                     }
                 }
+
 
                 if (lastRegistration != null) {
                     lastRegistration.setRegistrationTo(registrationFrom);
@@ -221,6 +233,8 @@ public class RoadEntityManager extends CprEntityManager {
                 try {
                     queryManager.saveRegistration(session, entity, registration);
                 } catch (DataFordelerException e) {
+                    e.printStackTrace();
+                } catch (javax.persistence.EntityNotFoundException e) {
                     e.printStackTrace();
                 }
             }

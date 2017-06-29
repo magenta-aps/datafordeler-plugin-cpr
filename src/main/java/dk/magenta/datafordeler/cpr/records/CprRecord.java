@@ -48,7 +48,7 @@ public abstract class CprRecord extends Record {
         this.line = null;
     }
 
-    //public abstract DoubleHashMap<String,String,PersonBaseData> getDataEffects(String timestamp);
+    //public abstract DoubleHashMap<String,String,PersonBaseData> populateBaseData(String timestamp);
 
     protected static String normalizeDate(String date) {
         if (date == null || date.trim().isEmpty()) {

@@ -1,11 +1,14 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
+import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import org.hibernate.Session;
 
-import java.util.HashMap;
+import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by lars on 22-06-17.
@@ -38,16 +41,9 @@ public class NameRecord extends PersonDataRecord {
     }
 
     @Override
-    protected PersonBaseData createEmptyBaseData() {
-        return new PersonBaseData();
-    }
-
-    @Override
-    public void getDataEffects(HashMap<PersonEffect, PersonBaseData> data, String timestamp) {
-        PersonBaseData personBaseData;
-        if (timestamp.equals(this.get("nvn_ts"))) {
-            personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("nvnhaenstart"), this.getBoolean("haenstart_umrk-navne"));
-            personBaseData.setName(
+    public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+        if (registrationTime.equals(this.getOffsetDateTime("nvn_ts")) && effect.compareRange(this.getOffsetDateTime("nvnhaenstart"), this.getBoolean("haenstart_umrk-navne"), null, false)) {
+            data.setName(
                     this.getInt("start_mynkod-navne"),
                     this.get("fornvn"),
                     this.getMarking("fornvn_mrk"),
@@ -60,23 +56,20 @@ public class NameRecord extends PersonDataRecord {
                     this.getBoolean("indrap-navne")
             );
         }
-        if (timestamp.equals(this.get("adrnvn_ts"))) {
-            personBaseData = this.getBaseDataItem(data);
-            personBaseData.setAddressName(
+        if (registrationTime.equals(this.getOffsetDateTime("adrnvn_ts")) && effect.compareRange(null, false, null, false)) {
+            data.setAddressName(
                     this.getInt("adrnvn_mynkod"),
                     this.get("adrnvn")
             );
         }
-        if (timestamp.equals(this.get("dok_ts-navne"))) {
-            personBaseData = this.getBaseDataItem(data);
-            personBaseData.setNameVerification(
+        if (registrationTime.equals(this.getOffsetDateTime("dok_ts-navne")) && effect.compareRange(null, false, null, false)) {
+            data.setNameVerification(
                     this.getInt("dok_mynkod-navne"),
                     this.getBoolean("dok-navne")
             );
         }
-        if (timestamp.equals(this.get("myntxt_ts-navne"))) {
-            personBaseData = this.getBaseDataItem(data);
-            personBaseData.setNameAuthorityText(
+        if (registrationTime.equals(this.getOffsetDateTime("myntxt_ts-navne")) && effect.compareRange(null, false, null, false)) {
+            data.setNameAuthorityText(
                     this.getInt("myntxt_mynkod-navne"),
                     this.get("myntxt-navne")
             );
@@ -89,12 +82,20 @@ public class NameRecord extends PersonDataRecord {
     }
 
     @Override
-    public HashSet<String> getTimestamps() {
-        HashSet<String> timestamps = super.getTimestamps();
-        timestamps.add(this.get("nvn_ts"));
-        timestamps.add(this.get("adrnvn_ts"));
-        timestamps.add(this.get("dok_ts-navne"));
-        timestamps.add(this.get("myntxt_ts-navne"));
+    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
+        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
+        timestamps.add(this.getOffsetDateTime("nvn_ts"));
+        timestamps.add(this.getOffsetDateTime("adrnvn_ts"));
+        timestamps.add(this.getOffsetDateTime("dok_ts-navne"));
+        timestamps.add(this.getOffsetDateTime("myntxt_ts-navne"));
         return timestamps;
+    }
+
+    @Override
+    public Set<PersonEffect> getEffects() {
+        HashSet<PersonEffect> effects = new HashSet<>();
+        effects.add(new PersonEffect(null, this.getOffsetDateTime("nvnhaenstart"), this.getMarking("haenstart_umrk-navne"), null, false));
+        effects.add(new PersonEffect(null, null, false, null, false));
+        return effects;
     }
 }

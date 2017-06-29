@@ -1,11 +1,14 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
+import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import org.hibernate.Session;
 
-import java.util.HashMap;
+import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by lars on 27-06-17.
@@ -28,11 +31,9 @@ public class ProtectionRecord extends PersonDataRecord {
     }
 
     @Override
-    public void getDataEffects(HashMap<PersonEffect, PersonBaseData> data, String registrationFrom) {
-        PersonBaseData personBaseData;
-        if (registrationFrom.equals(this.get("start_ts-beskyttelse"))) {
-            personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slet_dt-beskyttelse"), false);
-            personBaseData.setProtection(
+    public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+        if (registrationTime.equals(this.get("start_ts-beskyttelse"))) {
+            data.setProtection(
                     this.getInt("start_mynkod-beskyttelse"),
                     this.getInt("beskyttype"),
                     this.getBoolean("indrap-beskyttelse")
@@ -41,14 +42,16 @@ public class ProtectionRecord extends PersonDataRecord {
     }
 
     @Override
-    protected PersonBaseData createEmptyBaseData() {
-        return new PersonBaseData();
+    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
+        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
+        timestamps.add(this.getOffsetDateTime("start_ts-beskyttelse"));
+        return timestamps;
     }
 
     @Override
-    public HashSet<String> getTimestamps() {
-        HashSet<String> timestamps = super.getTimestamps();
-        timestamps.add(this.get("start_ts-beskyttelse"));
-        return timestamps;
+    public Set<PersonEffect> getEffects() {
+        HashSet<PersonEffect> effects = new HashSet<>();
+        effects.add(new PersonEffect(null, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slet_dt-beskyttelse"), false));
+        return effects;
     }
 }

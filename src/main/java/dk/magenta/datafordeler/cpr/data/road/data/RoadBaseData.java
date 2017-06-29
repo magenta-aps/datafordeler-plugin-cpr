@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.data.road.data;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
+import dk.magenta.datafordeler.cpr.data.unversioned.PostCode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,9 +21,15 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private RoadCoreData coreData;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OrderBy("memoNumber")
     private List<RoadMemoData> memoData = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<RoadPostcodeData> postcodeData = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<RoadCityData> cityData = new ArrayList<>();
 
 
     public void setCore(int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode, int fromRoadCode, String addressingName, String name) {
@@ -44,6 +51,24 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         this.memoData.add(memoData);
     }
 
+    public void addPostcode(String houseNumberFrom, String houseNumberTo, boolean even, PostCode postCode) {
+        RoadPostcodeData postcodeData = new RoadPostcodeData();
+        postcodeData.setHouseNumberFrom(houseNumberFrom);
+        postcodeData.setHouseNumberTo(houseNumberTo);
+        postcodeData.setEven(even);
+        postcodeData.setPostCode(postCode);
+        this.postcodeData.add(postcodeData);
+    }
+
+    public void addCity(String houseNumberFrom, String houseNumberTo, boolean even, String cityName) {
+        RoadCityData cityData = new RoadCityData();
+        cityData.setHouseNumberFrom(houseNumberFrom);
+        cityData.setHouseNumberTo(houseNumberTo);
+        cityData.setEven(even);
+        cityData.setCityName(cityName);
+        this.cityData.add(cityData);
+    }
+
 
         /**
          * Return a map of attributes, including those from the superclass
@@ -57,6 +82,12 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         }
         if (this.memoData != null && !this.memoData.isEmpty()) {
             map.put("memo", this.memoData);
+        }
+        if (this.postcodeData != null && !this.postcodeData.isEmpty()) {
+            map.put("postcode", this.postcodeData);
+        }
+        if (this.cityData != null && !this.cityData.isEmpty()) {
+            map.put("city", this.cityData);
         }
         return map;
     }

@@ -35,7 +35,7 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
         return Integer.parseInt(this.get("pnr"));
     }
 
-    public HashSet<String> getTimestamps() {
+    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         return new HashSet<>();
     }
 
@@ -64,7 +64,9 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
         return data.get(effect);
     }
 
-    protected abstract PersonBaseData createEmptyBaseData();
+    protected PersonBaseData createEmptyBaseData() {
+        return new PersonBaseData();
+    }
 
     @Override
     protected PersonEffect createEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {

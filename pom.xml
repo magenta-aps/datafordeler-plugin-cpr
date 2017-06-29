@@ -8,7 +8,7 @@
     <artifactId>datafordeler-plugin-cpr</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>datafordeler-plugin-cpr</name>
+    <text>datafordeler-plugin-cpr</text>
 
     <properties>
         <java.version>1.8</java.version>

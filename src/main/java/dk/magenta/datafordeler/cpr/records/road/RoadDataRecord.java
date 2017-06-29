@@ -15,6 +15,8 @@ import java.util.HashSet;
 public abstract class RoadDataRecord extends CprDataRecord<RoadEffect, RoadBaseData> {
 
     public static final String RECORDTYPE_ROAD = "001";
+    public static final String RECORDTYPE_ROADCITY = "003";
+    public static final String RECORDTYPE_ROADPOSTCODE = "004";
     public static final String RECORDTYPE_ROADMEMO = "005";
     // TODO: Add one for each data type
 
@@ -22,10 +24,6 @@ public abstract class RoadDataRecord extends CprDataRecord<RoadEffect, RoadBaseD
         super(line);
         this.obtain("komkod", 4, 4);
         this.obtain("vejkod", 8, 4);
-    }
-
-    protected int getTimestampStart() {
-        return 21;
     }
 
     public int getMunicipalityCode() {
@@ -36,7 +34,7 @@ public abstract class RoadDataRecord extends CprDataRecord<RoadEffect, RoadBaseD
         return this.getInt("vejkod");
     }
 
-    public HashSet<String> getTimestamps() {
+    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         return new HashSet<>();
     }
 

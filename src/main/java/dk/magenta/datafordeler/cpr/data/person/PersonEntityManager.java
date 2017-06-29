@@ -8,13 +8,9 @@ import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.fapi.FapiService;
-import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
-import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
-import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
@@ -87,7 +83,7 @@ public class PersonEntityManager extends CprEntityManager {
         ListHashMap<PersonEntity, PersonDataRecord> recordMap = new ListHashMap<>();
         Session session = sessionManager.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        TreeSet<String> sortedTimestamps = new TreeSet<>();
+        TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
 
 
         HashMap<Integer, PersonEntity> entityCache = new HashMap<>();
@@ -111,14 +107,14 @@ public class PersonEntityManager extends CprEntityManager {
         }
 
         for (PersonEntity entity : recordMap.keySet()) {
-            ListHashMap<String, PersonDataRecord> ajourRecords = new ListHashMap<>();
+            ListHashMap<OffsetDateTime, PersonDataRecord> ajourRecords = new ListHashMap<>();
             List<PersonDataRecord> recordList = recordMap.get(entity);
 
             for (PersonDataRecord record : recordList) {
                 System.out.println("record: "+record);
-                Set<String> timestamps = record.getTimestamps();
-                for (String timestamp : timestamps) {
-                    if (timestamp != null && !timestamp.isEmpty()) {
+                Set<OffsetDateTime> timestamps = record.getRegistrationTimestamps();
+                for (OffsetDateTime timestamp : timestamps) {
+                    if (timestamp != null) {
                         ajourRecords.add(timestamp, record);
                         sortedTimestamps.add(timestamp);
                     }
@@ -127,9 +123,7 @@ public class PersonEntityManager extends CprEntityManager {
 
             // Create one Registration per unique timestamp
             PersonRegistration lastRegistration = null;
-            for (String timestamp : sortedTimestamps) {
-                OffsetDateTime registrationFrom = CprParser.parseTimestamp(timestamp);
-                System.out.println("timestamp: "+timestamp);
+            for (OffsetDateTime registrationFrom : sortedTimestamps) {
                 System.out.println("registrationFrom: "+registrationFrom);
 
                 PersonRegistration registration = entity.getRegistration(registrationFrom);
@@ -154,13 +148,33 @@ public class PersonEntityManager extends CprEntityManager {
 
                 // Each record sets its own basedata
                 HashMap<PersonEffect, PersonBaseData> data = new HashMap<>();
-                for (PersonDataRecord record : ajourRecords.get(timestamp)) {
+                for (PersonDataRecord record : ajourRecords.get(registrationFrom)) {
                     // Take what we need from the record and put it into dataitems
-                    record.getDataEffects(data, timestamp);
+                    Set<PersonEffect> effects = record.getEffects();
+                    for (PersonEffect effect : effects) {
+
+                        PersonEffect realEffect = registration.getEffect(effect.getEffectFrom(), effect.isUncertainFrom(), effect.getEffectTo(), effect.isUncertainTo());
+                        if (realEffect != null) {
+                            effect = realEffect;
+                        } else {
+                            effect.setRegistration(registration);
+                        }
+
+                        if (effect.getDataItems().isEmpty()) {
+                            PersonBaseData baseData = new PersonBaseData();
+                            baseData.addEffect(effect);
+                        }
+                        for (PersonBaseData baseData : effect.getDataItems()) {
+                            // There really should be only one item for each effect right now
+                            record.populateBaseData(baseData, effect, registrationFrom, this.queryManager, session);
+                        }
+                    }
+
+                    /*record.populateBaseData(data, timestamp);
                     for (PersonEffect effect : data.keySet()) {
                         PersonBaseData dataItem = data.get(effect);
                         effect.setRegistration(registration);
-                        dataItem.addEffect(effect);
+                        dataItem.addEffect(effect);*/
                         //PersonEffect effect = registration.getEffect(effectFrom, effectTo);
                         /*if (effect == null) {
                             effect = new PersonEffect(registration, effectFrom, effectTo);
@@ -168,7 +182,7 @@ public class PersonEntityManager extends CprEntityManager {
                         data.addEffect(effect);*/
 
 
-                    }
+                    //}
                 }
 
                 if (lastRegistration != null) {

@@ -15,12 +15,17 @@ import java.util.List;
 @Table(name="cpr_person_registration")
 public class PersonRegistration extends Registration<PersonEntity, PersonRegistration, PersonEffect> {
 
-    /*@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public List<PersonEffect> getEffects() {
-        ArrayList<PersonEffect> uniqueEffects = new ArrayList<>();
+    public PersonEffect getEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         for (PersonEffect effect : this.effects) {
-            OffsetDateTime effectFrom = effect.getEffectFrom();
+            if (
+                    (effect.getEffectFrom() == null ? effectFrom == null : effect.getEffectFrom().equals(effectFrom)) &&
+                    (effect.getEffectTo() == null ? effectTo == null : effect.getEffectTo().equals(effectTo)) &&
+                    (effect.isUncertainFrom() == effectFromUncertain) &&
+                    (effect.isUncertainTo() == effectToUncertain)
+            ) {
+                return effect;
+            }
         }
-        return uniqueEffects;
-    }*/
+        return null;
+    }
 }

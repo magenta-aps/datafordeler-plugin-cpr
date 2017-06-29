@@ -1,11 +1,14 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
+import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import org.hibernate.Session;
 
-import java.util.HashMap;
+import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by lars on 22-06-17.
@@ -49,16 +52,9 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
-    protected PersonBaseData createEmptyBaseData() {
-        return new PersonBaseData();
-    }
-
-    @Override
-    public void getDataEffects(HashMap<PersonEffect, PersonBaseData> data, String registrationFrom) {
-        PersonBaseData personBaseData;
-        if (registrationFrom.equals(this.get("adr_ts"))) {
-            personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"));
-            personBaseData.setAddress(
+    public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+        if (registrationTime.equals(this.getOffsetDateTime("adr_ts")) && effect.compareRange(this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), null, false)) {
+            data.setAddress(
                     this.getInt("start_mynkod-personbolig"),
                     this.getInt("komkod"),
                     this.getInt("vejkod"),
@@ -75,13 +71,11 @@ public class AddressRecord extends PersonDataRecord {
                     this.get("adr5-supladr")
             );
         }
-        if (registrationFrom.equals(this.get("convn_ts"))) {
-            personBaseData = this.getBaseDataItem(data, null, false);
-            personBaseData.setCoName(this.get("convn"));
+        if (registrationTime.equals(this.getOffsetDateTime("convn_ts")) && effect.compareRange(null, false, null, false)) {
+            data.setCoName(this.get("convn"));
         }
-        if (registrationFrom.equals(this.get("tilfra_ts"))) {
-            personBaseData = this.getBaseDataItem(data, null, false);
-            personBaseData.setMoveMunicipality(
+        if (registrationTime.equals(this.getOffsetDateTime("tilfra_ts")) && effect.compareRange(null, false, null, false)) {
+            data.setMoveMunicipality(
                     this.getInt("tilfra_mynkod"),
                     this.getDateTime("tilflykomdto"),
                     this.getBoolean("tilflykomdt_umrk"),
@@ -93,11 +87,19 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public HashSet<String> getTimestamps() {
-        HashSet<String> timestamps = super.getTimestamps();
-        timestamps.add(this.get("adr_ts"));
-        timestamps.add(this.get("convn_ts"));
-        timestamps.add(this.get("tilfra_ts"));
+    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
+        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
+        timestamps.add(this.getOffsetDateTime("adr_ts"));
+        timestamps.add(this.getOffsetDateTime("convn_ts"));
+        timestamps.add(this.getOffsetDateTime("tilfra_ts"));
         return timestamps;
+    }
+
+    @Override
+    public Set<PersonEffect> getEffects() {
+        HashSet<PersonEffect> effects = new HashSet<>();
+        effects.add(new PersonEffect(null, this.getOffsetDateTime("tilflydto"), this.getMarking("tilflydto_umrk"), null, false));
+        effects.add(new PersonEffect(null, null, false, null, false));
+        return effects;
     }
 }
