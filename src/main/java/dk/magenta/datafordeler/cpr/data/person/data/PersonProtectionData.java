@@ -15,24 +15,12 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "cpr_person_protection")
-public class PersonProtectionData extends DetailData {
+public class PersonProtectionData extends AuthorityDetailData {
+
 
     @Column
-    @JsonProperty
-    @XmlElement
-    private int authority;
-
-    public int getAuthority() {
-        return authority;
-    }
-
-    public void setAuthority(int authority) {
-        this.authority = authority;
-    }
-
-    @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "beskyttelsestype")
+    @XmlElement(name = "beskyttelsestype")
     private int protectionType;
 
     public int getProtectionType() {
@@ -44,8 +32,8 @@ public class PersonProtectionData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "rapportMarkering")
+    @XmlElement(name = "rapportMarkering")
     private boolean reportMarking;
 
     public boolean getReportMarking() {
@@ -58,8 +46,7 @@ public class PersonProtectionData extends DetailData {
 
     @Override
     public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("authority", this.authority);
+        HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("protectionType", this.protectionType);
         map.put("reportMarking", this.reportMarking);
         return map;

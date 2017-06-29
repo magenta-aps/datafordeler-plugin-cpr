@@ -19,8 +19,8 @@ import java.util.Map;
 public class PersonBirthData extends DetailData {
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "fødselstidspunkt")
+    @XmlElement(name = "fødselstidspunkt")
     private LocalDateTime birthDateTime;
 
     public LocalDateTime getBirthDateTime() {
@@ -34,8 +34,8 @@ public class PersonBirthData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "fødselstidspunktUsikkert")
+    @XmlElement(name = "fødselstidspunktUsikkert")
     private boolean birthDateUncertain;
 
     public boolean isBirthDateUncertain() {
@@ -49,8 +49,8 @@ public class PersonBirthData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "fødselsrækkefølge")
+    @XmlElement(name = "fødselsrækkefølge")
     private int birthSequence;
 
     public int getBirthSequence() {

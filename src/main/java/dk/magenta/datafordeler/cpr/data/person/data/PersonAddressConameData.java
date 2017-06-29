@@ -18,8 +18,8 @@ import java.util.Map;
 public class PersonAddressConameData extends DetailData {
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "conavn")
+    @XmlElement(name = "conavn")
     private String coName;
 
     public String getCoName() {

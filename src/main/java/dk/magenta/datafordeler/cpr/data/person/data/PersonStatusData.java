@@ -18,8 +18,8 @@ import java.util.Map;
 public class PersonStatusData extends DetailData {
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "status")
+    @XmlElement(name = "status")
     private String status;
 
     public String getStatus() {

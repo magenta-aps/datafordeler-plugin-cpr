@@ -1,8 +1,10 @@
 package dk.magenta.datafordeler.cpr.data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.database.Registration;
 
+import javax.xml.bind.annotation.XmlElement;
 import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
 
@@ -11,8 +13,12 @@ import java.time.temporal.TemporalAccessor;
  */
 public abstract class CprEffect<R extends Registration, V extends CprEffect, B extends CprData> extends Effect<R, V, B> {
 
+    @JsonProperty(value = "fraUsikker")
+    @XmlElement(name = "fraUsikker")
     private boolean uncertainFrom;
 
+    @JsonProperty(value = "tilUsikker")
+    @XmlElement(name = "tilUsikker")
     private boolean uncertainTo;
 
     public CprEffect() {

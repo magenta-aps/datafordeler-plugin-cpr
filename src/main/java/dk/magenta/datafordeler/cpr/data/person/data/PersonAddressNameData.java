@@ -15,24 +15,11 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "cpr_person_addressname")
-public class PersonAddressNameData extends DetailData {
+public class PersonAddressNameData extends AuthorityDetailData {
 
     @Column
-    @JsonProperty
-    @XmlElement
-    private int authority;
-
-    public int getAuthority() {
-        return this.authority;
-    }
-
-    public void setAuthority(int authority) {
-        this.authority = authority;
-    }
-
-    @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "adressenavn")
+    @XmlElement(name = "adressenavn")
     private String addressName;
 
     public String getAddressName() {
@@ -45,8 +32,7 @@ public class PersonAddressNameData extends DetailData {
 
     @Override
     public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("authority", this.authority);
+        HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("addressName", this.addressName);
         return map;
     }

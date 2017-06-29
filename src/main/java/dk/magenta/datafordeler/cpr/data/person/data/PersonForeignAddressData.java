@@ -17,26 +17,12 @@ import java.util.Map;
 @Entity
 @Table(name = "cpr_person_foreign_address")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PersonForeignAddressData extends DetailData {
-
-    @Column
-    @JsonProperty
-    @XmlElement
-    private int authority;
-
-    public int getAuthority() {
-        return this.authority;
-    }
-
-    public void setAuthority(int authority) {
-        this.authority = authority;
-    }
-
+public class PersonForeignAddressData extends AuthorityDetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "adresselinje1")
+    @XmlElement(name = "adresselinje1")
     private String addressLine1;
 
     public String getAddressLine1() {
@@ -48,8 +34,8 @@ public class PersonForeignAddressData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "adresselinje2")
+    @XmlElement(name = "adresselinje2")
     private String addressLine2;
 
     public String getAddressLine2() {
@@ -61,8 +47,8 @@ public class PersonForeignAddressData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "adresselinje3")
+    @XmlElement(name = "adresselinje3")
     private String addressLine3;
 
     public String getAddressLine3() {
@@ -74,8 +60,8 @@ public class PersonForeignAddressData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "adresselinje4")
+    @XmlElement(name = "adresselinje4")
     private String addressLine4;
 
     public String getAddressLine4() {
@@ -87,8 +73,8 @@ public class PersonForeignAddressData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "adresselinje5")
+    @XmlElement(name = "adresselinje5")
     private String addressLine5;
 
     public String getAddressLine5() {
@@ -101,8 +87,7 @@ public class PersonForeignAddressData extends DetailData {
 
     @Override
     public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("authority", this.authority);
+        HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("addressLine1", this.addressLine1);
         map.put("addressLine2", this.addressLine2);
         map.put("addressLine3", this.addressLine3);

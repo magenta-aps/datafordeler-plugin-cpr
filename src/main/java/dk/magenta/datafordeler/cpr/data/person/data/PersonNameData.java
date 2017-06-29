@@ -15,24 +15,12 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "cpr_person_name")
-public class PersonNameData extends DetailData {
+public class PersonNameData extends AuthorityDetailData {
+
 
     @Column
-    @JsonProperty
-    @XmlElement
-    private int authority;
-
-    public int getAuthority() {
-        return this.authority;
-    }
-
-    public void setAuthority(int authority) {
-        this.authority = authority;
-    }
-
-    @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "fornavn")
+    @XmlElement(name = "fornavn")
     private String firstName;
 
     public String getFirstName() {
@@ -44,8 +32,8 @@ public class PersonNameData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "fornavnMarkering")
+    @XmlElement(name = "fornavnMarkering")
     private boolean firstNameMarking;
 
     public boolean isFirstNameMarking() {
@@ -57,8 +45,8 @@ public class PersonNameData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "mellemnavn")
+    @XmlElement(name = "mellemnavn")
     private String middleName;
 
     public String getMiddleName() {
@@ -70,8 +58,8 @@ public class PersonNameData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "mellemnavnMarkering")
+    @XmlElement(name = "mellemnavnMarkering")
     private boolean middleNameMarking;
 
     public boolean isMiddleNameMarking() {
@@ -83,8 +71,8 @@ public class PersonNameData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "efternavn")
+    @XmlElement(name = "efternavn")
     private String lastName;
 
     public String getLastName() {
@@ -96,8 +84,8 @@ public class PersonNameData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "efternavnMarkering")
+    @XmlElement(name = "efternavnMarkering")
     private boolean lastNameMarking;
 
     public boolean isLastNameMarking() {
@@ -109,8 +97,8 @@ public class PersonNameData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "egetEfternavn")
+    @XmlElement(name = "egetEfternavn")
     private String ownLastName;
 
     public String getOwnLastName() {
@@ -122,8 +110,8 @@ public class PersonNameData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "egetEfternavnMarkering")
+    @XmlElement(name = "egetEfternavnMarkering")
     private boolean ownLastNameMarking;
 
     public boolean isOwnLastNameMarking() {
@@ -150,8 +138,7 @@ public class PersonNameData extends DetailData {
 
     @Override
     public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("authority", this.authority);
+        HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("firstName", this.firstName);
         map.put("firstNameMarking", this.firstNameMarking);
         map.put("middleName", this.middleName);

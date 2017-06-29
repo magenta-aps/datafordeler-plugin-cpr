@@ -18,13 +18,15 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "cpr_person_parent")
-public class PersonParentData extends DetailData {
+public class PersonParentData extends AuthorityDetailData {
 
     @Column
     @JsonIgnore
     @XmlTransient
     private boolean isMother;
 
+    @JsonIgnore
+    @XmlTransient
     public boolean isMother() {
         return this.isMother;
     }
@@ -36,23 +38,8 @@ public class PersonParentData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
-    private int authority;
-
-    public int getAuthority() {
-        return this.authority;
-    }
-
-    public void setAuthority(int authority) {
-        this.authority = authority;
-    }
-
-
-
-    @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "cprnummer")
+    @XmlElement(name = "cprnummer")
     private int cprNumber;
 
     public int getCprNumber() {
@@ -66,8 +53,8 @@ public class PersonParentData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "fødselsdato")
+    @XmlElement(name = "fødselsdato")
     private LocalDate birthDate;
 
     public LocalDate getBirthDate() {
@@ -81,8 +68,8 @@ public class PersonParentData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "fødselsdatoUsikker")
+    @XmlElement(name = "fødselsdatoUsikker")
     private boolean birthDateUncertain;
 
     public boolean isBirthDateUncertain() {
@@ -96,8 +83,8 @@ public class PersonParentData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "navn")
+    @XmlElement(name = "navn")
     private String name;
 
     public String getName() {
@@ -111,8 +98,8 @@ public class PersonParentData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "navneMarkering")
+    @XmlElement(name = "navneMarkering")
     private boolean nameMarking;
 
     public boolean isNameMarking() {
@@ -127,8 +114,7 @@ public class PersonParentData extends DetailData {
 
     @Override
     public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("authority", this.authority);
+        HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("cprNumber", this.cprNumber);
         map.put("birthDate", this.birthDate);
         map.put("birthDateUncertain", this.birthDateUncertain);

@@ -15,25 +15,12 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "cpr_person_emigration")
-public class PersonEmigrationData extends DetailData {
+public class PersonEmigrationData extends AuthorityDetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
-    private int authority;
-
-    public int getAuthority() {
-        return authority;
-    }
-
-    public void setAuthority(int authority) {
-        this.authority = authority;
-    }
-
-    @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "landekode")
+    @XmlElement(name = "landekode")
     private int countryCode;
 
     public int getCountryCode() {
@@ -46,8 +33,7 @@ public class PersonEmigrationData extends DetailData {
 
     @Override
     public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("authority", this.authority);
+        HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("countryCode", this.countryCode);
         return map;
     }

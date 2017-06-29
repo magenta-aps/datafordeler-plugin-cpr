@@ -15,7 +15,7 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "cpr_person_core")
-public class PersonCoreData extends DetailData {
+public class PersonCoreData extends AuthorityDetailData {
 
     public enum Gender {
         M,
@@ -23,8 +23,8 @@ public class PersonCoreData extends DetailData {
     }
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "nuværendeCprNummer")
+    @XmlElement(name = "nuværendeCprNummer")
     private int currentCprNumber;
 
     public int getCurrentCprNumber() {
@@ -38,8 +38,8 @@ public class PersonCoreData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "køn")
+    @XmlElement(name = "køn")
     private Gender gender;
 
     public Gender getGender() {
@@ -60,30 +60,15 @@ public class PersonCoreData extends DetailData {
         }
     }
 
-    @Column
-    @JsonProperty
-    @XmlElement
-    private int startAuthority;
-
-    public int getStartAuthority() {
-        return this.startAuthority;
-    }
-
-    public void setStartAuthority(int startAuthority) {
-        this.startAuthority = startAuthority;
-    }
 
     @Override
     public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>(super.asMap());
         if (currentCprNumber != 0) {
             map.put("currentCprNumber", this.currentCprNumber);
         }
         if (this.gender != null) {
             map.put("gender", this.gender);
-        }
-        if (this.startAuthority != 0) {
-            map.put("startAuthority", this.startAuthority);
         }
         return map;
     }

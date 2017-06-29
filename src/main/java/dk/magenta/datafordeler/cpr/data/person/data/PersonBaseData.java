@@ -91,7 +91,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.coreData == null) {
             this.coreData = new PersonCoreData();
         }
-        this.coreData.setStartAuthority(authority);
+        this.coreData.setAuthority(authority);
     }
 
     public void setStatus(String status) {
@@ -289,46 +289,46 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             map.put("status", this.statusData.getStatus());
         }
         if (this.motherData != null) {
-            map.put("mother", this.motherData);
+            map.put("mor", this.motherData);
         }
         if (this.fatherData != null) {
-            map.put("father", this.fatherData);
+            map.put("far", this.fatherData);
         }
         if (this.motherVerificationData != null) {
-            map.put("motherVerification", this.motherVerificationData);
+            map.put("morVerifikation", this.motherVerificationData);
         }
         if (this.fatherVerificationData != null) {
-            map.put("fatherVerification", this.fatherVerificationData);
+            map.put("farVerifikation", this.fatherVerificationData);
         }
         if (this.positionData != null) {
             map.put("position", this.positionData);
         }
         if (this.birthData != null) {
-            map.put("birth", this.birthData);
+            map.put("fødsel", this.birthData);
         }
         if (this.addressData != null) {
-            map.put("address", this.addressData);
+            map.put("adresse", this.addressData);
         }
         if (this.nameData != null) {
-            map.put("name", this.nameData);
+            map.put("navn", this.nameData);
         }
         if (this.addressNameData != null) {
             map.put("addressNameData", this.addressNameData);
         }
         if (this.nameVerificationData != null) {
-            map.put("nameVerification", this.nameVerificationData);
+            map.put("navneverifikation", this.nameVerificationData);
         }
         if (this.nameAuthorityTextData != null) {
-            map.put("nameAuthority", this.nameAuthorityTextData);
+            map.put("navnemyndighed", this.nameAuthorityTextData);
         }
         if (this.protectionData != null) {
-            map.put("protection", this.protectionData);
+            map.put("beskyttelse", this.protectionData);
         }
         if (this.emigrationData != null) {
-            map.put("emigration", this.emigrationData);
+            map.put("udrejse", this.emigrationData);
         }
         if (this.foreignAddressData != null) {
-            map.put("foreignAddress", this.foreignAddressData);
+            map.put("udlandsadresse", this.foreignAddressData);
         }
 
         return map;

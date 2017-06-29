@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
@@ -38,6 +39,9 @@ public class ParseTest {
     @Autowired
     private RoadEntityManager roadEntityManager;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     public void testParsePerson() throws IOException, ParseException {
         Session session = null;
@@ -52,7 +56,7 @@ public class ParseTest {
 
             try {
                 List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
-                System.out.println(entities);
+                System.out.println(objectMapper.writeValueAsString(entities));
             } catch (DataFordelerException e) {
                 e.printStackTrace();
             }
@@ -78,7 +82,7 @@ public class ParseTest {
 
             try {
                 List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
-                System.out.println(entities);
+                System.out.println(objectMapper.writeValueAsString(entities));
             } catch (DataFordelerException e) {
                 e.printStackTrace();
             }

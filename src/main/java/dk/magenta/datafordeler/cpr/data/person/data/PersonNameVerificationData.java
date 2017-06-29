@@ -15,27 +15,12 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "cpr_person_name_verification")
-public class PersonNameVerificationData extends DetailData {
+public class PersonNameVerificationData extends AuthorityDetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
-    private int authority;
-
-    public int getAuthority() {
-        return this.authority;
-    }
-
-    public void setAuthority(int authority) {
-        this.authority = authority;
-    }
-
-
-
-    @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "verificeret")
+    @XmlElement(name = "verificeret")
     private boolean verification;
 
     public boolean isVerification() {
@@ -50,8 +35,7 @@ public class PersonNameVerificationData extends DetailData {
 
     @Override
     public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("authority", this.authority);
+        HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("verification", this.verification);
         return map;
     }

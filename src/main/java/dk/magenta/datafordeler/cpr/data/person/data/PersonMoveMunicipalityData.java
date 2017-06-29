@@ -18,27 +18,12 @@ import java.util.Map;
 @Entity
 @Table(name = "cpr_person_address")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PersonMoveMunicipalityData extends DetailData {
+public class PersonMoveMunicipalityData extends AuthorityDetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
-    private int authority;
-
-    public int getAuthority() {
-        return this.authority;
-    }
-
-    public void setAuthority(int authority) {
-        this.authority = authority;
-    }
-
-
-
-    @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "tilflytningsdato")
+    @XmlElement(name = "tilflytningsdato")
     private LocalDateTime moveToDate;
 
     public LocalDateTime getMoveToDate() {
@@ -52,8 +37,8 @@ public class PersonMoveMunicipalityData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "tilflytningsdatoUsikker")
+    @XmlElement(name = "tilflytningsdatoUsikker")
     private boolean moveToDateUncertain;
 
     public boolean isMoveToDateUncertain() {
@@ -67,8 +52,8 @@ public class PersonMoveMunicipalityData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "fraflytningskommune")
+    @XmlElement(name = "fraflytningskommune")
     private int moveFromMunicipality;
 
     public int getMoveFromMunicipality() {
@@ -82,8 +67,8 @@ public class PersonMoveMunicipalityData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "fraflytningsdato")
+    @XmlElement(name = "fraflytningsdato")
     private LocalDateTime moveFromDate;
 
     public LocalDateTime getMoveFromDate() {
@@ -97,8 +82,8 @@ public class PersonMoveMunicipalityData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "fraflytningsdatoUsikker")
+    @XmlElement(name = "fraflytningsdatoUsikker")
     private boolean moveFromDateUncertain;
 
     public boolean isMoveFromDateUncertain() {
@@ -113,8 +98,7 @@ public class PersonMoveMunicipalityData extends DetailData {
 
     @Override
     public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("authority", this.authority);
+        HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("moveToDate", this.moveToDate);
         map.put("moveToDateUncertain", this.moveToDateUncertain);
         map.put("moveFromMunicipality", this.moveFromMunicipality);

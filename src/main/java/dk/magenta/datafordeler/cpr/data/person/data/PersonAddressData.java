@@ -17,26 +17,12 @@ import java.util.Map;
 @Entity
 @Table(name = "cpr_person_address")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PersonAddressData extends DetailData {
-
-    @Column
-    @JsonProperty
-    @XmlElement
-    private int authority;
-
-    public int getAuthority() {
-        return this.authority;
-    }
-
-    public void setAuthority(int authority) {
-        this.authority = authority;
-    }
-
+public class PersonAddressData extends AuthorityDetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "kommunekode")
+    @XmlElement(name = "kommunekode")
     private int municipalityCode;
 
     public int getMunicipalityCode() {
@@ -50,8 +36,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "vejkode")
+    @XmlElement(name = "vejkode")
     private int roadCode;
 
     public int getRoadCode() {
@@ -65,8 +51,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "husnummer")
+    @XmlElement(name = "husnummer")
     private String houseNumber;
 
     public String getHouseNumber() {
@@ -80,8 +66,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "etage")
+    @XmlElement(name = "etage")
     private String floor;
 
     public String getFloor() {
@@ -95,8 +81,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "sidedør")
+    @XmlElement(name = "sidedør")
     private String door;
 
     public String getDoor() {
@@ -110,8 +96,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "bnr")
+    @XmlElement(name = "bnr")
     private String bNumber;
 
     public String getbNumber() {
@@ -125,8 +111,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "adresseteksttype")
+    @XmlElement(name = "adresseteksttype")
     private int addressTextType;
 
     public int getAddressTextType() {
@@ -140,8 +126,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "startmyndighed")
+    @XmlElement(name = "startmyndighed")
     private int startAuthority;
 
     public int getStartAuthority() {
@@ -155,8 +141,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "supplerendeAdresse1")
+    @XmlElement(name = "supplerendeAdresse1")
     private String supplementaryAddress1;
 
     public String getSupplementaryAddress1() {
@@ -170,8 +156,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "supplerendeAdresse2")
+    @XmlElement(name = "supplerendeAdresse2")
     private String supplementaryAddress2;
 
     public String getSupplementaryAddress2() {
@@ -185,8 +171,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "supplerendeAdresse3")
+    @XmlElement(name = "supplerendeAdresse3")
     private String supplementaryAddress3;
 
     public String getSupplementaryAddress3() {
@@ -200,8 +186,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "supplerendeAdresse4")
+    @XmlElement(name = "supplerendeAdresse4")
     private String supplementaryAddress4;
 
     public String getSupplementaryAddress4() {
@@ -215,8 +201,8 @@ public class PersonAddressData extends DetailData {
 
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty(value = "supplerendeAdresse5")
+    @XmlElement(name = "supplerendeAdresse5")
     private String supplementaryAddress5;
 
     public String getSupplementaryAddress5() {
@@ -231,8 +217,7 @@ public class PersonAddressData extends DetailData {
 
     @Override
     public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("authority", this.authority);
+        HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("municipalityCode", this.municipalityCode);
         map.put("roadCode", this.roadCode);
         map.put("houseNumber", this.houseNumber);
