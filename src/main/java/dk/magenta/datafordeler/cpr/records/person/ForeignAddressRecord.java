@@ -5,12 +5,13 @@ import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
  * Created by lars on 27-06-17.
  */
-public class ForeignAddressRecord extends PersonDataRecord<PersonBaseData> {
+public class ForeignAddressRecord extends PersonDataRecord {
 
     public ForeignAddressRecord(String line) throws ParseException {
         super(line);
@@ -34,8 +35,7 @@ public class ForeignAddressRecord extends PersonDataRecord<PersonBaseData> {
     }
 
     @Override
-    public ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String registrationFrom) {
-        ListHashMap<PersonEffect, PersonBaseData> data = new ListHashMap<>();
+    public void getDataEffects(HashMap<PersonEffect, PersonBaseData> data, String registrationFrom) {
         PersonBaseData personBaseData;
         if (registrationFrom.equals(this.get("udr_ts"))) {
             personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("udrdto"), this.getMarking("udrdto_umrk"));
@@ -45,7 +45,6 @@ public class ForeignAddressRecord extends PersonDataRecord<PersonBaseData> {
             personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("udrdto"), this.getMarking("udrdto_umrk"));
             personBaseData.setForeignAddress(this.getInt("udlandadr_mynkod"), this.get("udlandadr1"), this.get("udlandadr2"), this.get("udlandadr3"), this.get("udlandadr4"), this.get("udlandadr5"));
         }
-        return data;
     }
 
     @Override

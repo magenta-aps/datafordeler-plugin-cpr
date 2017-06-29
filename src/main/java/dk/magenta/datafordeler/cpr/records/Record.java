@@ -119,9 +119,7 @@ public abstract class Record extends HashMap<String, String> {
     }
 
     public OffsetDateTime getOffsetDateTime(String key) {
-        System.out.println("parsing "+this.get(key)+" as offsetdatetime");
         LocalDateTime dateTime = this.getDateTime(key);
-        System.out.println("dateTime: "+dateTime);
         if (dateTime != null) {
             return OffsetDateTime.from(
                     ZonedDateTime.of(

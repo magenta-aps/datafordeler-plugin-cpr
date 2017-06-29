@@ -1,6 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.road;
 
-import dk.magenta.datafordeler.core.database.Effect;
+import dk.magenta.datafordeler.cpr.data.CprEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 
 import javax.persistence.Table;
@@ -12,11 +12,7 @@ import java.time.temporal.TemporalAccessor;
  */
 @javax.persistence.Entity
 @Table(name="cpr_road_effect")
-public class RoadEffect extends Effect<RoadRegistration, RoadEffect, RoadBaseData> {
-
-    private boolean uncertainFrom;
-
-    private boolean uncertainTo;
+public class RoadEffect extends CprEffect<RoadRegistration, RoadEffect, RoadBaseData> {
 
     public RoadEffect() {
     }
@@ -33,23 +29,4 @@ public class RoadEffect extends Effect<RoadRegistration, RoadEffect, RoadBaseDat
         super(registration, effectFrom, effectTo);
     }
 
-    public boolean isUncertainFrom() {
-        return this.uncertainFrom;
-    }
-
-    public void setUncertainFrom(boolean uncertainFrom) {
-        this.uncertainFrom = uncertainFrom;
-    }
-
-    public boolean isUncertainTo() {
-        return this.uncertainTo;
-    }
-
-    public void setUncertainTo(boolean uncertainTo) {
-        this.uncertainTo = uncertainTo;
-    }
-
-    public void setRegistration(RoadRegistration registration) {
-        super.setRegistration(registration);
-    }
 }

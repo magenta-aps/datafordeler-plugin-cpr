@@ -1,17 +1,17 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
  * Created by lars on 22-06-17.
  */
-public class HistoricAddressRecord extends PersonDataRecord<PersonBaseData> {
+public class HistoricAddressRecord extends PersonDataRecord {
 
     public HistoricAddressRecord(String line) throws ParseException {
         super(line);
@@ -45,8 +45,7 @@ public class HistoricAddressRecord extends PersonDataRecord<PersonBaseData> {
     }
 
     @Override
-    public ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String registrationFrom) {
-        ListHashMap<PersonEffect, PersonBaseData> data = new ListHashMap<>();
+    public void getDataEffects(HashMap<PersonEffect, PersonBaseData> data, String registrationFrom) {
         PersonBaseData personBaseData;
 
         OffsetDateTime effectFrom = this.getOffsetDateTime("nvnhaenstart");
@@ -90,7 +89,6 @@ public class HistoricAddressRecord extends PersonDataRecord<PersonBaseData> {
                     this.get("myntxt-navne")
             );
         }
-        return data;
     }
 
     @Override

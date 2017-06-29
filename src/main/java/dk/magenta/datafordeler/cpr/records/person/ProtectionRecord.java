@@ -1,16 +1,16 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
  * Created by lars on 27-06-17.
  */
-public class ProtectionRecord extends PersonDataRecord<PersonBaseData> {
+public class ProtectionRecord extends PersonDataRecord {
 
     public ProtectionRecord(String line) throws ParseException {
         super(line);
@@ -28,8 +28,7 @@ public class ProtectionRecord extends PersonDataRecord<PersonBaseData> {
     }
 
     @Override
-    public ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String registrationFrom) {
-        ListHashMap<PersonEffect, PersonBaseData> data = new ListHashMap<>();
+    public void getDataEffects(HashMap<PersonEffect, PersonBaseData> data, String registrationFrom) {
         PersonBaseData personBaseData;
         if (registrationFrom.equals(this.get("start_ts-beskyttelse"))) {
             personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slet_dt-beskyttelse"), false);
@@ -39,7 +38,6 @@ public class ProtectionRecord extends PersonDataRecord<PersonBaseData> {
                     this.getBoolean("indrap-beskyttelse")
             );
         }
-        return data;
     }
 
     @Override

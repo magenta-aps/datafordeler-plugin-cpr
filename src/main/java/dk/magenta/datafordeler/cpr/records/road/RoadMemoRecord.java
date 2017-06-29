@@ -1,16 +1,16 @@
 package dk.magenta.datafordeler.cpr.records.road;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
  * Created by lars on 28-06-17.
  */
-public class RoadMemoRecord extends RoadDataRecord<RoadBaseData> {
+public class RoadMemoRecord extends RoadDataRecord {
 
     public RoadMemoRecord(String line) throws ParseException {
         super(line);
@@ -33,8 +33,7 @@ public class RoadMemoRecord extends RoadDataRecord<RoadBaseData> {
     }
 
     @Override
-    public ListHashMap<RoadEffect, RoadBaseData> getDataEffects(String registrationFrom) {
-        ListHashMap<RoadEffect, RoadBaseData> data = new ListHashMap<>();
+    public void getDataEffects(HashMap<RoadEffect, RoadBaseData> data, String registrationFrom) {
         RoadBaseData roadBaseData;
         if (registrationFrom.equals(this.get("timestamp"))) {
             roadBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("haenstart"), false);
@@ -43,7 +42,6 @@ public class RoadMemoRecord extends RoadDataRecord<RoadBaseData> {
                     this.get("notatlinie")
             );
         }
-        return data;
     }
 
     @Override

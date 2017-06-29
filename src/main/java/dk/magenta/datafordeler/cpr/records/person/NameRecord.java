@@ -1,16 +1,16 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
  * Created by lars on 22-06-17.
  */
-public class NameRecord extends PersonDataRecord<PersonBaseData> {
+public class NameRecord extends PersonDataRecord {
     public NameRecord(String line) throws ParseException {
         super(line);
         this.obtain("start_mynkod-navne", 14, 4);
@@ -43,8 +43,7 @@ public class NameRecord extends PersonDataRecord<PersonBaseData> {
     }
 
     @Override
-    public ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String timestamp) {
-        ListHashMap<PersonEffect, PersonBaseData> data = new ListHashMap<>();
+    public void getDataEffects(HashMap<PersonEffect, PersonBaseData> data, String timestamp) {
         PersonBaseData personBaseData;
         if (timestamp.equals(this.get("nvn_ts"))) {
             personBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("nvnhaenstart"), this.getBoolean("haenstart_umrk-navne"));
@@ -82,7 +81,6 @@ public class NameRecord extends PersonDataRecord<PersonBaseData> {
                     this.get("myntxt-navne")
             );
         }
-        return data;
     }
 
     @Override

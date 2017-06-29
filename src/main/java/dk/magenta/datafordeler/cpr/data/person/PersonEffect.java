@@ -1,6 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
-import dk.magenta.datafordeler.core.database.Effect;
+import dk.magenta.datafordeler.cpr.data.CprEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
 import javax.persistence.Table;
@@ -12,11 +12,7 @@ import java.time.temporal.TemporalAccessor;
  */
 @javax.persistence.Entity
 @Table(name="cpr_person_effect")
-public class PersonEffect extends Effect<PersonRegistration, PersonEffect, PersonBaseData> {
-
-    private boolean uncertainFrom;
-
-    private boolean uncertainTo;
+public class PersonEffect extends CprEffect<PersonRegistration, PersonEffect, PersonBaseData> {
 
     public PersonEffect() {
     }
@@ -33,23 +29,4 @@ public class PersonEffect extends Effect<PersonRegistration, PersonEffect, Perso
         super(registration, effectFrom, effectTo);
     }
 
-    public boolean isUncertainFrom() {
-        return this.uncertainFrom;
-    }
-
-    public void setUncertainFrom(boolean uncertainFrom) {
-        this.uncertainFrom = uncertainFrom;
-    }
-
-    public boolean isUncertainTo() {
-        return this.uncertainTo;
-    }
-
-    public void setUncertainTo(boolean uncertainTo) {
-        this.uncertainTo = uncertainTo;
-    }
-
-    public void setRegistration(PersonRegistration registration) {
-        super.setRegistration(registration);
-    }
 }

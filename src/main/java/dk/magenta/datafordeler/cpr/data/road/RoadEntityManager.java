@@ -171,9 +171,9 @@ public class RoadEntityManager extends CprEntityManager {
                         //registration = this.cloneRegistration(lastRegistration);
                         registration = new RoadRegistration();
                         for (RoadEffect originalEffect : lastRegistration.getEffects()) {
-                            RoadEffect newEffect = new RoadEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
+                            RoadEffect copyEffect = new RoadEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
                             for (RoadBaseData originalData : originalEffect.getDataItems()) {
-                                originalData.addEffect(newEffect);
+                                originalData.addEffect(copyEffect);
                             }
                         }
                     }
@@ -184,22 +184,23 @@ public class RoadEntityManager extends CprEntityManager {
                 registration.setEntity(entity);
                 entity.addRegistration(registration);
 
+
+
+
                 // Each record sets its own basedata
+                HashMap<RoadEffect, RoadBaseData> data = new HashMap<>();
                 for (RoadDataRecord record : ajourRecords.get(timestamp)) {
                     // Take what we need from the record and put it into dataitems
-                    ListHashMap<RoadEffect, RoadBaseData> dataItems = record.getDataEffects(timestamp);
-                    if (dataItems != null) {
-                        for (RoadEffect effect : dataItems.keySet()) {
-                            for (RoadBaseData data : dataItems.get(effect)) {
-                                effect.setRegistration(registration);
-                                data.addEffect(effect);
-                                //RoadEffect effect = registration.getEffect(effectFrom, effectTo);
-                                /*if (effect == null) {
-                                    effect = new RoadEffect(registration, effectFrom, effectTo);
-                                }
-                                data.addEffect(effect);*/
-                            }
+                    record.getDataEffects(data, timestamp);
+                    for (RoadEffect effect : data.keySet()) {
+                        RoadBaseData dataItem = data.get(effect);
+                        effect.setRegistration(registration);
+                        dataItem.addEffect(effect);
+                        //RoadEffect effect = registration.getEffect(effectFrom, effectTo);
+                        /*if (effect == null) {
+                            effect = new RoadEffect(registration, effectFrom, effectTo);
                         }
+                        data.addEffect(effect);*/
                     }
                 }
 

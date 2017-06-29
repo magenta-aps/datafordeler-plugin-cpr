@@ -1,17 +1,17 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
  * Created by lars on 22-06-17.
  */
-public class PersonRecord extends PersonDataRecord<PersonBaseData> {
+public class PersonRecord extends PersonDataRecord {
     public PersonRecord(String line) throws ParseException {
         super(line);
         this.obtain("pnrgaeld", 14, 10);
@@ -66,8 +66,7 @@ public class PersonRecord extends PersonDataRecord<PersonBaseData> {
      * @return
      */
     @Override
-    public ListHashMap<PersonEffect, PersonBaseData> getDataEffects(String registrationFrom) {
-        ListHashMap<PersonEffect, PersonBaseData> data = new ListHashMap<>();
+    public void getDataEffects(HashMap<PersonEffect, PersonBaseData> data, String registrationFrom) {
         PersonBaseData personBaseData;
 
         if (registrationFrom.equals(this.get("status_ts"))) {
@@ -135,8 +134,6 @@ public class PersonRecord extends PersonDataRecord<PersonBaseData> {
             personBaseData.setGender(this.get("koen"));
             personBaseData.setStartAuthority(this.getInt("start_mynkod-road"));
         }
-
-        return data;
     }
 
     @Override

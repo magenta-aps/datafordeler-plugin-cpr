@@ -12,7 +12,9 @@ import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
+import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
@@ -151,21 +153,21 @@ public class PersonEntityManager extends CprEntityManager {
                 entity.addRegistration(registration);
 
                 // Each record sets its own basedata
+                HashMap<PersonEffect, PersonBaseData> data = new HashMap<>();
                 for (PersonDataRecord record : ajourRecords.get(timestamp)) {
                     // Take what we need from the record and put it into dataitems
-                    ListHashMap<PersonEffect, PersonBaseData> dataItems = record.getDataEffects(timestamp);
-                    if (dataItems != null) {
-                        for (PersonEffect effect : dataItems.keySet()) {
-                            for (PersonBaseData data : dataItems.get(effect)) {
-                                effect.setRegistration(registration);
-                                data.addEffect(effect);
-                                //PersonEffect effect = registration.getEffect(effectFrom, effectTo);
-                                /*if (effect == null) {
-                                    effect = new PersonEffect(registration, effectFrom, effectTo);
-                                }
-                                data.addEffect(effect);*/
-                            }
+                    record.getDataEffects(data, timestamp);
+                    for (PersonEffect effect : data.keySet()) {
+                        PersonBaseData dataItem = data.get(effect);
+                        effect.setRegistration(registration);
+                        dataItem.addEffect(effect);
+                        //PersonEffect effect = registration.getEffect(effectFrom, effectTo);
+                        /*if (effect == null) {
+                            effect = new PersonEffect(registration, effectFrom, effectTo);
                         }
+                        data.addEffect(effect);*/
+
+
                     }
                 }
 

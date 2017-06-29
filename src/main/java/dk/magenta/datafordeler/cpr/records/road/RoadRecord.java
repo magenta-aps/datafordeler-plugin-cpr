@@ -8,12 +8,13 @@ import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
  * Created by lars on 28-06-17.
  */
-public class RoadRecord extends RoadDataRecord<RoadBaseData> {
+public class RoadRecord extends RoadDataRecord {
 
     public RoadRecord(String line) throws ParseException {
         super(line);
@@ -40,8 +41,7 @@ public class RoadRecord extends RoadDataRecord<RoadBaseData> {
     }
 
     @Override
-    public ListHashMap<RoadEffect, RoadBaseData> getDataEffects(String registrationFrom) {
-        ListHashMap<RoadEffect, RoadBaseData> data = new ListHashMap<>();
+    public void getDataEffects(HashMap<RoadEffect, RoadBaseData> data, String registrationFrom) {
         RoadBaseData roadBaseData;
         if (registrationFrom.equals(this.get("timestamp"))) {
             roadBaseData = this.getBaseDataItem(data, this.getOffsetDateTime("haenstart"), false);
@@ -54,7 +54,6 @@ public class RoadRecord extends RoadDataRecord<RoadBaseData> {
                     this.get("vejnvn")
             );
         }
-        return data;
     }
 
     @Override
