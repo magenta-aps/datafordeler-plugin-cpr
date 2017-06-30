@@ -21,9 +21,7 @@ import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
@@ -108,140 +106,141 @@ public class RoadEntityManager extends CprEntityManager {
     @Override
     public List<RoadRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
         ArrayList<RoadRegistration> allRegistrations = new ArrayList<>();
-        List<Record> records = roadParser.parse(registrationData, "utf-8");
-        ListHashMap<RoadEntity, RoadDataRecord> recordMap = new ListHashMap<>();
-        Session session = sessionManager.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData));
 
-        DoubleHashMap<Integer, Integer, RoadEntity> entityCache = new DoubleHashMap<>();
+        boolean done = false;
+        while (!done) {
+            int limit = 1000;
+            StringJoiner buffer = new StringJoiner("\n");
+            int i;
+            for (i = 0; i < limit; i++) {
+                String line = reader.readLine();
+                if (line != null) {
+                    buffer.add(line);
+                } else {
+                    done = true;
+                }
+            }
+            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes());
 
-        for (Record record : records) {
-            if (record instanceof RoadDataRecord) {
-                RoadDataRecord roadDataRecord = (RoadDataRecord) record;
-                HashMap<String, Object> lookup = new HashMap<>();
-                int municipalityCode = roadDataRecord.getMunicipalityCode();
-                int roadcode = roadDataRecord.getRoadCode();
-                lookup.put("municipalityCode", municipalityCode);
-                lookup.put("roadCode", roadcode);
-                RoadEntity entity = entityCache.get(municipalityCode, roadcode);
-                if (entity == null) {
-                    entity = queryManager.getItem(session, RoadEntity.class, lookup);
+            List<Record> records = roadParser.parse(chunk, "iso-8859-1");
+            ListHashMap<RoadEntity, RoadDataRecord> recordMap = new ListHashMap<>();
+            Session session = sessionManager.getSessionFactory().openSession();
+            Transaction transaction = session.beginTransaction();
+
+            DoubleHashMap<Integer, Integer, RoadEntity> entityCache = new DoubleHashMap<>();
+
+            for (Record record : records) {
+                if (record instanceof RoadDataRecord) {
+                    RoadDataRecord roadDataRecord = (RoadDataRecord) record;
+                    HashMap<String, Object> lookup = new HashMap<>();
+                    int municipalityCode = roadDataRecord.getMunicipalityCode();
+                    int roadcode = roadDataRecord.getRoadCode();
+                    lookup.put("municipalityCode", municipalityCode);
+                    lookup.put("roadCode", roadcode);
+                    RoadEntity entity = entityCache.get(municipalityCode, roadcode);
                     if (entity == null) {
-                        entity = new RoadEntity(UUID.randomUUID(), "test");
-                        entity.setMunicipalityCode(roadDataRecord.getMunicipalityCode());
-                        entity.setRoadCode(roadDataRecord.getRoadCode());
+                        entity = queryManager.getItem(session, RoadEntity.class, lookup);
+                        if (entity == null) {
+                            entity = new RoadEntity(UUID.randomUUID(), "test");
+                            entity.setMunicipalityCode(roadDataRecord.getMunicipalityCode());
+                            entity.setRoadCode(roadDataRecord.getRoadCode());
+                        }
+                        entityCache.put(municipalityCode, roadcode, entity);
                     }
-                    entityCache.put(municipalityCode, roadcode, entity);
-                }
-                recordMap.add(entity, roadDataRecord);
-            }
-        }
-        System.out.println("recordMap: "+recordMap);
-
-        for (RoadEntity entity : recordMap.keySet()) {
-            ArrayList<RoadRegistration> entityRegistrations = new ArrayList<>();
-            ListHashMap<OffsetDateTime, RoadDataRecord> ajourRecords = new ListHashMap<>();
-            List<RoadDataRecord> recordList = recordMap.get(entity);
-
-            TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
-            for (RoadDataRecord record : recordList) {
-                System.out.println("record: "+record);
-                Set<OffsetDateTime> timestamps = record.getRegistrationTimestamps();
-                for (OffsetDateTime timestamp : timestamps) {
-                    if (timestamp != null) {
-                        ajourRecords.add(timestamp, record);
-                        sortedTimestamps.add(timestamp);
-                    }
+                    recordMap.add(entity, roadDataRecord);
                 }
             }
 
-            // Create one Registration per unique timestamp
-            RoadRegistration lastRegistration = null;
-            for (OffsetDateTime registrationFrom : sortedTimestamps) {
-                System.out.println("registrationFrom: "+registrationFrom);
+            for (RoadEntity entity : recordMap.keySet()) {
+                ArrayList<RoadRegistration> entityRegistrations = new ArrayList<>();
+                ListHashMap<OffsetDateTime, RoadDataRecord> ajourRecords = new ListHashMap<>();
+                List<RoadDataRecord> recordList = recordMap.get(entity);
 
-                RoadRegistration registration = entity.getRegistration(registrationFrom);
-                if (registration == null) {
-                    System.out.println("Did not find existing registration");
-                    if (lastRegistration == null) {
-                        registration = new RoadRegistration();
-                    } else {
-                        //registration = this.cloneRegistration(lastRegistration);
-                        registration = new RoadRegistration();
-                        for (RoadEffect originalEffect : lastRegistration.getEffects()) {
-                            RoadEffect copyEffect = new RoadEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
-                            copyEffect.setUncertainFrom(originalEffect.isUncertainFrom());
-                            copyEffect.setUncertainTo(originalEffect.isUncertainTo());
-                            for (RoadBaseData originalData : originalEffect.getDataItems()) {
-                                originalData.addEffect(copyEffect);
+                TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
+                for (RoadDataRecord record : recordList) {
+                    Set<OffsetDateTime> timestamps = record.getRegistrationTimestamps();
+                    for (OffsetDateTime timestamp : timestamps) {
+                        if (timestamp != null) {
+                            ajourRecords.add(timestamp, record);
+                            sortedTimestamps.add(timestamp);
+                        }
+                    }
+                }
+
+                // Create one Registration per unique timestamp
+                RoadRegistration lastRegistration = null;
+                for (OffsetDateTime registrationFrom : sortedTimestamps) {
+
+                    RoadRegistration registration = entity.getRegistration(registrationFrom);
+                    if (registration == null) {
+                        if (lastRegistration == null) {
+                            registration = new RoadRegistration();
+                        } else {
+                            //registration = this.cloneRegistration(lastRegistration);
+                            registration = new RoadRegistration();
+                            for (RoadEffect originalEffect : lastRegistration.getEffects()) {
+                                RoadEffect copyEffect = new RoadEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
+                                copyEffect.setUncertainFrom(originalEffect.isUncertainFrom());
+                                copyEffect.setUncertainTo(originalEffect.isUncertainTo());
+                                for (RoadBaseData originalData : originalEffect.getDataItems()) {
+                                    originalData.addEffect(copyEffect);
+                                }
                             }
                         }
+                        registration.setRegistrationFrom(registrationFrom);
                     }
-                    registration.setRegistrationFrom(registrationFrom);
-                    System.out.println("created new registration at "+registrationFrom);
-                } else
-                    System.out.println("Found existing registration");
-                registration.setEntity(entity);
-                entity.addRegistration(registration);
+                    registration.setEntity(entity);
+                    entity.addRegistration(registration);
 
 
+                    // Each record sets its own basedata
+                    for (RoadDataRecord record : ajourRecords.get(registrationFrom)) {
+                        // Take what we need from the record and put it into dataitems
+                        Set<RoadEffect> effects = record.getEffects();
+                        for (RoadEffect effect : effects) {
 
+                            RoadEffect realEffect = registration.getEffect(effect.getEffectFrom(), effect.isUncertainFrom(), effect.getEffectTo(), effect.isUncertainTo());
+                            if (realEffect != null) {
+                                effect = realEffect;
+                            } else {
+                                effect.setRegistration(registration);
+                            }
 
-                // Each record sets its own basedata
-                for (RoadDataRecord record : ajourRecords.get(registrationFrom)) {
-                    // Take what we need from the record and put it into dataitems
-                    Set<RoadEffect> effects = record.getEffects();
-                    for (RoadEffect effect : effects) {
-
-                        RoadEffect realEffect = registration.getEffect(effect.getEffectFrom(), effect.isUncertainFrom(), effect.getEffectTo(), effect.isUncertainTo());
-                        if (realEffect != null) {
-                            effect = realEffect;
-                            System.out.println("Using old effect");
-                        } else {
-                            effect.setRegistration(registration);
-                        }
-
-                        //if (effect.getDataItems().isEmpty()) {
-                            System.out.println("Creating new baseData for effect "+effect.getEffectFrom()+"/"+effect.getEffectTo());
+                            //if (effect.getDataItems().isEmpty()) {
                             RoadBaseData baseData = new RoadBaseData();
                             baseData.addEffect(effect);
-                        //}
-                        //for (RoadBaseData baseData : effect.getDataItems()) {
-                            System.out.println("Populating baseData for effect "+effect.getEffectFrom()+"/"+effect.getEffectTo());
+                            //}
+                            //for (RoadBaseData baseData : effect.getDataItems()) {
                             // There really should be only one item for each effect right now
                             record.populateBaseData(baseData, effect, registrationFrom, this.queryManager, session);
-                        //}
+                            //}
+                        }
+                    }
+
+
+                    if (lastRegistration != null) {
+                        lastRegistration.setRegistrationTo(registrationFrom);
+                    }
+                    lastRegistration = registration;
+                    entityRegistrations.add(registration);
+
+                }
+
+                for (RoadRegistration registration : entityRegistrations) {
+                    try {
+                        queryManager.saveRegistration(session, entity, registration);
+                    } catch (DataFordelerException e) {
+                        e.printStackTrace();
+                    } catch (javax.persistence.EntityNotFoundException e) {
+                        e.printStackTrace();
                     }
                 }
-
-
-                if (lastRegistration != null) {
-                    lastRegistration.setRegistrationTo(registrationFrom);
-                }
-                lastRegistration = registration;
-                entityRegistrations.add(registration);
-
+                //allRegistrations.addAll(entityRegistrations);
             }
-
-            for (RoadRegistration registration : entityRegistrations) {
-                try {
-                    queryManager.saveRegistration(session, entity, registration);
-                } catch (DataFordelerException e) {
-                    e.printStackTrace();
-                } catch (javax.persistence.EntityNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-            //try {
-                //System.out.println("registrations: "+objectMapper.writeValueAsString(entityRegistrations));
-                System.out.println("registrations: "+entityRegistrations);
-            //} catch (JsonProcessingException e) {
-            //    e.printStackTrace();
-            //}
-            allRegistrations.addAll(entityRegistrations);
+            transaction.commit();
+            session.close();
         }
-        transaction.commit();
-        session.close();
         return allRegistrations;
     }
 

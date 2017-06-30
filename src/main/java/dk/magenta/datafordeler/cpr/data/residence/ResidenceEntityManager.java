@@ -10,6 +10,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
+import dk.magenta.datafordeler.cpr.data.person.PersonRegistration;
 import dk.magenta.datafordeler.cpr.data.person.PersonRegistrationReference;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
@@ -22,9 +23,7 @@ import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
@@ -81,88 +80,105 @@ public class ResidenceEntityManager extends CprEntityManager {
     @Override
     public List<ResidenceRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
         ArrayList<ResidenceRegistration> registrations = new ArrayList<>();
-        List<Record> records = roadParser.parse(registrationData, "utf-8");
-        ListHashMap<ResidenceEntity, ResidenceRecord> recordMap = new ListHashMap<>();
-        Session session = sessionManager.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData));
 
-        for (Record record : records) {
-            if (record instanceof ResidenceRecord) {
-                ResidenceRecord residenceRecord = (ResidenceRecord) record;
-
-                //ResidenceEntity entity = queryManager.getItem(session, ResidenceEntity.class, );
-                //if (entity == null) {
-                ResidenceEntity entity = new ResidenceEntity(UUID.randomUUID(), "cpr");
-                //}
-
-                recordMap.add(entity, residenceRecord);
-            }
-        }
-
-        for (ResidenceEntity entity : recordMap.keySet()) {
-            ListHashMap<OffsetDateTime, ResidenceRecord> ajourRecords = new ListHashMap<>();
-            List<ResidenceRecord> recordList = recordMap.get(entity);
-
-            for (ResidenceRecord record : recordList) {
-                System.out.println("record: "+record);
-                Set<OffsetDateTime> timestamps = record.getRegistrationTimestamps();
-                for (OffsetDateTime timestamp : timestamps) {
-                    if (timestamp != null) {
-                        ajourRecords.add(timestamp, record);
-                        sortedTimestamps.add(timestamp);
-                    }
+        boolean done = false;
+        while (!done) {
+            int limit = 1000;
+            StringJoiner buffer = new StringJoiner("\n");
+            int i;
+            for (i = 0; i < limit; i++) {
+                String line = reader.readLine();
+                if (line != null) {
+                    buffer.add(line);
+                } else {
+                    done = true;
                 }
             }
 
-            // Create one Registration per unique timestamp
-            ResidenceRegistration lastRegistration = null;
-            for (OffsetDateTime registrationFrom : sortedTimestamps) {
-                System.out.println("registrationFrom: "+registrationFrom);
+            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes());
+            List<Record> records = roadParser.parse(chunk, "iso-8859-1");
+            ListHashMap<ResidenceEntity, ResidenceRecord> recordMap = new ListHashMap<>();
+            Session session = sessionManager.getSessionFactory().openSession();
+            Transaction transaction = session.beginTransaction();
+            TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
 
-                ResidenceRegistration registration = entity.getRegistration(registrationFrom);
-                if (registration == null) {
-                    if (lastRegistration == null) {
-                        registration = new ResidenceRegistration();
-                    } else {
-                        //registration = this.cloneRegistration(lastRegistration);
-                        registration = new ResidenceRegistration();
-                        for (ResidenceEffect originalEffect : lastRegistration.getEffects()) {
-                            ResidenceEffect newEffect = new ResidenceEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
-                            for (ResidenceBaseData originalData : originalEffect.getDataItems()) {
-                                originalData.addEffect(newEffect);
+            for (Record record : records) {
+                if (record instanceof ResidenceRecord) {
+                    ResidenceRecord residenceRecord = (ResidenceRecord) record;
+
+                    //ResidenceEntity entity = queryManager.getItem(session, ResidenceEntity.class, );
+                    //if (entity == null) {
+                    ResidenceEntity entity = new ResidenceEntity(UUID.randomUUID(), "cpr");
+                    //}
+
+                    recordMap.add(entity, residenceRecord);
+                }
+            }
+
+            for (ResidenceEntity entity : recordMap.keySet()) {
+                ListHashMap<OffsetDateTime, ResidenceRecord> ajourRecords = new ListHashMap<>();
+                List<ResidenceRecord> recordList = recordMap.get(entity);
+
+                for (ResidenceRecord record : recordList) {
+                    System.out.println("record: " + record);
+                    Set<OffsetDateTime> timestamps = record.getRegistrationTimestamps();
+                    for (OffsetDateTime timestamp : timestamps) {
+                        if (timestamp != null) {
+                            ajourRecords.add(timestamp, record);
+                            sortedTimestamps.add(timestamp);
+                        }
+                    }
+                }
+
+                // Create one Registration per unique timestamp
+                ResidenceRegistration lastRegistration = null;
+                for (OffsetDateTime registrationFrom : sortedTimestamps) {
+                    System.out.println("registrationFrom: " + registrationFrom);
+
+                    ResidenceRegistration registration = entity.getRegistration(registrationFrom);
+                    if (registration == null) {
+                        if (lastRegistration == null) {
+                            registration = new ResidenceRegistration();
+                        } else {
+                            //registration = this.cloneRegistration(lastRegistration);
+                            registration = new ResidenceRegistration();
+                            for (ResidenceEffect originalEffect : lastRegistration.getEffects()) {
+                                ResidenceEffect newEffect = new ResidenceEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
+                                for (ResidenceBaseData originalData : originalEffect.getDataItems()) {
+                                    originalData.addEffect(newEffect);
+                                }
                             }
                         }
+                        registration.setRegistrationFrom(registrationFrom);
+                        System.out.println("created new registration at " + registrationFrom);
                     }
-                    registration.setRegistrationFrom(registrationFrom);
-                    System.out.println("created new registration at "+registrationFrom);
-                }
-                registration.setEntity(entity);
-                entity.addRegistration(registration);
+                    registration.setEntity(entity);
+                    entity.addRegistration(registration);
 
-                // Each record sets its own basedata
-                HashMap<ResidenceEffect, PersonBaseData> data = new HashMap<>();
-                for (ResidenceRecord record : ajourRecords.get(registrationFrom)) {
-                    // Take what we need from the record and put it into dataitems
-                    Set<ResidenceEffect> effects = record.getEffects();
-                    for (ResidenceEffect effect : effects) {
+                    // Each record sets its own basedata
+                    HashMap<ResidenceEffect, PersonBaseData> data = new HashMap<>();
+                    for (ResidenceRecord record : ajourRecords.get(registrationFrom)) {
+                        // Take what we need from the record and put it into dataitems
+                        Set<ResidenceEffect> effects = record.getEffects();
+                        for (ResidenceEffect effect : effects) {
 
-                        ResidenceEffect realEffect = registration.getEffect(effect.getEffectFrom(), effect.isUncertainFrom(), effect.getEffectTo(), effect.isUncertainTo());
-                        if (realEffect != null) {
-                            effect = realEffect;
-                        } else {
-                            effect.setRegistration(registration);
-                        }
+                            ResidenceEffect realEffect = registration.getEffect(effect.getEffectFrom(), effect.isUncertainFrom(), effect.getEffectTo(), effect.isUncertainTo());
+                            if (realEffect != null) {
+                                effect = realEffect;
+                            } else {
+                                effect.setRegistration(registration);
+                            }
 
-                        if (effect.getDataItems().isEmpty()) {
-                            ResidenceBaseData baseData = new ResidenceBaseData();
-                            baseData.addEffect(effect);
+                            if (effect.getDataItems().isEmpty()) {
+                                ResidenceBaseData baseData = new ResidenceBaseData();
+                                baseData.addEffect(effect);
+                            }
+                            for (ResidenceBaseData baseData : effect.getDataItems()) {
+                                // There really should be only one item for each effect right now
+                                record.populateBaseData(baseData, effect, registrationFrom, this.queryManager, session);
+                            }
                         }
-                        for (ResidenceBaseData baseData : effect.getDataItems()) {
-                            // There really should be only one item for each effect right now
-                            record.populateBaseData(baseData, effect, registrationFrom, this.queryManager, session);
-                        }
-                    }
 
                     /*record.populateBaseData(data, timestamp);
                     for (PersonEffect effect : data.keySet()) {
@@ -176,32 +192,33 @@ public class ResidenceEntityManager extends CprEntityManager {
                         data.addEffect(effect);*/
 
 
-                    //}
-                }
+                        //}
+                    }
 
-                if (lastRegistration != null) {
-                    lastRegistration.setRegistrationTo(registrationFrom);
-                }
-                lastRegistration = registration;
-                registrations.add(registration);
+                    if (lastRegistration != null) {
+                        lastRegistration.setRegistrationTo(registrationFrom);
+                    }
+                    lastRegistration = registration;
+                    registrations.add(registration);
 
-            }
-            System.out.println(registrations);
-            try {
-                System.out.println("registrations: "+objectMapper.writeValueAsString(registrations));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            for (ResidenceRegistration registration : registrations) {
+                }
+                System.out.println(registrations);
                 try {
-                    queryManager.saveRegistration(session, entity, registration);
-                } catch (DataFordelerException e) {
+                    System.out.println("registrations: " + objectMapper.writeValueAsString(registrations));
+                } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
+                for (ResidenceRegistration registration : registrations) {
+                    try {
+                        queryManager.saveRegistration(session, entity, registration);
+                    } catch (DataFordelerException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
+            transaction.commit();
+            session.close();
         }
-        transaction.commit();
-        session.close();
         return registrations;
     }
 

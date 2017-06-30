@@ -20,9 +20,7 @@ import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
@@ -79,96 +77,114 @@ public class PersonEntityManager extends CprEntityManager {
     @Override
     public List<PersonRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
         ArrayList<PersonRegistration> registrations = new ArrayList<>();
-        List<Record> records = personParser.parse(registrationData, "utf-8");
-        ListHashMap<PersonEntity, PersonDataRecord> recordMap = new ListHashMap<>();
-        Session session = sessionManager.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData));
+
+        boolean done = false;
+        while (!done) {
+            int limit = 1000;
+            StringJoiner buffer = new StringJoiner("\n");
+            int i;
+            for (i = 0; i < limit; i++) {
+                String line = reader.readLine();
+                if (line != null) {
+                    buffer.add(line);
+                } else {
+                    done = true;
+                }
+            }
+
+            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes());
+
+            List<Record> records = personParser.parse(chunk, "iso-8859-1");
+            ListHashMap<PersonEntity, PersonDataRecord> recordMap = new ListHashMap<>();
+            Session session = sessionManager.getSessionFactory().openSession();
+            Transaction transaction = session.beginTransaction();
+            TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
 
 
-        HashMap<Integer, PersonEntity> entityCache = new HashMap<>();
+            HashMap<Integer, PersonEntity> entityCache = new HashMap<>();
 
-        for (Record record : records) {
-            if (record instanceof PersonDataRecord) {
-                PersonDataRecord personDataRecord = (PersonDataRecord) record;
-                int cprNumber = personDataRecord.getCprNumber();
+            for (Record record : records) {
+                if (record instanceof PersonDataRecord) {
+                    PersonDataRecord personDataRecord = (PersonDataRecord) record;
+                    int cprNumber = personDataRecord.getCprNumber();
 
-                PersonEntity entity = entityCache.get(cprNumber);
-                if (entity == null) {
-                    entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
+                    PersonEntity entity = entityCache.get(cprNumber);
                     if (entity == null) {
-                        entity = new PersonEntity(UUID.randomUUID(), "test");
-                        entity.setCprNumber(cprNumber);
+                        entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
+                        if (entity == null) {
+                            entity = new PersonEntity(UUID.randomUUID(), "test");
+                            entity.setCprNumber(cprNumber);
+                        }
+                        entityCache.put(cprNumber, entity);
                     }
-                    entityCache.put(cprNumber, entity);
-                }
-                recordMap.add(entity, personDataRecord);
-            }
-        }
-
-        for (PersonEntity entity : recordMap.keySet()) {
-            ListHashMap<OffsetDateTime, PersonDataRecord> ajourRecords = new ListHashMap<>();
-            List<PersonDataRecord> recordList = recordMap.get(entity);
-
-            for (PersonDataRecord record : recordList) {
-                System.out.println("record: "+record);
-                Set<OffsetDateTime> timestamps = record.getRegistrationTimestamps();
-                for (OffsetDateTime timestamp : timestamps) {
-                    if (timestamp != null) {
-                        ajourRecords.add(timestamp, record);
-                        sortedTimestamps.add(timestamp);
-                    }
+                    recordMap.add(entity, personDataRecord);
                 }
             }
 
-            // Create one Registration per unique timestamp
-            PersonRegistration lastRegistration = null;
-            for (OffsetDateTime registrationFrom : sortedTimestamps) {
-                System.out.println("registrationFrom: "+registrationFrom);
+            for (PersonEntity entity : recordMap.keySet()) {
+                ListHashMap<OffsetDateTime, PersonDataRecord> ajourRecords = new ListHashMap<>();
+                List<PersonDataRecord> recordList = recordMap.get(entity);
 
-                PersonRegistration registration = entity.getRegistration(registrationFrom);
-                if (registration == null) {
-                    if (lastRegistration == null) {
-                        registration = new PersonRegistration();
-                    } else {
-                        //registration = this.cloneRegistration(lastRegistration);
-                        registration = new PersonRegistration();
-                        for (PersonEffect originalEffect : lastRegistration.getEffects()) {
-                            PersonEffect newEffect = new PersonEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
-                            for (PersonBaseData originalData : originalEffect.getDataItems()) {
-                                originalData.addEffect(newEffect);
+                for (PersonDataRecord record : recordList) {
+                    System.out.println("record: " + record);
+                    Set<OffsetDateTime> timestamps = record.getRegistrationTimestamps();
+                    for (OffsetDateTime timestamp : timestamps) {
+                        if (timestamp != null) {
+                            ajourRecords.add(timestamp, record);
+                            sortedTimestamps.add(timestamp);
+                        }
+                    }
+                }
+
+                // Create one Registration per unique timestamp
+                PersonRegistration lastRegistration = null;
+                for (OffsetDateTime registrationFrom : sortedTimestamps) {
+                    System.out.println("registrationFrom: " + registrationFrom);
+
+                    PersonRegistration registration = entity.getRegistration(registrationFrom);
+                    if (registration == null) {
+                        if (lastRegistration == null) {
+                            registration = new PersonRegistration();
+                        } else {
+                            //registration = this.cloneRegistration(lastRegistration);
+                            registration = new PersonRegistration();
+                            for (PersonEffect originalEffect : lastRegistration.getEffects()) {
+                                PersonEffect newEffect = new PersonEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
+                                for (PersonBaseData originalData : originalEffect.getDataItems()) {
+                                    originalData.addEffect(newEffect);
+                                }
                             }
                         }
+                        registration.setRegistrationFrom(registrationFrom);
+                        System.out.println("created new registration at " + registrationFrom);
                     }
-                    registration.setRegistrationFrom(registrationFrom);
-                    System.out.println("created new registration at "+registrationFrom);
-                }
-                registration.setEntity(entity);
-                entity.addRegistration(registration);
+                    registration.setEntity(entity);
+                    entity.addRegistration(registration);
 
-                // Each record sets its own basedata
-                HashMap<PersonEffect, PersonBaseData> data = new HashMap<>();
-                for (PersonDataRecord record : ajourRecords.get(registrationFrom)) {
-                    // Take what we need from the record and put it into dataitems
-                    Set<PersonEffect> effects = record.getEffects();
-                    for (PersonEffect effect : effects) {
+                    // Each record sets its own basedata
+                    HashMap<PersonEffect, PersonBaseData> data = new HashMap<>();
+                    for (PersonDataRecord record : ajourRecords.get(registrationFrom)) {
+                        // Take what we need from the record and put it into dataitems
+                        Set<PersonEffect> effects = record.getEffects();
+                        for (PersonEffect effect : effects) {
 
-                        PersonEffect realEffect = registration.getEffect(effect.getEffectFrom(), effect.isUncertainFrom(), effect.getEffectTo(), effect.isUncertainTo());
-                        if (realEffect != null) {
-                            effect = realEffect;
-                        } else {
-                            effect.setRegistration(registration);
-                        }
+                            PersonEffect realEffect = registration.getEffect(effect.getEffectFrom(), effect.isUncertainFrom(), effect.getEffectTo(), effect.isUncertainTo());
+                            if (realEffect != null) {
+                                effect = realEffect;
+                            } else {
+                                effect.setRegistration(registration);
+                            }
 
-                        if (effect.getDataItems().isEmpty()) {
-                            PersonBaseData baseData = new PersonBaseData();
-                            baseData.addEffect(effect);
+                            if (effect.getDataItems().isEmpty()) {
+                                PersonBaseData baseData = new PersonBaseData();
+                                baseData.addEffect(effect);
+                            }
+                            for (PersonBaseData baseData : effect.getDataItems()) {
+                                // There really should be only one item for each effect right now
+                                record.populateBaseData(baseData, effect, registrationFrom, this.queryManager, session);
+                            }
                         }
-                        for (PersonBaseData baseData : effect.getDataItems()) {
-                            // There really should be only one item for each effect right now
-                            record.populateBaseData(baseData, effect, registrationFrom, this.queryManager, session);
-                        }
-                    }
 
                     /*record.populateBaseData(data, timestamp);
                     for (PersonEffect effect : data.keySet()) {
@@ -182,32 +198,33 @@ public class PersonEntityManager extends CprEntityManager {
                         data.addEffect(effect);*/
 
 
-                    //}
-                }
+                        //}
+                    }
 
-                if (lastRegistration != null) {
-                    lastRegistration.setRegistrationTo(registrationFrom);
-                }
-                lastRegistration = registration;
-                registrations.add(registration);
+                    if (lastRegistration != null) {
+                        lastRegistration.setRegistrationTo(registrationFrom);
+                    }
+                    lastRegistration = registration;
+                    registrations.add(registration);
 
-            }
-            System.out.println(registrations);
-            try {
-                System.out.println("registrations: "+objectMapper.writeValueAsString(registrations));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            for (PersonRegistration registration : registrations) {
+                }
+                System.out.println(registrations);
                 try {
-                    queryManager.saveRegistration(session, entity, registration);
-                } catch (DataFordelerException e) {
+                    System.out.println("registrations: " + objectMapper.writeValueAsString(registrations));
+                } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
+                for (PersonRegistration registration : registrations) {
+                    try {
+                        queryManager.saveRegistration(session, entity, registration);
+                    } catch (DataFordelerException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
+            transaction.commit();
+            session.close();
         }
-        transaction.commit();
-        session.close();
         return registrations;
     }
 
