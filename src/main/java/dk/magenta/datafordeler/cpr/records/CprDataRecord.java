@@ -12,6 +12,7 @@ import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -55,5 +56,7 @@ public abstract class CprDataRecord<V extends CprEffect, B extends CprData> exte
     protected abstract B createEmptyBaseData();
 
     public abstract Set<V> getEffects();
+
+    public abstract HashSet<OffsetDateTime> getRegistrationTimestamps();
 
 }

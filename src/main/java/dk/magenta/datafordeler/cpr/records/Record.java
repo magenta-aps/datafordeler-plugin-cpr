@@ -19,6 +19,14 @@ public abstract class Record extends HashMap<String, String> {
         return classParts[classParts.length-1];
     }
 
+    public String getString(String key, boolean stripLeadingZeroes) {
+        String value = this.get(key);
+        if (value != null && stripLeadingZeroes) {
+            value = value.replaceAll("^0+", "");
+        }
+        return value;
+    }
+
     public int getInt(String key) {
         return this.getInt(key, false);
     }

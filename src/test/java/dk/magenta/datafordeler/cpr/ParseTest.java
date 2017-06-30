@@ -6,6 +6,9 @@ import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.*;
+import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
+import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
+import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadQuery;
@@ -38,6 +41,9 @@ public class ParseTest {
 
     @Autowired
     private RoadEntityManager roadEntityManager;
+
+    @Autowired
+    private ResidenceEntityManager residenceEntityManager;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -86,6 +92,32 @@ public class ParseTest {
             } catch (DataFordelerException e) {
                 e.printStackTrace();
             }
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    @Test
+    public void testParseResidence() throws IOException, ParseException {
+        Session session = null;
+        try {
+            InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+            residenceEntityManager.parseRegistration(testData);
+
+            ResidenceQuery query = new ResidenceQuery();
+            //query.setMunicipalityCode("0730");
+            //query.setCode("0012");
+            //query.setMunicipalityCode();
+            /*session = sessionManager.getSessionFactory().openSession();
+
+            try {
+                List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
+                System.out.println(objectMapper.writeValueAsString(entities));
+            } catch (DataFordelerException e) {
+                e.printStackTrace();
+            }*/
         } finally {
             if (session != null) {
                 session.close();
