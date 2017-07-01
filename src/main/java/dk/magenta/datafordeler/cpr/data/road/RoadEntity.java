@@ -17,7 +17,7 @@ import java.util.UUID;
  * Created by lars on 16-05-17.
  */
 @javax.persistence.Entity
-@Table(name="cpr_person_entity", indexes = {@Index(name = "cprNumber", columnList = "cprNumber")})
+@Table(name="cpr_road_entity", indexes = {@Index(name = "cprNumber", columnList = "cprNumber")})
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RoadEntity extends Entity<RoadEntity, RoadRegistration> {
 
