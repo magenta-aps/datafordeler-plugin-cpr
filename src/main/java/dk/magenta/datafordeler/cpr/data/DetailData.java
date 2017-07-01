@@ -6,10 +6,7 @@ import dk.magenta.datafordeler.core.database.Identification;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 
 import javax.persistence.MappedSuperclass;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lars on 12-06-17.
@@ -37,7 +34,7 @@ public abstract class DetailData extends DatabaseEntry {
         return this.asMap();
     }
 
-    public static Map<String, Object> listDatabaseFields(List<? extends DetailData> list) {
+    public static Map<String, Object> listDatabaseFields(Collection<? extends DetailData> list) {
         ListHashMap<String, Object> map = new ListHashMap<>();
         for (DetailData data : list) {
             Map<String, Object> fields = data.databaseFields();
