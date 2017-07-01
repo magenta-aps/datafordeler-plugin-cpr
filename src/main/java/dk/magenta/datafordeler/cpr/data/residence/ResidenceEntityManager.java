@@ -9,6 +9,7 @@ import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.util.ListHashMap;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonRegistration;
 import dk.magenta.datafordeler.cpr.data.person.PersonRegistrationReference;
@@ -109,7 +110,7 @@ public class ResidenceEntityManager extends CprEntityManager {
 
                     //ResidenceEntity entity = queryManager.getItem(session, ResidenceEntity.class, );
                     //if (entity == null) {
-                    ResidenceEntity entity = new ResidenceEntity(UUID.randomUUID(), "cpr");
+                    ResidenceEntity entity = new ResidenceEntity(UUID.randomUUID(), CprPlugin.getDomain());
                     //}
 
                     recordMap.add(entity, residenceRecord);

@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
+import dk.magenta.datafordeler.core.exception.HttpStatusException;
 import dk.magenta.datafordeler.core.io.Event;
 import dk.magenta.datafordeler.core.plugin.*;
 import dk.magenta.datafordeler.core.util.CloseDetectInputStream;
@@ -11,6 +12,8 @@ import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
+import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
+import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,48 +117,106 @@ public class CprRegisterManager extends RegisterManager {
         return this.configurationManager.getConfiguration().getPullCronSchedule();
     }
 
-    @Override
-    protected ItemInputStream<Event> parseEventResponse(InputStream responseContent) throws DataFordelerException {
+    public ItemInputStream<Event> pullEvents(URI eventInterface) throws DataFordelerException {
+        FtpCommunicator eventCommunicator = (FtpCommunicator) this.getEventFetcher();
+        CprConfiguration configuration = configurationManager.getConfiguration();
+
         PipedInputStream inputStream = new PipedInputStream();
-        final BufferedReader dataStream = new BufferedReader(new InputStreamReader(responseContent));
+        final PipedOutputStream outputStream;
         try {
-            final PipedOutputStream outputStream = new PipedOutputStream(inputStream);
+            outputStream = new PipedOutputStream(inputStream);
+            System.out.println("outputStream: "+outputStream);
             final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            System.out.println("objectOutputStream: "+objectOutputStream);
+
+            final List<EntityManager> entityManagers = new ArrayList<>(this.entityManagers);
+            final URI baseEndpoint = this.baseEndpoint;
 
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        String line;
 
-                        // Scenario 1: one line per event
-                        while ((line = dataStream.readLine()) != null) {
-                            objectOutputStream.writeObject(CprRegisterManager.this.parseLines(Collections.singletonList(line)));
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
+                    for (EntityManager entityManager : entityManagers) {
+                        InputStream responseBody = null;
+                        String schema = entityManager.getSchema();
+
                         try {
-                            objectOutputStream.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            switch (schema) {
+                                case PersonEntity.schema:
+                                    responseBody = eventCommunicator.fetch(
+                                            CprRegisterManager.this.getEventInterface()
+                                    );
+                                    break;
+                                case RoadEntity.schema:
+                                    try {
+                                        responseBody = new FileInputStream(new File(configuration.getCprRoadDataLocation()));
+                                    } catch (FileNotFoundException e) {
+                                        e.printStackTrace();
+                                    }
+                                    break;
+                                case ResidenceEntity.schema:
+                                    try {
+                                        responseBody = new FileInputStream(new File(configuration.getCprResidenceDataLocation()));
+                                    } catch (FileNotFoundException e) {
+                                        e.printStackTrace();
+                                    }
+                                    break;
+                            }
+                        } catch (HttpStatusException e1) {
+                            e1.printStackTrace();
+                        } catch (DataStreamException e1) {
+                            e1.printStackTrace();
                         }
-                        try {
-                            dataStream.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        if (responseBody != null) {
+                            System.out.println("got a response body");
+
+                            final BufferedReader responseReader = new BufferedReader(new InputStreamReader(responseBody));
+                            System.out.println("inputStream: " + inputStream);
+                            System.out.println("dataStream: " + responseReader);
+
+
+                            int count = 0;
+                            try {
+                                String line;
+
+                                // One line per event
+                                while ((line = responseReader.readLine()) != null) {
+                                    System.out.println("got a response line");
+                                    objectOutputStream.writeObject(CprRegisterManager.this.wrap(Collections.singletonList(line), schema));
+                                    count++;
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } finally {
+
+                                System.out.println("Wrote " + count + " events");
+
+                                try {
+                                    responseReader.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
+                    }
+                    try {
+                        objectOutputStream.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
                     }
                 }
             });
             t.start();
-            return new ItemInputStream<Event>(inputStream);
+
+            //System.out.println("There are "+entityManagerParseStreams.size()+" streams");
+            return new ItemInputStream<>(inputStream);
         } catch (IOException e) {
-            throw new DataStreamException(e);
+            e.printStackTrace();
+            return null;
         }
     }
 
-    private Event parseLines(List<String> lines) {
+    private Event wrap(List<String> lines, String schema) {
         Event event = new Event();
         event.setEventID(UUID.randomUUID().toString());
         event.setBeskedVersion("1.0");
@@ -163,13 +224,11 @@ public class CprRegisterManager extends RegisterManager {
         for (String line : lines) {
             s.add(line);
         }
-        // Find the relevant class and parse the line into it
-        String skema = PersonEntity.schema;
-        String data = s.toString();
-
-        event.setDataskema(skema);
-        event.setObjektData(data);
+        event.setDataskema(schema);
+        event.setObjektData(s.toString());
         return event;
     }
+
+
 
 }

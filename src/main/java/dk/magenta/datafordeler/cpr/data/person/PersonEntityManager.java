@@ -9,6 +9,7 @@ import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.util.ListHashMap;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprParser;
@@ -113,7 +114,7 @@ public class PersonEntityManager extends CprEntityManager {
                     if (entity == null) {
                         entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
                         if (entity == null) {
-                            entity = new PersonEntity(UUID.randomUUID(), "test");
+                            entity = new PersonEntity(PersonEntity.generateUUID(cprNumber), CprPlugin.getDomain());
                             entity.setCprNumber(cprNumber);
                         }
                         entityCache.put(cprNumber, entity);

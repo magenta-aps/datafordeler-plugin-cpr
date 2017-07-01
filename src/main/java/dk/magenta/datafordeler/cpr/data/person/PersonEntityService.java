@@ -21,7 +21,7 @@ public class PersonEntityService extends FapiService<PersonEntity, PersonQuery> 
 
     @Override
     public String getServiceName() {
-        return "road";
+        return "person";
     }
 
     @Override

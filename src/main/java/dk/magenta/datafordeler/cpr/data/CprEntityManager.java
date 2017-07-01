@@ -93,7 +93,7 @@ public abstract class CprEntityManager extends EntityManager {
 
     @Override
     protected URI getReceiptEndpoint(Receipt receipt) {
-        return expandBaseURI(this.getBaseEndpoint(), "/receipt/" + receipt.getEventID());
+        return null;
     }
 
     @Override

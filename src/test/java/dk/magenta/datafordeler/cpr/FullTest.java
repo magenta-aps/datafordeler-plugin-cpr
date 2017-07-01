@@ -47,7 +47,7 @@ public class FullTest {
 
     @Test
     public void test() throws Exception {
-        File tempFile = null;
+        /*File tempFile = null;
         FtpService ftp = new FtpService();
         try {
             int port = 2101;
@@ -101,7 +101,7 @@ public class FullTest {
             if (tempFile != null) {
                 tempFile.delete();
             }
-        }
+        }*/
     }
 
 }

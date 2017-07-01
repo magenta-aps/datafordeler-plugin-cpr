@@ -33,6 +33,15 @@ public class CprConfiguration implements Configuration {
     @Column
     private boolean ftps = true;
 
+
+    // Temporary: set this to the location of the cpr file on the server
+    @Column
+    private String cprRoadDataLocation = "";
+
+    // Temporary: set this to the location of the cpr file on the server
+    @Column
+    private String cprResidenceDataLocation = "";
+
     public String getPullCronSchedule() {
         return this.pullCronSchedule;
     }
@@ -51,6 +60,14 @@ public class CprConfiguration implements Configuration {
 
     public boolean getFtps() {
         return this.ftps;
+    }
+
+    public String getCprRoadDataLocation() {
+        return this.cprRoadDataLocation;
+    }
+
+    public String getCprResidenceDataLocation() {
+        return this.cprResidenceDataLocation;
     }
 
     /**

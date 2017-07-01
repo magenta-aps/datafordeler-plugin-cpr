@@ -47,4 +47,12 @@ public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {
     public void setCprNumber(int cprNumber) {
         this.cprNumber = cprNumber;
     }
+
+
+
+    public static UUID generateUUID(int cprNumber) {
+        String uuidInput = "person:"+cprNumber;
+        return UUID.nameUUIDFromBytes(uuidInput.getBytes());
+    }
+
 }

@@ -61,4 +61,9 @@ public class RoadEntity extends Entity<RoadEntity, RoadRegistration> {
     public void setRoadCode(int roadCode) {
         this.roadCode = roadCode;
     }
+
+    public static UUID generateUUID(int municipalityCode, int roadCode) {
+        String uuidInput = "road:"+municipalityCode+"/"+roadCode;
+        return UUID.nameUUIDFromBytes(uuidInput.getBytes());
+    }
 }

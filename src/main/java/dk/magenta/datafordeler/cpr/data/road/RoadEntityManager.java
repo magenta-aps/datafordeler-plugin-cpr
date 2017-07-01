@@ -1,6 +1,5 @@
 package dk.magenta.datafordeler.cpr.data.road;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
@@ -10,9 +9,9 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
-import dk.magenta.datafordeler.cpr.parsers.CprParser;
 import dk.magenta.datafordeler.cpr.parsers.RoadParser;
 import dk.magenta.datafordeler.cpr.records.Record;
 import dk.magenta.datafordeler.cpr.records.road.RoadDataRecord;
@@ -135,18 +134,18 @@ public class RoadEntityManager extends CprEntityManager {
                     RoadDataRecord roadDataRecord = (RoadDataRecord) record;
                     HashMap<String, Object> lookup = new HashMap<>();
                     int municipalityCode = roadDataRecord.getMunicipalityCode();
-                    int roadcode = roadDataRecord.getRoadCode();
+                    int roadCode = roadDataRecord.getRoadCode();
                     lookup.put("municipalityCode", municipalityCode);
-                    lookup.put("roadCode", roadcode);
-                    RoadEntity entity = entityCache.get(municipalityCode, roadcode);
+                    lookup.put("roadCode", roadCode);
+                    RoadEntity entity = entityCache.get(municipalityCode, roadCode);
                     if (entity == null) {
                         entity = queryManager.getItem(session, RoadEntity.class, lookup);
                         if (entity == null) {
-                            entity = new RoadEntity(UUID.randomUUID(), "test");
-                            entity.setMunicipalityCode(roadDataRecord.getMunicipalityCode());
-                            entity.setRoadCode(roadDataRecord.getRoadCode());
+                            entity = new RoadEntity(RoadEntity.generateUUID(municipalityCode, roadCode), CprPlugin.getDomain());
+                            entity.setMunicipalityCode(municipalityCode);
+                            entity.setRoadCode(roadCode);
                         }
-                        entityCache.put(municipalityCode, roadcode, entity);
+                        entityCache.put(municipalityCode, roadCode, entity);
                     }
                     recordMap.add(entity, roadDataRecord);
                 }
