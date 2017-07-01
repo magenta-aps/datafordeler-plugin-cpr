@@ -36,11 +36,11 @@ public class CprConfiguration implements Configuration {
 
     // Temporary: set this to the location of the cpr file on the server
     @Column
-    private String cprRoadDataLocation = "";
+    private String cprRoadDataLocation = "/home/lars/Projekt/datafordeler/A370715.txt";
 
     // Temporary: set this to the location of the cpr file on the server
     @Column
-    private String cprResidenceDataLocation = "";
+    private String cprResidenceDataLocation = "/home/lars/Projekt/datafordeler/A370715.txt";
 
     public String getPullCronSchedule() {
         return this.pullCronSchedule;

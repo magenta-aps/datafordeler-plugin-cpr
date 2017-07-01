@@ -77,7 +77,7 @@ public class PersonEntityManager extends CprEntityManager {
 
     @Override
     public List<PersonRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
-        ArrayList<PersonRegistration> registrations = new ArrayList<>();
+        ArrayList<PersonRegistration> allRegistrations = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData));
 
         boolean done = false;
@@ -94,13 +94,11 @@ public class PersonEntityManager extends CprEntityManager {
                 }
             }
 
-            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes());
-
+            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes("iso-8859-1"));
             List<Record> records = personParser.parse(chunk, "iso-8859-1");
             ListHashMap<PersonEntity, PersonDataRecord> recordMap = new ListHashMap<>();
             Session session = sessionManager.getSessionFactory().openSession();
             Transaction transaction = session.beginTransaction();
-            TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
 
 
             HashMap<Integer, PersonEntity> entityCache = new HashMap<>();
@@ -124,7 +122,9 @@ public class PersonEntityManager extends CprEntityManager {
             }
 
             for (PersonEntity entity : recordMap.keySet()) {
+                ArrayList<PersonRegistration> entityRegistrations = new ArrayList<>();
                 ListHashMap<OffsetDateTime, PersonDataRecord> ajourRecords = new ListHashMap<>();
+                TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
                 List<PersonDataRecord> recordList = recordMap.get(entity);
 
                 for (PersonDataRecord record : recordList) {
@@ -206,27 +206,27 @@ public class PersonEntityManager extends CprEntityManager {
                         lastRegistration.setRegistrationTo(registrationFrom);
                     }
                     lastRegistration = registration;
-                    registrations.add(registration);
+                    entityRegistrations.add(registration);
 
                 }
-                System.out.println(registrations);
                 try {
-                    System.out.println("registrations: " + objectMapper.writeValueAsString(registrations));
+                    System.out.println("registrations: " + objectMapper.writeValueAsString(entityRegistrations));
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
-                for (PersonRegistration registration : registrations) {
+                for (PersonRegistration registration : entityRegistrations) {
                     try {
                         queryManager.saveRegistration(session, entity, registration);
                     } catch (DataFordelerException e) {
                         e.printStackTrace();
                     }
                 }
+                allRegistrations.addAll(entityRegistrations);
             }
             transaction.commit();
             session.close();
         }
-        return registrations;
+        return allRegistrations;
     }
 
 

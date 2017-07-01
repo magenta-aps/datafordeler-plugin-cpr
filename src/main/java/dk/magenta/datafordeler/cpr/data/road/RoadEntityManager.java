@@ -120,7 +120,7 @@ public class RoadEntityManager extends CprEntityManager {
                     done = true;
                 }
             }
-            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes());
+            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes("iso-8859-1"));
 
             List<Record> records = roadParser.parse(chunk, "iso-8859-1");
             ListHashMap<RoadEntity, RoadDataRecord> recordMap = new ListHashMap<>();
@@ -154,9 +154,9 @@ public class RoadEntityManager extends CprEntityManager {
             for (RoadEntity entity : recordMap.keySet()) {
                 ArrayList<RoadRegistration> entityRegistrations = new ArrayList<>();
                 ListHashMap<OffsetDateTime, RoadDataRecord> ajourRecords = new ListHashMap<>();
+                TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
                 List<RoadDataRecord> recordList = recordMap.get(entity);
 
-                TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
                 for (RoadDataRecord record : recordList) {
                     Set<OffsetDateTime> timestamps = record.getRegistrationTimestamps();
                     for (OffsetDateTime timestamp : timestamps) {
@@ -235,7 +235,7 @@ public class RoadEntityManager extends CprEntityManager {
                         e.printStackTrace();
                     }
                 }
-                //allRegistrations.addAll(entityRegistrations);
+                allRegistrations.addAll(entityRegistrations);
             }
             transaction.commit();
             session.close();

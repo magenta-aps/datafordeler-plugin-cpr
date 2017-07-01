@@ -80,7 +80,7 @@ public class ResidenceEntityManager extends CprEntityManager {
 
     @Override
     public List<ResidenceRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
-        ArrayList<ResidenceRegistration> registrations = new ArrayList<>();
+        ArrayList<ResidenceRegistration> allRegistrations = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData));
 
         boolean done = false;
@@ -97,12 +97,11 @@ public class ResidenceEntityManager extends CprEntityManager {
                 }
             }
 
-            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes());
+            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes("iso-8859-1"));
             List<Record> records = roadParser.parse(chunk, "iso-8859-1");
             ListHashMap<ResidenceEntity, ResidenceRecord> recordMap = new ListHashMap<>();
             Session session = sessionManager.getSessionFactory().openSession();
             Transaction transaction = session.beginTransaction();
-            TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
 
             for (Record record : records) {
                 if (record instanceof ResidenceRecord) {
@@ -118,24 +117,29 @@ public class ResidenceEntityManager extends CprEntityManager {
             }
 
             for (ResidenceEntity entity : recordMap.keySet()) {
+                ArrayList<ResidenceRegistration> entityRegistrations = new ArrayList<>();
                 ListHashMap<OffsetDateTime, ResidenceRecord> ajourRecords = new ListHashMap<>();
+                TreeSet<OffsetDateTime> sortedTimestamps = new TreeSet<>();
                 List<ResidenceRecord> recordList = recordMap.get(entity);
+
 
                 for (ResidenceRecord record : recordList) {
                     System.out.println("record: " + record);
                     Set<OffsetDateTime> timestamps = record.getRegistrationTimestamps();
                     for (OffsetDateTime timestamp : timestamps) {
                         if (timestamp != null) {
+                            System.out.println("Adding "+record+" to ajourrecords at "+timestamp);
                             ajourRecords.add(timestamp, record);
                             sortedTimestamps.add(timestamp);
                         }
                     }
                 }
+                System.out.println("ajourRecords: "+ajourRecords);
+                System.out.println("sortedTimestamps: "+sortedTimestamps);
 
                 // Create one Registration per unique timestamp
                 ResidenceRegistration lastRegistration = null;
                 for (OffsetDateTime registrationFrom : sortedTimestamps) {
-                    System.out.println("registrationFrom: " + registrationFrom);
 
                     ResidenceRegistration registration = entity.getRegistration(registrationFrom);
                     if (registration == null) {
@@ -158,7 +162,8 @@ public class ResidenceEntityManager extends CprEntityManager {
                     entity.addRegistration(registration);
 
                     // Each record sets its own basedata
-                    HashMap<ResidenceEffect, PersonBaseData> data = new HashMap<>();
+                    System.out.println("ajourRecords: "+ajourRecords);
+                    System.out.println("registrationFrom: "+registrationFrom);
                     for (ResidenceRecord record : ajourRecords.get(registrationFrom)) {
                         // Take what we need from the record and put it into dataitems
                         Set<ResidenceEffect> effects = record.getEffects();
@@ -200,27 +205,22 @@ public class ResidenceEntityManager extends CprEntityManager {
                         lastRegistration.setRegistrationTo(registrationFrom);
                     }
                     lastRegistration = registration;
-                    registrations.add(registration);
+                    entityRegistrations.add(registration);
 
                 }
-                System.out.println(registrations);
-                try {
-                    System.out.println("registrations: " + objectMapper.writeValueAsString(registrations));
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-                for (ResidenceRegistration registration : registrations) {
+                for (ResidenceRegistration registration : entityRegistrations) {
                     try {
                         queryManager.saveRegistration(session, entity, registration);
                     } catch (DataFordelerException e) {
                         e.printStackTrace();
                     }
                 }
+                allRegistrations.addAll(entityRegistrations);
             }
             transaction.commit();
             session.close();
         }
-        return registrations;
+        return allRegistrations;
     }
 
 

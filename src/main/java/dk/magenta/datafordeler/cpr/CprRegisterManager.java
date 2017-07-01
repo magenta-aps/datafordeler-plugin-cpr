@@ -23,6 +23,7 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -120,6 +121,7 @@ public class CprRegisterManager extends RegisterManager {
     public ItemInputStream<Event> pullEvents(URI eventInterface) throws DataFordelerException {
         FtpCommunicator eventCommunicator = (FtpCommunicator) this.getEventFetcher();
         CprConfiguration configuration = configurationManager.getConfiguration();
+        final int linesPerEvent = 100;
 
         PipedInputStream inputStream = new PipedInputStream();
         final PipedOutputStream outputStream;
@@ -168,28 +170,31 @@ public class CprRegisterManager extends RegisterManager {
                             e1.printStackTrace();
                         }
                         if (responseBody != null) {
-                            System.out.println("got a response body");
 
-                            final BufferedReader responseReader = new BufferedReader(new InputStreamReader(responseBody));
-                            System.out.println("inputStream: " + inputStream);
-                            System.out.println("dataStream: " + responseReader);
+                            final BufferedReader responseReader = new BufferedReader(new InputStreamReader(responseBody, Charset.forName("iso-8859-1")));
 
-
-                            int count = 0;
+                            int eventCount = 0;
                             try {
                                 String line;
 
                                 // One line per event
+                                int lineCount = 0;
+                                ArrayList<String> lines = new ArrayList<>();
                                 while ((line = responseReader.readLine()) != null) {
-                                    System.out.println("got a response line");
-                                    objectOutputStream.writeObject(CprRegisterManager.this.wrap(Collections.singletonList(line), schema));
-                                    count++;
+                                    lines.add(line);
+                                    lineCount++;
+                                    if (lineCount >= linesPerEvent) {
+                                        objectOutputStream.writeObject(CprRegisterManager.this.wrap(lines, schema));
+                                        lines.clear();
+                                        lineCount = 0;
+                                        eventCount++;
+                                    }
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             } finally {
 
-                                System.out.println("Wrote " + count + " events");
+                                System.out.println("Wrote " + eventCount + " events");
 
                                 try {
                                     responseReader.close();
