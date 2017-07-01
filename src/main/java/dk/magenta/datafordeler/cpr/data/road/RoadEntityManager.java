@@ -1,18 +1,15 @@
 package dk.magenta.datafordeler.cpr.data.road;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
-import dk.magenta.datafordeler.cpr.parsers.CprParser;
 import dk.magenta.datafordeler.cpr.parsers.RoadParser;
 import dk.magenta.datafordeler.cpr.records.Record;
 import dk.magenta.datafordeler.cpr.records.road.RoadDataRecord;
@@ -30,7 +27,7 @@ import java.util.*;
 /**
  * Created by lars on 16-05-17.
  */
-@Component
+@Component("cprRoadEntityMananger")
 public class RoadEntityManager extends CprEntityManager {
 
     @Autowired
@@ -89,7 +86,7 @@ public class RoadEntityManager extends CprEntityManager {
     }
 
     @Override
-    public FapiService getEntityService() {
+    public RoadEntityService getEntityService() {
         return this.roadEntityService;
     }
 

@@ -4,17 +4,15 @@ import dk.magenta.datafordeler.core.exception.AccessDeniedException;
 import dk.magenta.datafordeler.core.exception.AccessRequiredException;
 import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.user.DafoUserDetails;
-import org.springframework.stereotype.Component;
-
-import javax.jws.WebService;
-import javax.ws.rs.Path;
+import dk.magenta.datafordeler.cpr.CprAccessChecker;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by lars on 19-05-17.
  */
-@Path("")
-@Component
-@WebService
+@RestController("CprRoadEntityService")
+@RequestMapping("/cpr/road/1/rest")
 public class RoadEntityService extends FapiService<RoadEntity, RoadQuery> {
 
     @Override
@@ -34,6 +32,7 @@ public class RoadEntityService extends FapiService<RoadEntity, RoadQuery> {
 
     @Override
     protected void checkAccess(DafoUserDetails dafoUserDetails) throws AccessDeniedException, AccessRequiredException {
+        CprAccessChecker.checkAccess(dafoUserDetails);
     }
 
     @Override
