@@ -7,7 +7,6 @@ import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
@@ -61,7 +60,7 @@ public class PersonEntityManager extends CprEntityManager {
     }
 
     @Override
-    public FapiService getEntityService() {
+    public PersonEntityService getEntityService() {
         return this.personEntityService;
     }
 

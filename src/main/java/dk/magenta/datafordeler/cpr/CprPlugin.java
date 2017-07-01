@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr;
 import dk.magenta.datafordeler.core.configuration.ConfigurationManager;
 import dk.magenta.datafordeler.core.plugin.Plugin;
 import dk.magenta.datafordeler.core.plugin.RegisterManager;
+import dk.magenta.datafordeler.core.plugin.RolesDefinition;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
@@ -59,4 +60,8 @@ public class CprPlugin extends Plugin {
         return this.configurationManager;
     }
 
+    @Override
+    public RolesDefinition getRolesDefinition() {
+        return new CprRolesDefinition();
+    }
 }
