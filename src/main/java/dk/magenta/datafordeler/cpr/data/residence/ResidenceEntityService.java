@@ -4,17 +4,14 @@ import dk.magenta.datafordeler.core.exception.AccessDeniedException;
 import dk.magenta.datafordeler.core.exception.AccessRequiredException;
 import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.user.DafoUserDetails;
-import org.springframework.stereotype.Component;
-
-import javax.jws.WebService;
-import javax.ws.rs.Path;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Created by lars on 19-05-17.
  */
-@Path("")
-@Component
-@WebService
+@Controller
+@RequestMapping("/cpr/residence/1/rest")
 public class ResidenceEntityService extends FapiService<ResidenceEntity, ResidenceQuery> {
 
     @Override
