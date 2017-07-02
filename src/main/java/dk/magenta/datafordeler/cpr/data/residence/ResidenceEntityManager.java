@@ -122,18 +122,18 @@ public class ResidenceEntityManager extends CprEntityManager {
 
 
                 for (ResidenceRecord record : recordList) {
-                    System.out.println("record: " + record);
+                    // System.out.println("record: " + record);
                     Set<OffsetDateTime> timestamps = record.getRegistrationTimestamps();
                     for (OffsetDateTime timestamp : timestamps) {
                         if (timestamp != null) {
-                            System.out.println("Adding "+record+" to ajourrecords at "+timestamp);
+                            // System.out.println("Adding "+record+" to ajourrecords at "+timestamp);
                             ajourRecords.add(timestamp, record);
                             sortedTimestamps.add(timestamp);
                         }
                     }
                 }
-                System.out.println("ajourRecords: "+ajourRecords);
-                System.out.println("sortedTimestamps: "+sortedTimestamps);
+                // System.out.println("ajourRecords: "+ajourRecords);
+                // System.out.println("sortedTimestamps: "+sortedTimestamps);
 
                 // Create one Registration per unique timestamp
                 ResidenceRegistration lastRegistration = null;
@@ -154,14 +154,14 @@ public class ResidenceEntityManager extends CprEntityManager {
                             }
                         }
                         registration.setRegistrationFrom(registrationFrom);
-                        System.out.println("created new registration at " + registrationFrom);
+                        // System.out.println("created new registration at " + registrationFrom);
                     }
                     registration.setEntity(entity);
                     entity.addRegistration(registration);
 
                     // Each record sets its own basedata
-                    System.out.println("ajourRecords: "+ajourRecords);
-                    System.out.println("registrationFrom: "+registrationFrom);
+                    // System.out.println("ajourRecords: "+ajourRecords);
+                    // System.out.println("registrationFrom: "+registrationFrom);
                     for (ResidenceRecord record : ajourRecords.get(registrationFrom)) {
                         // Take what we need from the record and put it into dataitems
                         Set<ResidenceEffect> effects = record.getEffects();

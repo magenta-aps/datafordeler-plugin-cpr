@@ -18,8 +18,9 @@ public class CprConfiguration implements Configuration {
     @Column(name = "id")
     private final String plugin = CprPlugin.class.getName();
 
+    // Midnight every january 1st
     @Column
-    private String pullCronSchedule = "0 0 * * * ?";
+    private String pullCronSchedule = "0 0 0 1 1 ?";
 
     @Column
     private String registerAddress = "ftp://localhost:2101";
