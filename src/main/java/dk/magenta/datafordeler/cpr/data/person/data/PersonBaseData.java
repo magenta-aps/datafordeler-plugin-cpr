@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hibernate.Session;
 
 /**
  * Created by lars on 16-05-17.
@@ -397,4 +398,8 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         return lookupDefinition;
     }
 
+    @Override
+    public void forceLoad(Session session) {
+
+    }
 }

@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
+import org.hibernate.Session;
 
 /**
  * Created by lars on 29-06-17.
@@ -108,5 +109,10 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         map.put("door", this.door);
         map.put("location", this.location);
         return map;
+    }
+
+    @Override
+    public void forceLoad(Session session) {
+
     }
 }

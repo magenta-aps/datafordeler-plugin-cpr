@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
 
 /**
  * Created by lars on 16-05-17.
@@ -112,4 +114,10 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         return lookupDefinition;
     }
 
+    @Override
+    public void forceLoad(Session session) {
+        Hibernate.initialize(memoData);
+        Hibernate.initialize(postcodeData);
+        Hibernate.initialize(postcodeData);
+    }
 }
