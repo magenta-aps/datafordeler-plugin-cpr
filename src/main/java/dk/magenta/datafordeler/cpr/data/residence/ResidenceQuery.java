@@ -21,7 +21,7 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
     public static final String FLOOR = "floor";
     public static final String DOOR = "door";
 
-    @QueryField(type = QueryField.FieldType.INT)
+    @QueryField(type = QueryField.FieldType.INT, queryName = MUNICIPALITY_CODE)
     private String municipalityCode;
 
     public String getMunicipalityCode() {
@@ -32,7 +32,7 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
         this.municipalityCode = municipalityCode;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING)
+    @QueryField(type = QueryField.FieldType.STRING, queryName = ROAD_CODE)
     private String roadCode;
 
     public String getRoadCode() {
@@ -43,7 +43,7 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
         this.roadCode = roadCode;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING)
+    @QueryField(type = QueryField.FieldType.STRING, queryName = HOUSE_NUMBER)
     private String houseNumber;
 
     public String getHouseNumber() {
@@ -54,7 +54,7 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
         this.houseNumber = houseNumber;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING)
+    @QueryField(type = QueryField.FieldType.STRING, queryName = FLOOR)
     private String floor;
 
     public String getFloor() {
@@ -65,7 +65,7 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
         this.floor = floor;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING)
+    @QueryField(type = QueryField.FieldType.STRING, queryName = DOOR)
     private String door;
 
     public String getDoor() {

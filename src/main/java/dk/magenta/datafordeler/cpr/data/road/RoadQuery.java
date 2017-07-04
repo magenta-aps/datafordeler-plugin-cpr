@@ -18,7 +18,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
     public static final String NAME = "name";
     public static final String MUNICIPALITY_CODE = "municipality_code";
 
-    @QueryField(type = QueryField.FieldType.INT)
+    @QueryField(type = QueryField.FieldType.INT, queryName = CODE)
     private String code;
 
     public String getCode() {
@@ -29,7 +29,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
         this.code = code;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING)
+    @QueryField(type = QueryField.FieldType.STRING, queryName = NAME)
     private String name;
 
     public String getName() {
@@ -40,7 +40,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
         this.name = name;
     }
 
-    @QueryField(type = QueryField.FieldType.INT)
+    @QueryField(type = QueryField.FieldType.INT, queryName = MUNICIPALITY_CODE)
     private String municipalityCode;
 
     public String getMunicipality_code() {
