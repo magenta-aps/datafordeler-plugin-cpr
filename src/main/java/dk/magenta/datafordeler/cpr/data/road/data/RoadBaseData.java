@@ -119,5 +119,6 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         Hibernate.initialize(memoData);
         Hibernate.initialize(postcodeData);
         Hibernate.initialize(postcodeData);
+        Hibernate.initialize(cityData);
     }
 }
