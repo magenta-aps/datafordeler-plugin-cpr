@@ -18,7 +18,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
     public static final String FIRSTNAME = "firstName";
     public static final String LASTNAME = "lastName";
 
-    @QueryField(type = QueryField.FieldType.INT)
+    @QueryField(type = QueryField.FieldType.STRING)
     private String cprNumber;
 
     public String getCprNumber() {

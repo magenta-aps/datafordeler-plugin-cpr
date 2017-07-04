@@ -1,7 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,14 +46,14 @@ public class PersonNameData extends AuthorityDetailData {
     @Column
     @JsonProperty(value = "mellemnavn")
     @XmlElement(name = "mellemnavn")
-    private String middleName;
+    private String mellemnavn;
 
-    public String getMiddleName() {
-        return this.middleName;
+    public String getMellemnavn() {
+        return this.mellemnavn;
     }
 
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
+    public void setMellemnavn(String mellemnavn) {
+        this.mellemnavn = mellemnavn;
     }
 
     @Column
@@ -141,7 +140,7 @@ public class PersonNameData extends AuthorityDetailData {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("firstName", this.firstName);
         map.put("firstNameMarking", this.firstNameMarking);
-        map.put("middleName", this.middleName);
+        map.put("mellemnavn", this.mellemnavn);
         map.put("middleNameMarking", this.middleNameMarking);
         map.put("lastName", this.lastName);
         map.put("lastNameMarking", this.lastNameMarking);

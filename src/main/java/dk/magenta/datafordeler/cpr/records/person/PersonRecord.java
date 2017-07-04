@@ -80,7 +80,7 @@ public class PersonRecord extends PersonDataRecord {
             data.setMother(
                     this.get("mornvn"),
                     this.getBoolean("mornvn_mrk"),
-                    this.getInt("pnrmor"),
+                    this.getString("pnrmor", false),
                     this.getDate("mor_foed_dt"),
                     this.getBoolean("mor_foed_dt_umrk"),
                     this.getInt("mor_mynkod")
@@ -91,7 +91,7 @@ public class PersonRecord extends PersonDataRecord {
             data.setFather(
                     this.get("farnvn"),
                     this.getBoolean("farnvn_mrk"),
-                    this.getInt("pnrfar"),
+                    this.getString("pnrfar", false),
                     this.getDate("far_foed_dt"),
                     this.getBoolean("far_foed_dt_umrk"),
                     this.getInt("far_mynkod")
@@ -126,7 +126,7 @@ public class PersonRecord extends PersonDataRecord {
                     this.getBoolean("foed_dt_umrk"),
                     this.getInt("foedsekvens")
             );
-            data.setCurrentCprNumber(this.getInt("pnrgaeld"));
+            data.setCurrentCprNumber(this.getString("pnrgaeld", false));
             data.setGender(this.get("koen"));
             data.setStartAuthority(this.getInt("start_mynkod-person"));
         }

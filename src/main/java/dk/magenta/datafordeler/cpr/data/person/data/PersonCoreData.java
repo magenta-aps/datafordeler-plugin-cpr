@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Created by lars on 21-06-17.
@@ -25,13 +26,13 @@ public class PersonCoreData extends AuthorityDetailData {
     @Column
     @JsonProperty(value = "nuværendeCprNummer")
     @XmlElement(name = "nuværendeCprNummer")
-    private int currentCprNumber;
+    private String currentCprNumber;
 
-    public int getCurrentCprNumber() {
+    public String getCurrentCprNumber() {
         return this.currentCprNumber;
     }
 
-    public void setCurrentCprNumber(int currentCprNumber) {
+    public void setCurrentCprNumber(String currentCprNumber) {
         this.currentCprNumber = currentCprNumber;
     }
 
@@ -64,7 +65,7 @@ public class PersonCoreData extends AuthorityDetailData {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        if (currentCprNumber != 0) {
+        if (StringUtils.isNotEmpty(currentCprNumber)) {
             map.put("currentCprNumber", this.currentCprNumber);
         }
         if (this.gender != null) {

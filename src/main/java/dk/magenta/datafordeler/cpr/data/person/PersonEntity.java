@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.database.Identification;
 
+import java.math.BigInteger;
 import javax.persistence.Column;
 import javax.persistence.Index;
 import javax.persistence.Table;
@@ -38,19 +39,19 @@ public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {
     @Column
     @JsonProperty
     @XmlElement
-    private int cprNumber;
+    private String cprNumber;
 
-    public int getCprNumber() {
+    public String getCprNumber() {
         return this.cprNumber;
     }
 
-    public void setCprNumber(int cprNumber) {
+    public void setCprNumber(String cprNumber) {
         this.cprNumber = cprNumber;
     }
 
 
 
-    public static UUID generateUUID(int cprNumber) {
+    public static UUID generateUUID(String cprNumber) {
         String uuidInput = "person:"+cprNumber;
         return UUID.nameUUIDFromBytes(uuidInput.getBytes());
     }

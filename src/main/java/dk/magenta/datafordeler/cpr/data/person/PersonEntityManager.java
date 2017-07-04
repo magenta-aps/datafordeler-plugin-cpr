@@ -15,6 +15,7 @@ import dk.magenta.datafordeler.cpr.parsers.CprParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
 import dk.magenta.datafordeler.cpr.records.Record;
+import java.math.BigInteger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,12 +101,12 @@ public class PersonEntityManager extends CprEntityManager {
             Transaction transaction = session.beginTransaction();
 
 
-            HashMap<Integer, PersonEntity> entityCache = new HashMap<>();
+            HashMap<String, PersonEntity> entityCache = new HashMap<>();
 
             for (Record record : records) {
                 if (record instanceof PersonDataRecord) {
                     PersonDataRecord personDataRecord = (PersonDataRecord) record;
-                    int cprNumber = personDataRecord.getCprNumber();
+                    String cprNumber = personDataRecord.getCprNumber();
 
                     PersonEntity entity = entityCache.get(cprNumber);
                     if (entity == null) {

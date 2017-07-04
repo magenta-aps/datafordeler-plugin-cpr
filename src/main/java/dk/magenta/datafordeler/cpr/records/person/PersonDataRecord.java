@@ -5,6 +5,7 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 
+import java.math.BigInteger;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,8 +32,8 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
         return 21;
     }
 
-    public int getCprNumber() {
-        return Integer.parseInt(this.get("pnr"));
+    public String getCprNumber() {
+        return this.get("pnr");
     }
 
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {

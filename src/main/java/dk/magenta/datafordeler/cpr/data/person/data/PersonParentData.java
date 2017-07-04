@@ -40,13 +40,13 @@ public class PersonParentData extends AuthorityDetailData {
     @Column
     @JsonProperty(value = "cprnummer")
     @XmlElement(name = "cprnummer")
-    private int cprNumber;
+    private String cprNumber;
 
-    public int getCprNumber() {
+    public String getCprNumber() {
         return this.cprNumber;
     }
 
-    public void setCprNumber(int cprNumber) {
+    public void setCprNumber(String cprNumber) {
         this.cprNumber = cprNumber;
     }
 

@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
 
@@ -74,7 +73,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private PersonForeignAddressData foreignAddressData;
 
 
-    public void setCurrentCprNumber(int cprNumber) {
+    public void setCurrentCprNumber(String cprNumber) {
         if (this.coreData == null) {
             this.coreData = new PersonCoreData();
         }
@@ -102,7 +101,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.statusData.setStatus(status);
     }
 
-    public void setMother(String name, boolean nameMarking, int cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode) {
+    public void setMother(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode) {
         if (this.motherData == null) {
             this.motherData = new PersonParentData();
             this.motherData.setMother(true);
@@ -115,7 +114,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.motherData.setAuthority(authorityCode);
     }
 
-    public void setFather(String name, boolean nameMarking, int cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode) {
+    public void setFather(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode) {
         if (this.fatherData == null) {
             this.fatherData = new PersonParentData();
             this.fatherData.setMother(false);
@@ -213,7 +212,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.nameData.setAuthority(authority);
         this.nameData.setFirstName(firstName);
         this.nameData.setFirstNameMarking(firstNameMarking);
-        this.nameData.setMiddleName(middleName);
+        this.nameData.setMellemnavn(middleName);
         this.nameData.setMiddleNameMarking(middleNameMarking);
         this.nameData.setLastName(lastName);
         this.nameData.setLastNameMarking(lastNameMarking);
