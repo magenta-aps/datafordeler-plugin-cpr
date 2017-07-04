@@ -55,7 +55,11 @@ public class CprRegisterManager extends RegisterManager {
     public void init() {
 
         CprConfiguration configuration = this.configurationManager.getConfiguration();
-        this.commonFetcher = new FtpCommunicator(configuration.getFtpUsername(), configuration.getFtpPassword(), configuration.getFtps());
+        this.commonFetcher = new FtpCommunicator(
+            configuration.getFtpUsername(),
+            configuration.getFtpPassword(),
+            configuration.getFtps()
+        );
     }
 
     @Override
@@ -94,7 +98,7 @@ public class CprRegisterManager extends RegisterManager {
 
     @Override
     protected URI getEventInterface() {
-        return expandBaseURI(this.getBaseEndpoint(), "/cprdata.txt");
+        return expandBaseURI(this.getBaseEndpoint(), "/ud/");
     }
 
     @Override
@@ -150,18 +154,22 @@ public class CprRegisterManager extends RegisterManager {
                                     );
                                     break;
                                 case RoadEntity.schema:
+                                    /*
                                     try {
                                         responseBody = new FileInputStream(new File(configuration.getCprRoadDataLocation()));
                                     } catch (FileNotFoundException e) {
                                         e.printStackTrace();
                                     }
+                                    */
                                     break;
                                 case ResidenceEntity.schema:
+                                    /*
                                     try {
                                         responseBody = new FileInputStream(new File(configuration.getCprResidenceDataLocation()));
                                     } catch (FileNotFoundException e) {
                                         e.printStackTrace();
                                     }
+                                    */
                                     break;
                             }
                         } catch (HttpStatusException e1) {
