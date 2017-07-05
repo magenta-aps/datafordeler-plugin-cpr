@@ -14,9 +14,11 @@ import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
+import dk.magenta.datafordeler.cpr.synchronization.LocalCopyFtpCommunicator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -34,7 +36,7 @@ import java.util.*;
 @Component
 public class CprRegisterManager extends RegisterManager {
 
-    private FtpCommunicator commonFetcher;
+    private LocalCopyFtpCommunicator commonFetcher;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -47,18 +49,26 @@ public class CprRegisterManager extends RegisterManager {
 
     private Logger log = LogManager.getLogger("CprRegisterManager");
 
+    @Value("${dafo.cpr.proxy-url:}")
+    private String proxyString;
+
+    @Value("${dafo.cpr.local-copy-folder:}")
+    private String localCopyFolder;
+
+
     public CprRegisterManager() {
 
     }
 
     @PostConstruct
-    public void init() {
-
+    public void init() throws IOException {
         CprConfiguration configuration = this.configurationManager.getConfiguration();
-        this.commonFetcher = new FtpCommunicator(
+        this.commonFetcher = new LocalCopyFtpCommunicator(
             configuration.getFtpUsername(),
             configuration.getFtpPassword(),
-            configuration.getFtps()
+            configuration.getFtps(),
+            proxyString,
+            localCopyFolder
         );
     }
 
@@ -123,7 +133,7 @@ public class CprRegisterManager extends RegisterManager {
     }
 
     public ItemInputStream<Event> pullEvents(URI eventInterface) throws DataFordelerException {
-        FtpCommunicator eventCommunicator = (FtpCommunicator) this.getEventFetcher();
+        LocalCopyFtpCommunicator ftpFetcher = (LocalCopyFtpCommunicator) this.getEventFetcher();
         CprConfiguration configuration = configurationManager.getConfiguration();
         final int linesPerEvent = 100;
 
@@ -149,7 +159,7 @@ public class CprRegisterManager extends RegisterManager {
                         try {
                             switch (schema) {
                                 case PersonEntity.schema:
-                                    responseBody = eventCommunicator.fetch(
+                                    responseBody = ftpFetcher.fetch(
                                             CprRegisterManager.this.getEventInterface()
                                     );
                                     break;
