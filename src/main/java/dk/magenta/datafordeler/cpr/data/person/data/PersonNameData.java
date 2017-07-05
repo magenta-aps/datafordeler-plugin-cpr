@@ -18,29 +18,43 @@ public class PersonNameData extends AuthorityDetailData {
 
 
     @Column
-    @JsonProperty(value = "fornavn")
-    @XmlElement(name = "fornavn")
-    private String firstName;
+    @JsonProperty(value = "adresseringsnavn")
+    @XmlElement(name = "adresseringsnavn")
+    private String adresseringsnavn;
 
-    public String getFirstName() {
-        return this.firstName;
+    public String getAdresseringsnavn() {
+        return this.adresseringsnavn;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setAdresseringsnavn(String adresseringsnavn) {
+        this.adresseringsnavn = adresseringsnavn;
+    }
+
+
+    @Column
+    @JsonProperty(value = "fornavne")
+    @XmlElement(name = "fornavne")
+    private String fornavne;
+
+    public String getFornavne() {
+        return this.fornavne;
+    }
+
+    public void setFornavne(String fornavne) {
+        this.fornavne = fornavne;
     }
 
     @Column
-    @JsonProperty(value = "fornavnMarkering")
-    @XmlElement(name = "fornavnMarkering")
-    private boolean firstNameMarking;
+    @JsonProperty(value = "fornavneMarkering")
+    @XmlElement(name = "fornavneMarkering")
+    private boolean fornavneMarkering;
 
-    public boolean isFirstNameMarking() {
-        return this.firstNameMarking;
+    public boolean isFornavneMarkering() {
+        return this.fornavneMarkering;
     }
 
-    public void setFirstNameMarking(boolean firstNameMarking) {
-        this.firstNameMarking = firstNameMarking;
+    public void setFornavneMarkering(boolean fornavneMarkering) {
+        this.fornavneMarkering = fornavneMarkering;
     }
 
     @Column
@@ -59,66 +73,64 @@ public class PersonNameData extends AuthorityDetailData {
     @Column
     @JsonProperty(value = "mellemnavnMarkering")
     @XmlElement(name = "mellemnavnMarkering")
-    private boolean middleNameMarking;
+    private boolean mellemnavnMarkering;
 
-    public boolean isMiddleNameMarking() {
-        return this.middleNameMarking;
+    public boolean isMellemnavnMarkering() {
+        return this.mellemnavnMarkering;
     }
 
-    public void setMiddleNameMarking(boolean middleNameMarking) {
-        this.middleNameMarking = middleNameMarking;
+    public void setMellemnavnMarkering(boolean mellemnavnMarkering) {
+        this.mellemnavnMarkering = mellemnavnMarkering;
     }
 
     @Column
     @JsonProperty(value = "efternavn")
     @XmlElement(name = "efternavn")
-    private String lastName;
+    private String efternavn;
 
-    public String getLastName() {
-        return this.lastName;
+    public String getEfternavn() {
+        return this.efternavn;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setEfternavn(String efternavn) {
+        this.efternavn = efternavn;
     }
 
     @Column
     @JsonProperty(value = "efternavnMarkering")
     @XmlElement(name = "efternavnMarkering")
-    private boolean lastNameMarking;
+    private boolean efternavnMarkering;
 
-    public boolean isLastNameMarking() {
-        return this.lastNameMarking;
+    public boolean isEfternavnMarkering() {
+        return this.efternavnMarkering;
     }
 
-    public void setLastNameMarking(boolean lastNameMarking) {
-        this.lastNameMarking = lastNameMarking;
+    public void setEfternavnMarkering(boolean efternavnMarkering) {
+        this.efternavnMarkering = efternavnMarkering;
     }
 
-    @Column
-    @JsonProperty(value = "egetEfternavn")
-    @XmlElement(name = "egetEfternavn")
-    private String ownLastName;
 
-    public String getOwnLastName() {
-        return this.ownLastName;
+    //Ikke i grunddatamodellen
+
+    private String egetEfternavn;
+
+    public String getEgetEfternavn() {
+        return this.egetEfternavn;
     }
 
-    public void setOwnLastName(String ownLastName) {
-        this.ownLastName = ownLastName;
+    public void setEgetEfternavn(String egetEfternavn) {
+        this.egetEfternavn = egetEfternavn;
     }
 
-    @Column
-    @JsonProperty(value = "egetEfternavnMarkering")
-    @XmlElement(name = "egetEfternavnMarkering")
-    private boolean ownLastNameMarking;
 
-    public boolean isOwnLastNameMarking() {
-        return this.ownLastNameMarking;
+    private boolean egetEfternavnMarkering;
+
+    public boolean isEgetEfternavnMarkering() {
+        return this.egetEfternavnMarkering;
     }
 
-    public void setOwnLastNameMarking(boolean ownLastNameMarking) {
-        this.ownLastNameMarking = ownLastNameMarking;
+    public void setEgetEfternavnMarkering(boolean egetEfternavnMarkering) {
+        this.egetEfternavnMarkering = egetEfternavnMarkering;
     }
 
 
@@ -138,15 +150,23 @@ public class PersonNameData extends AuthorityDetailData {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("firstName", this.firstName);
-        map.put("firstNameMarking", this.firstNameMarking);
+        //Navn
+        map.put("adresseringsnavn", this.adresseringsnavn);
+        map.put("efternavn", this.efternavn);
+        map.put("fornavne", this.fornavne);
         map.put("mellemnavn", this.mellemnavn);
-        map.put("middleNameMarking", this.middleNameMarking);
-        map.put("lastName", this.lastName);
-        map.put("lastNameMarking", this.lastNameMarking);
-        map.put("ownLastName", this.ownLastName);
-        map.put("ownLastNameMarking", this.ownLastNameMarking);
+
+        //NavneMarkering
+        map.put("efternavnMarkering", this.efternavnMarkering);
+        map.put("fornavneMarkering", this.fornavneMarkering);
+        map.put("mellemnavnMarkering", this.mellemnavnMarkering);
+
+        //Ikke i grunddatamodellen
         map.put("reportNames", this.reportNames);
+        map.put("egetEfternavnMarkering", this.egetEfternavnMarkering);
+        map.put("egetEfternavn", this.egetEfternavn);
+
+        //OBS: Virkning fra og til mangler i forhold til grunddatamodellen
         return map;
     }
 }

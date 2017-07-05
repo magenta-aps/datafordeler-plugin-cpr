@@ -19,46 +19,75 @@ import java.util.Map;
 public class PersonBirthData extends DetailData {
 
     @Column
-    @JsonProperty(value = "fødselstidspunkt")
-    @XmlElement(name = "fødselstidspunkt")
-    private LocalDateTime birthDateTime;
+    @JsonProperty(value = "cprFoedselsregistreringsstedskode")
+    @XmlElement(name = "cprFoedselsregistreringsstedskode")
+    private String cprFoedselsregistreringsstedskode;
 
-    public LocalDateTime getBirthDateTime() {
-        return this.birthDateTime;
+    public String isCprFoedselsregistreringsstedskode() {
+        return this.cprFoedselsregistreringsstedskode;
     }
 
-    public void setBirthDateTime(LocalDateTime birthDateTime) {
-        this.birthDateTime = birthDateTime;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "fødselstidspunktUsikkert")
-    @XmlElement(name = "fødselstidspunktUsikkert")
-    private boolean birthDateUncertain;
-
-    public boolean isBirthDateUncertain() {
-        return this.birthDateUncertain;
-    }
-
-    public void setBirthDateUncertain(boolean birthDateUncertain) {
-        this.birthDateUncertain = birthDateUncertain;
+    public void setCprFoedselsregistreringsstedskode(String cprFoedselsregistreringsstedskode) {
+        this.cprFoedselsregistreringsstedskode = cprFoedselsregistreringsstedskode;
     }
 
 
 
     @Column
-    @JsonProperty(value = "fødselsrækkefølge")
-    @XmlElement(name = "fødselsrækkefølge")
-    private int birthSequence;
+    @JsonProperty(value = "cprFoedselsregistreringsstedsnavn")
+    @XmlElement(name = "cprFoedselsregistreringsstedsnavn")
+    private String cprFoedselsregistreringsstedsnavn;
 
-    public int getBirthSequence() {
-        return this.birthSequence;
+    public String isCprFoedselsregistreringsstedsnavn() {
+        return this.cprFoedselsregistreringsstedsnavn;
     }
 
-    public void setBirthSequence(int birthSequence) {
-        this.birthSequence = birthSequence;
+    public void setCprFoedselsregistreringsstedsnavn(String cprFoedselsregistreringsstedsnavn) {
+        this.cprFoedselsregistreringsstedsnavn = cprFoedselsregistreringsstedsnavn;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "foedselsdato")
+    @XmlElement(name = "foedselsdato")
+    private LocalDateTime foedselsdato;
+
+    public LocalDateTime getFoedselsdato() {
+        return this.foedselsdato;
+    }
+
+    public void setFoedselsdato(LocalDateTime foedselsdato) {
+        this.foedselsdato = foedselsdato;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "foedselsdatoUsikkerhedsmarkering")
+    @XmlElement(name = "foedselsdatoUsikkerhedsmarkering")
+    private boolean foedselsdatoUsikkerhedsmarkering;
+
+    public boolean isFoedselsdatoUsikkerhedsmarkering() {
+        return this.foedselsdatoUsikkerhedsmarkering;
+    }
+
+    public void setFoedselsdatoUsikkerhedsmarkering(boolean foedselsdatoUsikkerhedsmarkering) {
+        this.foedselsdatoUsikkerhedsmarkering = foedselsdatoUsikkerhedsmarkering;
+    }
+
+
+
+    //Ikke i grunddatamodellen
+
+    private int foedselsraekkefoelge;
+
+    public int getFoedselsraekkefoelge() {
+        return this.foedselsraekkefoelge;
+    }
+
+    public void setFoedselsraekkefoelge(int foedselsraekkefoelge) {
+        this.foedselsraekkefoelge = foedselsraekkefoelge;
     }
 
 
@@ -66,9 +95,14 @@ public class PersonBirthData extends DetailData {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("birthDateTime", this.birthDateTime);
-        map.put("birthDateUncertain", this.birthDateUncertain);
-        map.put("birthSequence", this.birthSequence);
+        //Person
+        map.put("cprFoedselsregistreringsstedskode", this.cprFoedselsregistreringsstedskode);
+        map.put("cprFoedselsregistreringsstedsnavn", this.cprFoedselsregistreringsstedsnavn);
+        map.put("foedselsdato", this.foedselsdato);
+        map.put("foedselsdatoUsikkerhedsmarkering", this.foedselsdatoUsikkerhedsmarkering);
+
+        //Ikke i grunddatamodellen
+        map.put("foedselsraekkefoelge", this.foedselsraekkefoelge);
         return map;
     }
 }

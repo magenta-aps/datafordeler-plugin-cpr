@@ -20,18 +20,18 @@ public class PersonAddressConameData extends DetailData {
     @Column
     @JsonProperty(value = "conavn")
     @XmlElement(name = "conavn")
-    private String coName;
+    private String conavn;
 
-    public String getCoName() {
-        return this.coName;
+    public String getConavn() {
+        return this.conavn;
     }
 
-    public void setCoName(String coName) {
-        this.coName = coName;
+    public void setConavn(String conavn) {
+        this.conavn = conavn;
     }
 
     @Override
     public Map<String, Object> asMap() {
-        return Collections.singletonMap("coName", this.coName);
+        return Collections.singletonMap("conavn", this.conavn);
     }
 }

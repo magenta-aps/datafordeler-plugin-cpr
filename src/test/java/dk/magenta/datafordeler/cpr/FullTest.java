@@ -80,7 +80,7 @@ public class FullTest {
                         try {
                             session = sessionManager.getSessionFactory().openSession();
                             PersonQuery query = new PersonQuery();
-                            query.setFirstName("Tester");
+                            query.setFornavne("Tester");
                             List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
                             Assert.assertEquals(1, entities.size());
                         } catch (DataFordelerException e) {

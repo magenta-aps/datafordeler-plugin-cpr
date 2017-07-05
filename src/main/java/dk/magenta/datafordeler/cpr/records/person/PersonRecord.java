@@ -127,7 +127,7 @@ public class PersonRecord extends PersonDataRecord {
                     this.getInt("foedsekvens")
             );
             data.setCurrentCprNumber(this.getString("pnrgaeld", false));
-            data.setGender(this.get("koen"));
+            data.setKoen(this.get("koen"));
             data.setStartAuthority(this.getInt("start_mynkod-person"));
         }
     }

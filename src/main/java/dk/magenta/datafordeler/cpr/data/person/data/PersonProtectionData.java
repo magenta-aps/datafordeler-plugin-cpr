@@ -1,7 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,14 +20,14 @@ public class PersonProtectionData extends AuthorityDetailData {
     @Column
     @JsonProperty(value = "beskyttelsestype")
     @XmlElement(name = "beskyttelsestype")
-    private int protectionType;
+    private int beskyttelsestype;
 
-    public int getProtectionType() {
-        return protectionType;
+    public int getBeskyttelsestype() {
+        return beskyttelsestype;
     }
 
-    public void setProtectionType(int protectionType) {
-        this.protectionType = protectionType;
+    public void setBeskyttelsestype(int beskyttelsestype) {
+        this.beskyttelsestype = beskyttelsestype;
     }
 
     @Column
@@ -47,7 +46,7 @@ public class PersonProtectionData extends AuthorityDetailData {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("protectionType", this.protectionType);
+        map.put("beskyttelsestype", this.beskyttelsestype);
         map.put("reportMarking", this.reportMarking);
         return map;
     }

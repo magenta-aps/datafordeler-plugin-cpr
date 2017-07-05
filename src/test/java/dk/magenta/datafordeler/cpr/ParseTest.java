@@ -81,7 +81,7 @@ public class ParseTest {
             roadEntityManager.parseRegistration(testData);
 
             RoadQuery query = new RoadQuery();
-            //query.setMunicipalityCode("0730");
+            //query.setCprKommunekode("0730");
             //query.setCode("0012");
             query.setName("Aalborggade");
             session = sessionManager.getSessionFactory().openSession();
@@ -107,9 +107,9 @@ public class ParseTest {
             residenceEntityManager.parseRegistration(testData);
 
             ResidenceQuery query = new ResidenceQuery();
-            //query.setMunicipalityCode("0730");
+            //query.setCprKommunekode("0730");
             //query.setCode("0012");
-            //query.setMunicipalityCode();
+            //query.setCprKommunekode();
             /*session = sessionManager.getSessionFactory().openSession();
 
             try {

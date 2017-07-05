@@ -2,7 +2,6 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,48 +18,90 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PersonAddressData extends AuthorityDetailData {
 
-
     @Column
-    @JsonProperty(value = "kommunekode")
-    @XmlElement(name = "kommunekode")
-    private int municipalityCode;
+    @JsonProperty(value = "bygningsnummer")
+    @XmlElement(name = "bygningsnummer")
+    private String bygningsnummer;
 
-    public int getMunicipalityCode() {
-        return this.municipalityCode;
+    public String getBygningsnummer() {
+        return this.bygningsnummer;
     }
 
-    public void setMunicipalityCode(int municipalityCode) {
-        this.municipalityCode = municipalityCode;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "vejkode")
-    @XmlElement(name = "vejkode")
-    private int roadCode;
-
-    public int getRoadCode() {
-        return this.roadCode;
-    }
-
-    public void setRoadCode(int roadCode) {
-        this.roadCode = roadCode;
+    public void setBygningsnummer(String bygningsnummer) {
+        this.bygningsnummer = bygningsnummer;
     }
 
 
 
     @Column
-    @JsonProperty(value = "husnummer")
-    @XmlElement(name = "husnummer")
-    private String houseNumber;
+    @JsonProperty(value = "bynavn")
+    @XmlElement(name = "bynavn")
+    private String bynavn;
 
-    public String getHouseNumber() {
-        return this.houseNumber;
+    public String getBynavn() {
+        return this.bynavn;
     }
 
-    public void setHouseNumber(String houseNumber) {
-        this.houseNumber = houseNumber;
+    public void setBynavn(String bynavn) {
+        this.bynavn = bynavn;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "cprKommunekode")
+    @XmlElement(name = "cprKommunekode")
+    private String cprKommunekode;
+
+    public String getCprKommunekode() {
+        return this.cprKommunekode;
+    }
+
+    public void setCprKommunekode(String cprKommunekode) {
+        this.cprKommunekode = cprKommunekode;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "cprKommunenavn")
+    @XmlElement(name = "cprKommunenavn")
+    private String cprKommunenavn;
+
+    public String getCprKommunenavn() {
+        return this.cprKommunenavn;
+    }
+
+    public void setCprKommunenavn(String cprKommunenavn) {
+        this.cprKommunenavn = cprKommunenavn;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "cprVejkode")
+    @XmlElement(name = "cprVejkode")
+    private String cprVejkode;
+
+    public String getCprVejkode() { return this.cprVejkode; }
+
+    public void setCprVejkode(String cprVejkode) {
+        this.cprVejkode = cprVejkode;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "darAdresse")
+    @XmlElement(name = "darAdresse")
+    private String darAdresse;
+
+    public String getDarAdresse() {
+        return this.darAdresse;
+    }
+
+    public void setDarAdresse(String darAdresse) {
+        this.darAdresse = darAdresse;
     }
 
 
@@ -68,51 +109,169 @@ public class PersonAddressData extends AuthorityDetailData {
     @Column
     @JsonProperty(value = "etage")
     @XmlElement(name = "etage")
-    private String floor;
+    private String etage;
 
-    public String getFloor() {
-        return this.floor;
+    public String getEtage() {
+        return this.etage;
     }
 
-    public void setFloor(String floor) {
-        this.floor = floor;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "sidedør")
-    @XmlElement(name = "sidedør")
-    private String door;
-
-    public String getDoor() {
-        return this.door;
-    }
-
-    public void setDoor(String door) {
-        this.door = door;
+    public void setEtage(String etage) {
+        this.etage = etage;
     }
 
 
 
     @Column
-    @JsonProperty(value = "bnr")
-    @XmlElement(name = "bnr")
-    private String bNumber;
+    @JsonProperty(value = "husnummer")
+    @XmlElement(name = "husnummer")
+    private String husnummer;
 
-    public String getbNumber() {
-        return this.bNumber;
+    public String getHusnummer() {
+        return this.husnummer;
     }
 
-    public void setbNumber(String bNumber) {
-        this.bNumber = bNumber;
+    public void setHusnummer(String husnummer) {
+        this.husnummer = husnummer;
     }
 
 
 
     @Column
-    @JsonProperty(value = "adresseteksttype")
-    @XmlElement(name = "adresseteksttype")
+    @JsonProperty(value = "postdistrikt")
+    @XmlElement(name = "postdistrikt")
+    private String postdistrikt;
+
+    public String getPostdistrikt() {
+        return this.postdistrikt;
+    }
+
+    public void setPostdistrikt(String postdistrikt) {
+        this.postdistrikt = postdistrikt;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "postnummer")
+    @XmlElement(name = "postnummer")
+    private String postnummer;
+
+    public String getPostnummer() {
+        return this.postnummer;
+    }
+
+    public void setPostnummer(String postnummer) {
+        this.postnummer = postnummer;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "sideDoer")
+    @XmlElement(name = "sideDoer")
+    private String sideDoer;
+
+    public String getSideDoer() {
+        return this.sideDoer;
+    }
+
+    public void setSideDoer(String sideDoer) {
+        this.sideDoer = sideDoer;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "vejadresseringsnavn")
+    @XmlElement(name = "vejadresseringsnavn")
+    private String vejadresseringsnavn;
+
+    public String getVejadresseringsnavn() {
+        return this.vejadresseringsnavn;
+    }
+
+    public void setVejadresseringsnavn(String vejadresseringsnavn) {
+        this.vejadresseringsnavn = vejadresseringsnavn;
+    }
+
+
+    @Column
+    @JsonProperty(value = "adresselinie1")
+    @XmlElement(name = "adresselinie1")
+    private String adresselinie1;
+
+    public String getAdresselinie1() {
+        return this.adresselinie1;
+    }
+
+    public void setAdresselinie1(String adresselinie1) {
+        this.adresselinie1 = adresselinie1;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "adresselinie2")
+    @XmlElement(name = "adresselinie2")
+    private String adresselinie2;
+
+    public String getAdresselinie2() {
+        return this.adresselinie2;
+    }
+
+    public void setAdresselinie2(String adresselinie2) {
+        this.adresselinie2 = adresselinie2;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "adresselinie3")
+    @XmlElement(name = "adresselinie3")
+    private String adresselinie3;
+
+    public String getAdresselinie3() {
+        return this.adresselinie3;
+    }
+
+    public void setAdresselinie3(String adresselinie3) {
+        this.adresselinie3 = adresselinie3;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "adresselinie4")
+    @XmlElement(name = "adresselinie4")
+    private String adresselinie4;
+
+    public String getAdresselinie4() {
+        return this.adresselinie4;
+    }
+
+    public void setAdresselinie4(String adresselinie4) {
+        this.adresselinie4 = adresselinie4;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "adresselinie5")
+    @XmlElement(name = "adresselinie5")
+    private String adresselinie5;
+
+    public String getAdresselinie5() {
+        return this.adresselinie5;
+    }
+
+    public void setAdresselinie5(String adresselinie5) {
+        this.adresselinie5 = adresselinie5;
+    }
+
+
+
+    //Ikke i grunddatamodellen
+
     private int addressTextType;
 
     public int getAddressTextType() {
@@ -124,10 +283,6 @@ public class PersonAddressData extends AuthorityDetailData {
     }
 
 
-
-    @Column
-    @JsonProperty(value = "startmyndighed")
-    @XmlElement(name = "startmyndighed")
     private int startAuthority;
 
     public int getStartAuthority() {
@@ -139,98 +294,33 @@ public class PersonAddressData extends AuthorityDetailData {
     }
 
 
-
-    @Column
-    @JsonProperty(value = "supplerendeAdresse1")
-    @XmlElement(name = "supplerendeAdresse1")
-    private String supplementaryAddress1;
-
-    public String getSupplementaryAddress1() {
-        return this.supplementaryAddress1;
-    }
-
-    public void setSupplementaryAddress1(String supplementaryAddress1) {
-        this.supplementaryAddress1 = supplementaryAddress1;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "supplerendeAdresse2")
-    @XmlElement(name = "supplerendeAdresse2")
-    private String supplementaryAddress2;
-
-    public String getSupplementaryAddress2() {
-        return this.supplementaryAddress2;
-    }
-
-    public void setSupplementaryAddress2(String supplementaryAddress2) {
-        this.supplementaryAddress2 = supplementaryAddress2;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "supplerendeAdresse3")
-    @XmlElement(name = "supplerendeAdresse3")
-    private String supplementaryAddress3;
-
-    public String getSupplementaryAddress3() {
-        return this.supplementaryAddress3;
-    }
-
-    public void setSupplementaryAddress3(String supplementaryAddress3) {
-        this.supplementaryAddress3 = supplementaryAddress3;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "supplerendeAdresse4")
-    @XmlElement(name = "supplerendeAdresse4")
-    private String supplementaryAddress4;
-
-    public String getSupplementaryAddress4() {
-        return this.supplementaryAddress4;
-    }
-
-    public void setSupplementaryAddress4(String supplementaryAddress4) {
-        this.supplementaryAddress4 = supplementaryAddress4;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "supplerendeAdresse5")
-    @XmlElement(name = "supplerendeAdresse5")
-    private String supplementaryAddress5;
-
-    public String getSupplementaryAddress5() {
-        return this.supplementaryAddress5;
-    }
-
-    public void setSupplementaryAddress5(String supplementaryAddress5) {
-        this.supplementaryAddress5 = supplementaryAddress5;
-    }
-
-
-
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("municipalityCode", this.municipalityCode);
-        map.put("roadCode", this.roadCode);
-        map.put("houseNumber", this.houseNumber);
-        map.put("floor", this.floor);
-        map.put("door", this.door);
-        map.put("bNumber", this.bNumber);
+        //CprAdresse
+        map.put("bygningsnummer", this.bygningsnummer);
+        map.put("bynavn", this.bynavn);
+        map.put("cprKommunekode", this.cprKommunekode);
+        map.put("cprKommunenavn", this.cprKommunenavn);
+        map.put("cprVejkode", this.cprVejkode);
+        map.put("darAdresse", this.darAdresse);
+        map.put("etage", this.etage);
+        map.put("husnummer", this.husnummer);
+        map.put("postdistrikt", this.postdistrikt);
+        map.put("postnummer", this.postnummer);
+        map.put("sideDoer", this.sideDoer);
+        map.put("vejadresseringsnavn", this.vejadresseringsnavn);
+
+        //SimpelAdresse
+        map.put("adresselinie1", this.adresselinie1);
+        map.put("adresselinie2", this.adresselinie2);
+        map.put("adresselinie3", this.adresselinie3);
+        map.put("adresselinie4", this.adresselinie4);
+        map.put("adresselinie5", this.adresselinie5);
+
+        //Ikke i grunddatamodellen
         map.put("addressTextType", this.addressTextType);
         map.put("startAuthority", this.startAuthority);
-        map.put("supplementaryAddress1", this.supplementaryAddress1);
-        map.put("supplementaryAddress2", this.supplementaryAddress2);
-        map.put("supplementaryAddress3", this.supplementaryAddress3);
-        map.put("supplementaryAddress4", this.supplementaryAddress4);
-        map.put("supplementaryAddress5", this.supplementaryAddress5);
         return map;
     }
 }

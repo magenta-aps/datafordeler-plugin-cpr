@@ -2,7 +2,6 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,78 +20,78 @@ public class PersonForeignAddressData extends AuthorityDetailData {
 
 
     @Column
-    @JsonProperty(value = "adresselinje1")
-    @XmlElement(name = "adresselinje1")
-    private String addressLine1;
+    @JsonProperty(value = "adresselinie1")
+    @XmlElement(name = "adresselinie1")
+    private String adresselinie1;
 
-    public String getAddressLine1() {
-        return addressLine1;
+    public String getAdresselinie1() {
+        return adresselinie1;
     }
 
-    public void setAddressLine1(String addressLine1) {
-        this.addressLine1 = addressLine1;
-    }
-
-    @Column
-    @JsonProperty(value = "adresselinje2")
-    @XmlElement(name = "adresselinje2")
-    private String addressLine2;
-
-    public String getAddressLine2() {
-        return addressLine2;
-    }
-
-    public void setAddressLine2(String addressLine2) {
-        this.addressLine2 = addressLine2;
+    public void setAdresselinie1(String adresselinie1) {
+        this.adresselinie1 = adresselinie1;
     }
 
     @Column
-    @JsonProperty(value = "adresselinje3")
-    @XmlElement(name = "adresselinje3")
-    private String addressLine3;
+    @JsonProperty(value = "adresselinie2")
+    @XmlElement(name = "adresselinie2")
+    private String adresselinie2;
 
-    public String getAddressLine3() {
-        return addressLine3;
+    public String getAdresselinie2() {
+        return adresselinie2;
     }
 
-    public void setAddressLine3(String addressLine3) {
-        this.addressLine3 = addressLine3;
-    }
-
-    @Column
-    @JsonProperty(value = "adresselinje4")
-    @XmlElement(name = "adresselinje4")
-    private String addressLine4;
-
-    public String getAddressLine4() {
-        return addressLine4;
-    }
-
-    public void setAddressLine4(String addressLine4) {
-        this.addressLine4 = addressLine4;
+    public void setAdresselinie2(String adresselinie2) {
+        this.adresselinie2 = adresselinie2;
     }
 
     @Column
-    @JsonProperty(value = "adresselinje5")
-    @XmlElement(name = "adresselinje5")
-    private String addressLine5;
+    @JsonProperty(value = "adresselinie3")
+    @XmlElement(name = "adresselinie3")
+    private String adresselinie3;
 
-    public String getAddressLine5() {
-        return addressLine5;
+    public String getAdresselinie3() {
+        return adresselinie3;
     }
 
-    public void setAddressLine5(String addressLine5) {
-        this.addressLine5 = addressLine5;
+    public void setAdresselinie3(String adresselinie3) {
+        this.adresselinie3 = adresselinie3;
+    }
+
+    @Column
+    @JsonProperty(value = "adresselinie4")
+    @XmlElement(name = "adresselinie4")
+    private String adresselinie4;
+
+    public String getAdresselinie4() {
+        return adresselinie4;
+    }
+
+    public void setAdresselinie4(String adresselinie4) {
+        this.adresselinie4 = adresselinie4;
+    }
+
+    @Column
+    @JsonProperty(value = "adresselinie5")
+    @XmlElement(name = "adresselinie5")
+    private String adresselinie5;
+
+    public String getAdresselinie5() {
+        return adresselinie5;
+    }
+
+    public void setAdresselinie5(String adresselinie5) {
+        this.adresselinie5 = adresselinie5;
     }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("addressLine1", this.addressLine1);
-        map.put("addressLine2", this.addressLine2);
-        map.put("addressLine3", this.addressLine3);
-        map.put("addressLine4", this.addressLine4);
-        map.put("addressLine5", this.addressLine5);
+        map.put("adresselinie1", this.adresselinie1);
+        map.put("adresselinie2", this.adresselinie2);
+        map.put("adresselinie3", this.adresselinie3);
+        map.put("adresselinie4", this.adresselinie4);
+        map.put("adresselinie5", this.adresselinie5);
         return map;
     }
 }
