@@ -18,7 +18,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
     public static final String FIRSTNAME = "firstName";
     public static final String LASTNAME = "lastName";
 
-    @QueryField(type = QueryField.FieldType.STRING)
+    @QueryField(type = QueryField.FieldType.STRING, queryName = CPR)
     private String cprNumber;
 
     public String getCprNumber() {
@@ -29,7 +29,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
         this.cprNumber = cprNumber;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING)
+    @QueryField(type = QueryField.FieldType.STRING, queryName = FIRSTNAME)
     private String firstName;
 
     public String getFirstName() {
@@ -40,7 +40,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
         this.firstName = firstName;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING)
+    @QueryField(type = QueryField.FieldType.STRING, queryName = LASTNAME)
     private String lastName;
 
     public String getLastName() {
