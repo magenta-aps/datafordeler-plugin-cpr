@@ -122,9 +122,12 @@ public class PersonRecord extends PersonDataRecord {
         if (registrationTime.equals(this.getOffsetDateTime("start_ts-person")) && effect.compareRange( this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"))) {
 
             data.setBirth(
-                    LocalDateTime.of(this.getDate("foed_dt"), this.getTime("foed_tm")),
-                    this.getBoolean("foed_dt_umrk"),
-                    this.getInt("foedsekvens")
+                LocalDateTime.of(this.getDate("foed_dt"), this.getTime("foed_tm")),
+                this.getBoolean("foed_dt_umrk"),
+                // TODO: These are new fields which does not match up with the old input
+                "",
+                "",
+                this.getInt("foedsekvens")
             );
             data.setCurrentCprNumber(this.getString("pnrgaeld", false));
             data.setKoen(this.get("koen"));

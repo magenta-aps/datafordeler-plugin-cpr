@@ -55,20 +55,25 @@ public class AddressRecord extends PersonDataRecord {
     public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
         if (registrationTime.equals(this.getOffsetDateTime("adr_ts")) && effect.compareRange(this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), null, false)) {
             data.setAddress(
-                    this.getInt("start_mynkod-personbolig"),
-                    this.getInt("komkod"),
-                    this.getInt("vejkod"),
-                    this.get("husnr"),
-                    this.get("etage"),
-                    this.get("sidedoer"),
-                    this.get("bnr"),
-                    this.getInt("adrtxttype"),
-                    this.getInt("start_mynkod-adrtxt"),
-                    this.get("adr1-supladr"),
-                    this.get("adr2-supladr"),
-                    this.get("adr3-supladr"),
-                    this.get("adr4-supladr"),
-                    this.get("adr5-supladr")
+                this.getInt("start_mynkod-personbolig"),
+                this.get("bnr"),
+                null,
+                this.getString("komkod", false),
+                null,
+                this.getString("vejkod", false),
+                null,
+                this.get("etage"),
+                this.get("husnr"),
+                null,
+                null,
+                this.get("sidedoer"),
+                this.get("adr1-supladr"),
+                this.get("adr2-supladr"),
+                this.get("adr3-supladr"),
+                this.get("adr4-supladr"),
+                this.get("adr5-supladr"),
+                this.getInt("adrtxttype"),
+                this.getInt("start_mynkod-adrtxt")
             );
         }
         if (registrationTime.equals(this.getOffsetDateTime("convn_ts")) && effect.compareRange(null, false, null, false)) {

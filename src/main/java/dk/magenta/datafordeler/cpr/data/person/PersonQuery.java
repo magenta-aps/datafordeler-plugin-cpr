@@ -14,9 +14,9 @@ import java.util.Map;
  */
 public class PersonQuery extends CprQuery<PersonEntity> {
 
-    public static final String CPR = "cpr";
-    public static final String FIRSTNAME = "firstName";
-    public static final String LASTNAME = "lastName";
+    public static final String CPR = "personnummer";
+    public static final String FIRSTNAME = "fornavn";
+    public static final String LASTNAME = "efternavn";
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = CPR)
     private String cprNumber;

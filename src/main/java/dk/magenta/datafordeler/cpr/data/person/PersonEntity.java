@@ -37,8 +37,8 @@ public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {
     public static final String schema = "Person";
 
     @Column
-    @JsonProperty
-    @XmlElement
+    @JsonProperty("personnummer")
+    @XmlElement(name=("personnummer"))
     private String cprNumber;
 
     public String getCprNumber() {

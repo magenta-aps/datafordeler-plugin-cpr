@@ -44,16 +44,18 @@ public class NameRecord extends PersonDataRecord {
     public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
         if (registrationTime.equals(this.getOffsetDateTime("nvn_ts")) && effect.compareRange(this.getOffsetDateTime("nvnhaenstart"), this.getBoolean("haenstart_umrk-navne"), null, false)) {
             data.setName(
-                    this.getInt("start_mynkod-navne"),
-                    this.get("fornvn"),
-                    this.getMarking("fornvn_mrk"),
-                    this.get("melnvn"),
-                    this.getMarking("melnvn_mrk"),
-                    this.get("efternvn"),
-                    this.getMarking("efternvn_mrk"),
-                    this.get("slægtsnvn"),
-                    this.getMarking("slægtsnvn_mrk"),
-                    this.getBoolean("indrap-navne")
+                this.getInt("start_mynkod-navne"),
+                // TODO: Present in new model, but not in old?
+                "",
+                this.get("efternvn"),
+                this.get("fornvn"),
+                this.get("melnvn"),
+                this.getMarking("efternvn_mrk"),
+                this.getMarking("fornvn_mrk"),
+                this.getMarking("melnvn_mrk"),
+                this.get("slægtsnvn"),
+                this.getMarking("slægtsnvn_mrk"),
+                this.getBoolean("indrap-navne")
             );
         }
         if (registrationTime.equals(this.getOffsetDateTime("adrnvn_ts")) && effect.compareRange(null, false, null, false)) {

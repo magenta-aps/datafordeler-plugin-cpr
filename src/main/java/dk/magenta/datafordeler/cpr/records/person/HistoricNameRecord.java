@@ -45,16 +45,17 @@ public class HistoricNameRecord extends PersonDataRecord {
 
         if (registrationTime.equals(this.getOffsetDateTime("nvn_ts"))) {
             data.setName(
-                    this.getInt("start_mynkod-navne"),
-                    this.get("fornvn"),
-                    this.getMarking("fornvn_mrk"),
-                    this.get("melnvn"),
-                    this.getMarking("melnvn_mrk"),
-                    this.get("efternvn"),
-                    this.getMarking("efternvn_mrk"),
-                    this.get("slægtsnvn"),
-                    this.getMarking("slægtsnvn_mrk"),
-                    false
+                this.getInt("start_mynkod-navne"),
+                "",
+                this.get("efternvn"),
+                this.get("fornvn"),
+                this.get("melnvn"),
+                this.getMarking("efternvn_mrk"),
+                this.getMarking("fornvn_mrk"),
+                this.getMarking("melnvn_mrk"),
+                this.get("slægtsnvn"),
+                this.getMarking("slægtsnvn_mrk"),
+                false
             );
         }
         if (registrationTime.equals(this.getOffsetDateTime("adrnvn_ts"))) {
