@@ -4,7 +4,6 @@ import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.fapi.QueryField;
 import dk.magenta.datafordeler.cpr.data.CprQuery;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 
 import java.util.HashMap;
@@ -15,85 +14,85 @@ import java.util.Map;
  */
 public class ResidenceQuery extends CprQuery<ResidenceEntity> {
 
-    public static final String MUNICIPALITY_CODE = "municipalityCode";
-    public static final String ROAD_CODE = "roadCode";
-    public static final String HOUSE_NUMBER = "houseNumber";
-    public static final String FLOOR = "floor";
-    public static final String DOOR = "door";
+    public static final String KOMMUNEKODE = "kommunekode";
+    public static final String VEJKODE = "vejkode";
+    public static final String HUSNUMMER = "husnummer";
+    public static final String ETAGE = "etage";
+    public static final String SIDE_DOER = "sideDoer";
 
-    @QueryField(type = QueryField.FieldType.INT, queryName = MUNICIPALITY_CODE)
-    private String municipalityCode;
+    @QueryField(type = QueryField.FieldType.INT, queryName = KOMMUNEKODE)
+    private String kommunekode;
 
-    public String getMunicipalityCode() {
-        return this.municipalityCode;
+    public String getKommunekode() {
+        return this.kommunekode;
     }
 
-    public void setMunicipalityCode(String municipalityCode) {
-        this.municipalityCode = municipalityCode;
+    public void setKommunekode(String kommunekode) {
+        this.kommunekode = kommunekode;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING, queryName = ROAD_CODE)
-    private String roadCode;
+    @QueryField(type = QueryField.FieldType.STRING, queryName = VEJKODE)
+    private String vejkode;
 
-    public String getRoadCode() {
-        return this.roadCode;
+    public String getVejkode() {
+        return this.vejkode;
     }
 
-    public void setRoadCode(String roadCode) {
-        this.roadCode = roadCode;
+    public void setVejkode(String vejkode) {
+        this.vejkode = vejkode;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING, queryName = HOUSE_NUMBER)
-    private String houseNumber;
+    @QueryField(type = QueryField.FieldType.STRING, queryName = HUSNUMMER)
+    private String husnummer;
 
-    public String getHouseNumber() {
-        return this.houseNumber;
+    public String getHusnummer() {
+        return this.husnummer;
     }
 
-    public void setHouseNumber(String houseNumber) {
-        this.houseNumber = houseNumber;
+    public void setHusnummer(String husnummer) {
+        this.husnummer = husnummer;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING, queryName = FLOOR)
-    private String floor;
+    @QueryField(type = QueryField.FieldType.STRING, queryName = ETAGE)
+    private String etage;
 
-    public String getFloor() {
-        return this.floor;
+    public String getEtage() {
+        return this.etage;
     }
 
-    public void setFloor(String floor) {
-        this.floor = floor;
+    public void setEtage(String etage) {
+        this.etage = etage;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING, queryName = DOOR)
-    private String door;
+    @QueryField(type = QueryField.FieldType.STRING, queryName = SIDE_DOER)
+    private String sideDoer;
 
-    public String getDoor() {
-        return this.door;
+    public String getSideDoer() {
+        return this.sideDoer;
     }
 
-    public void setDoor(String door) {
-        this.door = door;
+    public void setSideDoer(String sideDoer) {
+        this.sideDoer = sideDoer;
     }
 
     @Override
     public Map<String, Object> getSearchParameters() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put(MUNICIPALITY_CODE, this.municipalityCode);
-        map.put(ROAD_CODE, this.roadCode);
-        map.put(HOUSE_NUMBER, this.houseNumber);
-        map.put(FLOOR, this.floor);
-        map.put(DOOR, this.door);
+        map.put(KOMMUNEKODE, this.kommunekode);
+        map.put(VEJKODE, this.vejkode);
+        map.put(HUSNUMMER, this.husnummer);
+        map.put(ETAGE, this.etage);
+        map.put(SIDE_DOER, this.sideDoer);
         return map;
     }
 
     @Override
     public void setFromParameters(ParameterMap parameters) {
-        this.setMunicipalityCode(parameters.getFirst(MUNICIPALITY_CODE));
-        this.setRoadCode(parameters.getFirst(ROAD_CODE));
-        this.setHouseNumber(parameters.getFirst(HOUSE_NUMBER));
-        this.setFloor(parameters.getFirst(FLOOR));
-        this.setDoor(parameters.getFirst(DOOR));
+        this.setKommunekode(parameters.getFirst(KOMMUNEKODE));
+        this.setVejkode(parameters.getFirst(VEJKODE));
+        this.setHusnummer(parameters.getFirst(HUSNUMMER));
+        this.setEtage(parameters.getFirst(ETAGE));
+        this.setSideDoer(parameters.getFirst(SIDE_DOER));
     }
 
     @Override
@@ -110,20 +109,20 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
     @Override
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = new LookupDefinition(this);
-        if (this.municipalityCode != null) {
-            lookupDefinition.put("municipalityCode", this.municipalityCode);
+        if (this.kommunekode != null) {
+            lookupDefinition.put("kommunekode", this.kommunekode);
         }
-        if (this.roadCode != null) {
-            lookupDefinition.put("roadCode", this.roadCode);
+        if (this.vejkode != null) {
+            lookupDefinition.put("vejkode", this.vejkode);
         }
-        if (this.houseNumber != null) {
-            lookupDefinition.put("houseNumber", this.houseNumber);
+        if (this.husnummer != null) {
+            lookupDefinition.put("husnummer", this.husnummer);
         }
-        if (this.floor != null) {
-            lookupDefinition.put("floor", this.floor);
+        if (this.etage != null) {
+            lookupDefinition.put("etage", this.etage);
         }
-        if (this.door != null) {
-            lookupDefinition.put("door", this.door);
+        if (this.sideDoer != null) {
+            lookupDefinition.put("sideDoer", this.sideDoer);
         }
         return lookupDefinition;
     }

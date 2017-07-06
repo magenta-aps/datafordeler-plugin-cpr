@@ -1,7 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,14 +20,14 @@ public class PersonNameVerificationData extends AuthorityDetailData {
     @Column
     @JsonProperty(value = "verificeret")
     @XmlElement(name = "verificeret")
-    private boolean verification;
+    private boolean verificeret;
 
-    public boolean isVerification() {
-        return this.verification;
+    public boolean isVerificeret() {
+        return this.verificeret;
     }
 
-    public void setVerification(boolean verification) {
-        this.verification = verification;
+    public void setVerificeret(boolean verificeret) {
+        this.verificeret = verificeret;
     }
 
 
@@ -36,7 +35,7 @@ public class PersonNameVerificationData extends AuthorityDetailData {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("verification", this.verification);
+        map.put("verificeret", this.verificeret);
         return map;
     }
 }

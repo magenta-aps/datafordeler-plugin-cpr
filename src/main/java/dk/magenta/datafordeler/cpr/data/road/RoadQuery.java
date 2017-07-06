@@ -14,57 +14,57 @@ import java.util.Map;
  */
 public class RoadQuery extends CprQuery<RoadEntity> {
 
-    public static final String CODE = "code";
-    public static final String NAME = "name";
-    public static final String MUNICIPALITY_CODE = "municipality_code";
+    public static final String VEJKODE = "vejkode";
+    public static final String NAVN = "navn";
+    public static final String KOMMUNEKODE = "kommunekode";
 
-    @QueryField(type = QueryField.FieldType.INT, queryName = CODE)
-    private String code;
+    @QueryField(type = QueryField.FieldType.INT, queryName = VEJKODE)
+    private String vejkode;
 
-    public String getCode() {
-        return this.code;
+    public String getVejkode() {
+        return this.vejkode;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setVejkode(String vejkode) {
+        this.vejkode = vejkode;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING, queryName = NAME)
-    private String name;
+    @QueryField(type = QueryField.FieldType.STRING, queryName = NAVN)
+    private String navn;
 
-    public String getName() {
-        return this.name;
+    public String getNavn() {
+        return this.navn;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNavn(String navn) {
+        this.navn = navn;
     }
 
-    @QueryField(type = QueryField.FieldType.INT, queryName = MUNICIPALITY_CODE)
-    private String municipalityCode;
+    @QueryField(type = QueryField.FieldType.INT, queryName = KOMMUNEKODE)
+    private String kommunekode;
 
-    public String getMunicipality_code() {
-        return municipalityCode;
+    public String getKommunekode() {
+        return kommunekode;
     }
 
-    public void setMunicipalityCode(String municipalityCode) {
-        this.municipalityCode = municipalityCode;
+    public void setKommunekode(String kommunekode) {
+        this.kommunekode = kommunekode;
     }
 
     @Override
     public Map<String, Object> getSearchParameters() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put(CODE, this.code);
-        map.put(NAME, this.name);
-        map.put(MUNICIPALITY_CODE, this.municipalityCode);
+        map.put(VEJKODE, this.vejkode);
+        map.put(NAVN, this.navn);
+        map.put(KOMMUNEKODE, this.kommunekode);
         return map;
     }
 
     @Override
     public void setFromParameters(ParameterMap parameters) {
-        this.setCode(parameters.getFirst(CODE));
-        this.setName(parameters.getFirst(NAME));
-        this.setMunicipalityCode(parameters.getFirst(MUNICIPALITY_CODE));
+        this.setVejkode(parameters.getFirst(VEJKODE));
+        this.setNavn(parameters.getFirst(NAVN));
+        this.setKommunekode(parameters.getFirst(KOMMUNEKODE));
     }
 
     @Override
@@ -81,14 +81,14 @@ public class RoadQuery extends CprQuery<RoadEntity> {
     @Override
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = new LookupDefinition(this);
-        if (this.code != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".roadCode", this.code);
+        if (this.vejkode != null) {
+            lookupDefinition.put(LookupDefinition.entityref + ".vejkode", this.vejkode);
         }
-        if (this.name != null) {
-            lookupDefinition.put("coreData.name", this.name);
+        if (this.navn != null) {
+            lookupDefinition.put("coreData.navn", this.navn);
         }
-        if (this.municipalityCode != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".municipalityCode", this.name);
+        if (this.kommunekode != null) {
+            lookupDefinition.put(LookupDefinition.entityref + ".kommunekode", this.navn);
         }
         return lookupDefinition;
     }

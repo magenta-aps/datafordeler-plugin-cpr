@@ -66,7 +66,7 @@ public class FullTest {
                 @Override
                 public Boolean call() throws Exception {
                     ftp.startServer(username, password, port, Collections.singletonList(tempFileClosure));
-                    URI dataLocation = new URI("ftp://localhost:"+port+"/"+tempFileClosure.getName());
+                    URI dataLocation = new URI("ftp://localhost:"+port+"/"+tempFileClosure.getNavn());
 
                     ItemInputStream<Event> eventStream = plugin.getRegisterManager().pullEvents(dataLocation);
                     if (eventStream != null) {

@@ -19,152 +19,152 @@ import org.hibernate.Session;
 public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonCoreData coreData;
+    private PersonCoreData kerneData;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonStatusData statusData;
+    private PersonStatusData status;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonParentData motherData;
+    private PersonParentData mor;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonParentData fatherData;
+    private PersonParentData far;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonParentVerificationData motherVerificationData;
+    private PersonParentVerificationData morVerifikation;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonParentVerificationData fatherVerificationData;
+    private PersonParentVerificationData farVerifikation;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonPositionData positionData;
+    private PersonPositionData stilling;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonBirthData birthData;
+    private PersonBirthData foedsel;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonAddressData addressData;
+    private PersonAddressData adresse;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonAddressConameData coNameData;
+    private PersonAddressConameData conavn;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonMoveMunicipalityData moveMunicipalityData;
+    private PersonMoveMunicipalityData flytKommune;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonNameData nameData;
+    private PersonNameData navn;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonAddressNameData addressNameData;
+    private PersonAddressNameData adressenavn;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonNameVerificationData nameVerificationData;
+    private PersonNameVerificationData navneverifikation;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonNameAuthorityTextData nameAuthorityTextData;
+    private PersonNameAuthorityTextData navnemyndighed;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonProtectionData protectionData;
+    private PersonProtectionData beskyttelse;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonEmigrationData emigrationData;
+    private PersonEmigrationData udrejseIndrejse;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonForeignAddressData foreignAddressData;
+    private PersonForeignAddressData udenlandsadresse;
 
 
-    public void setCurrentCprNumber(String personnummer) {
-        if (this.coreData == null) {
-            this.coreData = new PersonCoreData();
+    public void setPersonnummer(String personnummer) {
+        if (this.kerneData == null) {
+            this.kerneData = new PersonCoreData();
         }
-        this.coreData.setPersonnummer(personnummer);
+        this.kerneData.setPersonnummer(personnummer);
     }
 
     public void setKoen(String koen) {
-        if (this.coreData == null) {
-            this.coreData = new PersonCoreData();
+        if (this.kerneData == null) {
+            this.kerneData = new PersonCoreData();
         }
-        this.coreData.setKoen(koen);
+        this.kerneData.setKoen(koen);
     }
 
     public void setStartAuthority(int authority) {
-        if (this.coreData == null) {
-            this.coreData = new PersonCoreData();
+        if (this.kerneData == null) {
+            this.kerneData = new PersonCoreData();
         }
-        this.coreData.setAuthority(authority);
+        this.kerneData.setAuthority(authority);
     }
 
     public void setStatus(String status) {
-        if (this.statusData == null) {
-            this.statusData = new PersonStatusData();
+        if (this.status == null) {
+            this.status = new PersonStatusData();
         }
-        this.statusData.setStatus(status);
+        this.status.setStatus(status);
     }
 
     public void setMother(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode) {
-        if (this.motherData == null) {
-            this.motherData = new PersonParentData();
-            this.motherData.setMother(true);
+        if (this.mor == null) {
+            this.mor = new PersonParentData();
+            this.mor.setMor(true);
         }
-        this.motherData.setName(name);
-        this.motherData.setNameMarking(nameMarking);
-        this.motherData.setCprNumber(cprNumber);
-        this.motherData.setBirthDate(birthDate);
-        this.motherData.setBirthDateUncertain(birthDateUncertain);
-        this.motherData.setAuthority(authorityCode);
+        this.mor.setNavn(name);
+        this.mor.setNavneMarkering(nameMarking);
+        this.mor.setPersonnummer(cprNumber);
+        this.mor.setFoedselsdato(birthDate);
+        this.mor.setFoedselsdatoUsikker(birthDateUncertain);
+        this.mor.setAuthority(authorityCode);
     }
 
     public void setFather(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode) {
-        if (this.fatherData == null) {
-            this.fatherData = new PersonParentData();
-            this.fatherData.setMother(false);
+        if (this.far == null) {
+            this.far = new PersonParentData();
+            this.far.setMor(false);
         }
-        this.fatherData.setName(name);
-        this.fatherData.setNameMarking(nameMarking);
-        this.fatherData.setCprNumber(cprNumber);
-        this.fatherData.setBirthDate(birthDate);
-        this.fatherData.setBirthDateUncertain(birthDateUncertain);
-        this.fatherData.setAuthority(authorityCode);
+        this.far.setNavn(name);
+        this.far.setNavneMarkering(nameMarking);
+        this.far.setPersonnummer(cprNumber);
+        this.far.setFoedselsdato(birthDate);
+        this.far.setFoedselsdatoUsikker(birthDateUncertain);
+        this.far.setAuthority(authorityCode);
     }
 
     public void setMotherVerification(int authorityCode, boolean verified) {
-        if (this.motherVerificationData == null) {
-            this.motherVerificationData = new PersonParentVerificationData();
-            this.motherVerificationData.setMother(true);
+        if (this.morVerifikation == null) {
+            this.morVerifikation = new PersonParentVerificationData();
+            this.morVerifikation.setMor(true);
         }
-        this.motherVerificationData.setAuthority(authorityCode);
-        this.motherVerificationData.setVerified(verified);
+        this.morVerifikation.setAuthority(authorityCode);
+        this.morVerifikation.setVerificeret(verified);
     }
 
     public void setFatherVerification(int authorityCode, boolean verified) {
-        if (this.fatherVerificationData == null) {
-            this.fatherVerificationData = new PersonParentVerificationData();
-            this.fatherVerificationData.setMother(false);
+        if (this.farVerifikation == null) {
+            this.farVerifikation = new PersonParentVerificationData();
+            this.farVerifikation.setMor(false);
         }
-        this.fatherVerificationData.setAuthority(authorityCode);
-        this.fatherVerificationData.setVerified(verified);
+        this.farVerifikation.setAuthority(authorityCode);
+        this.farVerifikation.setVerificeret(verified);
     }
 
     public void setPosition(int authorityCode, String position) {
-        if (this.positionData == null) {
-            this.positionData = new PersonPositionData();
+        if (this.stilling == null) {
+            this.stilling = new PersonPositionData();
         }
-        this.positionData.setAuthority(authorityCode);
-        this.positionData.setPosition(position);
+        this.stilling.setAuthority(authorityCode);
+        this.stilling.setStilling(position);
     }
 
     public void setBirth(LocalDateTime foedselsdato, boolean foedselsdatoUsikkerhedsmarkering,
                          String cprFoedselsregistreringsstedskode, String cprFoedselsregistreringsstedsnavn,
                          int foedselsraekkefoelge) {
-        if (this.birthData == null) {
-            this.birthData = new PersonBirthData();
+        if (this.foedsel == null) {
+            this.foedsel = new PersonBirthData();
         }
-        this.birthData.setCprFoedselsregistreringsstedskode(cprFoedselsregistreringsstedskode);
-        this.birthData.setCprFoedselsregistreringsstedsnavn(cprFoedselsregistreringsstedsnavn);
-        this.birthData.setFoedselsdato(foedselsdato);
-        this.birthData.setFoedselsdatoUsikkerhedsmarkering(foedselsdatoUsikkerhedsmarkering);
+        this.foedsel.setCprFoedselsregistreringsstedskode(cprFoedselsregistreringsstedskode);
+        this.foedsel.setCprFoedselsregistreringsstedsnavn(cprFoedselsregistreringsstedsnavn);
+        this.foedsel.setFoedselsdato(foedselsdato);
+        this.foedsel.setFoedselsdatoUsikkerhedsmarkering(foedselsdatoUsikkerhedsmarkering);
 
-        this.birthData.setFoedselsraekkefoelge(foedselsraekkefoelge);
+        this.foedsel.setFoedselsraekkefoelge(foedselsraekkefoelge);
     }
 
     public void setAddress(int authority, String bygningsnummer, String bynavn, String cprKommunekode,
@@ -172,128 +172,128 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
                            String husnummer, String postdistrikt, String postnummer, String sideDoer,
                            String adresselinie1, String adresselinie2, String adresselinie3, String adresselinie4,
                            String adresselinie5, int addressTextType, int startAuthority) {
-        if (this.addressData == null) {
-            this.addressData = new PersonAddressData();
+        if (this.adresse == null) {
+            this.adresse = new PersonAddressData();
         }
-        this.addressData.setAuthority(authority);
-        this.addressData.setBygningsnummer(bygningsnummer);
-        this.addressData.setBynavn(bynavn);
-        this.addressData.setCprKommunekode(cprKommunekode);
-        this.addressData.setCprKommunenavn(cprKommunenavn);
-        this.addressData.setCprVejkode(cprVejkode);
-        this.addressData.setDarAdresse(darAdresse);
-        this.addressData.setEtage(etage);
-        this.addressData.setHusnummer(husnummer);
-        this.addressData.setPostdistrikt(postdistrikt);
-        this.addressData.setPostnummer(postnummer);
-        this.addressData.setSideDoer(sideDoer);
+        this.adresse.setAuthority(authority);
+        this.adresse.setBygningsnummer(bygningsnummer);
+        this.adresse.setBynavn(bynavn);
+        this.adresse.setCprKommunekode(cprKommunekode);
+        this.adresse.setCprKommunenavn(cprKommunenavn);
+        this.adresse.setCprVejkode(cprVejkode);
+        this.adresse.setDarAdresse(darAdresse);
+        this.adresse.setEtage(etage);
+        this.adresse.setHusnummer(husnummer);
+        this.adresse.setPostdistrikt(postdistrikt);
+        this.adresse.setPostnummer(postnummer);
+        this.adresse.setSideDoer(sideDoer);
 
-        this.addressData.setAdresselinie1(adresselinie1);
-        this.addressData.setAdresselinie2(adresselinie2);
-        this.addressData.setAdresselinie3(adresselinie3);
-        this.addressData.setAdresselinie4(adresselinie4);
-        this.addressData.setAdresselinie5(adresselinie5);
+        this.adresse.setAdresselinie1(adresselinie1);
+        this.adresse.setAdresselinie2(adresselinie2);
+        this.adresse.setAdresselinie3(adresselinie3);
+        this.adresse.setAdresselinie4(adresselinie4);
+        this.adresse.setAdresselinie5(adresselinie5);
 
-        this.addressData.setAddressTextType(addressTextType);
-        this.addressData.setStartAuthority(startAuthority);
+        this.adresse.setAddressTextType(addressTextType);
+        this.adresse.setStartAuthority(startAuthority);
     }
 
     public void setCoName(String coName) {
-        if (this.coNameData == null) {
-            this.coNameData = new PersonAddressConameData();
+        if (this.conavn == null) {
+            this.conavn = new PersonAddressConameData();
         }
-        this.coNameData.setConavn(coName);
+        this.conavn.setConavn(coName);
     }
 
     public void setMoveMunicipality(int authority, LocalDateTime fraflytningsdatoKommune,
                                     boolean fraflytningsdatoKommuneUsikkerhedsmarkering, int fraflytningskommunekode,
                                     LocalDateTime tilflytningsdatoKommune,
                                     boolean tilflytningsdatoKommuneUsikkerhedsmarkering) {
-        if (this.moveMunicipalityData == null) {
-            this.moveMunicipalityData = new PersonMoveMunicipalityData();
+        if (this.flytKommune == null) {
+            this.flytKommune = new PersonMoveMunicipalityData();
         }
-        this.moveMunicipalityData.setAuthority(authority);
-        this.moveMunicipalityData.setFraflytningsdatoKommune(fraflytningsdatoKommune);
-        this.moveMunicipalityData.setFraflytningsdatoKommuneUsikkerhedsmarkering(fraflytningsdatoKommuneUsikkerhedsmarkering);
-        this.moveMunicipalityData.setFraflytningskommunekode(fraflytningskommunekode);
-        this.moveMunicipalityData.setTilflytningsdatoKommune(tilflytningsdatoKommune);
-        this.moveMunicipalityData.setTilflytningsdatoKommuneUsikkerhedsmarkering(tilflytningsdatoKommuneUsikkerhedsmarkering);
+        this.flytKommune.setAuthority(authority);
+        this.flytKommune.setFraflytningsdatoKommune(fraflytningsdatoKommune);
+        this.flytKommune.setFraflytningsdatoKommuneUsikkerhedsmarkering(fraflytningsdatoKommuneUsikkerhedsmarkering);
+        this.flytKommune.setFraflytningskommunekode(fraflytningskommunekode);
+        this.flytKommune.setTilflytningsdatoKommune(tilflytningsdatoKommune);
+        this.flytKommune.setTilflytningsdatoKommuneUsikkerhedsmarkering(tilflytningsdatoKommuneUsikkerhedsmarkering);
     }
 
     public void setName(int authority, String adresseringsnavn, String efternavn, String fornavne, String mellemnavn,
                         boolean efternavnMarkering, boolean fornavneMarkering, boolean mellemnavnMarkering,
                         String egetEfternavn, boolean ownLastNameMarking, boolean reportNames) {
-        if (this.nameData == null) {
-            this.nameData = new PersonNameData();
+        if (this.navn == null) {
+            this.navn = new PersonNameData();
         }
-        this.nameData.setAuthority(authority);
-        this.nameData.setAdresseringsnavn(adresseringsnavn);
-        this.nameData.setEfternavn(efternavn);
-        this.nameData.setFornavne(fornavne);
-        this.nameData.setMellemnavn(mellemnavn);
+        this.navn.setAuthority(authority);
+        this.navn.setAdresseringsnavn(adresseringsnavn);
+        this.navn.setEfternavn(efternavn);
+        this.navn.setFornavne(fornavne);
+        this.navn.setMellemnavn(mellemnavn);
 
 
-        this.nameData.setEfternavnMarkering(efternavnMarkering);
-        this.nameData.setFornavneMarkering(fornavneMarkering);
-        this.nameData.setMellemnavnMarkering(mellemnavnMarkering);
+        this.navn.setEfternavnMarkering(efternavnMarkering);
+        this.navn.setFornavneMarkering(fornavneMarkering);
+        this.navn.setMellemnavnMarkering(mellemnavnMarkering);
 
-        this.nameData.setEgetEfternavn(egetEfternavn);
-        this.nameData.setEgetEfternavnMarkering(ownLastNameMarking);
-        this.nameData.setReportNames(reportNames);
+        this.navn.setEgetEfternavn(egetEfternavn);
+        this.navn.setEgetEfternavnMarkering(ownLastNameMarking);
+        this.navn.setReportNames(reportNames);
     }
 
     public void setAddressName(int authority, String addressName) {
-        if (this.addressNameData == null) {
-            this.addressNameData = new PersonAddressNameData();
+        if (this.adressenavn == null) {
+            this.adressenavn = new PersonAddressNameData();
         }
-        this.addressNameData.setAuthority(authority);
-        this.addressNameData.setAdressenavn(addressName);
-        System.out.println("this.addressNameData: "+this.addressNameData);
+        this.adressenavn.setAuthority(authority);
+        this.adressenavn.setAdressenavn(addressName);
+        System.out.println("this.adressenavn: "+this.adressenavn);
     }
 
     public void setNameVerification(int authority, boolean verification) {
-        if (this.nameVerificationData == null) {
-            this.nameVerificationData = new PersonNameVerificationData();
+        if (this.navneverifikation == null) {
+            this.navneverifikation = new PersonNameVerificationData();
         }
-        this.nameVerificationData.setAuthority(authority);
-        this.nameVerificationData.setVerification(verification);
+        this.navneverifikation.setAuthority(authority);
+        this.navneverifikation.setVerificeret(verification);
     }
 
     public void setNameAuthorityText(int authority, String text) {
-        if (this.nameAuthorityTextData == null) {
-            this.nameAuthorityTextData = new PersonNameAuthorityTextData();
+        if (this.navnemyndighed == null) {
+            this.navnemyndighed = new PersonNameAuthorityTextData();
         }
-        this.nameAuthorityTextData.setAuthority(authority);
-        this.nameAuthorityTextData.setText(text);
+        this.navnemyndighed.setAuthority(authority);
+        this.navnemyndighed.setTekst(text);
     }
 
     public void setProtection(int authority, int beskyttelsestype, boolean reportMarking) {
-        if (this.protectionData == null) {
-            this.protectionData = new PersonProtectionData();
+        if (this.beskyttelse == null) {
+            this.beskyttelse = new PersonProtectionData();
         }
-        this.protectionData.setAuthority(authority);
-        this.protectionData.setBeskyttelsestype(beskyttelsestype);
-        this.protectionData.setReportMarking(reportMarking);
+        this.beskyttelse.setAuthority(authority);
+        this.beskyttelse.setBeskyttelsestype(beskyttelsestype);
+        this.beskyttelse.setRapportMarkering(reportMarking);
     }
 
     public void setEmigration(int authority, int countryCode) {
-        if (this.emigrationData == null) {
-            this.emigrationData = new PersonEmigrationData();
+        if (this.udrejseIndrejse == null) {
+            this.udrejseIndrejse = new PersonEmigrationData();
         }
-        this.emigrationData.setAuthority(authority);
-        this.emigrationData.setLandekode(countryCode);;
+        this.udrejseIndrejse.setAuthority(authority);
+        this.udrejseIndrejse.setLandekode(countryCode);;
     }
 
     public void setForeignAddress(int authority, String adresselinie1, String adresselinie2, String adresselinie3, String adresselinie4, String adresselinie5) {
-        if (this.foreignAddressData == null) {
-            this.foreignAddressData = new PersonForeignAddressData();
+        if (this.udenlandsadresse == null) {
+            this.udenlandsadresse = new PersonForeignAddressData();
         }
-        this.foreignAddressData.setAuthority(authority);
-        this.foreignAddressData.setAdresselinie1(adresselinie1);
-        this.foreignAddressData.setAdresselinie2(adresselinie2);
-        this.foreignAddressData.setAdresselinie3(adresselinie3);
-        this.foreignAddressData.setAdresselinie4(adresselinie4);
-        this.foreignAddressData.setAdresselinie5(adresselinie5);
+        this.udenlandsadresse.setAuthority(authority);
+        this.udenlandsadresse.setAdresselinie1(adresselinie1);
+        this.udenlandsadresse.setAdresselinie2(adresselinie2);
+        this.udenlandsadresse.setAdresselinie3(adresselinie3);
+        this.udenlandsadresse.setAdresselinie4(adresselinie4);
+        this.udenlandsadresse.setAdresselinie5(adresselinie5);
     }
 
     /**
@@ -303,53 +303,53 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>();
-        if (this.coreData != null) {
-            map.putAll(this.coreData.asMap());
+        if (this.kerneData != null) {
+            map.putAll(this.kerneData.asMap());
         }
-        if (this.statusData != null) {
-            map.put("status", this.statusData.getStatus());
+        if (this.status != null) {
+            map.put("status", this.status.getStatus());
         }
-        if (this.motherData != null) {
-            map.put("mor", this.motherData);
+        if (this.mor != null) {
+            map.put("mor", this.mor);
         }
-        if (this.fatherData != null) {
-            map.put("far", this.fatherData);
+        if (this.far != null) {
+            map.put("far", this.far);
         }
-        if (this.motherVerificationData != null) {
-            map.put("morVerifikation", this.motherVerificationData);
+        if (this.morVerifikation != null) {
+            map.put("morVerifikation", this.morVerifikation);
         }
-        if (this.fatherVerificationData != null) {
-            map.put("farVerifikation", this.fatherVerificationData);
+        if (this.farVerifikation != null) {
+            map.put("farVerifikation", this.farVerifikation);
         }
-        if (this.positionData != null) {
-            map.put("position", this.positionData);
+        if (this.stilling != null) {
+            map.put("stilling", this.stilling);
         }
-        if (this.birthData != null) {
-            map.put("fødsel", this.birthData);
+        if (this.foedsel != null) {
+            map.put("foedsel", this.foedsel);
         }
-        if (this.addressData != null) {
-            map.put("adresse", this.addressData);
+        if (this.adresse != null) {
+            map.put("adresse", this.adresse);
         }
-        if (this.nameData != null) {
-            map.put("navn", this.nameData);
+        if (this.navn != null) {
+            map.put("navn", this.navn);
         }
-        if (this.addressNameData != null) {
-            map.put("addressNameData", this.addressNameData);
+        if (this.adressenavn != null) {
+            map.put("adressenavn", this.adressenavn);
         }
-        if (this.nameVerificationData != null) {
-            map.put("navneverifikation", this.nameVerificationData);
+        if (this.navneverifikation != null) {
+            map.put("navneverifikation", this.navneverifikation);
         }
-        if (this.nameAuthorityTextData != null) {
-            map.put("navnemyndighed", this.nameAuthorityTextData);
+        if (this.navnemyndighed != null) {
+            map.put("navnemyndighed", this.navnemyndighed);
         }
-        if (this.protectionData != null) {
-            map.put("beskyttelse", this.protectionData);
+        if (this.beskyttelse != null) {
+            map.put("beskyttelse", this.beskyttelse);
         }
-        if (this.emigrationData != null) {
-            map.put("udrejse", this.emigrationData);
+        if (this.udrejseIndrejse != null) {
+            map.put("udrejseIndrejse", this.udrejseIndrejse);
         }
-        if (this.foreignAddressData != null) {
-            map.put("udlandsadresse", this.foreignAddressData);
+        if (this.udenlandsadresse != null) {
+            map.put("udenlandsadresse", this.udenlandsadresse);
         }
 
         return map;
@@ -361,59 +361,59 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         LookupDefinition lookupDefinition = new LookupDefinition();
         lookupDefinition.setMatchNulls(true);
 
-        if (this.coreData != null) {
-            lookupDefinition.putAll("coreData", this.coreData.databaseFields());
+        if (this.kerneData != null) {
+            lookupDefinition.putAll("kerneData", this.kerneData.databaseFields());
         }
-        if (this.statusData != null) {
-            lookupDefinition.putAll("statusData", this.statusData.databaseFields());
+        if (this.status != null) {
+            lookupDefinition.putAll("status", this.status.databaseFields());
         }
-        if (this.motherData != null) {
-            lookupDefinition.putAll("motherData", this.motherData.databaseFields());
+        if (this.mor != null) {
+            lookupDefinition.putAll("mor", this.mor.databaseFields());
         }
-        if (this.fatherData != null) {
-            lookupDefinition.putAll("fatherData", this.fatherData.databaseFields());
+        if (this.far != null) {
+            lookupDefinition.putAll("far", this.far.databaseFields());
         }
-        if (this.motherVerificationData != null) {
-            lookupDefinition.putAll("motherVerificationData", this.motherVerificationData.databaseFields());
+        if (this.morVerifikation != null) {
+            lookupDefinition.putAll("morVerifikation", this.morVerifikation.databaseFields());
         }
-        if (this.fatherVerificationData != null) {
-            lookupDefinition.putAll("fatherVerificationData", this.fatherVerificationData.databaseFields());
+        if (this.farVerifikation != null) {
+            lookupDefinition.putAll("farVerifikation", this.farVerifikation.databaseFields());
         }
-        if (this.positionData != null) {
-            lookupDefinition.putAll("positionData", this.positionData.databaseFields());
+        if (this.stilling != null) {
+            lookupDefinition.putAll("stilling", this.stilling.databaseFields());
         }
-        if (this.birthData != null) {
-            lookupDefinition.putAll("birthData", this.birthData.databaseFields());
+        if (this.foedsel != null) {
+            lookupDefinition.putAll("foedsel", this.foedsel.databaseFields());
         }
-        if (this.addressData != null) {
-            lookupDefinition.putAll("addressData", this.addressData.databaseFields());
+        if (this.adresse != null) {
+            lookupDefinition.putAll("adresse", this.adresse.databaseFields());
         }
-        if (this.coNameData != null) {
-            lookupDefinition.putAll("coNameData", this.coNameData.databaseFields());
+        if (this.conavn != null) {
+            lookupDefinition.putAll("conavn", this.conavn.databaseFields());
         }
-        if (this.moveMunicipalityData != null) {
-            lookupDefinition.putAll("moveMunicipalityData", this.moveMunicipalityData.databaseFields());
+        if (this.flytKommune != null) {
+            lookupDefinition.putAll("flytKommune", this.flytKommune.databaseFields());
         }
-        if (this.nameData != null) {
-            lookupDefinition.putAll("nameData", this.nameData.databaseFields());
+        if (this.navn != null) {
+            lookupDefinition.putAll("navn", this.navn.databaseFields());
         }
-        if (this.addressNameData != null) {
-            lookupDefinition.putAll("addressNameData", this.addressNameData.databaseFields());
+        if (this.adressenavn != null) {
+            lookupDefinition.putAll("adressenavn", this.adressenavn.databaseFields());
         }
-        if (this.nameVerificationData != null) {
-            lookupDefinition.putAll("nameVerificationData", this.nameVerificationData.databaseFields());
+        if (this.navneverifikation != null) {
+            lookupDefinition.putAll("navneverifikation", this.navneverifikation.databaseFields());
         }
-        if (this.nameAuthorityTextData != null) {
-            lookupDefinition.putAll("nameAuthorityTextData", this.nameAuthorityTextData.databaseFields());
+        if (this.navnemyndighed != null) {
+            lookupDefinition.putAll("navnemyndighed", this.navnemyndighed.databaseFields());
         }
-        if (this.protectionData != null) {
-            lookupDefinition.putAll("protectionData", this.protectionData.databaseFields());
+        if (this.beskyttelse != null) {
+            lookupDefinition.putAll("beskyttelse", this.beskyttelse.databaseFields());
         }
-        if (this.emigrationData != null) {
-            lookupDefinition.putAll("emigrationData", this.emigrationData.databaseFields());
+        if (this.udrejseIndrejse != null) {
+            lookupDefinition.putAll("udrejseIndrejse", this.udrejseIndrejse.databaseFields());
         }
-        if (this.foreignAddressData != null) {
-            lookupDefinition.putAll("foreignAddressData", this.foreignAddressData.databaseFields());
+        if (this.udenlandsadresse != null) {
+            lookupDefinition.putAll("udenlandsadresse", this.udenlandsadresse.databaseFields());
         }
         return lookupDefinition;
     }

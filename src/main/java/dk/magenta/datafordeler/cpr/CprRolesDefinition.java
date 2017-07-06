@@ -17,7 +17,7 @@ public class CprRolesDefinition extends RolesDefinition {
             "Cpr",
             new ReadServiceRoleVersion(
                     1.0f,
-                    "Role that gives access to all CPR data."
+                    "Role that gives access to all PERSONNUMMER data."
             )
     );
 

@@ -33,21 +33,21 @@ public class PersonProtectionData extends AuthorityDetailData {
     @Column
     @JsonProperty(value = "rapportMarkering")
     @XmlElement(name = "rapportMarkering")
-    private boolean reportMarking;
+    private boolean rapportMarkering;
 
-    public boolean getReportMarking() {
-        return reportMarking;
+    public boolean getRapportMarkering() {
+        return rapportMarkering;
     }
 
-    public void setReportMarking(boolean reportMarking) {
-        this.reportMarking = reportMarking;
+    public void setRapportMarkering(boolean rapportMarkering) {
+        this.rapportMarkering = rapportMarkering;
     }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("beskyttelsestype", this.beskyttelsestype);
-        map.put("reportMarking", this.reportMarking);
+        map.put("rapportMarkering", this.rapportMarkering);
         return map;
     }
 }

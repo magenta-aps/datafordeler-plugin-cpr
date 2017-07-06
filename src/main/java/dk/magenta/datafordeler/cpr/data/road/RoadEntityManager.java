@@ -47,12 +47,12 @@ public class RoadEntityManager extends CprEntityManager {
     private ObjectMapper objectMapper;
 
     private static class RoadIdentifier {
-        public int municipalityCode;
-        public int roadCode;
+        public int kommunekode;
+        public int vejkode;
 
         public RoadIdentifier(int municipalityCode, int roadCode) {
-            this.municipalityCode = municipalityCode;
-            this.roadCode = roadCode;
+            this.kommunekode = municipalityCode;
+            this.vejkode = roadCode;
         }
 
         @Override
@@ -62,14 +62,14 @@ public class RoadEntityManager extends CprEntityManager {
 
             RoadIdentifier that = (RoadIdentifier) o;
 
-            if (municipalityCode != that.municipalityCode) return false;
-            return roadCode == that.roadCode;
+            if (kommunekode != that.kommunekode) return false;
+            return vejkode == that.vejkode;
         }
 
         @Override
         public int hashCode() {
-            int result = municipalityCode;
-            result = 31 * result + roadCode;
+            int result = kommunekode;
+            result = 31 * result + vejkode;
             return result;
         }
     }
@@ -134,15 +134,15 @@ public class RoadEntityManager extends CprEntityManager {
                     HashMap<String, Object> lookup = new HashMap<>();
                     int municipalityCode = roadDataRecord.getMunicipalityCode();
                     int roadCode = roadDataRecord.getRoadCode();
-                    lookup.put("municipalityCode", municipalityCode);
-                    lookup.put("roadCode", roadCode);
+                    lookup.put("kommunekode", municipalityCode);
+                    lookup.put("vejkode", roadCode);
                     RoadEntity entity = entityCache.get(municipalityCode, roadCode);
                     if (entity == null) {
                         entity = queryManager.getItem(session, RoadEntity.class, lookup);
                         if (entity == null) {
                             entity = new RoadEntity(RoadEntity.generateUUID(municipalityCode, roadCode), CprPlugin.getDomain());
-                            entity.setMunicipalityCode(municipalityCode);
-                            entity.setRoadCode(roadCode);
+                            entity.setKommunekode(municipalityCode);
+                            entity.setVejkode(roadCode);
                         }
                         entityCache.put(municipalityCode, roadCode, entity);
                     }

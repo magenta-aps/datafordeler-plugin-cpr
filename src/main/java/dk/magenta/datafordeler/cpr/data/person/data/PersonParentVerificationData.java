@@ -2,14 +2,12 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,16 +21,16 @@ public class PersonParentVerificationData extends AuthorityDetailData {
     @Column
     @JsonIgnore
     @XmlTransient
-    private boolean isMother;
+    private boolean isMor;
 
     @JsonIgnore
     @XmlTransient
-    public boolean isMother() {
-        return this.isMother;
+    public boolean isMor() {
+        return this.isMor;
     }
 
-    public void setMother(boolean mother) {
-        isMother = mother;
+    public void setMor(boolean mor) {
+        isMor = mor;
     }
 
 
@@ -40,14 +38,14 @@ public class PersonParentVerificationData extends AuthorityDetailData {
     @Column
     @JsonProperty(value = "verificeret")
     @XmlElement(name = "verificeret")
-    private boolean verified;
+    private boolean verificeret;
 
-    public boolean isVerified() {
-        return this.verified;
+    public boolean isVerificeret() {
+        return this.verificeret;
     }
 
-    public void setVerified(boolean verified) {
-        this.verified = verified;
+    public void setVerificeret(boolean verificeret) {
+        this.verificeret = verificeret;
     }
 
 
@@ -55,7 +53,7 @@ public class PersonParentVerificationData extends AuthorityDetailData {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("verified", this.verified);
+        map.put("verificeret", this.verificeret);
         return map;
     }
 }

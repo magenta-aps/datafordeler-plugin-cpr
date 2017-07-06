@@ -6,7 +6,6 @@ import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.*;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
@@ -56,8 +55,8 @@ public class ParseTest {
             personEntityManager.parseRegistration(testData);
 
             PersonQuery query = new PersonQuery();
-            //query.setCprNumber("121008217");
-            query.setFirstName("Tester");
+            //query.setPersonnummer("121008217");
+            query.setFornavn("Tester");
             session = sessionManager.getSessionFactory().openSession();
 
             try {
@@ -82,8 +81,8 @@ public class ParseTest {
 
             RoadQuery query = new RoadQuery();
             //query.setCprKommunekode("0730");
-            //query.setCode("0012");
-            query.setName("Aalborggade");
+            //query.setPostnummer("0012");
+            query.setNavn("Aalborggade");
             session = sessionManager.getSessionFactory().openSession();
 
             try {
@@ -108,7 +107,7 @@ public class ParseTest {
 
             ResidenceQuery query = new ResidenceQuery();
             //query.setCprKommunekode("0730");
-            //query.setCode("0012");
+            //query.setPostnummer("0012");
             //query.setCprKommunekode();
             /*session = sessionManager.getSessionFactory().openSession();
 

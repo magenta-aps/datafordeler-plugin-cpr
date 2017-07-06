@@ -38,11 +38,11 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
     @Override
     public void populateBaseData(ResidenceBaseData data, ResidenceEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
         if (registrationTime.equals(this.getOffsetDateTime("timestamp")) && effect.compareRange(this.getOffsetDateTime("haenstart"), false, null, false)) {
-            data.setMunicipalityCode(this.getInt("komkod"));
-            data.setRoadCode(this.getInt("vejkod"));
-            data.setHouseNumber(this.getString("husnr", true));
-            data.setFloor(this.getString("etage", true));
-            data.setDoor(this.getString("sidedoer", true));
+            data.setKommunekode(this.getInt("komkod"));
+            data.setVejkode(this.getInt("vejkod"));
+            data.setHusnummer(this.getString("husnr", true));
+            data.setEtage(this.getString("etage", true));
+            data.setSideDoer(this.getString("sidedoer", true));
         }
     }
 

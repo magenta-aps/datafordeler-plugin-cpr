@@ -2,8 +2,6 @@ package dk.magenta.datafordeler.cpr.data.residence.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.data.CprData;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
 
 import javax.persistence.Column;
@@ -22,92 +20,92 @@ import org.hibernate.Session;
 public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseData> {
 
     @Column
-    @JsonProperty(value = "kommuneKode")
+    @JsonProperty(value = "kommunekode")
     @XmlElement(name = "kommuneKode")
-    private int municipalityCode;
+    private int kommunekode;
 
-    public int getMunicipalityCode() {
-        return this.municipalityCode;
+    public int getKommunekode() {
+        return this.kommunekode;
     }
 
-    public void setMunicipalityCode(int municipalityCode) {
-        this.municipalityCode = municipalityCode;
+    public void setKommunekode(int kommunekode) {
+        this.kommunekode = kommunekode;
     }
 
     @Column
-    @JsonProperty(value = "vejKode")
-    @XmlElement(name = "vejKode")
-    private int roadCode;
+    @JsonProperty(value = "vejkode")
+    @XmlElement(name = "vejkode")
+    private int vejkode;
 
-    public int getRoadCode() {
-        return this.roadCode;
+    public int getVejkode() {
+        return this.vejkode;
     }
 
-    public void setRoadCode(int roadCode) {
-        this.roadCode = roadCode;
+    public void setVejkode(int vejkode) {
+        this.vejkode = vejkode;
     }
 
     @Column
     @JsonProperty(value = "husnummer")
     @XmlElement(name = "husnummer")
-    private String houseNumber;
+    private String husnummer;
 
-    public String getHouseNumber() {
-        return this.houseNumber;
+    public String getHusnummer() {
+        return this.husnummer;
     }
 
-    public void setHouseNumber(String houseNumber) {
-        this.houseNumber = houseNumber;
+    public void setHusnummer(String husnummer) {
+        this.husnummer = husnummer;
     }
 
     @Column
     @JsonProperty(value = "etage")
     @XmlElement(name = "etage")
-    private String floor;
+    private String etage;
 
-    public String getFloor() {
-        return this.floor;
+    public String getEtage() {
+        return this.etage;
     }
 
-    public void setFloor(String floor) {
-        this.floor = floor;
+    public void setEtage(String etage) {
+        this.etage = etage;
     }
 
     @Column
-    @JsonProperty(value = "sidedør")
-    @XmlElement(name = "sidedør")
-    private String door;
+    @JsonProperty(value = "sideDoer")
+    @XmlElement(name = "sideDoer")
+    private String sideDoer;
 
-    public String getDoor() {
-        return this.door;
+    public String getSideDoer() {
+        return this.sideDoer;
     }
 
-    public void setDoor(String door) {
-        this.door = door;
+    public void setSideDoer(String sideDoer) {
+        this.sideDoer = sideDoer;
     }
 
     @Column
     @JsonProperty(value = "lokalitet")
     @XmlElement(name = "lokalitet")
-    private String location;
+    private String lokalitet;
 
-    public String getLocation() {
-        return this.location;
+    public String getLokalitet() {
+        return this.lokalitet;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setLokalitet(String lokalitet) {
+        this.lokalitet = lokalitet;
     }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("municipalityCode", this.municipalityCode);
-        map.put("roadCode", this.roadCode);
-        map.put("houseNumber", this.houseNumber);
-        map.put("floor", this.floor);
-        map.put("door", this.door);
-        map.put("location", this.location);
+        map.put("kommunekode", this.kommunekode);
+        map.put("vejkode", this.vejkode);
+        map.put("husnummer", this.husnummer);
+        map.put("etage", this.etage);
+        map.put("sideDoer", this.sideDoer);
+        map.put("lokalitet", this.lokalitet);
         return map;
     }
 

@@ -5,7 +5,7 @@ import dk.magenta.datafordeler.core.exception.AccessRequiredException;
 import dk.magenta.datafordeler.core.user.DafoUserDetails;
 
 /**
- * Checkx access for all entity services related to CPR.
+ * Checkx access for all entity services related to PERSONNUMMER.
  */
 public abstract class CprAccessChecker {
 
@@ -17,7 +17,7 @@ public abstract class CprAccessChecker {
      */
     public static void checkAccess(DafoUserDetails dafoUserDetails)
             throws AccessDeniedException, AccessRequiredException {
-        // Users must have the READ_CPR_ROLE to access CPR data
+        // Users must have the READ_CPR_ROLE to access PERSONNUMMER data
         dafoUserDetails.checkHasSystemRole(CprRolesDefinition.READ_CPR_ROLE);
     }
 }
