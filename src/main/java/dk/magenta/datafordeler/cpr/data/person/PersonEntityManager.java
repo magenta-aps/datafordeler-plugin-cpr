@@ -11,11 +11,9 @@ import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.parsers.CprParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
 import dk.magenta.datafordeler.cpr.records.Record;
-import java.math.BigInteger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +111,7 @@ public class PersonEntityManager extends CprEntityManager {
                         entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
                         if (entity == null) {
                             entity = new PersonEntity(PersonEntity.generateUUID(cprNumber), CprPlugin.getDomain());
-                            entity.setCprNumber(cprNumber);
+                            entity.setPersonnummer(cprNumber);
                         }
                         entityCache.put(cprNumber, entity);
                     }

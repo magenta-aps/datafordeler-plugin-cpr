@@ -50,9 +50,9 @@ public class RoadEntityManager extends CprEntityManager {
         public int kommunekode;
         public int vejkode;
 
-        public RoadIdentifier(int municipalityCode, int roadCode) {
-            this.kommunekode = municipalityCode;
-            this.vejkode = roadCode;
+        public RoadIdentifier(int kommunekode, int vejkode) {
+            this.kommunekode = kommunekode;
+            this.vejkode = vejkode;
         }
 
         @Override
