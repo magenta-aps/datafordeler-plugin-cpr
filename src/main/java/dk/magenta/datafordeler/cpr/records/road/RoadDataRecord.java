@@ -1,7 +1,6 @@
 package dk.magenta.datafordeler.cpr.records.road;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
@@ -45,8 +44,8 @@ public abstract class RoadDataRecord extends CprDataRecord<RoadEffect, RoadBaseD
     @Override
     protected RoadEffect createEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         RoadEffect effect = new RoadEffect(null, effectFrom, effectTo);
-        effect.setUncertainFrom(effectFromUncertain);
-        effect.setUncertainTo(effectToUncertain);
+        effect.setVirkningFraUsikkerhedsmarkering(effectFromUncertain);
+        effect.setVirkningTilUsikkerhedsmarkering(effectToUncertain);
         return effect;
     }
 

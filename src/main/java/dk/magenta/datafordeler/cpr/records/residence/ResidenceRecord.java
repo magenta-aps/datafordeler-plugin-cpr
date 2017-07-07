@@ -49,8 +49,8 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
     @Override
     protected ResidenceEffect createEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         ResidenceEffect effect = new ResidenceEffect(null, effectFrom, effectTo);
-        effect.setUncertainFrom(effectFromUncertain);
-        effect.setUncertainTo(effectToUncertain);
+        effect.setVirkningFraUsikkerhedsmarkering(effectFromUncertain);
+        effect.setVirkningTilUsikkerhedsmarkering(effectToUncertain);
         return effect;
     }
 

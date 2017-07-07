@@ -175,18 +175,18 @@ public class RoadEntityManager extends CprEntityManager {
                         if (lastRegistration == null) {
                             registration = new RoadRegistration();
                         } else {
-                            //registration = this.cloneRegistration(lastRegistration);
+                            //registrering = this.cloneRegistration(lastRegistration);
                             registration = new RoadRegistration();
-                            for (RoadEffect originalEffect : lastRegistration.getEffects()) {
-                                RoadEffect copyEffect = new RoadEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
-                                copyEffect.setUncertainFrom(originalEffect.isUncertainFrom());
-                                copyEffect.setUncertainTo(originalEffect.isUncertainTo());
+                            for (RoadEffect originalEffect : lastRegistration.getVirkninger()) {
+                                RoadEffect copyEffect = new RoadEffect(registration, originalEffect.getVirkningFra(), originalEffect.getVirkningTil());
+                                copyEffect.setVirkningFraUsikkerhedsmarkering(originalEffect.isVirkningFraUsikkerhedsmarkering());
+                                copyEffect.setVirkningTilUsikkerhedsmarkering(originalEffect.isVirkningTilUsikkerhedsmarkering());
                                 for (RoadBaseData originalData : originalEffect.getDataItems()) {
-                                    originalData.addEffect(copyEffect);
+                                    originalData.addVirkning(copyEffect);
                                 }
                             }
                         }
-                        registration.setRegistrationFrom(registrationFrom);
+                        registration.setRegistreringFra(registrationFrom);
                     }
                     registration.setEntity(entity);
                     entity.addRegistration(registration);
@@ -198,16 +198,16 @@ public class RoadEntityManager extends CprEntityManager {
                         Set<RoadEffect> effects = record.getEffects();
                         for (RoadEffect effect : effects) {
 
-                            RoadEffect realEffect = registration.getEffect(effect.getEffectFrom(), effect.isUncertainFrom(), effect.getEffectTo(), effect.isUncertainTo());
+                            RoadEffect realEffect = registration.getEffect(effect.getVirkningFra(), effect.isVirkningFraUsikkerhedsmarkering(), effect.getVirkningTil(), effect.isVirkningTilUsikkerhedsmarkering());
                             if (realEffect != null) {
                                 effect = realEffect;
                             } else {
-                                effect.setRegistration(registration);
+                                effect.setRegistrering(registration);
                             }
 
                             //if (effect.getDataItems().isEmpty()) {
                             RoadBaseData baseData = new RoadBaseData();
-                            baseData.addEffect(effect);
+                            baseData.addVirkning(effect);
                             //}
                             //for (RoadBaseData baseData : effect.getDataItems()) {
                             // There really should be only one item for each effect right now
@@ -218,7 +218,7 @@ public class RoadEntityManager extends CprEntityManager {
 
 
                     if (lastRegistration != null) {
-                        lastRegistration.setRegistrationTo(registrationFrom);
+                        lastRegistration.setRegistreringTil(registrationFrom);
                     }
                     lastRegistration = registration;
                     entityRegistrations.add(registration);
@@ -227,7 +227,7 @@ public class RoadEntityManager extends CprEntityManager {
 
                 for (RoadRegistration registration : entityRegistrations) {
                     try {
-                        queryManager.saveRegistration(session, entity, registration);
+                        queryManager.saveRegistrering(session, entity, registration);
                     } catch (DataFordelerException e) {
                         e.printStackTrace();
                     } catch (javax.persistence.EntityNotFoundException e) {

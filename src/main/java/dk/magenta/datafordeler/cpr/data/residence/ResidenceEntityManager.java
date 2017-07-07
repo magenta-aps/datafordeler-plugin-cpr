@@ -1,6 +1,5 @@
 package dk.magenta.datafordeler.cpr.data.residence;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
@@ -11,11 +10,9 @@ import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonRegistrationReference;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.parsers.RoadParser;
 import dk.magenta.datafordeler.cpr.records.Record;
-import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
 import dk.magenta.datafordeler.cpr.records.residence.ResidenceRecord;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -144,39 +141,39 @@ public class ResidenceEntityManager extends CprEntityManager {
                         if (lastRegistration == null) {
                             registration = new ResidenceRegistration();
                         } else {
-                            //registration = this.cloneRegistration(lastRegistration);
+                            //registrering = this.cloneRegistration(lastRegistration);
                             registration = new ResidenceRegistration();
-                            for (ResidenceEffect originalEffect : lastRegistration.getEffects()) {
-                                ResidenceEffect newEffect = new ResidenceEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
+                            for (ResidenceEffect originalEffect : lastRegistration.getVirkninger()) {
+                                ResidenceEffect newEffect = new ResidenceEffect(registration, originalEffect.getVirkningFra(), originalEffect.getVirkningTil());
                                 for (ResidenceBaseData originalData : originalEffect.getDataItems()) {
-                                    originalData.addEffect(newEffect);
+                                    originalData.addVirkning(newEffect);
                                 }
                             }
                         }
-                        registration.setRegistrationFrom(registrationFrom);
-                        // System.out.println("created new registration at " + registrationFrom);
+                        registration.setRegistreringFra(registrationFrom);
+                        // System.out.println("created new registrering at " + registreringFra);
                     }
                     registration.setEntity(entity);
                     entity.addRegistration(registration);
 
                     // Each record sets its own basedata
                     // System.out.println("ajourRecords: "+ajourRecords);
-                    // System.out.println("registrationFrom: "+registrationFrom);
+                    // System.out.println("registreringFra: "+registreringFra);
                     for (ResidenceRecord record : ajourRecords.get(registrationFrom)) {
                         // Take what we need from the record and put it into dataitems
                         Set<ResidenceEffect> effects = record.getEffects();
                         for (ResidenceEffect effect : effects) {
 
-                            ResidenceEffect realEffect = registration.getEffect(effect.getEffectFrom(), effect.isUncertainFrom(), effect.getEffectTo(), effect.isUncertainTo());
+                            ResidenceEffect realEffect = registration.getEffect(effect.getVirkningFra(), effect.isVirkningFraUsikkerhedsmarkering(), effect.getVirkningTil(), effect.isVirkningTilUsikkerhedsmarkering());
                             if (realEffect != null) {
                                 effect = realEffect;
                             } else {
-                                effect.setRegistration(registration);
+                                effect.setRegistrering(registration);
                             }
 
                             if (effect.getDataItems().isEmpty()) {
                                 ResidenceBaseData baseData = new ResidenceBaseData();
-                                baseData.addEffect(effect);
+                                baseData.addVirkning(effect);
                             }
                             for (ResidenceBaseData baseData : effect.getDataItems()) {
                                 // There really should be only one item for each effect right now
@@ -187,20 +184,20 @@ public class ResidenceEntityManager extends CprEntityManager {
                     /*record.populateBaseData(data, timestamp);
                     for (PersonEffect effect : data.keySet()) {
                         PersonBaseData dataItem = data.get(effect);
-                        effect.setRegistration(registration);
-                        dataItem.addEffect(effect);*/
-                        //PersonEffect effect = registration.getEffect(effectFrom, effectTo);
+                        effect.setRegistrering(registrering);
+                        dataItem.addVirkning(effect);*/
+                        //PersonEffect effect = registrering.getEffect(effectFrom, effectTo);
                         /*if (effect == null) {
-                            effect = new PersonEffect(registration, effectFrom, effectTo);
+                            effect = new PersonEffect(registrering, effectFrom, effectTo);
                         }
-                        data.addEffect(effect);*/
+                        data.addVirkning(effect);*/
 
 
                         //}
                     }
 
                     if (lastRegistration != null) {
-                        lastRegistration.setRegistrationTo(registrationFrom);
+                        lastRegistration.setRegistreringTil(registrationFrom);
                     }
                     lastRegistration = registration;
                     entityRegistrations.add(registration);
@@ -208,7 +205,7 @@ public class ResidenceEntityManager extends CprEntityManager {
                 }
                 for (ResidenceRegistration registration : entityRegistrations) {
                     try {
-                        queryManager.saveRegistration(session, entity, registration);
+                        queryManager.saveRegistrering(session, entity, registration);
                     } catch (DataFordelerException e) {
                         e.printStackTrace();
                     }

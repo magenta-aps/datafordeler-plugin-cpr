@@ -15,7 +15,7 @@ import java.util.Map;
 public class PersonQuery extends CprQuery<PersonEntity> {
 
     public static final String PERSONNUMMER = "personnummer";
-    public static final String FORNAVN = "fornavn";
+    public static final String FORNAVNE = "fornavne";
     public static final String EFTERNAVN = "efternavn";
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = PERSONNUMMER)
@@ -29,7 +29,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
         this.personnummer = personnummer;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING, queryName = FORNAVN)
+    @QueryField(type = QueryField.FieldType.STRING, queryName = FORNAVNE)
     private String fornavn;
 
     public String getFornavn() {
@@ -55,7 +55,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
     public Map<String, Object> getSearchParameters() {
         HashMap<String, Object> map = new HashMap<>();
         map.put(PERSONNUMMER, this.personnummer);
-        map.put(FORNAVN, this.fornavn);
+        map.put(FORNAVNE, this.fornavn);
         map.put(EFTERNAVN, this.efternavn);
         return map;
     }
@@ -63,7 +63,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
     @Override
     public void setFromParameters(ParameterMap parameters) {
         this.setPersonnummer(parameters.getFirst(PERSONNUMMER));
-        this.setFornavn(parameters.getFirst(FORNAVN));
+        this.setFornavn(parameters.getFirst(FORNAVNE));
         this.setEfternavn(parameters.getFirst(EFTERNAVN));
     }
 
@@ -82,13 +82,13 @@ public class PersonQuery extends CprQuery<PersonEntity> {
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = new LookupDefinition(this);
         if (this.personnummer != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".personnummer", this.personnummer);
+            lookupDefinition.put(LookupDefinition.entityref + "." + PERSONNUMMER, this.personnummer);
         }
         if (this.fornavn != null) {
-            lookupDefinition.put("nameData.fornavn", this.fornavn);
+            lookupDefinition.put("navn." + FORNAVNE, this.fornavn);
         }
         if (this.efternavn != null) {
-            lookupDefinition.put("nameData.efternavn", this.efternavn);
+            lookupDefinition.put("navn." + EFTERNAVN, this.efternavn);
         }
         return lookupDefinition;
     }

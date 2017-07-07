@@ -137,14 +137,14 @@ public class PersonNameData extends AuthorityDetailData {
     @Column
     @JsonProperty
     @XmlElement
-    private boolean reportNames;
+    private boolean rapportnavne;
 
-    public boolean isReportNames() {
-        return this.reportNames;
+    public boolean isRapportnavne() {
+        return this.rapportnavne;
     }
 
-    public void setReportNames(boolean reportNames) {
-        this.reportNames = reportNames;
+    public void setRapportnavne(boolean rapportnavne) {
+        this.rapportnavne = rapportnavne;
     }
 
     @Override
@@ -162,7 +162,7 @@ public class PersonNameData extends AuthorityDetailData {
         map.put("mellemnavnMarkering", this.mellemnavnMarkering);
 
         //Ikke i grunddatamodellen
-        map.put("reportNames", this.reportNames);
+        map.put("rapportnavne", this.rapportnavne);
         map.put("egetEfternavnMarkering", this.egetEfternavnMarkering);
         map.put("egetEfternavn", this.egetEfternavn);
 

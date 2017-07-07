@@ -272,25 +272,25 @@ public class PersonAddressData extends AuthorityDetailData {
 
     //Ikke i grunddatamodellen
 
-    private int addressTextType;
+    private int adressetekststype;
 
-    public int getAddressTextType() {
-        return this.addressTextType;
+    public int getAdressetekststype() {
+        return this.adressetekststype;
     }
 
-    public void setAddressTextType(int addressTextType) {
-        this.addressTextType = addressTextType;
+    public void setAdressetekststype(int adressetekststype) {
+        this.adressetekststype = adressetekststype;
     }
 
 
-    private int startAuthority;
+    private int startautoritet;
 
-    public int getStartAuthority() {
-        return this.startAuthority;
+    public int getStartautoritet() {
+        return this.startautoritet;
     }
 
-    public void setStartAuthority(int startAuthority) {
-        this.startAuthority = startAuthority;
+    public void setStartautoritet(int startautoritet) {
+        this.startautoritet = startautoritet;
     }
 
 
@@ -319,8 +319,8 @@ public class PersonAddressData extends AuthorityDetailData {
         map.put("adresselinie5", this.adresselinie5);
 
         //Ikke i grunddatamodellen
-        map.put("addressTextType", this.addressTextType);
-        map.put("startAuthority", this.startAuthority);
+        map.put("adressetekststype", this.adressetekststype);
+        map.put("startautoritet", this.startautoritet);
         return map;
     }
 }

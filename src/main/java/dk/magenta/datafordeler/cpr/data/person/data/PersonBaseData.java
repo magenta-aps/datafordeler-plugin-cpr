@@ -91,7 +91,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.kerneData == null) {
             this.kerneData = new PersonCoreData();
         }
-        this.kerneData.setAuthority(authority);
+        this.kerneData.setMyndighed(authority);
     }
 
     public void setStatus(String status) {
@@ -111,7 +111,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.mor.setPersonnummer(cprNumber);
         this.mor.setFoedselsdato(birthDate);
         this.mor.setFoedselsdatoUsikker(birthDateUncertain);
-        this.mor.setAuthority(authorityCode);
+        this.mor.setMyndighed(authorityCode);
     }
 
     public void setFather(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode) {
@@ -124,7 +124,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.far.setPersonnummer(cprNumber);
         this.far.setFoedselsdato(birthDate);
         this.far.setFoedselsdatoUsikker(birthDateUncertain);
-        this.far.setAuthority(authorityCode);
+        this.far.setMyndighed(authorityCode);
     }
 
     public void setMotherVerification(int authorityCode, boolean verified) {
@@ -132,7 +132,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             this.morVerifikation = new PersonParentVerificationData();
             this.morVerifikation.setMor(true);
         }
-        this.morVerifikation.setAuthority(authorityCode);
+        this.morVerifikation.setMyndighed(authorityCode);
         this.morVerifikation.setVerificeret(verified);
     }
 
@@ -141,7 +141,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             this.farVerifikation = new PersonParentVerificationData();
             this.farVerifikation.setMor(false);
         }
-        this.farVerifikation.setAuthority(authorityCode);
+        this.farVerifikation.setMyndighed(authorityCode);
         this.farVerifikation.setVerificeret(verified);
     }
 
@@ -149,7 +149,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.stilling == null) {
             this.stilling = new PersonPositionData();
         }
-        this.stilling.setAuthority(authorityCode);
+        this.stilling.setMyndighed(authorityCode);
         this.stilling.setStilling(position);
     }
 
@@ -175,7 +175,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.adresse == null) {
             this.adresse = new PersonAddressData();
         }
-        this.adresse.setAuthority(authority);
+        this.adresse.setMyndighed(authority);
         this.adresse.setBygningsnummer(bygningsnummer);
         this.adresse.setBynavn(bynavn);
         this.adresse.setCprKommunekode(cprKommunekode);
@@ -194,8 +194,8 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.adresse.setAdresselinie4(adresselinie4);
         this.adresse.setAdresselinie5(adresselinie5);
 
-        this.adresse.setAddressTextType(addressTextType);
-        this.adresse.setStartAuthority(startAuthority);
+        this.adresse.setAdressetekststype(addressTextType);
+        this.adresse.setStartautoritet(startAuthority);
     }
 
     public void setCoName(String coName) {
@@ -212,7 +212,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.flytKommune == null) {
             this.flytKommune = new PersonMoveMunicipalityData();
         }
-        this.flytKommune.setAuthority(authority);
+        this.flytKommune.setMyndighed(authority);
         this.flytKommune.setFraflytningsdatoKommune(fraflytningsdatoKommune);
         this.flytKommune.setFraflytningsdatoKommuneUsikkerhedsmarkering(fraflytningsdatoKommuneUsikkerhedsmarkering);
         this.flytKommune.setFraflytningskommunekode(fraflytningskommunekode);
@@ -226,7 +226,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.navn == null) {
             this.navn = new PersonNameData();
         }
-        this.navn.setAuthority(authority);
+        this.navn.setMyndighed(authority);
         this.navn.setAdresseringsnavn(adresseringsnavn);
         this.navn.setEfternavn(efternavn);
         this.navn.setFornavne(fornavne);
@@ -239,14 +239,14 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
         this.navn.setEgetEfternavn(egetEfternavn);
         this.navn.setEgetEfternavnMarkering(ownLastNameMarking);
-        this.navn.setReportNames(reportNames);
+        this.navn.setRapportnavne(reportNames);
     }
 
     public void setAddressName(int authority, String addressName) {
         if (this.adressenavn == null) {
             this.adressenavn = new PersonAddressNameData();
         }
-        this.adressenavn.setAuthority(authority);
+        this.adressenavn.setMyndighed(authority);
         this.adressenavn.setAdressenavn(addressName);
         System.out.println("this.adressenavn: "+this.adressenavn);
     }
@@ -255,7 +255,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.navneverifikation == null) {
             this.navneverifikation = new PersonNameVerificationData();
         }
-        this.navneverifikation.setAuthority(authority);
+        this.navneverifikation.setMyndighed(authority);
         this.navneverifikation.setVerificeret(verification);
     }
 
@@ -263,7 +263,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.navnemyndighed == null) {
             this.navnemyndighed = new PersonNameAuthorityTextData();
         }
-        this.navnemyndighed.setAuthority(authority);
+        this.navnemyndighed.setMyndighed(authority);
         this.navnemyndighed.setTekst(text);
     }
 
@@ -271,7 +271,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.beskyttelse == null) {
             this.beskyttelse = new PersonProtectionData();
         }
-        this.beskyttelse.setAuthority(authority);
+        this.beskyttelse.setMyndighed(authority);
         this.beskyttelse.setBeskyttelsestype(beskyttelsestype);
         this.beskyttelse.setRapportMarkering(reportMarking);
     }
@@ -280,7 +280,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.udrejseIndrejse == null) {
             this.udrejseIndrejse = new PersonEmigrationData();
         }
-        this.udrejseIndrejse.setAuthority(authority);
+        this.udrejseIndrejse.setMyndighed(authority);
         this.udrejseIndrejse.setLandekode(countryCode);;
     }
 
@@ -288,7 +288,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.udenlandsadresse == null) {
             this.udenlandsadresse = new PersonForeignAddressData();
         }
-        this.udenlandsadresse.setAuthority(authority);
+        this.udenlandsadresse.setMyndighed(authority);
         this.udenlandsadresse.setAdresselinie1(adresselinie1);
         this.udenlandsadresse.setAdresselinie2(adresselinie2);
         this.udenlandsadresse.setAdresselinie3(adresselinie3);

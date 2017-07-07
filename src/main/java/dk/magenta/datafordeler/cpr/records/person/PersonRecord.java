@@ -119,7 +119,7 @@ public class PersonRecord extends PersonDataRecord {
             );
         }
 
-        if (registrationTime.equals(this.getOffsetDateTime("start_ts-person")) && effect.compareRange( this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"))) {
+        if (effect.compareRange( this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"))) {
 
             data.setBirth(
                 LocalDateTime.of(this.getDate("foed_dt"), this.getTime("foed_tm")),
@@ -129,7 +129,7 @@ public class PersonRecord extends PersonDataRecord {
                 "",
                 this.getInt("foedsekvens")
             );
-            data.setPersonnummer(this.getString("pnrgaeld", false));
+            data.setPersonnummer(this.getString("pnr", false));
             data.setKoen(this.get("koen"));
             data.setStartAuthority(this.getInt("start_mynkod-person"));
         }

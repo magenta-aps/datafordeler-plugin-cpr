@@ -5,7 +5,6 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 
-import java.math.BigInteger;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,8 +57,8 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
         }
         if (effect == null) {
             effect = new PersonEffect(null, effectFrom, effectTo);
-            effect.setUncertainFrom(effectFromUncertain);
-            effect.setUncertainTo(effectToUncertain);
+            effect.setVirkningFraUsikkerhedsmarkering(effectFromUncertain);
+            effect.setVirkningTilUsikkerhedsmarkering(effectToUncertain);
             data.put(effect, this.createEmptyBaseData());
         }
         return data.get(effect);
@@ -72,8 +71,8 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
     @Override
     protected PersonEffect createEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         PersonEffect effect = new PersonEffect(null, effectFrom, effectTo);
-        effect.setUncertainFrom(effectFromUncertain);
-        effect.setUncertainTo(effectToUncertain);
+        effect.setVirkningFraUsikkerhedsmarkering(effectFromUncertain);
+        effect.setVirkningTilUsikkerhedsmarkering(effectToUncertain);
         return effect;
     }
 }

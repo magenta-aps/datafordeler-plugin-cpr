@@ -15,7 +15,7 @@ import java.util.Map;
 public class RoadQuery extends CprQuery<RoadEntity> {
 
     public static final String VEJKODE = "vejkode";
-    public static final String NAVN = "navn";
+    public static final String VEJNAVN = "vejnavn";
     public static final String KOMMUNEKODE = "kommunekode";
 
     @QueryField(type = QueryField.FieldType.INT, queryName = VEJKODE)
@@ -29,7 +29,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
         this.vejkode = vejkode;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING, queryName = NAVN)
+    @QueryField(type = QueryField.FieldType.STRING, queryName = VEJNAVN)
     private String navn;
 
     public String getNavn() {
@@ -55,7 +55,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
     public Map<String, Object> getSearchParameters() {
         HashMap<String, Object> map = new HashMap<>();
         map.put(VEJKODE, this.vejkode);
-        map.put(NAVN, this.navn);
+        map.put(VEJNAVN, this.navn);
         map.put(KOMMUNEKODE, this.kommunekode);
         return map;
     }
@@ -63,7 +63,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
     @Override
     public void setFromParameters(ParameterMap parameters) {
         this.setVejkode(parameters.getFirst(VEJKODE));
-        this.setNavn(parameters.getFirst(NAVN));
+        this.setNavn(parameters.getFirst(VEJNAVN));
         this.setKommunekode(parameters.getFirst(KOMMUNEKODE));
     }
 
@@ -82,13 +82,13 @@ public class RoadQuery extends CprQuery<RoadEntity> {
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = new LookupDefinition(this);
         if (this.vejkode != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".vejkode", this.vejkode);
+            lookupDefinition.put(LookupDefinition.entityref + "." + VEJKODE, this.vejkode);
         }
         if (this.navn != null) {
-            lookupDefinition.put("coreData.navn", this.navn);
+            lookupDefinition.put("coreData." + VEJNAVN, this.navn);
         }
         if (this.kommunekode != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".kommunekode", this.navn);
+            lookupDefinition.put(LookupDefinition.entityref + "." + KOMMUNEKODE, this.navn);
         }
         return lookupDefinition;
     }

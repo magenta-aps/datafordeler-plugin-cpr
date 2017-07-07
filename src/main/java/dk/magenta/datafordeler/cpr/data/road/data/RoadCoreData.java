@@ -1,10 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.road.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.core.database.LookupDefinition;
-import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.DetailData;
-import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,81 +19,81 @@ public class RoadCoreData extends DetailData {
 
 
     @Column
-    @JsonProperty(value = "tilKommuneKode")
-    @XmlElement(name = "tilKommuneKode")
-    private int toMunicipalityCode;
+    @JsonProperty(value = "tilKommunekode")
+    @XmlElement(name = "tilKommunekode")
+    private int tilKommunekode;
 
-    public int getToMunicipalityCode() {
-        return this.toMunicipalityCode;
+    public int getTilKommunekode() {
+        return this.tilKommunekode;
     }
 
-    public void setToMunicipalityCode(int toMunicipalityCode) {
-        this.toMunicipalityCode = toMunicipalityCode;
-    }
-
-    @Column
-    @JsonProperty(value = "tilVejKode")
-    @XmlElement(name = "tilVejKode")
-    private int toRoadCode;
-
-    public int getToRoadCode() {
-        return this.toRoadCode;
-    }
-
-    public void setToRoadCode(int toRoadCode) {
-        this.toRoadCode = toRoadCode;
+    public void setTilKommunekode(int tilKommunekode) {
+        this.tilKommunekode = tilKommunekode;
     }
 
     @Column
-    @JsonProperty(value = "fraKommuneKode")
-    @XmlElement(name = "fraKommuneKode")
-    private int fromMunicipalityCode;
+    @JsonProperty(value = "tilVejkode")
+    @XmlElement(name = "tilVejkode")
+    private int tilVejkode;
 
-    public int getFromMunicipalityCode() {
-        return this.fromMunicipalityCode;
+    public int getTilVejkode() {
+        return this.tilVejkode;
     }
 
-    public void setFromMunicipalityCode(int fromMunicipalityCode) {
-        this.fromMunicipalityCode = fromMunicipalityCode;
-    }
-
-    @Column
-    @JsonProperty(value = "fraVejKode")
-    @XmlElement(name = "fraVejKode")
-    private int fromRoadCode;
-
-    public int getFromRoadCode() {
-        return this.fromRoadCode;
-    }
-
-    public void setFromRoadCode(int fromRoadCode) {
-        this.fromRoadCode = fromRoadCode;
+    public void setTilVejkode(int tilVejkode) {
+        this.tilVejkode = tilVejkode;
     }
 
     @Column
-    @JsonProperty(value = "addresseringsNavn")
-    @XmlElement(name = "addresseringsNavn")
-    private String addressingName;
+    @JsonProperty(value = "fraKommunekode")
+    @XmlElement(name = "fraKommunekode")
+    private int fraKommunekode;
 
-    public String getAddressingName() {
-        return this.addressingName;
+    public int getFraKommunekode() {
+        return this.fraKommunekode;
     }
 
-    public void setAddressingName(String addressingName) {
-        this.addressingName = addressingName;
+    public void setFraKommunekode(int fraKommunekode) {
+        this.fraKommunekode = fraKommunekode;
     }
 
     @Column
-    @JsonProperty(value = "vejNavn")
-    @XmlElement(name = "vejNavn")
-    private String name;
+    @JsonProperty(value = "fraVejkode")
+    @XmlElement(name = "fraVejkode")
+    private int fraVejkode;
 
-    public String getName() {
-        return this.name;
+    public int getFraVejkode() {
+        return this.fraVejkode;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFraVejkode(int fraVejkode) {
+        this.fraVejkode = fraVejkode;
+    }
+
+    @Column
+    @JsonProperty(value = "addresseringsnavn")
+    @XmlElement(name = "addresseringsnavn")
+    private String addresseringsnavn;
+
+    public String getAddresseringsnavn() {
+        return this.addresseringsnavn;
+    }
+
+    public void setAddresseringsnavn(String addresseringsnavn) {
+        this.addresseringsnavn = addresseringsnavn;
+    }
+
+    @Column
+    @JsonProperty(value = "vejnavn")
+    @XmlElement(name = "vejnavn")
+    private String vejnavn;
+
+    public String getVejnavn() {
+        return this.vejnavn;
+    }
+
+    public void setVejnavn(String vejnavn) {
+        this.vejnavn = vejnavn;
     }
 
     /**
@@ -107,23 +104,23 @@ public class RoadCoreData extends DetailData {
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>();
 
-        if (this.toMunicipalityCode != 0) {
-            map.put("toMunicipalityCode", this.toMunicipalityCode);
+        if (this.tilKommunekode != 0) {
+            map.put("tilKommunekode", this.tilKommunekode);
         }
-        if (this.toRoadCode != 0) {
-            map.put("toRoadCode", this.toRoadCode);
+        if (this.tilVejkode != 0) {
+            map.put("tilVejkode", this.tilVejkode);
         }
-        if (this.fromMunicipalityCode != 0) {
-            map.put("fromMunicipalityCode", this.fromMunicipalityCode);
+        if (this.fraKommunekode != 0) {
+            map.put("fraKommunekode", this.fraKommunekode);
         }
-        if (this.fromRoadCode != 0) {
-            map.put("fromRoadCode", this.fromRoadCode);
+        if (this.fraVejkode != 0) {
+            map.put("fraVejkode", this.fraVejkode);
         }
-        if (this.addressingName != null) {
-            map.put("addressingName", this.addressingName);
+        if (this.addresseringsnavn != null) {
+            map.put("addresseringsnavn", this.addresseringsnavn);
         }
-        if (this.name != null) {
-            map.put("name", this.name);
+        if (this.vejnavn != null) {
+            map.put("vejnavn", this.vejnavn);
         }
         return map;
     }

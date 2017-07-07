@@ -108,7 +108,7 @@ public class PersonEntityManager extends CprEntityManager {
 
                     PersonEntity entity = entityCache.get(cprNumber);
                     if (entity == null) {
-                        entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("cprNumber", cprNumber));
+                        entity = queryManager.getItem(session, PersonEntity.class, Collections.singletonMap("personnummer", cprNumber));
                         if (entity == null) {
                             entity = new PersonEntity(PersonEntity.generateUUID(cprNumber), CprPlugin.getDomain());
                             entity.setPersonnummer(cprNumber);
@@ -139,24 +139,24 @@ public class PersonEntityManager extends CprEntityManager {
                 // Create one Registration per unique timestamp
                 PersonRegistration lastRegistration = null;
                 for (OffsetDateTime registrationFrom : sortedTimestamps) {
-                    System.out.println("registrationFrom: " + registrationFrom);
+                    System.out.println("registreringFra: " + registrationFrom);
 
                     PersonRegistration registration = entity.getRegistration(registrationFrom);
                     if (registration == null) {
                         if (lastRegistration == null) {
                             registration = new PersonRegistration();
                         } else {
-                            //registration = this.cloneRegistration(lastRegistration);
+                            //registrering = this.cloneRegistration(lastRegistration);
                             registration = new PersonRegistration();
-                            for (PersonEffect originalEffect : lastRegistration.getEffects()) {
-                                PersonEffect newEffect = new PersonEffect(registration, originalEffect.getEffectFrom(), originalEffect.getEffectTo());
+                            for (PersonEffect originalEffect : lastRegistration.getVirkninger()) {
+                                PersonEffect newEffect = new PersonEffect(registration, originalEffect.getVirkningFra(), originalEffect.getVirkningTil());
                                 for (PersonBaseData originalData : originalEffect.getDataItems()) {
-                                    originalData.addEffect(newEffect);
+                                    originalData.addVirkning(newEffect);
                                 }
                             }
                         }
-                        registration.setRegistrationFrom(registrationFrom);
-                        System.out.println("created new registration at " + registrationFrom);
+                        registration.setRegistreringFra(registrationFrom);
+                        System.out.println("created new registrering at " + registrationFrom);
                     }
                     registration.setEntity(entity);
                     entity.addRegistration(registration);
@@ -168,16 +168,16 @@ public class PersonEntityManager extends CprEntityManager {
                         Set<PersonEffect> effects = record.getEffects();
                         for (PersonEffect effect : effects) {
 
-                            PersonEffect realEffect = registration.getEffect(effect.getEffectFrom(), effect.isUncertainFrom(), effect.getEffectTo(), effect.isUncertainTo());
+                            PersonEffect realEffect = registration.getEffect(effect.getVirkningFra(), effect.isVirkningFraUsikkerhedsmarkering(), effect.getVirkningTil(), effect.isVirkningTilUsikkerhedsmarkering());
                             if (realEffect != null) {
                                 effect = realEffect;
                             } else {
-                                effect.setRegistration(registration);
+                                effect.setRegistrering(registration);
                             }
 
                             if (effect.getDataItems().isEmpty()) {
                                 PersonBaseData baseData = new PersonBaseData();
-                                baseData.addEffect(effect);
+                                baseData.addVirkning(effect);
                             }
                             for (PersonBaseData baseData : effect.getDataItems()) {
                                 // There really should be only one item for each effect right now
@@ -188,20 +188,20 @@ public class PersonEntityManager extends CprEntityManager {
                     /*record.populateBaseData(data, timestamp);
                     for (PersonEffect effect : data.keySet()) {
                         PersonBaseData dataItem = data.get(effect);
-                        effect.setRegistration(registration);
-                        dataItem.addEffect(effect);*/
-                        //PersonEffect effect = registration.getEffect(effectFrom, effectTo);
+                        effect.setRegistrering(registrering);
+                        dataItem.addVirkning(effect);*/
+                        //PersonEffect effect = registrering.getEffect(effectFrom, effectTo);
                         /*if (effect == null) {
-                            effect = new PersonEffect(registration, effectFrom, effectTo);
+                            effect = new PersonEffect(registrering, effectFrom, effectTo);
                         }
-                        data.addEffect(effect);*/
+                        data.addVirkning(effect);*/
 
 
                         //}
                     }
 
                     if (lastRegistration != null) {
-                        lastRegistration.setRegistrationTo(registrationFrom);
+                        lastRegistration.setRegistreringTil(registrationFrom);
                     }
                     lastRegistration = registration;
                     entityRegistrations.add(registration);
@@ -214,7 +214,7 @@ public class PersonEntityManager extends CprEntityManager {
                 }
                 for (PersonRegistration registration : entityRegistrations) {
                     try {
-                        queryManager.saveRegistration(session, entity, registration);
+                        queryManager.saveRegistrering(session, entity, registration);
                     } catch (DataFordelerException e) {
                         e.printStackTrace();
                     }

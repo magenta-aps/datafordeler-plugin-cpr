@@ -13,13 +13,13 @@ import java.time.temporal.TemporalAccessor;
  */
 public abstract class CprEffect<R extends Registration, V extends CprEffect, B extends CprData> extends Effect<R, V, B> {
 
-    @JsonProperty(value = "fraUsikker")
-    @XmlElement(name = "fraUsikker")
-    private boolean uncertainFrom;
+    @JsonProperty(value = "virkningFraUsikkerhedsmarkering")
+    @XmlElement(name = "virkningFraUsikkerhedsmarkering")
+    private boolean virkningFraUsikkerhedsmarkering;
 
-    @JsonProperty(value = "tilUsikker")
-    @XmlElement(name = "tilUsikker")
-    private boolean uncertainTo;
+    @JsonProperty(value = "virkningTilUsikkerhedsmarkering")
+    @XmlElement(name = "virkningTilUsikkerhedsmarkering")
+    private boolean virkningTilUsikkerhedsmarkering;
 
     public CprEffect() {
     }
@@ -36,35 +36,35 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, B e
         super(registration, effectFrom, effectTo);
     }
 
-    public boolean isUncertainFrom() {
-        return this.uncertainFrom;
+    public boolean isVirkningFraUsikkerhedsmarkering() {
+        return this.virkningFraUsikkerhedsmarkering;
     }
 
-    public void setUncertainFrom(boolean uncertainFrom) {
-        this.uncertainFrom = uncertainFrom;
+    public void setVirkningFraUsikkerhedsmarkering(boolean virkningFraUsikkerhedsmarkering) {
+        this.virkningFraUsikkerhedsmarkering = virkningFraUsikkerhedsmarkering;
     }
 
-    public boolean isUncertainTo() {
-        return this.uncertainTo;
+    public boolean isVirkningTilUsikkerhedsmarkering() {
+        return this.virkningTilUsikkerhedsmarkering;
     }
 
-    public void setUncertainTo(boolean uncertainTo) {
-        this.uncertainTo = uncertainTo;
+    public void setVirkningTilUsikkerhedsmarkering(boolean virkningTilUsikkerhedsmarkering) {
+        this.virkningTilUsikkerhedsmarkering = virkningTilUsikkerhedsmarkering;
     }
 
-    public void setRegistration(R registration) {
-        super.setRegistration(registration);
+    public void setRegistrering(R registrering) {
+        super.setRegistrering(registrering);
     }
     public boolean compareRange(V other) {
-        return (other != null && this.compareRange(other.getEffectFrom(), other.isUncertainFrom(), other.getEffectTo(), other.isUncertainTo()));
+        return (other != null && this.compareRange(other.getVirkningFra(), other.isVirkningFraUsikkerhedsmarkering(), other.getVirkningTil(), other.isVirkningTilUsikkerhedsmarkering()));
     }
 
     public boolean compareRange(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         return (
-                (this.getEffectFrom() != null ? this.getEffectFrom().equals(effectFrom) : effectFrom == null) &&
-                        (this.getEffectTo() != null ? this.getEffectTo().equals(effectTo) : effectTo == null) &&
-                        (this.isUncertainFrom() == effectFromUncertain) &&
-                        (this.isUncertainTo() == effectToUncertain)
+                (this.getVirkningFra() != null ? this.getVirkningFra().equals(effectFrom) : effectFrom == null) &&
+                        (this.getVirkningTil() != null ? this.getVirkningTil().equals(effectTo) : effectTo == null) &&
+                        (this.isVirkningFraUsikkerhedsmarkering() == effectFromUncertain) &&
+                        (this.isVirkningTilUsikkerhedsmarkering() == effectToUncertain)
         );
     }
 }

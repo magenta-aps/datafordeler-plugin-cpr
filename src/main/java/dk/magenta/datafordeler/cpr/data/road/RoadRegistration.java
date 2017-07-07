@@ -1,7 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.road;
 
 import dk.magenta.datafordeler.core.database.Registration;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 
 import javax.persistence.Table;
 import java.time.OffsetDateTime;
@@ -14,12 +13,12 @@ import java.time.OffsetDateTime;
 public class RoadRegistration extends Registration<RoadEntity, RoadRegistration, RoadEffect> {
 
     public RoadEffect getEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
-        for (RoadEffect effect : this.effects) {
+        for (RoadEffect effect : this.virkninger) {
             if (
-                    (effect.getEffectFrom() == null ? effectFrom == null : effect.getEffectFrom().equals(effectFrom)) &&
-                            (effect.getEffectTo() == null ? effectTo == null : effect.getEffectTo().equals(effectTo)) &&
-                            (effect.isUncertainFrom() == effectFromUncertain) &&
-                            (effect.isUncertainTo() == effectToUncertain)
+                    (effect.getVirkningFra() == null ? effectFrom == null : effect.getVirkningFra().equals(effectFrom)) &&
+                            (effect.getVirkningTil() == null ? effectTo == null : effect.getVirkningTil().equals(effectTo)) &&
+                            (effect.isVirkningFraUsikkerhedsmarkering() == effectFromUncertain) &&
+                            (effect.isVirkningTilUsikkerhedsmarkering() == effectToUncertain)
                     ) {
                 return effect;
             }

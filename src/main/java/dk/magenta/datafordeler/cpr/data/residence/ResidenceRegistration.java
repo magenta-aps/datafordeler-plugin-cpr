@@ -13,12 +13,12 @@ import java.time.OffsetDateTime;
 public class ResidenceRegistration extends Registration<ResidenceEntity, ResidenceRegistration, ResidenceEffect> {
 
     public ResidenceEffect getEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
-        for (ResidenceEffect effect : this.effects) {
+        for (ResidenceEffect effect : this.virkninger) {
             if (
-                    (effect.getEffectFrom() == null ? effectFrom == null : effect.getEffectFrom().equals(effectFrom)) &&
-                    (effect.getEffectTo() == null ? effectTo == null : effect.getEffectTo().equals(effectTo)) &&
-                    (effect.isUncertainFrom() == effectFromUncertain) &&
-                    (effect.isUncertainTo() == effectToUncertain)
+                    (effect.getVirkningFra() == null ? effectFrom == null : effect.getVirkningFra().equals(effectFrom)) &&
+                    (effect.getVirkningTil() == null ? effectTo == null : effect.getVirkningTil().equals(effectTo)) &&
+                    (effect.isVirkningFraUsikkerhedsmarkering() == effectFromUncertain) &&
+                    (effect.isVirkningTilUsikkerhedsmarkering() == effectToUncertain)
             ) {
                 return effect;
             }

@@ -1,7 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.residence;
 
 import dk.magenta.datafordeler.cpr.data.CprEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 
 import javax.persistence.Table;
@@ -33,8 +32,8 @@ public class ResidenceEffect extends CprEffect<ResidenceRegistration, ResidenceE
 
     public ResidenceEffect(ResidenceRegistration registration, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         this(registration, effectFrom, effectTo);
-        this.setUncertainFrom(effectFromUncertain);
-        this.setUncertainTo(effectToUncertain);
+        this.setVirkningFraUsikkerhedsmarkering(effectFromUncertain);
+        this.setVirkningTilUsikkerhedsmarkering(effectToUncertain);
     }
 
 

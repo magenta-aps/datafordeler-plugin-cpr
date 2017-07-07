@@ -117,7 +117,7 @@ public class PersonParentData extends AuthorityDetailData {
         map.put("personnummer", this.personnummer);
         map.put("foedselsdato", this.foedselsdato);
         map.put("foedselsdatoUsikker", this.foedselsdatoUsikker);
-        map.put("name", this.navn);
+        map.put("navn", this.navn);
         map.put("navneMarkering", this.navneMarkering);
         return map;
     }

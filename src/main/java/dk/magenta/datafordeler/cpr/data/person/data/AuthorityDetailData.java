@@ -18,21 +18,21 @@ public abstract class AuthorityDetailData extends DetailData {
     @Column
     @JsonProperty(value = "myndighed")
     @XmlElement(name = "myndighed")
-    private int authority;
+    private int myndighed;
 
-    public int getAuthority() {
-        return this.authority;
+    public int getMyndighed() {
+        return this.myndighed;
     }
 
-    public void setAuthority(int authority) {
-        this.authority = authority;
+    public void setMyndighed(int myndighed) {
+        this.myndighed = myndighed;
     }
 
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("authority", this.authority);
+        map.put("myndighed", this.myndighed);
         return map;
     }
 }
