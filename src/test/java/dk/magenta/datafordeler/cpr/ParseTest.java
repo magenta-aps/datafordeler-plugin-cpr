@@ -5,7 +5,9 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.cpr.data.person.*;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonOutputWrapper;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
@@ -47,6 +49,8 @@ public class ParseTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private OutputWrapper<PersonEntity> personOutputWrapper = new PersonOutputWrapper();
+
     @Test
     public void testParsePerson() throws IOException, ParseException {
         Session session = null;
@@ -61,7 +65,7 @@ public class ParseTest {
 
             try {
                 List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
-                System.out.println(objectMapper.writeValueAsString(entities));
+                System.out.println(personOutputWrapper.wrapResults(entities));
             } catch (DataFordelerException e) {
                 e.printStackTrace();
             }
