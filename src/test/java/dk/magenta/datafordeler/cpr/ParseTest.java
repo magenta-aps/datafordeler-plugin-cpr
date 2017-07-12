@@ -65,7 +65,7 @@ public class ParseTest {
 
             try {
                 List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
-                System.out.println(personOutputWrapper.wrapResults(entities));
+                personOutputWrapper.wrapResults(entities);
             } catch (DataFordelerException e) {
                 e.printStackTrace();
             }

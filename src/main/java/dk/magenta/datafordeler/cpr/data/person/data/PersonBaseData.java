@@ -73,6 +73,78 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private PersonForeignAddressData udenlandsadresse;
 
 
+    public PersonCoreData getKerneData() {
+        return kerneData;
+    }
+
+    public PersonStatusData getStatus() {
+        return status;
+    }
+
+    public PersonParentData getMor() {
+        return mor;
+    }
+
+    public PersonParentData getFar() {
+        return far;
+    }
+
+    public PersonParentVerificationData getMorVerifikation() {
+        return morVerifikation;
+    }
+
+    public PersonParentVerificationData getFarVerifikation() {
+        return farVerifikation;
+    }
+
+    public PersonPositionData getStilling() {
+        return stilling;
+    }
+
+    public PersonBirthData getFoedsel() {
+        return foedsel;
+    }
+
+    public PersonAddressData getAdresse() {
+        return adresse;
+    }
+
+    public PersonAddressConameData getConavn() {
+        return conavn;
+    }
+
+    public PersonMoveMunicipalityData getFlytKommune() {
+        return flytKommune;
+    }
+
+    public PersonNameData getNavn() {
+        return navn;
+    }
+
+    public PersonAddressNameData getAdressenavn() {
+        return adressenavn;
+    }
+
+    public PersonNameVerificationData getNavneverifikation() {
+        return navneverifikation;
+    }
+
+    public PersonNameAuthorityTextData getNavnemyndighed() {
+        return navnemyndighed;
+    }
+
+    public PersonProtectionData getBeskyttelse() {
+        return beskyttelse;
+    }
+
+    public PersonEmigrationData getUdrejseIndrejse() {
+        return udrejseIndrejse;
+    }
+
+    public PersonForeignAddressData getUdenlandsadresse() {
+        return udenlandsadresse;
+    }
+
     public void setPersonnummer(String personnummer) {
         if (this.kerneData == null) {
             this.kerneData = new PersonCoreData();
