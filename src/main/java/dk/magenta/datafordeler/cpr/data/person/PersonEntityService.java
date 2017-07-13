@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/cpr/person/1/rest")
 public class PersonEntityService extends FapiService<PersonEntity, PersonQuery> {
 
+    public PersonEntityService() {
+        super();
+        this.setOutputWrapper(new PersonOutputWrapper());
+    }
+
     @Override
     public int getVersion() {
         return 1;

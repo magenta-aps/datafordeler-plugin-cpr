@@ -7,7 +7,7 @@ import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.cpr.data.person.*;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonOutputWrapper;
+import dk.magenta.datafordeler.cpr.data.person.PersonOutputWrapper;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;

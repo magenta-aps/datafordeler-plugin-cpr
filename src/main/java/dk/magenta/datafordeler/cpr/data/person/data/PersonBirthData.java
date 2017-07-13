@@ -23,7 +23,7 @@ public class PersonBirthData extends DetailData {
     @XmlElement(name = "cprFoedselsregistreringsstedskode")
     private String cprFoedselsregistreringsstedskode;
 
-    public String isCprFoedselsregistreringsstedskode() {
+    public String getCprFoedselsregistreringsstedskode() {
         return this.cprFoedselsregistreringsstedskode;
     }
 
@@ -38,7 +38,7 @@ public class PersonBirthData extends DetailData {
     @XmlElement(name = "cprFoedselsregistreringsstedsnavn")
     private String cprFoedselsregistreringsstedsnavn;
 
-    public String isCprFoedselsregistreringsstedsnavn() {
+    public String getCprFoedselsregistreringsstedsnavn() {
         return this.cprFoedselsregistreringsstedsnavn;
     }
 
