@@ -49,11 +49,13 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
       registreringer.add(wrapRegistrering(personRegistration));
     }
 
+    /*
     try {
       System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root));
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     }
+    */
     return root;
   }
 
