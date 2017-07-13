@@ -139,9 +139,14 @@ public class PersonRecord extends PersonDataRecord {
 
         if (effect.compareRange( this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"))) {
 
+            LocalDateTime foedselsdato = null;
+            if(this.getDate("foed_dt") != null && this.getTime("foed_tm") != null) {
+                foedselsdato = LocalDateTime.of(this.getDate("foed_dt"), this.getTime("foed_tm"));
+            }
+
             data.setBirth(
                 // LocalDateTime foedselsdato,
-                LocalDateTime.of(this.getDate("foed_dt"), this.getTime("foed_tm")),
+                foedselsdato,
                 // boolean foedselsdatoUsikkerhedsmarkering,
                 this.getBoolean("foed_dt_umrk"),
                 // String cprFoedselsregistreringsstedskode,
