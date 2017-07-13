@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
@@ -112,6 +113,7 @@ public class PersonNameData extends AuthorityDetailData {
 
     //Ikke i grunddatamodellen
 
+    @Transient
     private String egetEfternavn;
 
     public String getEgetEfternavn() {
@@ -123,6 +125,7 @@ public class PersonNameData extends AuthorityDetailData {
     }
 
 
+    @Transient
     private boolean egetEfternavnMarkering;
 
     public boolean isEgetEfternavnMarkering() {

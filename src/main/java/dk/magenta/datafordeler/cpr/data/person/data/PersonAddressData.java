@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
@@ -272,6 +273,7 @@ public class PersonAddressData extends AuthorityDetailData {
 
     //Ikke i grunddatamodellen
 
+    @Transient
     private int adressetekststype;
 
     public int getAdressetekststype() {
@@ -283,6 +285,7 @@ public class PersonAddressData extends AuthorityDetailData {
     }
 
 
+    @Transient
     private int startautoritet;
 
     public int getStartautoritet() {
