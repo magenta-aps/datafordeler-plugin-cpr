@@ -17,6 +17,7 @@ import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
 import dk.magenta.datafordeler.cpr.synchronization.LocalCopyFtpCommunicator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -159,27 +160,31 @@ public class CprRegisterManager extends RegisterManager {
                         try {
                             switch (schema) {
                                 case PersonEntity.schema:
-                                    responseBody = ftpFetcher.fetch(
+                                    if(!Strings.isEmpty(configuration.getRegisterAddress())) {
+                                        responseBody = ftpFetcher.fetch(
                                             CprRegisterManager.this.getEventInterface()
-                                    );
+                                        );
+                                    }
                                     break;
                                 case RoadEntity.schema:
-                                    /*
-                                    try {
-                                        responseBody = new FileInputStream(new File(configuration.getCprRoadDataLocation()));
-                                    } catch (FileNotFoundException e) {
-                                        e.printStackTrace();
+                                    if(!Strings.isEmpty(configuration.getCprRoadDataLocation())) {
+                                        try {
+                                            responseBody = new FileInputStream(
+                                                new File(configuration.getCprRoadDataLocation()));
+                                        } catch (FileNotFoundException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
-                                    */
                                     break;
                                 case ResidenceEntity.schema:
-                                    /*
-                                    try {
-                                        responseBody = new FileInputStream(new File(configuration.getCprResidenceDataLocation()));
-                                    } catch (FileNotFoundException e) {
-                                        e.printStackTrace();
+                                    if(!Strings.isEmpty(configuration.getCprResidenceDataLocation())) {
+                                        try {
+                                            responseBody = new FileInputStream(new File(
+                                                configuration.getCprResidenceDataLocation()));
+                                        } catch (FileNotFoundException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
-                                    */
                                     break;
                             }
                         } catch (HttpStatusException e1) {
