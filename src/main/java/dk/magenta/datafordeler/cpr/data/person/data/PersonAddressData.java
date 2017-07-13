@@ -322,8 +322,8 @@ public class PersonAddressData extends AuthorityDetailData {
         map.put("adresselinie5", this.adresselinie5);
 
         //Ikke i grunddatamodellen
-        map.put("adressetekststype", this.adressetekststype);
-        map.put("startautoritet", this.startautoritet);
+        //map.put("adressetekststype", this.adressetekststype);
+        //map.put("startautoritet", this.startautoritet);
         return map;
     }
 }

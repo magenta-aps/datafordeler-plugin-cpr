@@ -166,8 +166,8 @@ public class PersonNameData extends AuthorityDetailData {
 
         //Ikke i grunddatamodellen
         map.put("rapportnavne", this.rapportnavne);
-        map.put("egetEfternavnMarkering", this.egetEfternavnMarkering);
-        map.put("egetEfternavn", this.egetEfternavn);
+        //map.put("egetEfternavnMarkering", this.egetEfternavnMarkering);
+        //map.put("egetEfternavn", this.egetEfternavn);
 
         //OBS: Virkning fra og til mangler i forhold til grunddatamodellen
         return map;

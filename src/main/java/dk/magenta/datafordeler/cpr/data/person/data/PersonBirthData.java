@@ -104,7 +104,7 @@ public class PersonBirthData extends DetailData {
         map.put("foedselsdatoUsikkerhedsmarkering", this.foedselsdatoUsikkerhedsmarkering);
 
         //Ikke i grunddatamodellen
-        map.put("foedselsraekkefoelge", this.foedselsraekkefoelge);
+        //map.put("foedselsraekkefoelge", this.foedselsraekkefoelge);
         return map;
     }
 }
