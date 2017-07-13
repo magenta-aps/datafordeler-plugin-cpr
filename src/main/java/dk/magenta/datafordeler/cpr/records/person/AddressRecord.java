@@ -55,24 +55,43 @@ public class AddressRecord extends PersonDataRecord {
     public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
         if (registrationTime.equals(this.getOffsetDateTime("adr_ts")) && effect.compareRange(this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), null, false)) {
             data.setAddress(
+                // int authority,
                 this.getInt("start_mynkod-personbolig"),
+                // String bygningsnummer,
                 this.get("bnr"),
+                // String bynavn,
                 null,
+                // String cprKommunekode,
                 this.getString("komkod", false),
+                // String cprKommunenavn,
                 null,
+                // String cprVejkode,
                 this.getString("vejkod", false),
+                // String darAdresse,
                 null,
+                // String etage,
                 this.get("etage"),
+                // String husnummer,
                 this.get("husnr"),
+                // String postdistrikt,
                 null,
+                // String postnummer,
                 null,
+                // String sideDoer,
                 this.get("sidedoer"),
+                // String adresselinie1,
                 this.get("adr1-supladr"),
+                // String adresselinie2,
                 this.get("adr2-supladr"),
+                // String adresselinie3,
                 this.get("adr3-supladr"),
+                // String adresselinie4,
                 this.get("adr4-supladr"),
+                // String adresselinie5,
                 this.get("adr5-supladr"),
+                // int addressTextType,
                 this.getInt("adrtxttype"),
+                // int startAuthority
                 this.getInt("start_mynkod-adrtxt")
             );
         }
@@ -81,12 +100,18 @@ public class AddressRecord extends PersonDataRecord {
         }
         if (registrationTime.equals(this.getOffsetDateTime("tilfra_ts")) && effect.compareRange(null, false, null, false)) {
             data.setMoveMunicipality(
-                    this.getInt("tilfra_mynkod"),
-                    this.getDateTime("tilflykomdto"),
-                    this.getBoolean("tilflykomdt_umrk"),
-                    this.getInt("fraflykomkod"),
-                    this.getDateTime("fraflykomdto"),
-                    this.getBoolean("fraflykomdt_umrk")
+                //int authority,
+                this.getInt("tilfra_mynkod"),
+                // LocalDateTime fraflytningsdatoKommune,
+                this.getDateTime("tilflykomdto"),
+                // boolean fraflytningsdatoKommuneUsikkerhedsmarkering,
+                this.getBoolean("tilflykomdt_umrk"),
+                // int fraflytningskommunekode,
+                this.getInt("fraflykomkod"),
+                // LocalDateTime tilflytningsdatoKommune,
+                this.getDateTime("fraflykomdto"),
+                // boolean tilflytningsdatoKommuneUsikkerhedsmarkering
+                this.getBoolean("fraflykomdt_umrk")
             );
         }
     }

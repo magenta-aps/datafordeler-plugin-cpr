@@ -78,55 +78,77 @@ public class PersonRecord extends PersonDataRecord {
 
         if (registrationTime.equals(this.getOffsetDateTime("mor_ts")) && effect.compareRange(this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false)) {
             data.setMother(
-                    this.get("mornvn"),
-                    this.getBoolean("mornvn_mrk"),
-                    this.getString("pnrmor", false),
-                    this.getDate("mor_foed_dt"),
-                    this.getBoolean("mor_foed_dt_umrk"),
-                    this.getInt("mor_mynkod")
+                // String name,
+                this.get("mornvn"),
+                // boolean nameMarking,
+                this.getBoolean("mornvn_mrk"),
+                // String cprNumber,
+                this.getString("pnrmor", false),
+                // LocalDate birthDate,
+                this.getDate("mor_foed_dt"),
+                // boolean birthDateUncertain,
+                this.getBoolean("mor_foed_dt_umrk"),
+                // int authorityCode
+                this.getInt("mor_mynkod")
             );
         }
 
         if (registrationTime.equals(this.getOffsetDateTime("far_ts")) && effect.compareRange(this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false)) {
             data.setFather(
-                    this.get("farnvn"),
-                    this.getBoolean("farnvn_mrk"),
-                    this.getString("pnrfar", false),
-                    this.getDate("far_foed_dt"),
-                    this.getBoolean("far_foed_dt_umrk"),
-                    this.getInt("far_mynkod")
+                // String name,
+                this.get("farnvn"),
+                // boolean nameMarking,
+                this.getBoolean("farnvn_mrk"),
+                // String cprNumber,
+                this.getString("pnrfar", false),
+                // LocalDate birthDate,
+                this.getDate("far_foed_dt"),
+                // boolean birthDateUncertain,
+                this.getBoolean("far_foed_dt_umrk"),
+                // int authorityCode
+                this.getInt("far_mynkod")
             );
         }
 
         if (registrationTime.equals(this.getOffsetDateTime("mor_dok_ts")) && effect.compareRange(null, false, null, false)) {
             data.setMotherVerification(
-                    this.getInt("mor_dok_mynkod"),
-                    this.getBoolean("mor_dok")
+                // int authorityCode,
+                this.getInt("mor_dok_mynkod"),
+                // boolean verified
+                this.getBoolean("mor_dok")
             );
         }
 
         if (registrationTime.equals(this.getOffsetDateTime("far_dok_ts")) && effect.compareRange(null, false, null, false)) {
             data.setFatherVerification(
-                    this.getInt("far_dok_mynkod"),
-                    this.getBoolean("far_dok")
+                // int authorityCode,
+                this.getInt("far_dok_mynkod"),
+                // boolean verified
+                this.getBoolean("far_dok")
             );
         }
 
         if (registrationTime.equals(this.getOffsetDateTime("stilling_ts")) && effect.compareRange(null, false, null, false)) {
             data.setPosition(
-                    this.getInt("stilling_mynkod"),
-                    this.get("stilling")
+                // int authorityCode,
+                this.getInt("stilling_mynkod"),
+                // String position
+                this.get("stilling")
             );
         }
 
         if (effect.compareRange( this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"))) {
 
             data.setBirth(
+                // LocalDateTime foedselsdato,
                 LocalDateTime.of(this.getDate("foed_dt"), this.getTime("foed_tm")),
+                // boolean foedselsdatoUsikkerhedsmarkering,
                 this.getBoolean("foed_dt_umrk"),
-                // TODO: These are new fields which does not match up with the old input
-                "",
-                "",
+                // String cprFoedselsregistreringsstedskode,
+                null,
+                // String cprFoedselsregistreringsstedsnavn,
+                null,
+                // int foedselsraekkefoelge
                 this.getInt("foedsekvens")
             );
             data.setPersonnummer(this.getString("pnr", false));

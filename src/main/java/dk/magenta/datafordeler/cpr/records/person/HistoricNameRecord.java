@@ -45,35 +45,52 @@ public class HistoricNameRecord extends PersonDataRecord {
 
         if (registrationTime.equals(this.getOffsetDateTime("nvn_ts"))) {
             data.setName(
+                // int authority,
                 this.getInt("start_mynkod-navne"),
-                "",
+                // String adresseringsnavn,
+                null,
+                // String efternavn,
                 this.get("efternvn"),
+                // String fornavne,
                 this.get("fornvn"),
+                // String mellemnavn,
                 this.get("melnvn"),
+                // boolean efternavnMarkering,
                 this.getMarking("efternvn_mrk"),
+                // boolean fornavneMarkering,
                 this.getMarking("fornvn_mrk"),
+                // boolean mellemnavnMarkering,
                 this.getMarking("melnvn_mrk"),
+                // String egetEfternavn,
                 this.get("slægtsnvn"),
+                // boolean ownLastNameMarking,
                 this.getMarking("slægtsnvn_mrk"),
+                // boolean reportNames
                 false
             );
         }
         if (registrationTime.equals(this.getOffsetDateTime("adrnvn_ts"))) {
             data.setAddressName(
-                    this.getInt("adrnvn_mynkod"),
-                    this.get("adrnvn")
+                // int authority,
+                this.getInt("adrnvn_mynkod"),
+                // String addressName
+                this.get("adrnvn")
             );
         }
         if (registrationTime.equals(this.getOffsetDateTime("dok_ts-navne"))) {
             data.setNameVerification(
-                    this.getInt("dok_mynkod-navne"),
-                    this.getBoolean("dok-navne")
+                // int authority,
+                this.getInt("dok_mynkod-navne"),
+                // boolean verification
+                this.getBoolean("dok-navne")
             );
         }
         if (registrationTime.equals(this.getOffsetDateTime("myntxt_ts-navne"))) {
             data.setNameAuthorityText(
-                    this.getInt("myntxt_mynkod-navne"),
-                    this.get("myntxt-navne")
+                // int authority,
+                this.getInt("myntxt_mynkod-navne"),
+                // String text
+                this.get("myntxt-navne")
             );
         }
     }
