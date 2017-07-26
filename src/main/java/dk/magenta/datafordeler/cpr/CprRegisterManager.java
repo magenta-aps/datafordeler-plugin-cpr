@@ -5,18 +5,13 @@ import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.HttpStatusException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
-import dk.magenta.datafordeler.core.io.Event;
 import dk.magenta.datafordeler.core.io.PluginSourceData;
 import dk.magenta.datafordeler.core.plugin.*;
-import dk.magenta.datafordeler.core.util.CloseDetectInputStream;
 import dk.magenta.datafordeler.core.util.ItemInputStream;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
-import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
 import dk.magenta.datafordeler.cpr.synchronization.CprSourceData;
 import dk.magenta.datafordeler.cpr.synchronization.LocalCopyFtpCommunicator;
 import org.apache.logging.log4j.LogManager;
@@ -68,7 +63,11 @@ public class CprRegisterManager extends RegisterManager {
     public void init() throws IOException {
         CprConfiguration configuration = this.configurationManager.getConfiguration();
         if (this.localCopyFolder == null || this.localCopyFolder.isEmpty()) {
-            this.localCopyFolder = "cache";
+            File temp = File.createTempFile("datafordeler-cache","");
+            temp.delete();
+            temp.mkdir();
+            this.localCopyFolder = temp.getAbsolutePath();
+            //System.out.println("mkdir: "+new File(this.localCopyFolder).mkdir());
         }
         this.commonFetcher = new LocalCopyFtpCommunicator(
             configuration.getFtpUsername(),
@@ -171,8 +170,8 @@ public class CprRegisterManager extends RegisterManager {
 
         try {
             final PipedOutputStream outputStream = new PipedOutputStream(inputStream);
-
             final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            final int dataIdBase = responseBody.hashCode();
 
             Thread t = new Thread(new Runnable() {
                 @Override
@@ -191,14 +190,14 @@ public class CprRegisterManager extends RegisterManager {
                                     System.out.println("Package "+eventCount+", line "+lineCount);
                                     lineCount++;
                                     if (lineCount >= linesPerEvent) {
-                                        objectOutputStream.writeObject(CprRegisterManager.this.wrap(lines, schema));
+                                        objectOutputStream.writeObject(CprRegisterManager.this.wrap(lines, schema, dataIdBase, eventCount));
                                         lines.clear();
                                         lineCount = 0;
                                         eventCount++;
                                     }
                                 }
                                 if (lineCount > 0) {
-                                    objectOutputStream.writeObject(CprRegisterManager.this.wrap(lines, schema));
+                                    objectOutputStream.writeObject(CprRegisterManager.this.wrap(lines, schema, dataIdBase, eventCount));
                                     eventCount++;
                                 }
                                 CprRegisterManager.this.log.info("Packed "+eventCount+" data objects");
@@ -228,12 +227,12 @@ public class CprRegisterManager extends RegisterManager {
         }
     }
 
-    private CprSourceData wrap(List<String> lines, String schema) {
+    private CprSourceData wrap(List<String> lines, String schema, int base, int index) {
         StringJoiner s = new StringJoiner("\n");
         for (String line : lines) {
             s.add(line);
         }
-        return new CprSourceData(schema, s.toString());
+        return new CprSourceData(schema, s.toString(), base + ":" + index);
     }
 
 }

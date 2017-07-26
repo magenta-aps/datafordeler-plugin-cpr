@@ -6,10 +6,12 @@ public class CprSourceData implements PluginSourceData {
 
     private String schema;
     private String data;
+    private String id;
 
-    public CprSourceData(String schema, String data) {
+    public CprSourceData(String schema, String data, String id) {
         this.schema = schema;
         this.data = data;
+        this.id = id;
     }
 
     @Override
@@ -18,8 +20,18 @@ public class CprSourceData implements PluginSourceData {
     }
 
     @Override
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
     public String getData() {
         return this.data;
+    }
+
+    @Override
+    public String getReference() {
+        return null;
     }
 
 }
