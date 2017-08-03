@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr;
 
 import dk.magenta.datafordeler.core.configuration.ConfigurationManager;
 import dk.magenta.datafordeler.core.plugin.Plugin;
+import dk.magenta.datafordeler.core.plugin.PluginInterface;
 import dk.magenta.datafordeler.core.plugin.RegisterManager;
 import dk.magenta.datafordeler.core.plugin.RolesDefinition;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
@@ -17,7 +18,7 @@ import javax.annotation.PostConstruct;
  * Created by lars on 16-05-17.
  */
 @Component
-public class CprPlugin extends Plugin {
+public class CprPlugin extends Plugin implements PluginInterface {
 
     @Autowired
     private CprConfigurationManager configurationManager;
@@ -39,6 +40,11 @@ public class CprPlugin extends Plugin {
         this.registerManager.addEntityManager(this.personEntityManager);
         this.registerManager.addEntityManager(this.residenceEntityManager);
         this.registerManager.addEntityManager(this.roadEntityManager);
+    }
+
+    @Override
+    public long getVersion() {
+        return 1;
     }
 
     @Override
