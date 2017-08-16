@@ -113,7 +113,7 @@ public class CprRegisterManager extends RegisterManager {
     }
 
     @Override
-    protected URI getEventInterface(EntityManager entityManager) {
+    public URI getEventInterface(EntityManager entityManager) {
         return expandBaseURI(this.getBaseEndpoint(), "/ud/");
     }
 
