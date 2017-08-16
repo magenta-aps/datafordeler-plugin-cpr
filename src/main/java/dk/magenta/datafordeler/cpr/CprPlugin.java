@@ -34,6 +34,8 @@ public class CprPlugin extends Plugin {
     @Autowired
     private RoadEntityManager roadEntityManager;
 
+    private CprRolesDefinition rolesDefinition = new CprRolesDefinition();
+
     @PostConstruct
     public void init() {
         this.registerManager.addEntityManager(this.personEntityManager);
@@ -62,6 +64,6 @@ public class CprPlugin extends Plugin {
 
     @Override
     public RolesDefinition getRolesDefinition() {
-        return new CprRolesDefinition();
+        return this.rolesDefinition;
     }
 }
