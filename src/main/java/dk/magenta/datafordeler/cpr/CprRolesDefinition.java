@@ -1,11 +1,11 @@
 package dk.magenta.datafordeler.cpr;
 
 import dk.magenta.datafordeler.core.plugin.RolesDefinition;
-import dk.magenta.datafordeler.core.role.ReadServiceRole;
-import dk.magenta.datafordeler.core.role.ReadServiceRoleVersion;
-import dk.magenta.datafordeler.core.role.SystemRole;
+import dk.magenta.datafordeler.core.role.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -21,8 +21,22 @@ public class CprRolesDefinition extends RolesDefinition {
             )
     );
 
+    public static ExecuteCommandRole EXECUTE_CPR_PULL_ROLE = new ExecuteCommandRole(
+            "pull",
+            new HashMap<String, Object>() {{
+                put("plugin", "cpr");
+            }},
+            new ExecuteCommandRoleVersion(
+                    1.0f,
+                    "Role that gives access to start and stop the PULL command for CPR data"
+            )
+    );
+
     @Override
     public List<SystemRole> getRoles() {
-        return Collections.singletonList(READ_CPR_ROLE);
+        ArrayList<SystemRole> roles = new ArrayList<>();
+        roles.add(READ_CPR_ROLE);
+        roles.add(EXECUTE_CPR_PULL_ROLE);
+        return roles;
     }
 }
