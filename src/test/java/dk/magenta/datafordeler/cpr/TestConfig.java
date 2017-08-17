@@ -15,7 +15,6 @@ import org.springframework.context.annotation.ComponentScan;
         "dk.magenta.datafordeler.cpr.parsers", "dk.magenta.datafordeler.cpr.records"
 })
 @EntityScan("dk.magenta.datafordeler")
-@ServletComponentScan
 @SpringBootApplication
 public class TestConfig {
 
