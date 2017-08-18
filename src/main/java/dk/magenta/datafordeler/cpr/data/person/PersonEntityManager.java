@@ -214,9 +214,11 @@ public class PersonEntityManager extends CprEntityManager {
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
+                System.out.println("Saving "+entityRegistrations.size()+" registrations");
                 for (PersonRegistration registration : entityRegistrations) {
                     try {
                         queryManager.saveRegistration(session, entity, registration);
+                        System.out.println("Registration saved");
                     } catch (DataFordelerException e) {
                         e.printStackTrace();
                     }
