@@ -33,6 +33,11 @@ public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {
         super(uuid, domain);
     }
 
+    @Override
+    protected PersonRegistration createEmptyRegistration() {
+        return new PersonRegistration();
+    }
+
     @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="type")
     public static final String schema = "Person";
 
