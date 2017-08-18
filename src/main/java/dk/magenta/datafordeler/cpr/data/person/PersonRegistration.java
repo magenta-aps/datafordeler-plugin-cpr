@@ -28,4 +28,9 @@ public class PersonRegistration extends Registration<PersonEntity, PersonRegistr
         }
         return null;
     }
+
+    @Override
+    protected PersonEffect createEmptyEffect(OffsetDateTime effectFrom, OffsetDateTime effectTo) {
+        return new PersonEffect(this, effectFrom, effectTo);
+    }
 }

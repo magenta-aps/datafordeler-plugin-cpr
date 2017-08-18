@@ -25,4 +25,9 @@ public class ResidenceRegistration extends Registration<ResidenceEntity, Residen
         }
         return null;
     }
+
+    @Override
+    protected ResidenceEffect createEmptyEffect(OffsetDateTime effectFrom, OffsetDateTime effectTo) {
+        return new ResidenceEffect(this, effectFrom, effectTo);
+    }
 }

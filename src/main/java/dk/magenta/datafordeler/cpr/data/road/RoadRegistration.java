@@ -26,4 +26,9 @@ public class RoadRegistration extends Registration<RoadEntity, RoadRegistration,
         }
         return null;
     }
+
+    @Override
+    protected RoadEffect createEmptyEffect(OffsetDateTime effectFrom, OffsetDateTime effectTo) {
+        return new RoadEffect(this, effectFrom, effectTo);
+    }
 }
