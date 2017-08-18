@@ -9,7 +9,6 @@ import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonQuery;
-import dk.magenta.datafordeler.cpr.synchronization.CprSourceData;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Session;
 import org.junit.Assert;

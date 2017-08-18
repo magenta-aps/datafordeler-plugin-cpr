@@ -15,6 +15,7 @@ import org.apache.ftpserver.usermanager.impl.WritePermission;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,7 @@ public class FtpService {
         user.setName(username);
         user.setPassword(password);
 
-        this.tempDir = Files.createTempDirectory(null, PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxrwxrwx"))).toFile();
+        this.tempDir = Files.createTempDirectory(null, new FileAttribute[0]).toFile();
 
         for (File sourcefile : files) {
             System.out.println(sourcefile.getName());
