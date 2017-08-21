@@ -13,6 +13,7 @@ import org.hibernate.Session;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -57,6 +58,8 @@ public abstract class CprDataRecord<V extends CprEffect, B extends CprData> exte
 
     public abstract Set<V> getEffects();
 
-    public abstract HashSet<OffsetDateTime> getRegistrationTimestamps();
+    public abstract Set<OffsetDateTime> getRegistrationTimestamps();
+
+    public abstract List<Bitemporality> getBitemporality();
 
 }

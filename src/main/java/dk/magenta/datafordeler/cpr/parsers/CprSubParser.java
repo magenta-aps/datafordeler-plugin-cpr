@@ -13,31 +13,26 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public abstract class CprSubParser extends LineParser {
+public abstract class CprSubParser<T extends CprRecord> extends LineParser<T> {
 
     public CprSubParser() {
     }
 
     private Logger log = LogManager.getLogger("CprSubParser");
 
+    public Logger getLog() {
+        return this.log;
+    }
+
     @Override
-    protected CprRecord parseLine(String line) {
+    protected T parseLine(String line) {
         return this.parseLine(line.substring(0, 3), line);
     }
 
-    protected CprRecord parseLine(String recordType, String line) {
-        log.debug("Parsing record of type "+recordType);
-        try {
-            if (recordType.equals(CprRecord.RECORDTYPE_START)) {
-                return new CprStartRecord(line);
-            }
-            if (recordType.equals(CprRecord.RECORDTYPE_SLUT)) {
-                return new CprSlutRecord(line);
-            }
-        } catch (ParseException e) {
-            log.error(e);
-        }
-        return null;
+    protected void logType(String recordType) {
+        this.getLog().debug("Parsing record of type "+recordType);
     }
+
+    protected abstract T parseLine(String recordType, String line);
 
 }

@@ -4,16 +4,25 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by lars on 22-06-17.
  */
 public class NameRecord extends PersonDataRecord {
+
+    private Bitemporality nameTemporality;
+    private Bitemporality addressNameTemporality;
+    private Bitemporality documentNameTemporality;
+    private Bitemporality officiaryTemporality;
+
     public NameRecord(String line) throws ParseException {
         super(line);
         this.obtain("start_mynkod-navne", 14, 4);
@@ -38,11 +47,16 @@ public class NameRecord extends PersonDataRecord {
         this.obtain("myntxt_mynkod-navne", 289, 4);
         this.obtain("myntxt_ts-navne", 293, 12);
         this.obtain("myntxt-navne", 305, 20);
+
+        this.nameTemporality = new Bitemporality(this.getOffsetDateTime("nvn_ts"), this.getOffsetDateTime("nvnhaenstart"), this.getBoolean("haenstart_umrk-navne"), null, false);
+        this.addressNameTemporality = new Bitemporality(this.getOffsetDateTime("adrnvn_ts"));
+        this.documentNameTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-navne"));
+        this.officiaryTemporality = new Bitemporality(this.getOffsetDateTime("myntxt_ts-navne"));
     }
 
     @Override
     public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
-        if (registrationTime.equals(this.getOffsetDateTime("nvn_ts")) && effect.compareRange(this.getOffsetDateTime("nvnhaenstart"), this.getBoolean("haenstart_umrk-navne"), null, false)) {
+        if (this.nameTemporality.matches(registrationTime, effect)) {
             data.setName(
                     this.getInt("start_mynkod-navne"),
                     this.get("fornvn"),
@@ -56,19 +70,19 @@ public class NameRecord extends PersonDataRecord {
                     this.getBoolean("indrap-navne")
             );
         }
-        if (registrationTime.equals(this.getOffsetDateTime("adrnvn_ts")) && effect.compareRange(null, false, null, false)) {
+        if (this.addressNameTemporality.matches(registrationTime, effect)) {
             data.setAddressName(
                     this.getInt("adrnvn_mynkod"),
                     this.get("adrnvn")
             );
         }
-        if (registrationTime.equals(this.getOffsetDateTime("dok_ts-navne")) && effect.compareRange(null, false, null, false)) {
+        if (this.documentNameTemporality.matches(registrationTime, effect)) {
             data.setNameVerification(
                     this.getInt("dok_mynkod-navne"),
                     this.getBoolean("dok-navne")
             );
         }
-        if (registrationTime.equals(this.getOffsetDateTime("myntxt_ts-navne")) && effect.compareRange(null, false, null, false)) {
+        if (this.officiaryTemporality.matches(registrationTime, effect)) {
             data.setNameAuthorityText(
                     this.getInt("myntxt_mynkod-navne"),
                     this.get("myntxt-navne")
@@ -84,11 +98,21 @@ public class NameRecord extends PersonDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.getOffsetDateTime("nvn_ts"));
-        timestamps.add(this.getOffsetDateTime("adrnvn_ts"));
-        timestamps.add(this.getOffsetDateTime("dok_ts-navne"));
-        timestamps.add(this.getOffsetDateTime("myntxt_ts-navne"));
+        timestamps.add(this.nameTemporality.registrationTime);
+        timestamps.add(this.addressNameTemporality.registrationTime);
+        timestamps.add(this.documentNameTemporality.registrationTime);
+        timestamps.add(this.officiaryTemporality.registrationTime);
         return timestamps;
+    }
+
+    @Override
+    public List<Bitemporality> getBitemporality() {
+        return Arrays.asList(
+                this.nameTemporality,
+                this.addressNameTemporality,
+                this.documentNameTemporality,
+                this.officiaryTemporality
+        );
     }
 
     @Override

@@ -4,10 +4,13 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
+import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -15,12 +18,16 @@ import java.util.Set;
  */
 public class RoadMemoRecord extends RoadDataRecord {
 
+    private Bitemporality memoTemporality;
+
     public RoadMemoRecord(String line) throws ParseException {
         super(line);
         this.obtain("timestamp", 54, 12);
         this.obtain("notatnr", 12, 2);
         this.obtain("notatlinie", 14, 40);
         this.obtain("haenstart", 66, 12);
+
+        this.memoTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"), this.getOffsetDateTime("haenstart"), false, null, false);
     }
 
     @Override
@@ -30,7 +37,7 @@ public class RoadMemoRecord extends RoadDataRecord {
 
     @Override
     public void populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
-        if (registrationTime.equals(this.getOffsetDateTime("timestamp"))) {
+        if (this.memoTemporality.matches(registrationTime, effect)) {
             data.addMemo(
                     this.getInt("notatnr"),
                     this.get("notatlinie")
@@ -48,8 +55,13 @@ public class RoadMemoRecord extends RoadDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.getOffsetDateTime("timestamp"));
+        timestamps.add(this.memoTemporality.registrationTime);
         return timestamps;
+    }
+
+    @Override
+    public List<Bitemporality> getBitemporality() {
+        return Collections.singletonList(this.memoTemporality);
     }
 
 }

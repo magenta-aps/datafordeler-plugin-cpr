@@ -2,9 +2,7 @@ package dk.magenta.datafordeler.cpr.data.residence;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.magenta.datafordeler.core.database.QueryManager;
-import dk.magenta.datafordeler.core.database.RegistrationReference;
-import dk.magenta.datafordeler.core.database.SessionManager;
+import dk.magenta.datafordeler.core.database.*;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.ListHashMap;
@@ -13,7 +11,10 @@ import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonRegistrationReference;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
+import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
+import dk.magenta.datafordeler.cpr.parsers.ResidenceParser;
 import dk.magenta.datafordeler.cpr.parsers.RoadParser;
+import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import dk.magenta.datafordeler.cpr.records.Record;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
 import dk.magenta.datafordeler.cpr.records.residence.ResidenceRecord;
@@ -32,13 +33,13 @@ import java.util.*;
  * Created by lars on 16-05-17.
  */
 @Component
-public class ResidenceEntityManager extends CprEntityManager {
+public class ResidenceEntityManager extends CprEntityManager<ResidenceRecord, ResidenceEntity, ResidenceRegistration, ResidenceEffect, ResidenceBaseData> {
 
     @Autowired
     private ResidenceEntityService residenceEntityService;
 
     @Autowired
-    private RoadParser roadParser;
+    private ResidenceParser residenceParser;
 
     @Autowired
     private SessionManager sessionManager;
@@ -75,7 +76,7 @@ public class ResidenceEntityManager extends CprEntityManager {
     public List<ResidenceRegistration> parseRegistration(String registrationData) throws IOException, ParseException {
         return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)));
     }
-
+/*
     @Override
     public List<ResidenceRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
         ArrayList<ResidenceRegistration> allRegistrations = new ArrayList<>();
@@ -184,16 +185,16 @@ public class ResidenceEntityManager extends CprEntityManager {
                             }
                         }
 
-                    /*record.populateBaseData(data, timestamp);
+                    record.populateBaseData(data, timestamp);
                     for (PersonEffect effect : data.keySet()) {
                         PersonBaseData dataItem = data.get(effect);
                         effect.setRegistration(registration);
-                        dataItem.addEffect(effect);*/
+                        dataItem.addEffect(effect);
                         //PersonEffect effect = registration.getEffect(effectFrom, effectTo);
-                        /*if (effect == null) {
+                        if (effect == null) {
                             effect = new PersonEffect(registration, effectFrom, effectTo);
                         }
-                        data.addEffect(effect);*/
+                        data.addEffect(effect);
 
 
                         //}
@@ -222,10 +223,45 @@ public class ResidenceEntityManager extends CprEntityManager {
     }
 
 
-
+*/
     @Override
     protected RegistrationReference createRegistrationReference(URI uri) {
         return new PersonRegistrationReference(uri);
+    }
+
+    @Override
+    protected SessionManager getSessionManager() {
+        return this.sessionManager;
+    }
+
+    @Override
+    protected QueryManager getQueryManager() {
+        return this.queryManager;
+    }
+
+    @Override
+    protected CprSubParser<ResidenceRecord> getParser() {
+        return this.residenceParser;
+    }
+
+    @Override
+    protected Class<ResidenceEntity> getEntityClass() {
+        return ResidenceEntity.class;
+    }
+
+    @Override
+    protected UUID generateUUID(ResidenceRecord record) {
+        return ResidenceEntity.generateUUID(record.getMunicipalityCode(), record.getRoadCode(), record.getHouseNumber(), record.getFloor(), record.getDoor());
+    }
+
+    @Override
+    protected ResidenceEntity createBasicEntity(ResidenceRecord record) {
+        return new ResidenceEntity();
+    }
+
+    @Override
+    protected ResidenceBaseData createDataItem() {
+        return new ResidenceBaseData();
     }
 
 }

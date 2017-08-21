@@ -21,6 +21,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 /**
@@ -78,13 +80,17 @@ public class ParseTest {
         Session session = null;
         try {
             InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+            long start = Instant.now().toEpochMilli();
             roadEntityManager.parseRegistration(testData);
+            System.out.println("Parsed road data in "+ (Instant.now().toEpochMilli() - start) + " ms");
+            session = sessionManager.getSessionFactory().openSession();
+            long count = queryManager.count(session, RoadEntity.class, null);
+            System.out.println(count+" roads loaded");
 
             RoadQuery query = new RoadQuery();
-            //query.setMunicipalityCode("0730");
-            //query.setCode("0012");
+            query.setMunicipalityCode("0730");
+            query.setCode("0012");
             query.setName("Aalborggade");
-            session = sessionManager.getSessionFactory().openSession();
 
             try {
                 List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);

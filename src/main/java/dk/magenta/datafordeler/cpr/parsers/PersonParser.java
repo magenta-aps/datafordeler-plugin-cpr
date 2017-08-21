@@ -12,20 +12,21 @@ import org.springframework.stereotype.Component;
  * Created by lars on 04-11-14.
  */
 @Component
-public class PersonParser extends CprSubParser {
+public class PersonParser extends CprSubParser<PersonDataRecord> {
 
     public PersonParser() {
     }
 
-    private static Logger log = LogManager.getLogger(PersonParser.class);
-
+    private Logger log = LogManager.getLogger(PersonParser.class);
 
     @Override
-    protected CprRecord parseLine(String recordType, String line) {
-        CprRecord r = super.parseLine(recordType, line);
-        if (r != null) {
-            return r;
-        }
+    public Logger getLog() {
+        return this.log;
+    }
+
+    @Override
+    protected PersonDataRecord parseLine(String recordType, String line) {
+        this.logType(recordType);
         try {
             switch (recordType) {
                 case PersonDataRecord.RECORDTYPE_PERSON:

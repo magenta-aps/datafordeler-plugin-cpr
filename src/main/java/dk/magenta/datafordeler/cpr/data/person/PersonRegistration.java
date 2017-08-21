@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.person;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.Registration;
+import dk.magenta.datafordeler.cpr.data.CprRegistration;
 
 import javax.persistence.Table;
 import java.time.OffsetDateTime;
@@ -13,21 +14,7 @@ import java.util.List;
  */
 @javax.persistence.Entity
 @Table(name="cpr_person_registration")
-public class PersonRegistration extends Registration<PersonEntity, PersonRegistration, PersonEffect> {
-
-    public PersonEffect getEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
-        for (PersonEffect effect : this.effects) {
-            if (
-                    (effect.getEffectFrom() == null ? effectFrom == null : effect.getEffectFrom().equals(effectFrom)) &&
-                    (effect.getEffectTo() == null ? effectTo == null : effect.getEffectTo().equals(effectTo)) &&
-                    (effect.isUncertainFrom() == effectFromUncertain) &&
-                    (effect.isUncertainTo() == effectToUncertain)
-            ) {
-                return effect;
-            }
-        }
-        return null;
-    }
+public class PersonRegistration extends CprRegistration<PersonEntity, PersonRegistration, PersonEffect> {
 
     @Override
     protected PersonEffect createEmptyEffect(OffsetDateTime effectFrom, OffsetDateTime effectTo) {

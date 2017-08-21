@@ -5,16 +5,21 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.data.unversioned.PostCode;
+import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by lars on 29-06-17.
  */
 public class RoadPostcodeRecord extends RoadDataRecord {
+
+    private Bitemporality postcodeTemporality;
 
     public RoadPostcodeRecord(String line) throws ParseException {
         super(line);
@@ -24,6 +29,8 @@ public class RoadPostcodeRecord extends RoadDataRecord {
         this.obtain("timestamp", 21, 12);
         this.obtain("postnr", 33, 4);
         this.obtain("postdisttxt", 37, 20);
+
+        this.postcodeTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"));
     }
 
     @Override
@@ -33,12 +40,12 @@ public class RoadPostcodeRecord extends RoadDataRecord {
 
     @Override
     public void populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
-        if (registrationTime.equals(this.getOffsetDateTime("timestamp"))) {
+        if (this.postcodeTemporality.matches(registrationTime, effect)) {
             data.addPostcode(
-                    this.get("husnrfra"),
-                    this.get("husnrtil"),
+                    this.getString("husnrfra", false),
+                    this.getString("husnrtil", false),
                     this.getEven("ligeulige"),
-                    PostCode.getPostcode(this.getInt("postnr"), this.get("postdisttxt"), queryManager, session)
+                    PostCode.getPostcode(this.getInt("postnr"), this.getString("postdisttxt", true), queryManager, session)
             );
         }
     }
@@ -46,8 +53,13 @@ public class RoadPostcodeRecord extends RoadDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.getOffsetDateTime("timestamp"));
+        timestamps.add(this.postcodeTemporality.registrationTime);
         return timestamps;
+    }
+
+    @Override
+    public List<Bitemporality> getBitemporality() {
+        return Collections.singletonList(this.postcodeTemporality);
     }
 
     private boolean getEven(String key) {
