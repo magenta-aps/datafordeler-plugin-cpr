@@ -88,7 +88,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
             lookupDefinition.put("coreData.name", this.name);
         }
         if (this.municipalityCode != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".municipalityCode", this.name);
+            lookupDefinition.put(LookupDefinition.entityref + ".municipalityCode", this.municipalityCode);
         }
         return lookupDefinition;
     }
