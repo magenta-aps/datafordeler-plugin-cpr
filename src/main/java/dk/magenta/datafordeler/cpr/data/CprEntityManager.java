@@ -163,9 +163,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         boolean done = false;
         long linesRead = 0;
         int limit = 1000;
-        int maxLines = 10000;
         while (!done) {
-            System.out.println("------------------------------------------");
             StringJoiner buffer = new StringJoiner("\n");
             int i;
             for (i = 0; i < limit; i++) {
@@ -177,15 +175,12 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     done = true;
                 }
             }
-            if (linesRead >= maxLines) {
-                done = true;
-            }
-            System.out.println("Loaded a total of "+linesRead+" lines");
-            System.out.println("Processing batch of "+i+" lines");
+            log.debug("Loaded a total of "+linesRead+" lines");
+            log.debug("Processing batch of "+i+" lines");
             InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes("iso-8859-1"));
 
             List<T> chunkRecords = parser.parse(chunk, "iso-8859-1");
-            System.out.println("Batch parsed into "+chunkRecords.size()+" records");
+            log.debug("Batch parsed into "+chunkRecords.size()+" records");
             ListHashMap<E, T> recordMap = new ListHashMap<>();
             HashMap<UUID, E> entityCache = new HashMap<>();
 
@@ -207,7 +202,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 }
                 recordMap.add(entity, record);
             }
-            System.out.println("Batch resulted in "+recordMap.keySet().size()+" unique entities");
+            log.debug("Batch resulted in "+recordMap.keySet().size()+" unique entities");
 
 
 
@@ -215,7 +210,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 List<T> records = recordMap.get(entity);
 
                 Map<OffsetDateTime, R> entityRegistrations = this.buildRegistrations(entity, records);
-                //System.out.println(records.size()+"records, "+entityRegistrations.size()+" entityRegistrations");
 
                 for (T record : records) {
                     // Find the appropriate effect objects
@@ -224,7 +218,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     for (Bitemporality bitemporality : bitemporalities) {
                         R registration = entityRegistrations.get(bitemporality.registrationTime);
                         if (registration == null) {
-                            System.out.println("EPIC FAIL: didn't find registration at "+bitemporality.registrationTime);
+                            log.error("Didn't find registration at "+bitemporality.registrationTime);
                             return null;
                         }
                         V effect = registration.getEffect(bitemporality);
@@ -276,7 +270,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             }
             transaction.commit();
             session.close();
-            System.out.println("Time is now "+OffsetDateTime.now());
         }
         return allRegistrations;
     }
