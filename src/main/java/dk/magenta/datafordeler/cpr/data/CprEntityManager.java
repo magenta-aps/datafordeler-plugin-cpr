@@ -283,7 +283,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             registrationMap.put(registration.getRegistrationFrom(), registration);
             existingRegistrations.add(registration);
         }
-        TreeSet<OffsetDateTime> newTimes = new TreeSet<>();
         for (T record : records) {
             //System.out.println(record.getClass().getSimpleName()+": "+record.getLastUpdated());
             Set<OffsetDateTime> registrationStarts = record.getRegistrationTimestamps();
@@ -293,7 +292,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     R registration = entity.createRegistration();
                     registration.setRegistrationFrom(registrationStart);
                     registrationMap.put(registrationStart, registration);
-                    newTimes.add(registrationStart);
                 }
             }
         }
@@ -314,15 +312,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     registration.setSequenceNumber(last.getSequenceNumber() + 1);
                 } else if (!last.getRegistrationTo().isEqual(startTime)) {
                     log.error("Registration time mismatch: "+last.getRegistrationTo()+" != "+startTime);
-
-                    System.out.println("Existing registrations:");
-                    for (R r : existingRegistrations) {
-                        System.out.println("    "+r.getRegistrationFrom()+" - "+r.getRegistrationTo());
-                    }
-                    System.out.println("New registration times:");
-                    for (OffsetDateTime d : newTimes) {
-                        System.out.println("    "+d);
-                    }
                 }
             }
             last = registration;
