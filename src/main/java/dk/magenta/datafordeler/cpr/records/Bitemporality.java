@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.records;
 
+import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.CprEffect;
 
 import java.time.OffsetDateTime;
@@ -50,6 +51,6 @@ public class Bitemporality {
     }
 
     public boolean matches(OffsetDateTime registrationTime, CprEffect effect) {
-        return (registrationTime == null ? this.registrationTime == null : registrationTime.isEqual(this.registrationTime)) && effect.compareRange(this);
+        return Equality.equal(this.registrationTime, registrationTime) && effect.compareRange(this);
     }
 }
