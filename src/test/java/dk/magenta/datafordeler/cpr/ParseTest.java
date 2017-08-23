@@ -5,6 +5,7 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.person.*;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
@@ -91,6 +92,7 @@ public class ParseTest {
             query.setCode("0004");
 
             List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entities));
             Assert.assertEquals(1, entities.size());
             RoadEntity roadEntity = entities.get(0);
             Assert.assertEquals(CprPlugin.getDomain(), roadEntity.getDomain());
@@ -99,11 +101,11 @@ public class ParseTest {
             Assert.assertEquals(2, roadEntity.getRegistrations().size());
             RoadRegistration registration1 = roadEntity.getRegistrations().get(0);
             Assert.assertEquals(0, registration1.getSequenceNumber());
-            Assert.assertEquals(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), registration1.getRegistrationFrom());
-            Assert.assertEquals(OffsetDateTime.parse("2008-05-30T09:11:00+02:00"), registration1.getRegistrationTo());
+            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), registration1.getRegistrationFrom()));
+            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2008-05-30T09:11:00+02:00"), registration1.getRegistrationTo()));
             Assert.assertEquals(2, registration1.getEffects().size());
             RoadEffect effect11 = registration1.getEffects().get(0);
-            Assert.assertEquals(OffsetDateTime.parse("1900-01-01T12:00:00+01:00"), effect11.getEffectFrom());
+            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1900-01-01T12:00:00+01:00"), effect11.getEffectFrom()));
             Assert.assertNull(effect11.getEffectTo());
             Assert.assertEquals("Aalborggade", effect11.getData().get("addressingName"));
             Assert.assertEquals("Aalborggade", effect11.getData().get("name"));
@@ -111,7 +113,7 @@ public class ParseTest {
             Assert.assertFalse(effect11.isUncertainTo());
 
             RoadEffect effect12 = registration1.getEffects().get(1);
-            Assert.assertEquals(OffsetDateTime.parse("1996-03-12T07:42:00+01:00"), effect12.getEffectFrom());
+            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1996-03-12T07:42:00+01:00"), effect12.getEffectFrom()));
             Assert.assertNull(effect12.getEffectTo());
             List<RoadMemoData> memo = (List<RoadMemoData>) effect12.getData().get("memo");
             Assert.assertEquals(1, memo.get(0).getMemoNumber());
@@ -123,7 +125,7 @@ public class ParseTest {
 
             RoadRegistration registration2 = roadEntity.getRegistrations().get(1);
             Assert.assertEquals(1, registration2.getSequenceNumber());
-            Assert.assertEquals(OffsetDateTime.parse("2008-05-30T09:11:00+02:00"), registration2.getRegistrationFrom());
+            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2008-05-30T09:11:00+02:00"), registration2.getRegistrationFrom()));
             Assert.assertNull(registration2.getRegistrationTo());
             Assert.assertEquals(1, registration2.getEffects().size());
             RoadEffect effect21 = registration2.getEffects().get(0);
