@@ -15,6 +15,8 @@ import dk.magenta.datafordeler.core.util.DoubleHashMap;
 import dk.magenta.datafordeler.core.util.ItemInputStream;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.CprPlugin;
+import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
+import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.parsers.CprParser;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -43,6 +45,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    CprConfigurationManager cprConfigurationManager;
 
     private HttpCommunicator commonFetcher;
 
@@ -137,7 +142,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         return this.log;
     }
 
-
+    private CprConfiguration getConfiguration() {
+        return this.cprConfigurationManager.getConfiguration();
+    }
 
 
     protected abstract SessionManager getSessionManager();
@@ -156,7 +163,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     @Override
     public List<R> parseRegistration(InputStream registrationData) throws ParseException, IOException {
         ArrayList<R> allRegistrations = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData));
+        String charset = this.getConfiguration().getCharset();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData, charset));
         CprSubParser<T> parser = this.getParser();
         QueryManager queryManager = this.getQueryManager();
 
@@ -177,9 +185,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             }
             log.debug("Loaded a total of "+linesRead+" lines");
             log.debug("Processing batch of "+i+" lines");
-            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes("iso-8859-1"));
+            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes(charset));
 
-            List<T> chunkRecords = parser.parse(chunk, "iso-8859-1");
+            List<T> chunkRecords = parser.parse(chunk, charset);
             log.debug("Batch parsed into "+chunkRecords.size()+" records");
             ListHashMap<E, T> recordMap = new ListHashMap<>();
             HashMap<UUID, E> entityCache = new HashMap<>();
@@ -311,7 +319,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     last.setRegistrationTo(startTime);
                     registration.setSequenceNumber(last.getSequenceNumber() + 1);
                 } else if (!last.getRegistrationTo().isEqual(startTime)) {
+
                     log.error("Registration time mismatch: "+last.getRegistrationTo()+" != "+startTime);
+
                 }
             }
             last = registration;
