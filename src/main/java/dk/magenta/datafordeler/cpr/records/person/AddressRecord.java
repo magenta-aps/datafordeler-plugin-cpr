@@ -53,7 +53,7 @@ public class AddressRecord extends PersonDataRecord {
         this.obtain("start_dt-adrtxt", 335, 10);
         this.obtain("slet_dt-adrtxt", 345, 10);
 
-        this.addressTemporality = new Bitemporality(this.getOffsetDateTime("adr_ts"), this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), null, false);
+        this.addressTemporality = new Bitemporality(this.getOffsetDateTime("adr_ts"), null, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), null, false);
         this.conameTemporality = new Bitemporality(this.getOffsetDateTime("convn_ts"));
         this.municipalityTemporality = new Bitemporality(this.getOffsetDateTime("tilfra_ts"));
     }

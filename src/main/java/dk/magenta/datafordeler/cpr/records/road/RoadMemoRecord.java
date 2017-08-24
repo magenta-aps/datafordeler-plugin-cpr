@@ -27,7 +27,7 @@ public class RoadMemoRecord extends RoadDataRecord {
         this.obtain("notatlinie", 14, 40);
         this.obtain("haenstart", 66, 12);
 
-        this.memoTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"), this.getOffsetDateTime("haenstart"), false, null, false);
+        this.memoTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"), null, this.getOffsetDateTime("haenstart"), false, null, false);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class RoadMemoRecord extends RoadDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.memoTemporality.registrationTime);
+        timestamps.add(this.memoTemporality.registrationFrom);
         return timestamps;
     }
 

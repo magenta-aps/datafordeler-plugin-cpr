@@ -38,8 +38,8 @@ public class ForeignAddressRecord extends PersonDataRecord {
 
         OffsetDateTime effectFrom = this.getOffsetDateTime("udrdto");
         boolean effectFromUncertain = this.getMarking("udrdto_umrk");
-        this.emigrationTemporality = new Bitemporality(this.getOffsetDateTime("udr_ts"), effectFrom, effectFromUncertain, null, false);
-        this.foreignAddressTemporality = new Bitemporality(this.getOffsetDateTime("udlandadr_ts"), effectFrom, effectFromUncertain, null, false);
+        this.emigrationTemporality = new Bitemporality(this.getOffsetDateTime("udr_ts"), null, effectFrom, effectFromUncertain, null, false);
+        this.foreignAddressTemporality = new Bitemporality(this.getOffsetDateTime("udlandadr_ts"), null, effectFrom, effectFromUncertain, null, false);
     }
 
     @Override
@@ -61,8 +61,8 @@ public class ForeignAddressRecord extends PersonDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.emigrationTemporality.registrationTime);
-        timestamps.add(this.foreignAddressTemporality.registrationTime);
+        timestamps.add(this.emigrationTemporality.registrationFrom);
+        timestamps.add(this.foreignAddressTemporality.registrationFrom);
         return timestamps;
     }
 

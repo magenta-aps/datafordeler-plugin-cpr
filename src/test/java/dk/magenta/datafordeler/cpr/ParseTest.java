@@ -6,6 +6,7 @@ import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.Equality;
+import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.*;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
@@ -13,6 +14,7 @@ import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.*;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadMemoData;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadPostcodeData;
+import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Test;
@@ -81,12 +83,20 @@ public class ParseTest {
     public void testParseRoad() throws IOException, DataFordelerException {
         Session session = null;
         try {
-            InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+            InputStream testData = ParseTest.class.getResourceAsStream("/cprroaddata.txt");
             long start = Instant.now().toEpochMilli();
             roadEntityManager.parseRegistration(testData);
             System.out.println("Parsed road data in "+ (Instant.now().toEpochMilli() - start) + " ms");
             session = sessionManager.getSessionFactory().openSession();
 
+
+            for (UUID uuid : roadEntityManager.inspect) {
+                System.out.println(uuid.toString());
+                RoadEntity road = queryManager.getEntity(session, uuid, RoadEntity.class);
+                System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(road));
+            }
+
+/*
             RoadQuery query = new RoadQuery();
             query.setMunicipalityCode("0730");
             query.setCode("0004");
@@ -147,7 +157,7 @@ public class ParseTest {
             Assert.assertEquals("Randers SV", post.get(1).getPostCode().getText());
             Assert.assertFalse(effect21.isUncertainFrom());
             Assert.assertFalse(effect21.isUncertainTo());
-
+*/
         } finally {
             if (session != null) {
                 session.close();
@@ -179,6 +189,162 @@ public class ParseTest {
                 session.close();
             }
         }
+    }
+
+    @Test
+    public void testFindRegistrations() {
+        OffsetDateTime open = null;
+        OffsetDateTime time1 = OffsetDateTime.parse("2001-01-01T00:00:00Z");
+        OffsetDateTime time2 = OffsetDateTime.parse("2002-02-02T00:00:00Z");
+        OffsetDateTime time3 = OffsetDateTime.parse("2003-03-03T00:00:00Z");
+        OffsetDateTime time4 = OffsetDateTime.parse("2004-04-04T00:00:00Z");
+
+        // Find/create registrations on empty entity, with specific range
+        RoadEntity entity1 = new RoadEntity();
+        Bitemporality bitemporality1 = new Bitemporality(time1, time4);
+        List<RoadRegistration> result1 = roadEntityManager.findRegistrations(entity1, bitemporality1);
+        Assert.assertEquals(1, result1.size());
+        Assert.assertTrue(Equality.equal(time1, result1.get(0).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time4, result1.get(0).getRegistrationTo()));
+
+        // Find/create registrations on empty entity, with open start
+        RoadEntity entity2 = new RoadEntity();
+        Bitemporality bitemporality2 = new Bitemporality(open, time3);
+        List<RoadRegistration> result2 = roadEntityManager.findRegistrations(entity2, bitemporality2);
+        Assert.assertEquals(1, result2.size());
+        Assert.assertTrue(Equality.equal(open, result2.get(0).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time3, result2.get(0).getRegistrationTo()));
+
+        // Find/create registrations on empty entity, with open end
+        RoadEntity entity3 = new RoadEntity();
+        Bitemporality bitemporality3 = new Bitemporality(time2, open);
+        List<RoadRegistration> result3 = roadEntityManager.findRegistrations(entity3, bitemporality3);
+        Assert.assertEquals(1, result3.size());
+        Assert.assertTrue(Equality.equal(time2, result3.get(0).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(open, result3.get(0).getRegistrationTo()));
+
+        // Find/create registrations on empty entity, with open start and end
+        RoadEntity entity4 = new RoadEntity();
+        Bitemporality bitemporality4 = new Bitemporality(open, open);
+        List<RoadRegistration> result4 = roadEntityManager.findRegistrations(entity4, bitemporality4);
+        Assert.assertEquals(1, result4.size());
+        Assert.assertTrue(Equality.equal(open, result4.get(0).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(open, result4.get(0).getRegistrationTo()));
+
+        // Find/create registrations on entity with one registration, with matching range
+        RoadEntity entity5 = new RoadEntity();
+        RoadRegistration registration5 = entity5.createRegistration();
+        registration5.setRegistrationFrom(time1);
+        registration5.setRegistrationTo(time4);
+        Bitemporality bitemporality5 = new Bitemporality(time1, time4);
+        List<RoadRegistration> result5 = roadEntityManager.findRegistrations(entity5, bitemporality5);
+        Assert.assertEquals(1, result5.size());
+        Assert.assertTrue(Equality.equal(time1, result5.get(0).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time4, result5.get(0).getRegistrationTo()));
+
+        // Find/create registrations on entity with one registration, with off-range
+        RoadEntity entity6 = new RoadEntity();
+        RoadRegistration registration6 = entity6.createRegistration();
+        registration6.setRegistrationFrom(time2);
+        registration6.setRegistrationTo(time4);
+        Bitemporality bitemporality6 = new Bitemporality(time1, time3);
+        List<RoadRegistration> result6 = roadEntityManager.findRegistrations(entity6, bitemporality6);
+        Assert.assertEquals(2, result6.size());
+        Assert.assertTrue(Equality.equal(time1, result6.get(0).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time2, result6.get(0).getRegistrationTo()));
+        Assert.assertTrue(Equality.equal(time2, result6.get(1).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time3, result6.get(1).getRegistrationTo()));
+
+        // Find/create registrations on entity with one registration, with range off at the end
+        RoadEntity entity7 = new RoadEntity();
+        RoadRegistration registration7 = entity7.createRegistration();
+        registration7.setRegistrationFrom(time1);
+        registration7.setRegistrationTo(time3);
+        Bitemporality bitemporality7 = new Bitemporality(time1, time4);
+        List<RoadRegistration> result7 = roadEntityManager.findRegistrations(entity7, bitemporality7);
+        Assert.assertEquals(2, result7.size());
+        Assert.assertTrue(Equality.equal(time1, result7.get(0).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time3, result7.get(0).getRegistrationTo()));
+        Assert.assertTrue(Equality.equal(time3, result7.get(1).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time4, result7.get(1).getRegistrationTo()));
+
+        // Find/create registrations on entity with two registrations, with matching range
+        RoadEntity entity8 = new RoadEntity();
+        RoadRegistration registration8a = entity8.createRegistration();
+        registration8a.setRegistrationFrom(time1);
+        registration8a.setRegistrationTo(time2);
+        RoadRegistration registration8b = entity8.createRegistration();
+        registration8b.setRegistrationFrom(time2);
+        registration8b.setRegistrationTo(time3);
+        Bitemporality bitemporality8 = new Bitemporality(time1, time3);
+        List<RoadRegistration> result8 = roadEntityManager.findRegistrations(entity8, bitemporality8);
+        Assert.assertEquals(2, result8.size());
+        Assert.assertTrue(Equality.equal(time1, result8.get(0).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time2, result8.get(0).getRegistrationTo()));
+        Assert.assertTrue(Equality.equal(time2, result8.get(1).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time3, result8.get(1).getRegistrationTo()));
+
+        // Find/create registrations on entity with two registrations, with non-matching range
+        RoadEntity entity9 = new RoadEntity();
+        RoadRegistration registration9a = entity9.createRegistration();
+        registration9a.setRegistrationFrom(open);
+        registration9a.setRegistrationTo(time2);
+        RoadRegistration registration9b = entity9.createRegistration();
+        registration9b.setRegistrationFrom(time2);
+        registration9b.setRegistrationTo(time4);
+        Bitemporality bitemporality9 = new Bitemporality(time1, time3);
+        List<RoadRegistration> result9 = roadEntityManager.findRegistrations(entity9, bitemporality9);
+        Assert.assertEquals(2, result9.size());
+        Assert.assertTrue(Equality.equal(time1, result9.get(0).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time2, result9.get(0).getRegistrationTo()));
+        Assert.assertTrue(Equality.equal(time2, result9.get(1).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time3, result9.get(1).getRegistrationTo()));
+
+        // Find/create registrations on entity with two registrations (non-aligned), with non-matching range
+        RoadEntity entity10 = new RoadEntity();
+        RoadRegistration registration10a = entity10.createRegistration();
+        registration10a.setRegistrationFrom(open);
+        registration10a.setRegistrationTo(time2);
+        RoadRegistration registration10b = entity10.createRegistration();
+        registration10b.setRegistrationFrom(time3);
+        registration10b.setRegistrationTo(open);
+        Bitemporality bitemporality10 = new Bitemporality(time1, time4);
+        List<RoadRegistration> result10 = roadEntityManager.findRegistrations(entity10, bitemporality10);
+        Assert.assertEquals(3, result10.size());
+        Assert.assertTrue(Equality.equal(time1, result10.get(0).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time2, result10.get(0).getRegistrationTo()));
+        Assert.assertTrue(Equality.equal(time2, result10.get(1).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time3, result10.get(1).getRegistrationTo()));
+        Assert.assertTrue(Equality.equal(time3, result10.get(2).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time4, result10.get(2).getRegistrationTo()));
+
+
+        // Find/create registrations on entity with two registrations (non-aligned), with open range
+        RoadEntity entity11 = new RoadEntity();
+        RoadRegistration registration11a = entity11.createRegistration();
+        registration11a.setRegistrationFrom(time1);
+        registration11a.setRegistrationTo(time2);
+        RoadRegistration registration11b = entity11.createRegistration();
+        registration11b.setRegistrationFrom(time3);
+        registration11b.setRegistrationTo(time4);
+        Bitemporality bitemporality11 = new Bitemporality(open, open);
+        List<RoadRegistration> result11 = roadEntityManager.findRegistrations(entity11, bitemporality11);
+        Assert.assertEquals(5, result11.size());
+        Assert.assertEquals(5, entity11.getRegistrations().size());
+        Assert.assertTrue(Equality.equal(open, result11.get(0).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time1, result11.get(0).getRegistrationTo()));
+        Assert.assertTrue(Equality.equal(time1, result11.get(1).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time2, result11.get(1).getRegistrationTo()));
+        Assert.assertTrue(Equality.equal(time2, result11.get(2).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time3, result11.get(2).getRegistrationTo()));
+        Assert.assertTrue(Equality.equal(time3, result11.get(3).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(time4, result11.get(3).getRegistrationTo()));
+        Assert.assertTrue(Equality.equal(time4, result11.get(4).getRegistrationFrom()));
+        Assert.assertTrue(Equality.equal(open, result11.get(4).getRegistrationTo()));
+
+        List<RoadRegistration> result11a = roadEntityManager.findRegistrations(entity11, bitemporality11);
+        Assert.assertEquals(5, result11a.size());
+        Assert.assertEquals(5, entity11.getRegistrations().size());
     }
 
 }
