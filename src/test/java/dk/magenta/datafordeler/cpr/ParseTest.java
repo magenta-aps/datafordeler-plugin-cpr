@@ -89,13 +89,6 @@ public class ParseTest {
             System.out.println("Parsed road data in "+ (Instant.now().toEpochMilli() - start) + " ms");
             session = sessionManager.getSessionFactory().openSession();
 
-
-            for (UUID uuid : roadEntityManager.inspect) {
-                System.out.println(uuid.toString());
-                RoadEntity road = queryManager.getEntity(session, uuid, RoadEntity.class);
-                System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(road));
-            }
-
 /*
             RoadQuery query = new RoadQuery();
             query.setMunicipalityCode("0730");
@@ -201,32 +194,28 @@ public class ParseTest {
 
         // Find/create registrations on empty entity, with specific range
         RoadEntity entity1 = new RoadEntity();
-        Bitemporality bitemporality1 = new Bitemporality(time1, time4);
-        List<RoadRegistration> result1 = roadEntityManager.findRegistrations(entity1, bitemporality1);
+        List<RoadRegistration> result1 = entity1.findRegistrations(time1, time4);
         Assert.assertEquals(1, result1.size());
         Assert.assertTrue(Equality.equal(time1, result1.get(0).getRegistrationFrom()));
         Assert.assertTrue(Equality.equal(time4, result1.get(0).getRegistrationTo()));
 
         // Find/create registrations on empty entity, with open start
         RoadEntity entity2 = new RoadEntity();
-        Bitemporality bitemporality2 = new Bitemporality(open, time3);
-        List<RoadRegistration> result2 = roadEntityManager.findRegistrations(entity2, bitemporality2);
+        List<RoadRegistration> result2 = entity2.findRegistrations(open, time3);
         Assert.assertEquals(1, result2.size());
         Assert.assertTrue(Equality.equal(open, result2.get(0).getRegistrationFrom()));
         Assert.assertTrue(Equality.equal(time3, result2.get(0).getRegistrationTo()));
 
         // Find/create registrations on empty entity, with open end
         RoadEntity entity3 = new RoadEntity();
-        Bitemporality bitemporality3 = new Bitemporality(time2, open);
-        List<RoadRegistration> result3 = roadEntityManager.findRegistrations(entity3, bitemporality3);
+        List<RoadRegistration> result3 = entity3.findRegistrations(time2, open);
         Assert.assertEquals(1, result3.size());
         Assert.assertTrue(Equality.equal(time2, result3.get(0).getRegistrationFrom()));
         Assert.assertTrue(Equality.equal(open, result3.get(0).getRegistrationTo()));
 
         // Find/create registrations on empty entity, with open start and end
         RoadEntity entity4 = new RoadEntity();
-        Bitemporality bitemporality4 = new Bitemporality(open, open);
-        List<RoadRegistration> result4 = roadEntityManager.findRegistrations(entity4, bitemporality4);
+        List<RoadRegistration> result4 = entity4.findRegistrations(open, open);
         Assert.assertEquals(1, result4.size());
         Assert.assertTrue(Equality.equal(open, result4.get(0).getRegistrationFrom()));
         Assert.assertTrue(Equality.equal(open, result4.get(0).getRegistrationTo()));
@@ -236,8 +225,7 @@ public class ParseTest {
         RoadRegistration registration5 = entity5.createRegistration();
         registration5.setRegistrationFrom(time1);
         registration5.setRegistrationTo(time4);
-        Bitemporality bitemporality5 = new Bitemporality(time1, time4);
-        List<RoadRegistration> result5 = roadEntityManager.findRegistrations(entity5, bitemporality5);
+        List<RoadRegistration> result5 = entity5.findRegistrations(time1, time4);
         Assert.assertEquals(1, result5.size());
         Assert.assertTrue(Equality.equal(time1, result5.get(0).getRegistrationFrom()));
         Assert.assertTrue(Equality.equal(time4, result5.get(0).getRegistrationTo()));
@@ -247,8 +235,7 @@ public class ParseTest {
         RoadRegistration registration6 = entity6.createRegistration();
         registration6.setRegistrationFrom(time2);
         registration6.setRegistrationTo(time4);
-        Bitemporality bitemporality6 = new Bitemporality(time1, time3);
-        List<RoadRegistration> result6 = roadEntityManager.findRegistrations(entity6, bitemporality6);
+        List<RoadRegistration> result6 = entity6.findRegistrations(time1, time3);
         Assert.assertEquals(2, result6.size());
         Assert.assertTrue(Equality.equal(time1, result6.get(0).getRegistrationFrom()));
         Assert.assertTrue(Equality.equal(time2, result6.get(0).getRegistrationTo()));
@@ -260,8 +247,7 @@ public class ParseTest {
         RoadRegistration registration7 = entity7.createRegistration();
         registration7.setRegistrationFrom(time1);
         registration7.setRegistrationTo(time3);
-        Bitemporality bitemporality7 = new Bitemporality(time1, time4);
-        List<RoadRegistration> result7 = roadEntityManager.findRegistrations(entity7, bitemporality7);
+        List<RoadRegistration> result7 = entity7.findRegistrations(time1, time4);
         Assert.assertEquals(2, result7.size());
         Assert.assertTrue(Equality.equal(time1, result7.get(0).getRegistrationFrom()));
         Assert.assertTrue(Equality.equal(time3, result7.get(0).getRegistrationTo()));
@@ -276,8 +262,7 @@ public class ParseTest {
         RoadRegistration registration8b = entity8.createRegistration();
         registration8b.setRegistrationFrom(time2);
         registration8b.setRegistrationTo(time3);
-        Bitemporality bitemporality8 = new Bitemporality(time1, time3);
-        List<RoadRegistration> result8 = roadEntityManager.findRegistrations(entity8, bitemporality8);
+        List<RoadRegistration> result8 = entity8.findRegistrations(time1, time3);
         Assert.assertEquals(2, result8.size());
         Assert.assertTrue(Equality.equal(time1, result8.get(0).getRegistrationFrom()));
         Assert.assertTrue(Equality.equal(time2, result8.get(0).getRegistrationTo()));
@@ -292,8 +277,7 @@ public class ParseTest {
         RoadRegistration registration9b = entity9.createRegistration();
         registration9b.setRegistrationFrom(time2);
         registration9b.setRegistrationTo(time4);
-        Bitemporality bitemporality9 = new Bitemporality(time1, time3);
-        List<RoadRegistration> result9 = roadEntityManager.findRegistrations(entity9, bitemporality9);
+        List<RoadRegistration> result9 = entity9.findRegistrations(time1, time3);
         Assert.assertEquals(2, result9.size());
         Assert.assertTrue(Equality.equal(time1, result9.get(0).getRegistrationFrom()));
         Assert.assertTrue(Equality.equal(time2, result9.get(0).getRegistrationTo()));
@@ -308,8 +292,7 @@ public class ParseTest {
         RoadRegistration registration10b = entity10.createRegistration();
         registration10b.setRegistrationFrom(time3);
         registration10b.setRegistrationTo(open);
-        Bitemporality bitemporality10 = new Bitemporality(time1, time4);
-        List<RoadRegistration> result10 = roadEntityManager.findRegistrations(entity10, bitemporality10);
+        List<RoadRegistration> result10 = entity10.findRegistrations(time1, time4);
         Assert.assertEquals(3, result10.size());
         Assert.assertTrue(Equality.equal(time1, result10.get(0).getRegistrationFrom()));
         Assert.assertTrue(Equality.equal(time2, result10.get(0).getRegistrationTo()));
@@ -327,8 +310,7 @@ public class ParseTest {
         RoadRegistration registration11b = entity11.createRegistration();
         registration11b.setRegistrationFrom(time3);
         registration11b.setRegistrationTo(time4);
-        Bitemporality bitemporality11 = new Bitemporality(open, open);
-        List<RoadRegistration> result11 = roadEntityManager.findRegistrations(entity11, bitemporality11);
+        List<RoadRegistration> result11 = entity11.findRegistrations(open, open);
         Assert.assertEquals(5, result11.size());
         Assert.assertEquals(5, entity11.getRegistrations().size());
         Assert.assertTrue(Equality.equal(open, result11.get(0).getRegistrationFrom()));
@@ -342,7 +324,7 @@ public class ParseTest {
         Assert.assertTrue(Equality.equal(time4, result11.get(4).getRegistrationFrom()));
         Assert.assertTrue(Equality.equal(open, result11.get(4).getRegistrationTo()));
 
-        List<RoadRegistration> result11a = roadEntityManager.findRegistrations(entity11, bitemporality11);
+        List<RoadRegistration> result11a = entity11.findRegistrations(open, open);
         Assert.assertEquals(5, result11a.size());
         Assert.assertEquals(5, entity11.getRegistrations().size());
     }
