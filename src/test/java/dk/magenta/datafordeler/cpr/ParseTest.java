@@ -83,13 +83,13 @@ public class ParseTest {
     public void testParseRoad() throws IOException, DataFordelerException {
         Session session = null;
         try {
-            InputStream testData = ParseTest.class.getResourceAsStream("/cprroaddata.txt");
+            InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
             long start = Instant.now().toEpochMilli();
             roadEntityManager.parseRegistration(testData);
             System.out.println("Parsed road data in "+ (Instant.now().toEpochMilli() - start) + " ms");
             session = sessionManager.getSessionFactory().openSession();
 
-/*
+
             RoadQuery query = new RoadQuery();
             query.setMunicipalityCode("0730");
             query.setCode("0004");
@@ -150,7 +150,7 @@ public class ParseTest {
             Assert.assertEquals("Randers SV", post.get(1).getPostCode().getText());
             Assert.assertFalse(effect21.isUncertainFrom());
             Assert.assertFalse(effect21.isUncertainTo());
-*/
+
         } finally {
             if (session != null) {
                 session.close();
