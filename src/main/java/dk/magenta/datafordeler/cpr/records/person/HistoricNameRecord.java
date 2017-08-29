@@ -102,10 +102,10 @@ public class HistoricNameRecord extends PersonDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.nameTemporality.registrationTime);
-        timestamps.add(this.addressNameTemporality.registrationTime);
-        timestamps.add(this.documentNameTemporality.registrationTime);
-        timestamps.add(this.officiaryTemporality.registrationTime);
+        timestamps.add(this.nameTemporality.registrationFrom);
+        timestamps.add(this.addressNameTemporality.registrationFrom);
+        timestamps.add(this.documentNameTemporality.registrationFrom);
+        timestamps.add(this.officiaryTemporality.registrationFrom);
         return timestamps;
     }
 

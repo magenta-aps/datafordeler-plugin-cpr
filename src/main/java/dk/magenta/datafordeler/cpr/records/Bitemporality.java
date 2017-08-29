@@ -6,22 +6,23 @@ import dk.magenta.datafordeler.cpr.data.CprEffect;
 import java.time.OffsetDateTime;
 
 public class Bitemporality {
-    public OffsetDateTime registrationTime;
+    public OffsetDateTime registrationFrom;
+    public OffsetDateTime registrationTo;
     public OffsetDateTime effectFrom;
     public boolean effectFromUncertain;
     public OffsetDateTime effectTo;
     public boolean effectToUncertain;
 
-    public Bitemporality(OffsetDateTime registrationTime, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
-        this.registrationTime = registrationTime;
+    public Bitemporality(OffsetDateTime registrationFrom, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
+        this.registrationFrom = registrationFrom;
         this.effectFrom = effectFrom;
         this.effectFromUncertain = effectFromUncertain;
         this.effectTo = effectTo;
         this.effectToUncertain = effectToUncertain;
     }
 
-    public Bitemporality(OffsetDateTime registrationTime) {
-        this(registrationTime, null, false, null, false);
+    public Bitemporality(OffsetDateTime registrationFrom) {
+        this(registrationFrom, null, false, null, false);
     }
 
     @Override
@@ -33,7 +34,7 @@ public class Bitemporality {
 
         if (effectFromUncertain != that.effectFromUncertain) return false;
         if (effectToUncertain != that.effectToUncertain) return false;
-        if (registrationTime != null ? !registrationTime.equals(that.registrationTime) : that.registrationTime != null)
+        if (registrationFrom != null ? !registrationFrom.equals(that.registrationFrom) : that.registrationFrom != null)
             return false;
         if (effectFrom != null ? !effectFrom.equals(that.effectFrom) : that.effectFrom != null)
             return false;
@@ -42,7 +43,7 @@ public class Bitemporality {
 
     @Override
     public int hashCode() {
-        int result = registrationTime != null ? registrationTime.hashCode() : 0;
+        int result = registrationFrom != null ? registrationFrom.hashCode() : 0;
         result = 31 * result + (effectFrom != null ? effectFrom.hashCode() : 0);
         result = 31 * result + (effectFromUncertain ? 1 : 0);
         result = 31 * result + (effectTo != null ? effectTo.hashCode() : 0);
@@ -51,6 +52,6 @@ public class Bitemporality {
     }
 
     public boolean matches(OffsetDateTime registrationTime, CprEffect effect) {
-        return Equality.equal(this.registrationTime, registrationTime) && effect.compareRange(this);
+        return Equality.equal(this.registrationFrom, registrationTime) && effect.compareRange(this);
     }
 }

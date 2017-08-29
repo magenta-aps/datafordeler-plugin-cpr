@@ -60,7 +60,7 @@ public class RoadRecord extends RoadDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.roadTemporality.registrationTime);
+        timestamps.add(this.roadTemporality.registrationFrom);
         return timestamps;
     }
 

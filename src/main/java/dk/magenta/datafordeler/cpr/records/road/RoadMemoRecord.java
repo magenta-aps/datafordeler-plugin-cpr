@@ -55,7 +55,7 @@ public class RoadMemoRecord extends RoadDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.memoTemporality.registrationTime);
+        timestamps.add(this.memoTemporality.registrationFrom);
         return timestamps;
     }
 

@@ -165,13 +165,13 @@ public class PersonRecord extends PersonDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.statusTemporality.registrationTime);
-        timestamps.add(this.motherTemporality.registrationTime);
-        timestamps.add(this.fatherTemporality.registrationTime);
-        timestamps.add(this.motherVerificationTemporality.registrationTime);
-        timestamps.add(this.fatherVerificationTemporality.registrationTime);
-        timestamps.add(this.positionTemporality.registrationTime);
-        timestamps.add(this.birthTemporality.registrationTime);
+        timestamps.add(this.statusTemporality.registrationFrom);
+        timestamps.add(this.motherTemporality.registrationFrom);
+        timestamps.add(this.fatherTemporality.registrationFrom);
+        timestamps.add(this.motherVerificationTemporality.registrationFrom);
+        timestamps.add(this.fatherVerificationTemporality.registrationFrom);
+        timestamps.add(this.positionTemporality.registrationFrom);
+        timestamps.add(this.birthTemporality.registrationFrom);
         return timestamps;
     }
 

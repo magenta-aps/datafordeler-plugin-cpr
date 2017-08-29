@@ -61,8 +61,8 @@ public class ForeignAddressRecord extends PersonDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.emigrationTemporality.registrationTime);
-        timestamps.add(this.foreignAddressTemporality.registrationTime);
+        timestamps.add(this.emigrationTemporality.registrationFrom);
+        timestamps.add(this.foreignAddressTemporality.registrationFrom);
         return timestamps;
     }
 

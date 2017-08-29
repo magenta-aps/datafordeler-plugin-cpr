@@ -53,7 +53,7 @@ public class RoadPostcodeRecord extends RoadDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.postcodeTemporality.registrationTime);
+        timestamps.add(this.postcodeTemporality.registrationFrom);
         return timestamps;
     }
 
