@@ -10,19 +10,15 @@ import dk.magenta.datafordeler.core.plugin.Communicator;
 import dk.magenta.datafordeler.core.plugin.EntityManager;
 import dk.magenta.datafordeler.core.plugin.HttpCommunicator;
 import dk.magenta.datafordeler.core.plugin.RegisterManager;
-import dk.magenta.datafordeler.core.role.SystemRole;
-import dk.magenta.datafordeler.core.util.DoubleHashMap;
+import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.core.util.ItemInputStream;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
-import dk.magenta.datafordeler.cpr.parsers.CprParser;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
-import dk.magenta.datafordeler.cpr.records.CprRecord;
-import dk.magenta.datafordeler.cpr.records.Record;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -33,7 +29,6 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -224,9 +219,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     ArrayList<V> effects = new ArrayList<>();
                     List<Bitemporality> bitemporalities = record.getBitemporality();
                     for (Bitemporality bitemporality : bitemporalities) {
-                        R registration = entityRegistrations.get(bitemporality.registrationTime);
+                        R registration = entityRegistrations.get(bitemporality.registrationFrom);
                         if (registration == null) {
-                            log.error("Didn't find registration at "+bitemporality.registrationTime);
+                            log.error("Didn't find registration at "+bitemporality.registrationFrom);
                             return null;
                         }
                         V effect = registration.getEffect(bitemporality);
