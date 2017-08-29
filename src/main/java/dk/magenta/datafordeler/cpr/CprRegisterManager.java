@@ -59,6 +59,10 @@ public class CprRegisterManager extends RegisterManager {
 
     }
 
+    /**
+    * RegisterManager initialization; set up configuration and source fetcher.
+    * We store fetched data in a local cache, so create a random folder for that.
+    */
     @PostConstruct
     public void init() throws IOException {
         CprConfiguration configuration = this.configurationManager.getConfiguration();
@@ -67,7 +71,6 @@ public class CprRegisterManager extends RegisterManager {
             temp.delete();
             temp.mkdir();
             this.localCopyFolder = temp.getAbsolutePath();
-            //System.out.println("mkdir: "+new File(this.localCopyFolder).mkdir());
         }
         this.commonFetcher = new LocalCopyFtpCommunicator(
             configuration.getFtpUsername(),
@@ -140,7 +143,14 @@ public class CprRegisterManager extends RegisterManager {
 
 
 
-
+    /**
+    * Pull data from the data source denoted by eventInterface, using the 
+    * mechanism appropriate for the source.
+    * For CPR, this is done using a LocalCopyFtpCommunicator, where we fetch all 
+    * files in a remote folder (known to be text files).
+    * We then package chunks of lines into Events, and feed them into a stream for 
+    * returning.
+    */
     @Override
     public ItemInputStream<? extends PluginSourceData> pullEvents(URI eventInterface, EntityManager entityManager) throws DataFordelerException {
         if (!(entityManager instanceof CprEntityManager)) {

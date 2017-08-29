@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data;
 
 import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.database.Registration;
+import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 
 import java.time.OffsetDateTime;
@@ -11,8 +12,8 @@ public abstract class CprRegistration<E extends Entity<E, R>, R extends CprRegis
     public V getEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         for (V effect : this.effects) {
             if (
-                    Registration.equalOffsetDateTime(effect.getEffectFrom(), effectFrom) &&
-                    Registration.equalOffsetDateTime(effect.getEffectTo(), effectTo) &&
+                    Equality.equal(effect.getEffectFrom(), effectFrom) &&
+                    Equality.equal(effect.getEffectTo(), effectTo) &&
                             (effect.isUncertainFrom() == effectFromUncertain) &&
                             (effect.isUncertainTo() == effectToUncertain)
                     ) {
