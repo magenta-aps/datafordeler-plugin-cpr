@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.data;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.*;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
+import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
 import dk.magenta.datafordeler.core.io.Receipt;
@@ -156,7 +157,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     protected abstract D createDataItem();
 
     @Override
-    public List<R> parseRegistration(String registrationData) throws IOException, ParseException {
+    public List<R> parseRegistration(String registrationData) throws DataFordelerException {
         return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -169,10 +170,15 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     private static final String TASK_CHUNK_HANDLE = "CprChunk";
 
     @Override
-    public List<R> parseRegistration(InputStream registrationData) throws ParseException, IOException {
+    public List<R> parseRegistration(InputStream registrationData) throws DataFordelerException {
         ArrayList<R> allRegistrations = new ArrayList<>();
         String charset = this.getConfiguration().getCharset();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData, charset));
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(registrationData, charset));
+        } catch (UnsupportedEncodingException e) {
+            throw new DataStreamException(e);
+        }
         CprSubParser<T> parser = this.getParser();
         QueryManager queryManager = this.getQueryManager();
 
@@ -187,8 +193,11 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             timer.start(TASK_PARSE);
             StringJoiner buffer = new StringJoiner("\n");
             int i;
-            for (i = 0; i < limit; i++) {
-                String line = reader.readLine();
+            try {
+                for (i = 0; i < limit; i++) {
+                String line = null;
+                    line = reader.readLine();
+
                 if (line != null) {
                     buffer.add(line);
                     linesRead++;
@@ -196,9 +205,17 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     done = true;
                 }
             }
+            } catch (IOException e) {
+                throw new DataStreamException(e);
+            }
             log.debug("Loaded a total of "+linesRead+" lines");
             log.debug("Processing batch of "+i+" lines");
-            InputStream chunk = new ByteArrayInputStream(buffer.toString().getBytes(charset));
+            InputStream chunk = null;
+            try {
+                chunk = new ByteArrayInputStream(buffer.toString().getBytes(charset));
+            } catch (UnsupportedEncodingException e) {
+                throw new DataStreamException(e);
+            }
 
             List<T> chunkRecords = parser.parse(chunk, charset);
             log.debug("Batch parsed into "+chunkRecords.size()+" records");

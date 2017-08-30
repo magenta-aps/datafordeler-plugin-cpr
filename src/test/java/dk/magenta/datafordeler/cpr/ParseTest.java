@@ -1,9 +1,11 @@
 package dk.magenta.datafordeler.cpr;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
+import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
@@ -55,7 +57,7 @@ public class ParseTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testParsePerson() throws IOException, ParseException {
+    public void testParsePerson() throws DataFordelerException {
         Session session = null;
         try {
             InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
@@ -69,8 +71,8 @@ public class ParseTest {
             try {
                 List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
                 System.out.println(objectMapper.writeValueAsString(entities));
-            } catch (DataFordelerException e) {
-                e.printStackTrace();
+            } catch (JsonProcessingException e) {
+                throw new DataStreamException(e);
             }
         } finally {
             if (session != null) {
@@ -162,7 +164,7 @@ public class ParseTest {
     }
 
     @Test
-    public void testParseResidence() throws IOException, ParseException {
+    public void testParseResidence() throws DataFordelerException {
         Session session = null;
         try {
             InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");

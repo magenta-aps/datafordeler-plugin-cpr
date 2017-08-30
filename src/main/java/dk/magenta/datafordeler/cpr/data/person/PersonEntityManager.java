@@ -74,7 +74,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     }
 
     @Override
-    public List<PersonRegistration> parseRegistration(String registrationData) throws IOException, ParseException {
+    public List<PersonRegistration> parseRegistration(String registrationData) throws DataFordelerException {
         return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)));
     }
 /*

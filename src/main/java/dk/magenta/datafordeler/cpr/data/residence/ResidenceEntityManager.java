@@ -73,7 +73,7 @@ public class ResidenceEntityManager extends CprEntityManager<ResidenceRecord, Re
     }
 
     @Override
-    public List<ResidenceRegistration> parseRegistration(String registrationData) throws IOException, ParseException {
+    public List<ResidenceRegistration> parseRegistration(String registrationData) throws DataFordelerException {
         return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)));
     }
 /*
