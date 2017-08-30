@@ -28,7 +28,7 @@ public class RoadRecord extends RoadDataRecord {
         this.obtain("vejadrnvn", 52, 20);
         this.obtain("vejnvn", 72, 40);
 
-        this.roadTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"), this.getOffsetDateTime("haenstart"), false, null, false);
+        this.roadTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"), null, this.getOffsetDateTime("haenstart"), false, null, false);
     }
 
 

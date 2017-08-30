@@ -72,4 +72,11 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, D e
     public boolean compareRange(Bitemporality bitemporality) {
         return this.compareRange(bitemporality.effectFrom, bitemporality.effectFromUncertain, bitemporality.effectTo, bitemporality.effectToUncertain);
     }
+
+    public V createClone() {
+        V effect = super.createClone();
+        effect.setUncertainFrom(this.uncertainFrom);
+        effect.setUncertainTo(this.uncertainTo);
+        return effect;
+    }
 }

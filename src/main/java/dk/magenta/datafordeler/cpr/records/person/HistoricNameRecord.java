@@ -51,10 +51,10 @@ public class HistoricNameRecord extends PersonDataRecord {
         boolean effectFromUncertain = this.getMarking("haenstart_umrk-navne");
         OffsetDateTime effectTo = this.getOffsetDateTime("nvnhaenslut");
         boolean effectToUncertain = this.getMarking("haenslut_umrk-navne");
-        this.nameTemporality = new Bitemporality(this.getOffsetDateTime("nvn_ts"), effectFrom, effectFromUncertain, effectTo, effectToUncertain);
-        this.addressNameTemporality = new Bitemporality(this.getOffsetDateTime("adrnvn_ts"), effectFrom, effectFromUncertain, effectTo, effectToUncertain);
-        this.documentNameTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-navne"), effectFrom, effectFromUncertain, effectTo, effectToUncertain);
-        this.officiaryTemporality = new Bitemporality(this.getOffsetDateTime("myntxt_ts-navne"), effectFrom, effectFromUncertain, effectTo, effectToUncertain);
+        this.nameTemporality = new Bitemporality(this.getOffsetDateTime("nvn_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
+        this.addressNameTemporality = new Bitemporality(this.getOffsetDateTime("adrnvn_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
+        this.documentNameTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-navne"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
+        this.officiaryTemporality = new Bitemporality(this.getOffsetDateTime("myntxt_ts-navne"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
     }
 
     @Override

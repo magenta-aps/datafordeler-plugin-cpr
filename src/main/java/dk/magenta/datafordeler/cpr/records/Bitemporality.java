@@ -13,8 +13,9 @@ public class Bitemporality {
     public OffsetDateTime effectTo;
     public boolean effectToUncertain;
 
-    public Bitemporality(OffsetDateTime registrationFrom, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
+    public Bitemporality(OffsetDateTime registrationFrom, OffsetDateTime registrationTo, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         this.registrationFrom = registrationFrom;
+        this.registrationTo = registrationTo;
         this.effectFrom = effectFrom;
         this.effectFromUncertain = effectFromUncertain;
         this.effectTo = effectTo;
@@ -22,7 +23,15 @@ public class Bitemporality {
     }
 
     public Bitemporality(OffsetDateTime registrationFrom) {
-        this(registrationFrom, null, false, null, false);
+        this(registrationFrom, null, null, false, null, false);
+    }
+
+    public Bitemporality(OffsetDateTime registrationFrom, OffsetDateTime registrationTo) {
+        this(registrationFrom, registrationTo, null, false, null, false);
+    }
+
+    public Bitemporality(OffsetDateTime registrationFrom, OffsetDateTime registrationTo, OffsetDateTime effectFrom, OffsetDateTime effectTo) {
+        this(registrationFrom, registrationTo, effectFrom, false, effectTo, false);
     }
 
     @Override

@@ -48,7 +48,7 @@ public class NameRecord extends PersonDataRecord {
         this.obtain("myntxt_ts-navne", 293, 12);
         this.obtain("myntxt-navne", 305, 20);
 
-        this.nameTemporality = new Bitemporality(this.getOffsetDateTime("nvn_ts"), this.getOffsetDateTime("nvnhaenstart"), this.getBoolean("haenstart_umrk-navne"), null, false);
+        this.nameTemporality = new Bitemporality(this.getOffsetDateTime("nvn_ts"), null, this.getOffsetDateTime("nvnhaenstart"), this.getBoolean("haenstart_umrk-navne"), null, false);
         this.addressNameTemporality = new Bitemporality(this.getOffsetDateTime("adrnvn_ts"));
         this.documentNameTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-navne"));
         this.officiaryTemporality = new Bitemporality(this.getOffsetDateTime("myntxt_ts-navne"));

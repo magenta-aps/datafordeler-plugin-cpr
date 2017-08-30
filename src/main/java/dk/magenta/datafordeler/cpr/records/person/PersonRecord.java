@@ -73,13 +73,13 @@ public class PersonRecord extends PersonDataRecord {
         this.obtain("far_dok_ts", 352, 12);
         this.obtain("far_dok", 364, 3);
 
-        this.statusTemporality = new Bitemporality(this.getOffsetDateTime("status_ts"), this.getOffsetDateTime("statushaenstart"), this.getBoolean("statusdto_umrk"), null, false);
-        this.motherTemporality = new Bitemporality(this.getOffsetDateTime("mor_ts"), this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false);
-        this.fatherTemporality = new Bitemporality(this.getOffsetDateTime("far_ts"), this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false);
+        this.statusTemporality = new Bitemporality(this.getOffsetDateTime("status_ts"), null, this.getOffsetDateTime("statushaenstart"), this.getBoolean("statusdto_umrk"), null, false);
+        this.motherTemporality = new Bitemporality(this.getOffsetDateTime("mor_ts"), null, this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false);
+        this.fatherTemporality = new Bitemporality(this.getOffsetDateTime("far_ts"), null, this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false);
         this.motherVerificationTemporality = new Bitemporality(this.getOffsetDateTime("mor_dok_ts"));
         this.fatherVerificationTemporality = new Bitemporality(this.getOffsetDateTime("far_dok_ts"));
         this.positionTemporality = new Bitemporality(this.getOffsetDateTime("stilling_ts"));
-        this.birthTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-person"), this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
+        this.birthTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-person"), null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
     }
 
     /**

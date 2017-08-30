@@ -55,6 +55,7 @@ public abstract class LineParser<T extends CprRecord> {
         return this.parse(inputstream, encoding);
     }
 
+    // TODO: output an objectInputStream
     public List<T> parse(InputStream input, String encoding) {
         try {
             ArrayList<T> records = new ArrayList<>();
@@ -95,6 +96,9 @@ public abstract class LineParser<T extends CprRecord> {
         this.log.warn("Parse failed");
         return null;
     }
+
+
+
 
     protected abstract T parseLine(String line);
 

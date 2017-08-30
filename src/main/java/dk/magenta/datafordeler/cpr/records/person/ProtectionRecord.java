@@ -29,7 +29,7 @@ public class ProtectionRecord extends PersonDataRecord {
         this.obtain("indrap-beskyttelse",44	,3);
         this.obtain("slet_dt-beskyttelse",47,10);
 
-        this.protectionTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-beskyttelse"), this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slet_dt-beskyttelse"), false);
+        this.protectionTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-beskyttelse"), null, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slet_dt-beskyttelse"), false);
     }
 
     @Override

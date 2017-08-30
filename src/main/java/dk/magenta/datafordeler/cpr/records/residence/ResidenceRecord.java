@@ -34,7 +34,7 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
         this.obtain("haenstart", 35, 12);
         this.obtain("lokalitet", 59, 34);
 
-        this.residenceTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"), this.getOffsetDateTime("haenstart"), false, null, false);
+        this.residenceTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"), null, this.getOffsetDateTime("haenstart"), false, null, false);
     }
 
     @Override
