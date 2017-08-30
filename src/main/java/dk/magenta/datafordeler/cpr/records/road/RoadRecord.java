@@ -4,17 +4,18 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
+import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by lars on 28-06-17.
  */
 public class RoadRecord extends RoadDataRecord {
+
+    private Bitemporality roadTemporality;
 
     public RoadRecord(String line) throws ParseException {
         super(line);
@@ -26,6 +27,8 @@ public class RoadRecord extends RoadDataRecord {
         this.obtain("haenstart", 40, 12);
         this.obtain("vejadrnvn", 52, 20);
         this.obtain("vejnvn", 72, 40);
+
+        this.roadTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"), null, this.getOffsetDateTime("haenstart"), false, null, false);
     }
 
 
@@ -57,8 +60,13 @@ public class RoadRecord extends RoadDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.getOffsetDateTime("timestamp"));
+        timestamps.add(this.roadTemporality.registrationFrom);
         return timestamps;
+    }
+
+    @Override
+    public List<Bitemporality> getBitemporality() {
+        return Collections.singletonList(this.roadTemporality);
     }
 
     @Override

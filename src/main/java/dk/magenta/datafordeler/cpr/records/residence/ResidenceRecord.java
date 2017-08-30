@@ -4,11 +4,14 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
+import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,6 +20,8 @@ import java.util.Set;
 public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBaseData> {
 
     public static final String RECORDTYPE_RESIDENCE = "002";
+
+    private Bitemporality residenceTemporality;
 
     public ResidenceRecord(String line) throws ParseException {
         super(line);
@@ -28,6 +33,8 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
         this.obtain("timestamp", 22, 12);
         this.obtain("haenstart", 35, 12);
         this.obtain("lokalitet", 59, 34);
+
+        this.residenceTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"), null, this.getOffsetDateTime("haenstart"), false, null, false);
     }
 
     @Override
@@ -37,7 +44,7 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
 
     @Override
     public void populateBaseData(ResidenceBaseData data, ResidenceEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
-        if (registrationTime.equals(this.getOffsetDateTime("timestamp")) && effect.compareRange(this.getOffsetDateTime("haenstart"), false, null, false)) {
+        if (this.residenceTemporality.matches(registrationTime, effect)) {
             data.setMunicipalityCode(this.getInt("komkod"));
             data.setRoadCode(this.getInt("vejkod"));
             data.setHouseNumber(this.getString("husnr", true));
@@ -69,7 +76,33 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = new HashSet<>();
-        timestamps.add(this.getOffsetDateTime("timestamp"));
+        timestamps.add(this.residenceTemporality.registrationFrom);
         return timestamps;
+    }
+
+    @Override
+    public List<Bitemporality> getBitemporality() {
+        return Collections.singletonList(this.residenceTemporality);
+    }
+
+
+    public int getMunicipalityCode() {
+        return this.getInt("komkod");
+    }
+
+    public int getRoadCode() {
+        return this.getInt("vejkod");
+    }
+
+    public String getHouseNumber() {
+        return this.getString("husnr", true);
+    }
+
+    public String getFloor() {
+        return this.getString("etage", true);
+    }
+
+    public String getDoor() {
+        return this.getString("sidedoer",true);
     }
 }

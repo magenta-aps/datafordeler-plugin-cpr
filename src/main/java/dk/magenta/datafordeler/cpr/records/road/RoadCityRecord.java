@@ -4,17 +4,21 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
-import dk.magenta.datafordeler.cpr.data.unversioned.PostCode;
+import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by lars on 29-06-17.
  */
 public class RoadCityRecord extends RoadDataRecord {
+
+    private Bitemporality cityTemporality;
 
     public RoadCityRecord(String line) throws ParseException {
         super(line);
@@ -23,6 +27,8 @@ public class RoadCityRecord extends RoadDataRecord {
         this.obtain("ligeulige", 20, 1);
         this.obtain("timestamp", 21, 12);
         this.obtain("bynvn", 33, 34);
+
+        this.cityTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"));
     }
 
     @Override
@@ -32,7 +38,7 @@ public class RoadCityRecord extends RoadDataRecord {
 
     @Override
     public void populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
-        if (registrationTime.equals(this.getOffsetDateTime("timestamp"))) {
+        if (this.cityTemporality.matches(registrationTime, effect)) {
             data.addCity(
                     this.get("husnrfra"),
                     this.get("husnrtil"),
@@ -45,8 +51,13 @@ public class RoadCityRecord extends RoadDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.getOffsetDateTime("timestamp"));
+        timestamps.add(this.cityTemporality.registrationFrom);
         return timestamps;
+    }
+
+    @Override
+    public List<Bitemporality> getBitemporality() {
+        return Collections.singletonList(this.cityTemporality);
     }
 
     private boolean getEven(String key) {

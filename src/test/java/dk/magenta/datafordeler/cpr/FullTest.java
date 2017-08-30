@@ -2,8 +2,7 @@ package dk.magenta.datafordeler.cpr;
 
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
-import dk.magenta.datafordeler.core.exception.DataFordelerException;
-import dk.magenta.datafordeler.core.io.Event;
+import dk.magenta.datafordeler.core.io.PluginSourceData;
 import dk.magenta.datafordeler.core.util.ItemInputStream;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
@@ -24,7 +23,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.*;
 
 /**
  * Created by lars on 20-06-17.
@@ -37,7 +35,7 @@ public class FullTest {
     private CprPlugin plugin;
 
     @Autowired
-    private PersonEntityManager entityManager;
+    private PersonEntityManager personEntityManager;
 
     @Autowired
     private QueryManager queryManager;
@@ -45,10 +43,14 @@ public class FullTest {
     @Autowired
     private SessionManager sessionManager;
 
+    @Autowired
+    private CprRegisterManager registerManager;
+
     @Test
     public void test() throws Exception {
-        /*File tempFile = null;
+        File tempFile = null;
         FtpService ftp = new FtpService();
+        Session session = null;
         try {
             int port = 2101;
             CprConfiguration configuration = ((CprConfigurationManager) plugin.getConfigurationManager()).getConfiguration();
@@ -60,48 +62,35 @@ public class FullTest {
             tempFile.createNewFile();
             FileUtils.copyInputStreamToFile(contents, tempFile);
 
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            final File tempFileClosure = tempFile;
-            Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    ftp.startServer(username, password, port, Collections.singletonList(tempFileClosure));
-                    URI dataLocation = new URI("ftp://localhost:"+port+"/"+tempFileClosure.getName());
+            ftp.startServer(username, password, port, Collections.singletonList(tempFile));
+            URI dataLocation = new URI("ftp://localhost:"+port+"/"+tempFile.getName());
+            System.out.println("dataLocation: "+dataLocation);
 
-                    ItemInputStream<Event> eventStream = plugin.getRegisterManager().pullEvents(dataLocation);
-                    if (eventStream != null) {
-                        Event event;
-                        while ((event = eventStream.next()) != null) {
-                            entityManager.parseRegistration(event.getObjektData());
-                        }
-                        eventStream.close();
+            ItemInputStream<? extends PluginSourceData> eventStream = registerManager.pullEvents(dataLocation, personEntityManager);
 
-                        Session session = null;
-                        try {
-                            session = sessionManager.getSessionFactory().openSession();
-                            PersonQuery query = new PersonQuery();
-                            query.setFirstName("Tester");
-                            List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
-                            Assert.assertEquals(1, entities.size());
-                        } catch (DataFordelerException e) {
-                            e.printStackTrace();
-                        } finally {
-                            if (session != null) {
-                                session.close();
-                            }
-                        }
-                    }
-                    return true;
-                }
-            });
-            future.get(20, TimeUnit.SECONDS);
-            executorService.shutdownNow();
+            Assert.assertNotNull(eventStream);
+
+            PluginSourceData data;
+            while ((data = eventStream.next()) != null) {
+                personEntityManager.parseRegistration(data.getData());
+            }
+            eventStream.close();
+
+            session = sessionManager.getSessionFactory().openSession();
+            PersonQuery query = new PersonQuery();
+            query.setFirstName("Tester");
+            List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
+            Assert.assertEquals(1, entities.size());
+
         } finally {
             ftp.stopServer();
             if (tempFile != null) {
                 tempFile.delete();
             }
-        }*/
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 
 }

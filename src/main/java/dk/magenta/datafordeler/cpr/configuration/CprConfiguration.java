@@ -14,6 +14,15 @@ import javax.persistence.Table;
 @Table(name="cpr_config")
 public class CprConfiguration implements Configuration {
 
+    public enum Charset {
+        US_ASCII,
+        ISO_8859_1,
+        UTF_8,
+        UTF_16BE,
+        UTF_16LE,
+        UTF_16
+    }
+
     @Id
     @Column(name = "id")
     private final String plugin = CprPlugin.class.getName();
@@ -33,6 +42,18 @@ public class CprConfiguration implements Configuration {
 
     @Column
     private boolean ftps = true;
+
+    @Column
+    private Charset charset = Charset.ISO_8859_1;
+
+
+    // Temporary: set this to the location of the cpr file on the server
+    @Column
+    private String cprRoadDataLocation = "/home/lars/Projekt/datafordeler/A370715.txt";
+
+    // Temporary: set this to the location of the cpr file on the server
+    @Column
+    private String cprResidenceDataLocation = "/home/lars/Projekt/datafordeler/A370715.txt";
 
     public String getPullCronSchedule() {
         return this.pullCronSchedule;
@@ -54,6 +75,18 @@ public class CprConfiguration implements Configuration {
         return this.ftps;
     }
 
+    public String getCprRoadDataLocation() {
+        return this.cprRoadDataLocation;
+    }
+
+    public String getCprResidenceDataLocation() {
+        return this.cprResidenceDataLocation;
+    }
+
+    public String getCharset() {
+        return this.charset.name().replaceAll("_", "-");
+    }
+    
     /**
      * For testing - test methods will set this, but not save the entity to DB
      * @param registerAddress

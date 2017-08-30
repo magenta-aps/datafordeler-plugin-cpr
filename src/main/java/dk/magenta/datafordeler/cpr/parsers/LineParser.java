@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.parsers;
 
+import dk.magenta.datafordeler.cpr.records.CprRecord;
 import dk.magenta.datafordeler.cpr.records.Record;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * Created by lars on 15-12-14.
  */
-public abstract class LineParser {
+public abstract class LineParser<T extends CprRecord> {
 
     protected Logger log = LogManager.getLogger(LineParser.class);
 
@@ -26,7 +27,7 @@ public abstract class LineParser {
         return null;
     }
 
-    public List<Record> parse(InputStream input) {
+    public List<T> parse(InputStream input) {
         BufferedInputStream inputstream = new BufferedInputStream(input);
 
         String encoding = this.getEncoding();
@@ -54,9 +55,10 @@ public abstract class LineParser {
         return this.parse(inputstream, encoding);
     }
 
-    public List<Record> parse(InputStream input, String encoding) {
+    // TODO: output an objectInputStream
+    public List<T> parse(InputStream input, String encoding) {
         try {
-            ArrayList<Record> records = new ArrayList<>();
+            ArrayList<T> records = new ArrayList<>();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(input, encoding.toUpperCase()));
 
@@ -67,7 +69,7 @@ public abstract class LineParser {
                 line = line.trim();
                 if (line.length() > 3) {
                     try {
-                        Record record = this.parseLine(line);
+                        T record = this.parseLine(line);
                         if (record != null) {
                             records.add(record);
                         }
@@ -95,6 +97,9 @@ public abstract class LineParser {
         return null;
     }
 
-    protected abstract Record parseLine(String line);
+
+
+
+    protected abstract T parseLine(String line);
 
 }

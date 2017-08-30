@@ -38,6 +38,11 @@ public class RoadEntity extends Entity<RoadEntity, RoadRegistration> {
         super(uuid, domain);
     }
 
+    @Override
+    protected RoadRegistration createEmptyRegistration() {
+        return new RoadRegistration();
+    }
+
     @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="type")
     public static final String schema = "Vej";
 

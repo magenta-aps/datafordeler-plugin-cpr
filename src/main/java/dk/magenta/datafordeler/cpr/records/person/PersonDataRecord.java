@@ -36,6 +36,7 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
         return this.get("pnr");
     }
 
+    @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         return new HashSet<>();
     }

@@ -4,17 +4,29 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by lars on 22-06-17.
  */
 public class PersonRecord extends PersonDataRecord {
+
+    private Bitemporality statusTemporality;
+    private Bitemporality motherTemporality;
+    private Bitemporality fatherTemporality;
+    private Bitemporality motherVerificationTemporality;
+    private Bitemporality fatherVerificationTemporality;
+    private Bitemporality positionTemporality;
+    private Bitemporality birthTemporality;
+
     public PersonRecord(String line) throws ParseException {
         super(line);
         this.obtain("pnrgaeld", 14, 10);
@@ -60,6 +72,14 @@ public class PersonRecord extends PersonDataRecord {
         this.obtain("far_dok_mynkod", 348, 4);
         this.obtain("far_dok_ts", 352, 12);
         this.obtain("far_dok", 364, 3);
+
+        this.statusTemporality = new Bitemporality(this.getOffsetDateTime("status_ts"), null, this.getOffsetDateTime("statushaenstart"), this.getBoolean("statusdto_umrk"), null, false);
+        this.motherTemporality = new Bitemporality(this.getOffsetDateTime("mor_ts"), null, this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false);
+        this.fatherTemporality = new Bitemporality(this.getOffsetDateTime("far_ts"), null, this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false);
+        this.motherVerificationTemporality = new Bitemporality(this.getOffsetDateTime("mor_dok_ts"));
+        this.fatherVerificationTemporality = new Bitemporality(this.getOffsetDateTime("far_dok_ts"));
+        this.positionTemporality = new Bitemporality(this.getOffsetDateTime("stilling_ts"));
+        this.birthTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-person"), null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
     }
 
     /**
@@ -72,11 +92,11 @@ public class PersonRecord extends PersonDataRecord {
     @Override
     public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
 
-        if (registrationTime.equals(this.getOffsetDateTime("status_ts")) && effect.compareRange(this.getOffsetDateTime("statushaenstart"), this.getBoolean("statusdto_umrk"), null, false)) {
+        if (this.statusTemporality.matches(registrationTime, effect)) {
             data.setStatus(this.get("status"));
         }
 
-        if (registrationTime.equals(this.getOffsetDateTime("mor_ts")) && effect.compareRange(this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false)) {
+        if (this.motherTemporality.matches(registrationTime, effect)) {
             data.setMother(
                     this.get("mornvn"),
                     this.getBoolean("mornvn_mrk"),
@@ -87,7 +107,7 @@ public class PersonRecord extends PersonDataRecord {
             );
         }
 
-        if (registrationTime.equals(this.getOffsetDateTime("far_ts")) && effect.compareRange(this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false)) {
+        if (this.fatherTemporality.matches(registrationTime, effect)) {
             data.setFather(
                     this.get("farnvn"),
                     this.getBoolean("farnvn_mrk"),
@@ -98,28 +118,28 @@ public class PersonRecord extends PersonDataRecord {
             );
         }
 
-        if (registrationTime.equals(this.getOffsetDateTime("mor_dok_ts")) && effect.compareRange(null, false, null, false)) {
+        if (this.motherVerificationTemporality.matches(registrationTime, effect)) {
             data.setMotherVerification(
                     this.getInt("mor_dok_mynkod"),
                     this.getBoolean("mor_dok")
             );
         }
 
-        if (registrationTime.equals(this.getOffsetDateTime("far_dok_ts")) && effect.compareRange(null, false, null, false)) {
+        if (this.fatherVerificationTemporality.matches(registrationTime, effect)) {
             data.setFatherVerification(
                     this.getInt("far_dok_mynkod"),
                     this.getBoolean("far_dok")
             );
         }
 
-        if (registrationTime.equals(this.getOffsetDateTime("stilling_ts")) && effect.compareRange(null, false, null, false)) {
+        if (this.positionTemporality.matches(registrationTime, effect)) {
             data.setPosition(
                     this.getInt("stilling_mynkod"),
                     this.get("stilling")
             );
         }
 
-        if (registrationTime.equals(this.getOffsetDateTime("start_ts-person")) && effect.compareRange( this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"))) {
+        if (this.birthTemporality.matches(registrationTime, effect)) {
 
             data.setBirth(
                     LocalDateTime.of(this.getDate("foed_dt"), this.getTime("foed_tm")),
@@ -145,13 +165,27 @@ public class PersonRecord extends PersonDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.getOffsetDateTime("status_ts"));
-        timestamps.add(this.getOffsetDateTime("mor_ts"));
-        timestamps.add(this.getOffsetDateTime("stilling_ts"));
-        timestamps.add(this.getOffsetDateTime("far_ts"));
-        timestamps.add(this.getOffsetDateTime("mor_dok_ts"));
-        timestamps.add(this.getOffsetDateTime("far_dok_ts"));
+        timestamps.add(this.statusTemporality.registrationFrom);
+        timestamps.add(this.motherTemporality.registrationFrom);
+        timestamps.add(this.fatherTemporality.registrationFrom);
+        timestamps.add(this.motherVerificationTemporality.registrationFrom);
+        timestamps.add(this.fatherVerificationTemporality.registrationFrom);
+        timestamps.add(this.positionTemporality.registrationFrom);
+        timestamps.add(this.birthTemporality.registrationFrom);
         return timestamps;
+    }
+
+    @Override
+    public List<Bitemporality> getBitemporality() {
+        return Arrays.asList(
+                this.statusTemporality,
+                this.motherTemporality,
+                this.fatherTemporality,
+                this.motherVerificationTemporality,
+                this.fatherVerificationTemporality,
+                this.positionTemporality,
+                this.birthTemporality
+        );
     }
 
 

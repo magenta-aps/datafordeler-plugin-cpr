@@ -12,10 +12,13 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprParser;
+import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
 import dk.magenta.datafordeler.cpr.records.Record;
 import java.math.BigInteger;
+
+import dk.magenta.datafordeler.cpr.records.person.PersonRecord;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,7 @@ import java.util.*;
  * Created by lars on 16-05-17.
  */
 @Component
-public class PersonEntityManager extends CprEntityManager {
+public class PersonEntityManager extends CprEntityManager<PersonDataRecord, PersonEntity, PersonRegistration, PersonEffect, PersonBaseData> {
 
     @Autowired
     private PersonEntityService personEntityService;
@@ -71,10 +74,10 @@ public class PersonEntityManager extends CprEntityManager {
     }
 
     @Override
-    public List<PersonRegistration> parseRegistration(String registrationData) throws IOException, ParseException {
+    public List<PersonRegistration> parseRegistration(String registrationData) throws DataFordelerException {
         return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)));
     }
-
+/*
     @Override
     public List<PersonRegistration> parseRegistration(InputStream registrationData) throws ParseException, IOException {
         ArrayList<PersonRegistration> allRegistrations = new ArrayList<>();
@@ -186,20 +189,6 @@ public class PersonEntityManager extends CprEntityManager {
                                 record.populateBaseData(baseData, effect, registrationFrom, this.queryManager, session);
                             }
                         }
-
-                    /*record.populateBaseData(data, timestamp);
-                    for (PersonEffect effect : data.keySet()) {
-                        PersonBaseData dataItem = data.get(effect);
-                        effect.setRegistration(registration);
-                        dataItem.addEffect(effect);*/
-                        //PersonEffect effect = registration.getEffect(effectFrom, effectTo);
-                        /*if (effect == null) {
-                            effect = new PersonEffect(registration, effectFrom, effectTo);
-                        }
-                        data.addEffect(effect);*/
-
-
-                        //}
                     }
 
                     if (lastRegistration != null) {
@@ -214,9 +203,11 @@ public class PersonEntityManager extends CprEntityManager {
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
+                System.out.println("Saving "+entityRegistrations.size()+" registrations");
                 for (PersonRegistration registration : entityRegistrations) {
                     try {
                         queryManager.saveRegistration(session, entity, registration);
+                        System.out.println("Registration saved");
                     } catch (DataFordelerException e) {
                         e.printStackTrace();
                     }
@@ -229,11 +220,48 @@ public class PersonEntityManager extends CprEntityManager {
         return allRegistrations;
     }
 
-
+*/
 
     @Override
     protected RegistrationReference createRegistrationReference(URI uri) {
         return new PersonRegistrationReference(uri);
+    }
+
+    @Override
+    protected SessionManager getSessionManager() {
+        return this.sessionManager;
+    }
+
+    @Override
+    protected QueryManager getQueryManager() {
+        return this.queryManager;
+    }
+
+    @Override
+    protected CprSubParser<PersonDataRecord> getParser() {
+        return this.personParser;
+    }
+
+    @Override
+    protected Class<PersonEntity> getEntityClass() {
+        return PersonEntity.class;
+    }
+
+    @Override
+    protected UUID generateUUID(PersonDataRecord record) {
+        return PersonEntity.generateUUID(record.getCprNumber());
+    }
+
+    @Override
+    protected PersonEntity createBasicEntity(PersonDataRecord record) {
+        PersonEntity personEntity = new PersonEntity();
+        personEntity.setCprNumber(record.getCprNumber());
+        return personEntity;
+    }
+
+    @Override
+    protected PersonBaseData createDataItem() {
+        return new PersonBaseData();
     }
 
 }

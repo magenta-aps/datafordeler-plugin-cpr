@@ -15,6 +15,14 @@ import javax.annotation.PostConstruct;
 
 /**
  * Created by lars on 16-05-17.
+ * Datafordeler Plugin to fetch, parse and serve CPR data (data on people, roads and
+ * administrative regions).
+ * As with all plugins, it follows the model laid out in the Datafordeler Core
+ * project, so it takes care of where to fetch data, how to parse it, how to 
+ * store it (leveraging the Datafordeler bitemporality model), under what path 
+ * to serve it, and which roles should exist for data access.
+ * The Core and Engine take care of the generic glue around these, fetching and 
+ * serving based on the specifics laid out in the plugin.
  */
 @Component
 public class CprPlugin extends Plugin {
@@ -36,6 +44,9 @@ public class CprPlugin extends Plugin {
 
     private CprRolesDefinition rolesDefinition = new CprRolesDefinition();
 
+    /**
+     * Plugin initialization
+     */
     @PostConstruct
     public void init() {
         this.registerManager.addEntityManager(this.personEntityManager);
@@ -43,6 +54,9 @@ public class CprPlugin extends Plugin {
         this.registerManager.addEntityManager(this.roadEntityManager);
     }
 
+    /**
+     * Return the name for the plugin, used to identify it when issuing commands
+     */
     @Override
     public long getVersion() {
         return 1;
@@ -53,20 +67,32 @@ public class CprPlugin extends Plugin {
         return "cpr";
     }
 
+    /**
+     * Return the domain for the plugin, used in Identification objects under CPR
+     */
     public static String getDomain() {
         return "cpr";
     }
 
+    /**
+     * Return the plugin’s register manager
+     */
     @Override
     public RegisterManager getRegisterManager() {
         return this.registerManager;
     }
 
+    /**
+     * Return the plugin’s configuration manager
+     */
     @Override
     public ConfigurationManager getConfigurationManager() {
         return this.configurationManager;
     }
 
+    /**
+     * Get a defintion of user roles
+     */
     @Override
     public RolesDefinition getRolesDefinition() {
         return this.rolesDefinition;

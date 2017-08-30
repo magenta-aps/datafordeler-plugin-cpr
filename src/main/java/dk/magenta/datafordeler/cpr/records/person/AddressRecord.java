@@ -4,16 +4,24 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by lars on 22-06-17.
  */
 public class AddressRecord extends PersonDataRecord {
+
+    private Bitemporality addressTemporality;
+    private Bitemporality conameTemporality;
+    private Bitemporality municipalityTemporality;
+
     public AddressRecord(String line) throws ParseException {
         super(line);
         this.obtain("start_mynkod-personbolig", 14, 4);
@@ -44,6 +52,10 @@ public class AddressRecord extends PersonDataRecord {
         this.obtain("adr5-supladr", 301, 34);
         this.obtain("start_dt-adrtxt", 335, 10);
         this.obtain("slet_dt-adrtxt", 345, 10);
+
+        this.addressTemporality = new Bitemporality(this.getOffsetDateTime("adr_ts"), null, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), null, false);
+        this.conameTemporality = new Bitemporality(this.getOffsetDateTime("convn_ts"));
+        this.municipalityTemporality = new Bitemporality(this.getOffsetDateTime("tilfra_ts"));
     }
 
     @Override
@@ -53,7 +65,7 @@ public class AddressRecord extends PersonDataRecord {
 
     @Override
     public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
-        if (registrationTime.equals(this.getOffsetDateTime("adr_ts")) && effect.compareRange(this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), null, false)) {
+        if (this.addressTemporality.matches(registrationTime, effect)) {
             data.setAddress(
                     this.getInt("start_mynkod-personbolig"),
                     this.getInt("komkod"),
@@ -71,10 +83,10 @@ public class AddressRecord extends PersonDataRecord {
                     this.get("adr5-supladr")
             );
         }
-        if (registrationTime.equals(this.getOffsetDateTime("convn_ts")) && effect.compareRange(null, false, null, false)) {
+        if (this.conameTemporality.matches(registrationTime, effect)) {
             data.setCoName(this.get("convn"));
         }
-        if (registrationTime.equals(this.getOffsetDateTime("tilfra_ts")) && effect.compareRange(null, false, null, false)) {
+        if (this.municipalityTemporality.matches(registrationTime, effect)) {
             data.setMoveMunicipality(
                     this.getInt("tilfra_mynkod"),
                     this.getDateTime("tilflykomdto"),
@@ -93,6 +105,15 @@ public class AddressRecord extends PersonDataRecord {
         timestamps.add(this.getOffsetDateTime("convn_ts"));
         timestamps.add(this.getOffsetDateTime("tilfra_ts"));
         return timestamps;
+    }
+
+    @Override
+    public List<Bitemporality> getBitemporality() {
+        return Arrays.asList(
+                this.addressTemporality,
+                this.conameTemporality,
+                this.municipalityTemporality
+        );
     }
 
     @Override

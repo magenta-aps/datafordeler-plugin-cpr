@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.database.Registration;
+import dk.magenta.datafordeler.cpr.records.Bitemporality;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.time.OffsetDateTime;
@@ -11,7 +12,7 @@ import java.time.temporal.TemporalAccessor;
 /**
  * Created by lars on 29-06-17.
  */
-public abstract class CprEffect<R extends Registration, V extends CprEffect, B extends CprData> extends Effect<R, V, B> {
+public abstract class CprEffect<R extends Registration, V extends CprEffect, D extends CprData> extends Effect<R, V, D> {
 
     @JsonProperty(value = "fraUsikker")
     @XmlElement(name = "fraUsikker")
@@ -66,5 +67,16 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, B e
                         (this.isUncertainFrom() == effectFromUncertain) &&
                         (this.isUncertainTo() == effectToUncertain)
         );
+    }
+
+    public boolean compareRange(Bitemporality bitemporality) {
+        return this.compareRange(bitemporality.effectFrom, bitemporality.effectFromUncertain, bitemporality.effectTo, bitemporality.effectToUncertain);
+    }
+
+    public V createClone() {
+        V effect = super.createClone();
+        effect.setUncertainFrom(this.uncertainFrom);
+        effect.setUncertainTo(this.uncertainTo);
+        return effect;
     }
 }

@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.residence;
 
 import dk.magenta.datafordeler.core.database.Registration;
+import dk.magenta.datafordeler.cpr.data.CprRegistration;
 
 import javax.persistence.Table;
 import java.time.OffsetDateTime;
@@ -10,19 +11,11 @@ import java.time.OffsetDateTime;
  */
 @javax.persistence.Entity
 @Table(name="cpr_residence_registration")
-public class ResidenceRegistration extends Registration<ResidenceEntity, ResidenceRegistration, ResidenceEffect> {
+public class ResidenceRegistration extends CprRegistration<ResidenceEntity, ResidenceRegistration, ResidenceEffect> {
 
-    public ResidenceEffect getEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
-        for (ResidenceEffect effect : this.effects) {
-            if (
-                    (effect.getEffectFrom() == null ? effectFrom == null : effect.getEffectFrom().equals(effectFrom)) &&
-                    (effect.getEffectTo() == null ? effectTo == null : effect.getEffectTo().equals(effectTo)) &&
-                    (effect.isUncertainFrom() == effectFromUncertain) &&
-                    (effect.isUncertainTo() == effectToUncertain)
-            ) {
-                return effect;
-            }
-        }
-        return null;
+    @Override
+    protected ResidenceEffect createEmptyEffect(OffsetDateTime effectFrom, OffsetDateTime effectTo) {
+        return new ResidenceEffect(this, effectFrom, effectTo);
     }
+
 }
