@@ -58,6 +58,11 @@ public class CprPlugin extends Plugin {
      * Return the name for the plugin, used to identify it when issuing commands
      */
     @Override
+    public long getVersion() {
+        return 1;
+    }
+
+    @Override
     public String getName() {
         return "cpr";
     }

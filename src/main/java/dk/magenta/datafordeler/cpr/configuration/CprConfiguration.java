@@ -86,7 +86,7 @@ public class CprConfiguration implements Configuration {
     public String getCharset() {
         return this.charset.name().replaceAll("_", "-");
     }
-
+    
     /**
      * For testing - test methods will set this, but not save the entity to DB
      * @param registerAddress
