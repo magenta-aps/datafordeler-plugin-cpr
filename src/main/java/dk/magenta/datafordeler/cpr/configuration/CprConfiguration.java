@@ -12,6 +12,7 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -83,7 +84,7 @@ public class CprConfiguration implements Configuration {
     private String roadRegisterFtpPassword = null;
 
     @Column
-    private String roadRegisterLocalFile = "data/cprroaddata.txt";
+    private String roadRegisterLocalFile = "data/cprroaddata_truncated.txt";
 
     @Column
     private Charset roadRegisterDataCharset = Charset.ISO_8859_1;
@@ -220,7 +221,6 @@ public class CprConfiguration implements Configuration {
     }
 
     public URI getResidenceRegisterURI() throws ConfigurationException {
-        System.out.println("getResidenceRegisterURI()");
         return this.formatURI(this.residenceRegisterType, this.residenceRegisterLocalFile, this.residenceRegisterFtpAddress);
     }
 
@@ -364,7 +364,6 @@ public class CprConfiguration implements Configuration {
      * @param registerAddress
      */
     public void setPersonRegisterAddress(String registerAddress) {
-        System.out.println("setting registerAddress: " + registerAddress);
         this.personRegisterFtpAddress = registerAddress;
     }
 }

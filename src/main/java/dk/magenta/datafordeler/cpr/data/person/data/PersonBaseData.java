@@ -227,7 +227,6 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
         this.addressNameData.setAuthority(authority);
         this.addressNameData.setAddressName(addressName);
-        System.out.println("this.addressNameData: "+this.addressNameData);
     }
 
     public void setNameVerification(int authority, boolean verification) {
