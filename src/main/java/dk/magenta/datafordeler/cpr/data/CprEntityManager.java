@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -156,7 +157,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
     @Override
     public List<R> parseRegistration(String registrationData) throws DataFordelerException {
-        return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)));
+        String charset = this.getConfiguration().getRegisterCharset(this);
+        return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(Charset.forName(charset))));
     }
 
     private static final String TASK_PARSE = "CprParse";
@@ -170,13 +172,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     @Override
     public List<R> parseRegistration(InputStream registrationData) throws DataFordelerException {
         ArrayList<R> allRegistrations = new ArrayList<>();
-        String charset = this.getConfiguration().getPersonRegisterCharset();
+        String charset = this.getConfiguration().getRegisterCharset(this);
         BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(registrationData, charset));
-        } catch (UnsupportedEncodingException e) {
-            throw new DataStreamException(e);
-        }
+        reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
+
         CprSubParser<T> parser = this.getParser();
         QueryManager queryManager = this.getQueryManager();
 
@@ -195,7 +194,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 for (i = 0; i < limit; i++) {
                 String line = null;
                     line = reader.readLine();
-
                 if (line != null) {
                     buffer.add(line);
                     linesRead++;
@@ -261,6 +259,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         log.info(timer.formatTotal(TASK_FIND_ITEMS));
         log.info(timer.formatTotal(TASK_POPULATE_DATA));
         log.info(timer.formatTotal(TASK_SAVE));
+
         return allRegistrations;
     }
 
