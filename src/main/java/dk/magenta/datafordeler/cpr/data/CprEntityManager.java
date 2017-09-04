@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.*;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
-import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
 import dk.magenta.datafordeler.core.io.Receipt;
 import dk.magenta.datafordeler.core.plugin.Communicator;
@@ -31,7 +30,6 @@ import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -66,8 +64,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     @Override
     public void setRegisterManager(RegisterManager registerManager) {
         super.setRegisterManager(registerManager);
-        this.handledURISubstrings.add(expandBaseURI(this.getBaseEndpoint(), "/" + this.getBaseName(), null, null).toString());
-        this.handledURISubstrings.add(expandBaseURI(this.getBaseEndpoint(), "/get/" + this.getBaseName(), null, null).toString());
+        //this.handledURISubstrings.add(expandBaseURI(this.getBaseEndpoint(), "/" + this.getBaseName(), null, null).toString());
+        //this.handledURISubstrings.add(expandBaseURI(this.getBaseEndpoint(), "/get/" + this.getBaseName(), null, null).toString());
     }
 
     @Override
@@ -172,7 +170,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     @Override
     public List<R> parseRegistration(InputStream registrationData) throws DataFordelerException {
         ArrayList<R> allRegistrations = new ArrayList<>();
-        String charset = this.getConfiguration().getCharset();
+        String charset = this.getConfiguration().getPersonRegisterCharset();
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new InputStreamReader(registrationData, charset));

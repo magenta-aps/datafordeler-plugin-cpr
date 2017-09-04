@@ -68,7 +68,6 @@ public class FtpService {
         this.tempDir = Files.createTempDirectory(null, new FileAttribute[0]).toFile();
 
         for (File sourcefile : files) {
-            System.out.println(sourcefile.getName());
             File destFile = new File(this.tempDir, sourcefile.getName());
             FileUtils.copyFile(sourcefile, destFile);
         }

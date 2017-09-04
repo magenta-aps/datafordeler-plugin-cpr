@@ -54,17 +54,16 @@ public class FullTest {
         try {
             int port = 2101;
             CprConfiguration configuration = ((CprConfigurationManager) plugin.getConfigurationManager()).getConfiguration();
-            configuration.setRegisterAddress("ftp://localhost:" + port);
-            String username = configuration.getFtpUsername();
-            String password = configuration.getFtpPassword();
+            configuration.setPersonRegisterAddress("ftps://localhost:" + port);
+            String username = configuration.getPersonRegisterFtpUsername();
+            String password = configuration.getPersonRegisterFtpPassword();
             InputStream contents = FullTest.class.getResourceAsStream("/persondata.txt");
             tempFile = File.createTempFile("cprdata", "txt");
             tempFile.createNewFile();
             FileUtils.copyInputStreamToFile(contents, tempFile);
 
             ftp.startServer(username, password, port, Collections.singletonList(tempFile));
-            URI dataLocation = new URI("ftp://localhost:"+port+"/"+tempFile.getName());
-            System.out.println("dataLocation: "+dataLocation);
+            URI dataLocation = new URI("ftps://localhost:"+port+"/"+tempFile.getName());
 
             ItemInputStream<? extends PluginSourceData> eventStream = registerManager.pullEvents(dataLocation, personEntityManager);
 

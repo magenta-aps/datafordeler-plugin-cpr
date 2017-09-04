@@ -36,11 +36,10 @@ public class LocalCopyFtpCommunicator extends FtpCommunicator {
       String proxyString, String localCopyFolder) throws IOException {
     super(username, password, useFtps, proxyString);
     this.localCopyFolder = Paths.get(localCopyFolder);
-    if(!Files.isDirectory(this.localCopyFolder)) {
+    if (!Files.isDirectory(this.localCopyFolder)) {
       throw new IOException("Local copy folder for FTP download " +
           localCopyFolder + " is not a directory");
     }
-
   }
 
   @Override
@@ -52,7 +51,7 @@ public class LocalCopyFtpCommunicator extends FtpCommunicator {
       remotePaths.sort(Comparator.naturalOrder());
       List<String> downloadPaths = this.filterFilesToDownload(remotePaths);
 
-      for(String path : downloadPaths) {
+      for (String path : downloadPaths) {
         String fileName = path.substring(path.lastIndexOf('/') + 1);
         Path outputFile = Files.createFile(Paths.get(localCopyFolder.toString(), fileName));
         OutputStream outputStream = Files.newOutputStream(outputFile);
@@ -62,7 +61,7 @@ public class LocalCopyFtpCommunicator extends FtpCommunicator {
       }
       ftpClient.disconnect();
 
-      InputStream inputStream = buildChainedInputStream();
+      InputStream inputStream = this.buildChainedInputStream();
 
       if (inputStream != null) {
         CloseDetectInputStream inputCloser = new CloseDetectInputStream(inputStream);

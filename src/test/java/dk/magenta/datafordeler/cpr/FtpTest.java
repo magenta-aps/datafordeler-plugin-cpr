@@ -34,7 +34,7 @@ public class FtpTest {
         try {
             int port = 2101;
             CprConfiguration configuration = ((CprConfigurationManager) plugin.getConfigurationManager()).getConfiguration();
-            configuration.setRegisterAddress("ftp://localhost:" + port);
+            configuration.setPersonRegisterAddress("ftp://localhost:" + port);
             String username = configuration.getFtpUsername();
             String password = configuration.getFtpPassword();
             InputStream contents = FtpTest.class.getResourceAsStream("/persondata.txt");
