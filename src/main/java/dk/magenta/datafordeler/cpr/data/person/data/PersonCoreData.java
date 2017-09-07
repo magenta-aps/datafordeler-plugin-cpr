@@ -1,7 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,45 +17,45 @@ import org.apache.commons.lang.StringUtils;
 @Table(name = "cpr_person_core")
 public class PersonCoreData extends AuthorityDetailData {
 
-    public enum Gender {
-        M,
-        K
+    public enum Koen {
+        MAND,
+        KVINDE
     }
 
     @Column
-    @JsonProperty(value = "nuværendeCprNummer")
-    @XmlElement(name = "nuværendeCprNummer")
-    private String currentCprNumber;
+    @JsonProperty(value = "personnummer")
+    @XmlElement(name = "personnummer")
+    private String personnummer;
 
-    public String getCurrentCprNumber() {
-        return this.currentCprNumber;
+    public String getPersonnummer() {
+        return this.personnummer;
     }
 
-    public void setCurrentCprNumber(String currentCprNumber) {
-        this.currentCprNumber = currentCprNumber;
+    public void setPersonnummer(String personnummer) {
+        this.personnummer = personnummer;
     }
 
 
 
     @Column
-    @JsonProperty(value = "køn")
-    @XmlElement(name = "køn")
-    private Gender gender;
+    @JsonProperty(value = "koen")
+    @XmlElement(name = "koen")
+    private Koen koen;
 
-    public Gender getGender() {
-        return this.gender;
+    public Koen getKoen() {
+        return this.koen;
     }
 
-    public void setGender(Gender gender) {
-        this.gender = gender;
+    public void setKoen(Koen koen) {
+        this.koen = koen;
     }
 
-    public void setGender(String gender) {
-        if (gender != null) {
-            if (gender.equalsIgnoreCase("M")) {
-                this.setGender(Gender.M);
-            } else if (gender.equalsIgnoreCase("K")) {
-                this.setGender(Gender.K);
+    public void setKoen(String koen) {
+        if (koen != null) {
+            if (koen.equalsIgnoreCase("M")) {
+                this.setKoen(Koen.MAND);
+            } else if (koen.equalsIgnoreCase("K")) {
+                this.setKoen(Koen.KVINDE);
             }
         }
     }
@@ -65,11 +64,11 @@ public class PersonCoreData extends AuthorityDetailData {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        if (StringUtils.isNotEmpty(currentCprNumber)) {
-            map.put("currentCprNumber", this.currentCprNumber);
+        if (StringUtils.isNotEmpty(personnummer)) {
+            map.put("personnummer", this.personnummer);
         }
-        if (this.gender != null) {
-            map.put("gender", this.gender);
+        if (this.koen != null) {
+            map.put("koen", this.koen);
         }
         return map;
     }

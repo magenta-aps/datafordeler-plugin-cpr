@@ -50,12 +50,12 @@ public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEnti
     private ObjectMapper objectMapper;
 
     private static class RoadIdentifier {
-        public int municipalityCode;
-        public int roadCode;
+        public int kommunekode;
+        public int vejkode;
 
-        public RoadIdentifier(int municipalityCode, int roadCode) {
-            this.municipalityCode = municipalityCode;
-            this.roadCode = roadCode;
+        public RoadIdentifier(int kommunekode, int vejkode) {
+            this.kommunekode = kommunekode;
+            this.vejkode = vejkode;
         }
 
         @Override
@@ -65,14 +65,14 @@ public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEnti
 
             RoadIdentifier that = (RoadIdentifier) o;
 
-            if (municipalityCode != that.municipalityCode) return false;
-            return roadCode == that.roadCode;
+            if (kommunekode != that.kommunekode) return false;
+            return vejkode == that.vejkode;
         }
 
         @Override
         public int hashCode() {
-            int result = municipalityCode;
-            result = 31 * result + roadCode;
+            int result = kommunekode;
+            result = 31 * result + vejkode;
             return result;
         }
     }
@@ -132,8 +132,8 @@ public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEnti
     @Override
     protected RoadEntity createBasicEntity(RoadDataRecord record) {
         RoadEntity roadEntity = new RoadEntity();
-        roadEntity.setMunicipalityCode(record.getMunicipalityCode());
-        roadEntity.setRoadCode(record.getRoadCode());
+        roadEntity.setKommunekode(record.getMunicipalityCode());
+        roadEntity.setVejkode(record.getRoadCode());
         return roadEntity;
     }
 

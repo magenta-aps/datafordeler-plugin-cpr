@@ -31,8 +31,8 @@ public class RoadEffect extends CprEffect<RoadRegistration, RoadEffect, RoadBase
 
     public RoadEffect(RoadRegistration registration, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         this(registration, effectFrom, effectTo);
-        this.setUncertainFrom(effectFromUncertain);
-        this.setUncertainTo(effectToUncertain);
+        this.setEffectFromUncertain(effectFromUncertain);
+        this.setEffectToUncertain(effectToUncertain);
     }
 
 }

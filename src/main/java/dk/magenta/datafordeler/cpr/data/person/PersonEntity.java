@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.database.Identification;
 
-import java.math.BigInteger;
 import javax.persistence.Column;
 import javax.persistence.Index;
 import javax.persistence.Table;
@@ -18,7 +17,7 @@ import java.util.UUID;
  * Created by lars on 16-05-17.
  */
 @javax.persistence.Entity
-@Table(name="cpr_person_entity", indexes = {@Index(name = "cprNumber", columnList = "cprNumber")})
+@Table(name="cpr_person_entity", indexes = {@Index(name = "personnummer", columnList = "personnummer")})
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {
 
@@ -42,16 +41,16 @@ public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {
     public static final String schema = "Person";
 
     @Column
-    @JsonProperty
-    @XmlElement
-    private String cprNumber;
+    @JsonProperty("personnummer")
+    @XmlElement(name=("personnummer"))
+    private String personnummer;
 
-    public String getCprNumber() {
-        return this.cprNumber;
+    public String getPersonnummer() {
+        return this.personnummer;
     }
 
-    public void setCprNumber(String cprNumber) {
-        this.cprNumber = cprNumber;
+    public void setPersonnummer(String personnummer) {
+        this.personnummer = personnummer;
     }
 
 

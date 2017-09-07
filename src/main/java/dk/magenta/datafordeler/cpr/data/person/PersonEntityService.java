@@ -22,6 +22,11 @@ public class PersonEntityService extends FapiService<PersonEntity, PersonQuery> 
     @Autowired
     private CprPlugin cprPlugin;
 
+    public PersonEntityService() {
+        super();
+        this.setOutputWrapper(new PersonOutputWrapper());
+    }
+
     @Override
     public int getVersion() {
         return 1;

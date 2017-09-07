@@ -1,7 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,20 +20,20 @@ public class PersonEmigrationData extends AuthorityDetailData {
     @Column
     @JsonProperty(value = "landekode")
     @XmlElement(name = "landekode")
-    private int countryCode;
+    private int landekode;
 
-    public int getCountryCode() {
-        return countryCode;
+    public int getLandekode() {
+        return landekode;
     }
 
-    public void setCountryCode(int countryCode) {
-        this.countryCode = countryCode;
+    public void setLandekode(int landekode) {
+        this.landekode = landekode;
     }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("countryCode", this.countryCode);
+        map.put("landekode", this.landekode);
         return map;
     }
 }

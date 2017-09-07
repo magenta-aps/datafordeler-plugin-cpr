@@ -14,57 +14,57 @@ import java.util.Map;
  */
 public class PersonQuery extends CprQuery<PersonEntity> {
 
-    public static final String CPR = "cpr";
-    public static final String FIRSTNAME = "firstName";
-    public static final String LASTNAME = "lastName";
+    public static final String PERSONNUMMER = "personnummer";
+    public static final String FORNAVNE = "fornavne";
+    public static final String EFTERNAVN = "efternavn";
 
-    @QueryField(type = QueryField.FieldType.STRING, queryName = CPR)
-    private String cprNumber;
+    @QueryField(type = QueryField.FieldType.STRING, queryName = PERSONNUMMER)
+    private String personnummer;
 
-    public String getCprNumber() {
-        return this.cprNumber;
+    public String getPersonnummer() {
+        return this.personnummer;
     }
 
-    public void setCprNumber(String cprNumber) {
-        this.cprNumber = cprNumber;
+    public void setPersonnummer(String personnummer) {
+        this.personnummer = personnummer;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING, queryName = FIRSTNAME)
-    private String firstName;
+    @QueryField(type = QueryField.FieldType.STRING, queryName = FORNAVNE)
+    private String fornavn;
 
-    public String getFirstName() {
-        return firstName;
+    public String getFornavn() {
+        return fornavn;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFornavn(String fornavn) {
+        this.fornavn = fornavn;
     }
 
-    @QueryField(type = QueryField.FieldType.STRING, queryName = LASTNAME)
-    private String lastName;
+    @QueryField(type = QueryField.FieldType.STRING, queryName = EFTERNAVN)
+    private String efternavn;
 
-    public String getLastName() {
-        return lastName;
+    public String getEfternavn() {
+        return efternavn;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setEfternavn(String efternavn) {
+        this.efternavn = efternavn;
     }
 
     @Override
     public Map<String, Object> getSearchParameters() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put(CPR, this.cprNumber);
-        map.put(FIRSTNAME, this.firstName);
-        map.put(LASTNAME, this.lastName);
+        map.put(PERSONNUMMER, this.personnummer);
+        map.put(FORNAVNE, this.fornavn);
+        map.put(EFTERNAVN, this.efternavn);
         return map;
     }
 
     @Override
     public void setFromParameters(ParameterMap parameters) {
-        this.setCprNumber(parameters.getFirst(CPR));
-        this.setFirstName(parameters.getFirst(FIRSTNAME));
-        this.setLastName(parameters.getFirst(LASTNAME));
+        this.setPersonnummer(parameters.getFirst(PERSONNUMMER));
+        this.setFornavn(parameters.getFirst(FORNAVNE));
+        this.setEfternavn(parameters.getFirst(EFTERNAVN));
     }
 
     @Override
@@ -81,14 +81,14 @@ public class PersonQuery extends CprQuery<PersonEntity> {
     @Override
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = new LookupDefinition(this);
-        if (this.cprNumber != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".cprNumber", this.cprNumber);
+        if (this.personnummer != null) {
+            lookupDefinition.put(LookupDefinition.entityref + "." + PERSONNUMMER, this.personnummer);
         }
-        if (this.firstName != null) {
-            lookupDefinition.put("nameData.firstName", this.firstName);
+        if (this.fornavn != null) {
+            lookupDefinition.put("navn." + FORNAVNE, this.fornavn);
         }
-        if (this.lastName != null) {
-            lookupDefinition.put("nameData.lastName", this.lastName);
+        if (this.efternavn != null) {
+            lookupDefinition.put("navn." + EFTERNAVN, this.efternavn);
         }
         return lookupDefinition;
     }

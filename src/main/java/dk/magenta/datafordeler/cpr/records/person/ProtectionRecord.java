@@ -41,9 +41,12 @@ public class ProtectionRecord extends PersonDataRecord {
     public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
         if (this.protectionTemporality.matches(registrationTime, effect)) {
             data.setProtection(
-                    this.getInt("start_mynkod-beskyttelse"),
-                    this.getInt("beskyttype"),
-                    this.getBoolean("indrap-beskyttelse")
+                // int authority,
+                this.getInt("start_mynkod-beskyttelse"),
+                // int beskyttelsestype,
+                this.getInt("beskyttype"),
+                // boolean reportMarking
+                this.getBoolean("indrap-beskyttelse")
             );
         }
     }

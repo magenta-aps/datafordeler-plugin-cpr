@@ -14,8 +14,8 @@ public abstract class CprRegistration<E extends Entity<E, R>, R extends CprRegis
             if (
                     Equality.equal(effect.getEffectFrom(), effectFrom) &&
                     Equality.equal(effect.getEffectTo(), effectTo) &&
-                            (effect.isUncertainFrom() == effectFromUncertain) &&
-                            (effect.isUncertainTo() == effectToUncertain)
+                            (effect.getEffectFromUncertain() == effectFromUncertain) &&
+                            (effect.getEffectToUncertain() == effectToUncertain)
                     ) {
                 return effect;
             }
@@ -29,8 +29,8 @@ public abstract class CprRegistration<E extends Entity<E, R>, R extends CprRegis
 
     public V createEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         V effect = this.createEffect(effectFrom, effectTo);
-        effect.setUncertainFrom(effectFromUncertain);
-        effect.setUncertainTo(effectToUncertain);
+        effect.setEffectFromUncertain(effectFromUncertain);
+        effect.setEffectToUncertain(effectToUncertain);
         return effect;
     }
 

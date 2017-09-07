@@ -1,13 +1,9 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.core.database.Registration;
 import dk.magenta.datafordeler.cpr.data.CprRegistration;
 
 import javax.persistence.Table;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by lars on 16-05-17.
@@ -19,5 +15,19 @@ public class PersonRegistration extends CprRegistration<PersonEntity, PersonRegi
     @Override
     protected PersonEffect createEmptyEffect(OffsetDateTime effectFrom, OffsetDateTime effectTo) {
         return new PersonEffect(this, effectFrom, effectTo);
+    }
+
+    public PersonEffect getEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
+        for (PersonEffect effect : this.effects) {
+            if (
+                    (effect.getEffectFrom() == null ? effectFrom == null : effect.getEffectFrom().equals(effectFrom)) &&
+                    (effect.getEffectTo() == null ? effectTo == null : effect.getEffectTo().equals(effectTo)) &&
+                    (effect.getEffectFromUncertain() == effectFromUncertain) &&
+                    (effect.getEffectToUncertain() == effectToUncertain)
+            ) {
+                return effect;
+            }
+        }
+        return null;
     }
 }

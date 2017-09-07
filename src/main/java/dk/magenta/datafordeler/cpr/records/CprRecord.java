@@ -67,4 +67,8 @@ public abstract class CprRecord extends Record {
         return value != null && value.equals("*");
     }
 
+    protected String getMarkingCharacter(String key) {
+        return this.get(key);
+    }
+
 }

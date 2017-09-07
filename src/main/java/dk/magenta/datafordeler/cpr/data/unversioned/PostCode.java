@@ -20,35 +20,35 @@ public class PostCode extends UnversionedEntity {
     @Column
     @JsonProperty(value = "postnummer")
     @XmlElement(name = "postnummer")
-    private int code;
+    private int postnummer;
 
-    public int getCode() {
-        return this.code;
+    public int getPostnummer() {
+        return this.postnummer;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public void setPostnummer(int postnummer) {
+        this.postnummer = postnummer;
     }
 
     @Column
     @JsonProperty(value = "postdistrikt")
     @XmlElement(name = "postdistrikt")
-    private String text;
+    private String postdistrikt;
 
-    public String getText() {
-        return this.text;
+    public String getPostdistrikt() {
+        return this.postdistrikt;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setPostdistrikt(String postdistrikt) {
+        this.postdistrikt = postdistrikt;
     }
 
     public static PostCode getPostcode(int code, String text, QueryManager queryManager, Session session) {
-        PostCode postcode = queryManager.getItem(session, PostCode.class, Collections.singletonMap("code", code));
+        PostCode postcode = queryManager.getItem(session, PostCode.class, Collections.singletonMap("postnummer", code));
         if (postcode == null) {
             postcode = new PostCode();
-            postcode.setCode(code);
-            postcode.setText(text);
+            postcode.setPostnummer(code);
+            postcode.setPostdistrikt(text);
             session.save(postcode);
         }
         return postcode;

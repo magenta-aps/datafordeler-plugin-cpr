@@ -39,12 +39,12 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         if (this.coreData == null) {
             this.coreData = new RoadCoreData();
         }
-        this.coreData.setToMunicipalityCode(toMunicipalityCode);
-        this.coreData.setToRoadCode(toRoadCode);
-        this.coreData.setFromMunicipalityCode(fromMunicipalityCode);
-        this.coreData.setFromRoadCode(fromRoadCode);
-        this.coreData.setAddressingName(addressingName);
-        this.coreData.setName(name);
+        this.coreData.setTilKommunekode(toMunicipalityCode);
+        this.coreData.setTilVejkode(toRoadCode);
+        this.coreData.setFraKommunekode(fromMunicipalityCode);
+        this.coreData.setFraVejkode(fromRoadCode);
+        this.coreData.setAddresseringsnavn(addressingName);
+        this.coreData.setVejnavn(name);
     }
 
     public void addMemo(int memoNumber, String memoText) {

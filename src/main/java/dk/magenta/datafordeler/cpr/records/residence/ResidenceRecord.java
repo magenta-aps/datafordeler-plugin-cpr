@@ -45,19 +45,19 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
     @Override
     public void populateBaseData(ResidenceBaseData data, ResidenceEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
         if (this.residenceTemporality.matches(registrationTime, effect)) {
-            data.setMunicipalityCode(this.getInt("komkod"));
-            data.setRoadCode(this.getInt("vejkod"));
-            data.setHouseNumber(this.getString("husnr", true));
-            data.setFloor(this.getString("etage", true));
-            data.setDoor(this.getString("sidedoer", true));
+            data.setKommunekode(this.getInt("komkod"));
+            data.setVejkode(this.getInt("vejkod"));
+            data.setHusnummer(this.getString("husnr", true));
+            data.setEtage(this.getString("etage", true));
+            data.setSideDoer(this.getString("sidedoer", true));
         }
     }
 
     @Override
     protected ResidenceEffect createEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         ResidenceEffect effect = new ResidenceEffect(null, effectFrom, effectTo);
-        effect.setUncertainFrom(effectFromUncertain);
-        effect.setUncertainTo(effectToUncertain);
+        effect.setEffectFromUncertain(effectFromUncertain);
+        effect.setEffectToUncertain(effectToUncertain);
         return effect;
     }
 

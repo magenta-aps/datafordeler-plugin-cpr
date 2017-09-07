@@ -126,6 +126,16 @@ public abstract class Record extends HashMap<String, String> {
         return null;
     }
 
+
+    public LocalDateTime getDateTime(String dateKey, String timeKey) {
+        LocalDate localDate = this.getDate(dateKey);
+        LocalTime localTime = this.getTime(timeKey);
+        if (localDate != null) {
+            return LocalDateTime.of(localDate, localTime != null ? localTime : LocalTime.MIDNIGHT);
+        }
+        return null;
+    }
+
     public OffsetDateTime getOffsetDateTime(String key) {
         LocalDateTime dateTime = this.getDateTime(key);
         if (dateTime != null) {

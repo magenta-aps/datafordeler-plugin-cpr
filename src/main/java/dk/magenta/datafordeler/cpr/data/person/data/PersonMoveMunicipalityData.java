@@ -2,7 +2,6 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,76 +21,75 @@ public class PersonMoveMunicipalityData extends AuthorityDetailData {
 
 
     @Column
-    @JsonProperty(value = "tilflytningsdato")
-    @XmlElement(name = "tilflytningsdato")
-    private LocalDateTime moveToDate;
+    @JsonProperty(value = "fraflytningsdatoKommune")
+    @XmlElement(name = "fraflytningsdatoKommune")
+    private LocalDateTime fraflytningsdatoKommune;
 
-    public LocalDateTime getMoveToDate() {
-        return this.moveToDate;
+    public LocalDateTime getFraflytningsdatoKommune() {
+        return this.fraflytningsdatoKommune;
     }
 
-    public void setMoveToDate(LocalDateTime moveToDate) {
-        this.moveToDate = moveToDate;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "tilflytningsdatoUsikker")
-    @XmlElement(name = "tilflytningsdatoUsikker")
-    private boolean moveToDateUncertain;
-
-    public boolean isMoveToDateUncertain() {
-        return this.moveToDateUncertain;
-    }
-
-    public void setMoveToDateUncertain(boolean moveToDateUncertain) {
-        this.moveToDateUncertain = moveToDateUncertain;
+    public void setFraflytningsdatoKommune(LocalDateTime fraflytningsdatoKommune) {
+        this.fraflytningsdatoKommune = fraflytningsdatoKommune;
     }
 
 
 
     @Column
-    @JsonProperty(value = "fraflytningskommune")
-    @XmlElement(name = "fraflytningskommune")
-    private int moveFromMunicipality;
+    @JsonProperty(value = "fraflytningsdatoKommuneUsikkerhedsmarkering")
+    @XmlElement(name = "fraflytningsdatoKommuneUsikkerhedsmarkering")
+    private boolean fraflytningsdatoKommuneUsikkerhedsmarkering;
 
-    public int getMoveFromMunicipality() {
-        return this.moveFromMunicipality;
+    public boolean isFraflytningsdatoKommuneUsikkerhedsmarkering() {
+        return this.fraflytningsdatoKommuneUsikkerhedsmarkering;
     }
 
-    public void setMoveFromMunicipality(int moveFromMunicipality) {
-        this.moveFromMunicipality = moveFromMunicipality;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "fraflytningsdato")
-    @XmlElement(name = "fraflytningsdato")
-    private LocalDateTime moveFromDate;
-
-    public LocalDateTime getMoveFromDate() {
-        return this.moveFromDate;
-    }
-
-    public void setMoveFromDate(LocalDateTime moveFromDate) {
-        this.moveFromDate = moveFromDate;
+    public void setFraflytningsdatoKommuneUsikkerhedsmarkering(boolean fraflytningsdatoKommuneUsikkerhedsmarkering) {
+        this.fraflytningsdatoKommuneUsikkerhedsmarkering = fraflytningsdatoKommuneUsikkerhedsmarkering;
     }
 
 
 
     @Column
-    @JsonProperty(value = "fraflytningsdatoUsikker")
-    @XmlElement(name = "fraflytningsdatoUsikker")
-    private boolean moveFromDateUncertain;
+    @JsonProperty(value = "fraflytningskommunekode")
+    @XmlElement(name = "fraflytningskommunekode")
+    private int fraflytningskommunekode;
 
-    public boolean isMoveFromDateUncertain() {
-        return this.moveFromDateUncertain;
+    public int getFraflytningskommunekode() {
+        return this.fraflytningskommunekode;
     }
 
-    public void setMoveFromDateUncertain(boolean moveFromDateUncertain) {
-        this.moveFromDateUncertain = moveFromDateUncertain;
+    public void setFraflytningskommunekode(int fraflytningskommunekode) {
+        this.fraflytningskommunekode = fraflytningskommunekode;
+    }
+
+
+    @Column
+    @JsonProperty(value = "tilflytningsdatoKommune")
+    @XmlElement(name = "tilflytningsdatoKommune")
+    private LocalDateTime tilflytningsdatoKommune;
+
+    public LocalDateTime getTilflytningsdatoKommune() {
+        return this.tilflytningsdatoKommune;
+    }
+
+    public void setTilflytningsdatoKommune(LocalDateTime tilflytningsdatoKommune) {
+        this.tilflytningsdatoKommune = tilflytningsdatoKommune;
+    }
+
+
+
+    @Column
+    @JsonProperty(value = "tilflytningsdatoKommuneUsikkerhedsmarkering")
+    @XmlElement(name = "tilflytningsdatoKommuneUsikkerhedsmarkering")
+    private boolean tilflytningsdatoKommuneUsikkerhedsmarkering;
+
+    public boolean isTilflytningsdatoKommuneUsikkerhedsmarkering() {
+        return this.tilflytningsdatoKommuneUsikkerhedsmarkering;
+    }
+
+    public void setTilflytningsdatoKommuneUsikkerhedsmarkering(boolean tilflytningsdatoKommuneUsikkerhedsmarkering) {
+        this.tilflytningsdatoKommuneUsikkerhedsmarkering = tilflytningsdatoKommuneUsikkerhedsmarkering;
     }
 
 
@@ -99,11 +97,11 @@ public class PersonMoveMunicipalityData extends AuthorityDetailData {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("moveToDate", this.moveToDate);
-        map.put("moveToDateUncertain", this.moveToDateUncertain);
-        map.put("moveFromMunicipality", this.moveFromMunicipality);
-        map.put("moveFromDate", this.moveFromDate);
-        map.put("moveFromDateUncertain", this.moveFromDateUncertain);
+        map.put("fraflytningsdatoKommune", this.fraflytningsdatoKommune);
+        map.put("fraflytningsdatoKommuneUsikkerhedsmarkering", this.fraflytningsdatoKommuneUsikkerhedsmarkering);
+        map.put("fraflytningskommunekode", this.fraflytningskommunekode);
+        map.put("tilflytningsdatoKommune", this.tilflytningsdatoKommune);
+        map.put("tilflytningsdatoKommuneUsikkerhedsmarkering", this.tilflytningsdatoKommuneUsikkerhedsmarkering);
         return map;
     }
 }

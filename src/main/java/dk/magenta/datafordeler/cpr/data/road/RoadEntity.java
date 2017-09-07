@@ -20,8 +20,8 @@ import java.util.UUID;
 @Table(
     name="cpr_road_entity",
     indexes = {
-        @Index(name = "vejKode", columnList = "roadCode"),
-        @Index(name = "komKodeVejKode", columnList = "municipalityCode,roadCode")
+        @Index(name = "vejKode", columnList = "vejkode"),
+        @Index(name = "komKodeVejKode", columnList = "kommunekode,vejkode")
     }
 )
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -48,29 +48,29 @@ public class RoadEntity extends Entity<RoadEntity, RoadRegistration> {
 
 
     @Column
-    @JsonProperty(value = "kommuneKode")
-    @XmlElement(name = "kommuneKode")
-    private int municipalityCode;
+    @JsonProperty(value = "kommunekode")
+    @XmlElement(name = "kommunekode")
+    private int kommunekode;
 
-    public int getMunicipalityCode() {
-        return this.municipalityCode;
+    public int getKommunekode() {
+        return this.kommunekode;
     }
 
-    public void setMunicipalityCode(int municipalityCode) {
-        this.municipalityCode = municipalityCode;
+    public void setKommunekode(int kommunekode) {
+        this.kommunekode = kommunekode;
     }
 
     @Column
-    @JsonProperty(value = "vejKode")
-    @XmlElement(name = "vejKode")
-    private int roadCode;
+    @JsonProperty(value = "vejkode")
+    @XmlElement(name = "vejkode")
+    private int vejkode;
 
-    public int getRoadCode() {
-        return this.roadCode;
+    public int getVejkode() {
+        return this.vejkode;
     }
 
-    public void setRoadCode(int roadCode) {
-        this.roadCode = roadCode;
+    public void setVejkode(int vejkode) {
+        this.vejkode = vejkode;
     }
 
     public static UUID generateUUID(int municipalityCode, int roadCode) {

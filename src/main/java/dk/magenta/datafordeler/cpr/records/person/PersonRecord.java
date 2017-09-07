@@ -98,56 +98,81 @@ public class PersonRecord extends PersonDataRecord {
 
         if (this.motherTemporality.matches(registrationTime, effect)) {
             data.setMother(
-                    this.get("mornvn"),
-                    this.getBoolean("mornvn_mrk"),
-                    this.getString("pnrmor", false),
-                    this.getDate("mor_foed_dt"),
-                    this.getBoolean("mor_foed_dt_umrk"),
-                    this.getInt("mor_mynkod")
+                // String name,
+                this.get("mornvn"),
+                // boolean nameMarking,
+                this.getBoolean("mornvn_mrk"),
+                // String cprNumber,
+                this.getString("pnrmor", false),
+                // LocalDate birthDate,
+                this.getDate("mor_foed_dt"),
+                // boolean birthDateUncertain,
+                this.getBoolean("mor_foed_dt_umrk"),
+                // int authorityCode
+                this.getInt("mor_mynkod")
             );
         }
 
         if (this.fatherTemporality.matches(registrationTime, effect)) {
             data.setFather(
-                    this.get("farnvn"),
-                    this.getBoolean("farnvn_mrk"),
-                    this.getString("pnrfar", false),
-                    this.getDate("far_foed_dt"),
-                    this.getBoolean("far_foed_dt_umrk"),
-                    this.getInt("far_mynkod")
+                // String name,
+                this.get("farnvn"),
+                // boolean nameMarking,
+                this.getBoolean("farnvn_mrk"),
+                // String cprNumber,
+                this.getString("pnrfar", false),
+                // LocalDate birthDate,
+                this.getDate("far_foed_dt"),
+                // boolean birthDateUncertain,
+                this.getBoolean("far_foed_dt_umrk"),
+                // int authorityCode
+                this.getInt("far_mynkod")
             );
         }
 
         if (this.motherVerificationTemporality.matches(registrationTime, effect)) {
             data.setMotherVerification(
-                    this.getInt("mor_dok_mynkod"),
-                    this.getBoolean("mor_dok")
+                // int authorityCode,
+                this.getInt("mor_dok_mynkod"),
+                // boolean verified
+                this.getBoolean("mor_dok")
             );
         }
 
         if (this.fatherVerificationTemporality.matches(registrationTime, effect)) {
             data.setFatherVerification(
-                    this.getInt("far_dok_mynkod"),
-                    this.getBoolean("far_dok")
+                // int authorityCode,
+                this.getInt("far_dok_mynkod"),
+                // boolean verified
+                this.getBoolean("far_dok")
             );
         }
 
         if (this.positionTemporality.matches(registrationTime, effect)) {
             data.setPosition(
-                    this.getInt("stilling_mynkod"),
-                    this.get("stilling")
+                // int authorityCode,
+                this.getInt("stilling_mynkod"),
+                // String position
+                this.get("stilling")
             );
         }
 
         if (this.birthTemporality.matches(registrationTime, effect)) {
 
             data.setBirth(
-                    LocalDateTime.of(this.getDate("foed_dt"), this.getTime("foed_tm")),
-                    this.getBoolean("foed_dt_umrk"),
-                    this.getInt("foedsekvens")
+                // LocalDateTime foedselsdato,
+                this.getDateTime("foed_dt", "foed_tm"),
+                // boolean foedselsdatoUsikkerhedsmarkering,
+                this.getBoolean("foed_dt_umrk"),
+                // String cprFoedselsregistreringsstedskode,
+                null,
+                // String cprFoedselsregistreringsstedsnavn,
+                null,
+                // int foedselsraekkefoelge
+                this.getInt("foedsekvens")
             );
-            data.setCurrentCprNumber(this.getString("pnrgaeld", false));
-            data.setGender(this.get("koen"));
+            data.setPersonnummer(this.getString("pnr", false));
+            data.setKoen(this.get("koen"));
             data.setStartAuthority(this.getInt("start_mynkod-person"));
         }
     }

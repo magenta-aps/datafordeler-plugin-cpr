@@ -6,17 +6,15 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
-import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.Equality;
-import dk.magenta.datafordeler.cpr.data.CprEntityManager;
+import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.cpr.data.person.*;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
+import dk.magenta.datafordeler.cpr.data.person.PersonOutputWrapper;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.*;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadMemoData;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadPostcodeData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,6 +54,8 @@ public class ParseTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private OutputWrapper<PersonEntity> personOutputWrapper = new PersonOutputWrapper();
+
     @Test
     public void testParsePerson() throws DataFordelerException {
         Session session = null;
@@ -64,12 +64,13 @@ public class ParseTest {
             personEntityManager.parseRegistration(testData);
 
             PersonQuery query = new PersonQuery();
-            //query.setCprNumber("121008217");
-            query.setFirstName("Tester");
+            //query.setPersonnummer("121008217");
+            query.setFornavn("Tester");
             session = sessionManager.getSessionFactory().openSession();
 
             try {
                 List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
+                personOutputWrapper.wrapResults(entities);
                 System.out.println(objectMapper.writeValueAsString(entities));
             } catch (JsonProcessingException e) {
                 throw new DataStreamException(e);
@@ -93,16 +94,16 @@ public class ParseTest {
 
 
             RoadQuery query = new RoadQuery();
-            query.setMunicipalityCode("0730");
-            query.setCode("0004");
+            query.setKommunekode("0730");
+            query.setVejkode("0004");
 
             List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
             System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entities));
             Assert.assertEquals(1, entities.size());
             RoadEntity roadEntity = entities.get(0);
             Assert.assertEquals(CprPlugin.getDomain(), roadEntity.getDomain());
-            Assert.assertEquals(730, roadEntity.getMunicipalityCode());
-            Assert.assertEquals(4, roadEntity.getRoadCode());
+            Assert.assertEquals(730, roadEntity.getKommunekode());
+            Assert.assertEquals(4, roadEntity.getVejkode());
             Assert.assertEquals(2, roadEntity.getRegistrations().size());
             RoadRegistration registration1 = roadEntity.getRegistrations().get(0);
             Assert.assertEquals(0, registration1.getSequenceNumber());
@@ -114,10 +115,10 @@ public class ParseTest {
 
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1900-01-01T12:00:00+01:00"), effect11.getEffectFrom()));
             Assert.assertNull(effect11.getEffectTo());
-            Assert.assertEquals("Aalborggade", effect11.getData().get("addressingName"));
-            Assert.assertEquals("Aalborggade", effect11.getData().get("name"));
-            Assert.assertFalse(effect11.isUncertainFrom());
-            Assert.assertFalse(effect11.isUncertainTo());
+            Assert.assertEquals("Aalborggade", effect11.getData().get("addresseringsnavn"));
+            Assert.assertEquals("Aalborggade", effect11.getData().get("vejnavn"));
+            Assert.assertFalse(effect11.getEffectFromUncertain());
+            Assert.assertFalse(effect11.getEffectToUncertain());
 
             RoadEffect effect12 = effects1.get(1);
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1996-03-12T07:42:00+01:00"), effect12.getEffectFrom()));
@@ -139,22 +140,22 @@ public class ParseTest {
             RoadEffect effect21 = effects2.get(0);
             Assert.assertNull(effect21.getEffectFrom());
             Assert.assertNull(effect21.getEffectTo());
-            Assert.assertFalse(effect21.isUncertainFrom());
-            Assert.assertFalse(effect21.isUncertainTo());
+            Assert.assertFalse(effect21.getEffectFromUncertain());
+            Assert.assertFalse(effect21.getEffectToUncertain());
             List<RoadPostcodeData> post = (List<RoadPostcodeData>) effect21.getData().get("postcode");
             Assert.assertEquals(2, post.size());
             Assert.assertEquals("001", post.get(0).getHouseNumberFrom());
             Assert.assertEquals("999", post.get(0).getHouseNumberTo());
             Assert.assertFalse(post.get(0).isEven());
-            Assert.assertEquals(8940, post.get(0).getPostCode().getCode());
-            Assert.assertEquals("Randers SV", post.get(0).getPostCode().getText());
+            Assert.assertEquals(8940, post.get(0).getPostCode().getPostnummer());
+            Assert.assertEquals("Randers SV", post.get(0).getPostCode().getPostdistrikt());
             Assert.assertEquals("002", post.get(1).getHouseNumberFrom());
             Assert.assertEquals("998", post.get(1).getHouseNumberTo());
             Assert.assertTrue(post.get(1).isEven());
-            Assert.assertEquals(8940, post.get(1).getPostCode().getCode());
-            Assert.assertEquals("Randers SV", post.get(1).getPostCode().getText());
-            Assert.assertFalse(effect21.isUncertainFrom());
-            Assert.assertFalse(effect21.isUncertainTo());
+            Assert.assertEquals(8940, post.get(1).getPostCode().getPostnummer());
+            Assert.assertEquals("Randers SV", post.get(1).getPostCode().getPostdistrikt());
+            Assert.assertFalse(effect21.getEffectFromUncertain());
+            Assert.assertFalse(effect21.getEffectToUncertain());
 
         } finally {
             if (session != null) {
@@ -171,9 +172,9 @@ public class ParseTest {
             residenceEntityManager.parseRegistration(testData);
 
             ResidenceQuery query = new ResidenceQuery();
-            //query.setMunicipalityCode("0730");
-            //query.setCode("0012");
-            //query.setMunicipalityCode();
+            //query.setCprKommunekode("0730");
+            //query.setPostnummer("0012");
+            //query.setCprKommunekode();
             /*session = sessionManager.getSessionFactory().openSession();
 
             try {

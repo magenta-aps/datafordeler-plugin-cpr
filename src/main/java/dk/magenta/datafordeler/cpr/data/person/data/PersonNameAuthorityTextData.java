@@ -1,7 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,20 +20,20 @@ public class PersonNameAuthorityTextData extends AuthorityDetailData {
     @Column
     @JsonProperty(value = "tekst")
     @XmlElement(name = "tekst")
-    private String text;
+    private String tekst;
 
-    public String getText() {
-        return this.text;
+    public String getTekst() {
+        return this.tekst;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setTekst(String tekst) {
+        this.tekst = tekst;
     }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("text", this.text);
+        map.put("tekst", this.tekst);
         return map;
     }
 }

@@ -14,13 +14,9 @@ import java.time.temporal.TemporalAccessor;
  */
 public abstract class CprEffect<R extends Registration, V extends CprEffect, D extends CprData> extends Effect<R, V, D> {
 
-    @JsonProperty(value = "fraUsikker")
-    @XmlElement(name = "fraUsikker")
-    private boolean uncertainFrom;
+    private boolean effectFromUncertain;
 
-    @JsonProperty(value = "tilUsikker")
-    @XmlElement(name = "tilUsikker")
-    private boolean uncertainTo;
+    private boolean effectToUncertain;
 
     public CprEffect() {
     }
@@ -37,35 +33,39 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, D e
         super(registration, effectFrom, effectTo);
     }
 
-    public boolean isUncertainFrom() {
-        return this.uncertainFrom;
+    @JsonProperty("virkningFraUsikkerhedsmarkering")
+    @XmlElement(name = "virkningFraUsikkerhedsmarkering")
+    public boolean getEffectFromUncertain() {
+        return this.effectFromUncertain;
     }
 
-    public void setUncertainFrom(boolean uncertainFrom) {
-        this.uncertainFrom = uncertainFrom;
+    public void setEffectFromUncertain(boolean effectFromUncertain) {
+        this.effectFromUncertain = effectFromUncertain;
     }
 
-    public boolean isUncertainTo() {
-        return this.uncertainTo;
+    @JsonProperty("virkningTilUsikkerhedsmarkering")
+    @XmlElement(name = "virkningTilUsikkerhedsmarkering")
+    public boolean getEffectToUncertain() {
+        return this.effectToUncertain;
     }
 
-    public void setUncertainTo(boolean uncertainTo) {
-        this.uncertainTo = uncertainTo;
+    public void setEffectToUncertain(boolean effectToUncertain) {
+        this.effectToUncertain = effectToUncertain;
     }
 
-    public void setRegistration(R registration) {
-        super.setRegistration(registration);
+    public void setRegistration(R registrering) {
+        super.setRegistration(registrering);
     }
     public boolean compareRange(V other) {
-        return (other != null && this.compareRange(other.getEffectFrom(), other.isUncertainFrom(), other.getEffectTo(), other.isUncertainTo()));
+        return (other != null && this.compareRange(other.getEffectFrom(), other.getEffectFromUncertain(), other.getEffectTo(), other.getEffectToUncertain()));
     }
 
     public boolean compareRange(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         return (
                 (this.getEffectFrom() != null ? this.getEffectFrom().equals(effectFrom) : effectFrom == null) &&
                         (this.getEffectTo() != null ? this.getEffectTo().equals(effectTo) : effectTo == null) &&
-                        (this.isUncertainFrom() == effectFromUncertain) &&
-                        (this.isUncertainTo() == effectToUncertain)
+                        (this.getEffectFromUncertain() == effectFromUncertain) &&
+                        (this.getEffectToUncertain() == effectToUncertain)
         );
     }
 
@@ -75,8 +75,8 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, D e
 
     public V createClone() {
         V effect = super.createClone();
-        effect.setUncertainFrom(this.uncertainFrom);
-        effect.setUncertainTo(this.uncertainTo);
+        effect.setEffectFromUncertain(this.effectFromUncertain);
+        effect.setEffectToUncertain(this.effectToUncertain);
         return effect;
     }
 }

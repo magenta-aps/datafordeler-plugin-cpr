@@ -1,8 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.road;
 
-import dk.magenta.datafordeler.core.database.Registration;
 import dk.magenta.datafordeler.cpr.data.CprRegistration;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 
 import javax.persistence.Table;
 import java.time.OffsetDateTime;
@@ -17,6 +15,20 @@ public class RoadRegistration extends CprRegistration<RoadEntity, RoadRegistrati
     @Override
     protected RoadEffect createEmptyEffect(OffsetDateTime effectFrom, OffsetDateTime effectTo) {
         return new RoadEffect(this, effectFrom, effectTo);
+    }
+
+    public RoadEffect getEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
+        for (RoadEffect effect : this.effects) {
+            if (
+                    (effect.getEffectFrom() == null ? effectFrom == null : effect.getEffectFrom().equals(effectFrom)) &&
+                            (effect.getEffectTo() == null ? effectTo == null : effect.getEffectTo().equals(effectTo)) &&
+                            (effect.getEffectFromUncertain() == effectFromUncertain) &&
+                            (effect.getEffectToUncertain() == effectToUncertain)
+                    ) {
+                return effect;
+            }
+        }
+        return null;
     }
 
 }
