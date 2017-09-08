@@ -49,7 +49,7 @@ public class CprConfiguration implements Configuration {
     private String personRegisterPullCronSchedule = "0 0 0 1 1 ?";
 
     @Column
-    private RegisterType personRegisterType = RegisterType.REMOTE_FTP;
+    private RegisterType personRegisterType = RegisterType.LOCAL_FILE;
 
     @Column
     private String personRegisterFtpAddress = "ftps://localhost:2101/ud/";
@@ -61,7 +61,7 @@ public class CprConfiguration implements Configuration {
     private String personRegisterFtpPassword = "password";
 
     @Column
-    private String personRegisterLocalFile = null;
+    private String personRegisterLocalFile = "data/cprpersondata.txt";
 
     @Column
     private Charset personRegisterDataCharset = Charset.ISO_8859_1;
