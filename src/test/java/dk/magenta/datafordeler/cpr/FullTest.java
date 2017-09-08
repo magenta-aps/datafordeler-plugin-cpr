@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.PluginSourceData;
 import dk.magenta.datafordeler.core.util.ItemInputStream;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
@@ -52,6 +53,7 @@ public class FullTest {
     @Ignore
     @Test
     public void test() throws Exception {
+        ImportMetadata importMetadata = new ImportMetadata();
         File tempFile = null;
         FtpService ftp = new FtpService();
         Session session = null;
@@ -80,7 +82,7 @@ public class FullTest {
                     if (eventStream != null) {
                         PluginSourceData data;
                         while ((data = eventStream.next()) != null) {
-                            personEntityManager.parseRegistration(data.getData());
+                            personEntityManager.parseRegistration(data.getData(), importMetadata);
                         }
                         eventStream.close();
                         System.out.println("parsed & stored");

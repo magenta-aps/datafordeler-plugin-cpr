@@ -5,6 +5,7 @@ import dk.magenta.datafordeler.core.database.*;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.Receipt;
 import dk.magenta.datafordeler.core.plugin.Communicator;
 import dk.magenta.datafordeler.core.plugin.EntityManager;
@@ -156,9 +157,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     protected abstract D createDataItem();
 
     @Override
-    public List<R> parseRegistration(String registrationData) throws DataFordelerException {
+    public List<R> parseRegistration(String registrationData, ImportMetadata importMetadata) throws DataFordelerException {
         String charset = this.getConfiguration().getRegisterCharset(this);
-        return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(Charset.forName(charset))));
+        return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(Charset.forName(charset))), importMetadata);
     }
 
     private static final String TASK_PARSE = "CprParse";
@@ -170,7 +171,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     private static final String TASK_CHUNK_HANDLE = "CprChunk";
 
     @Override
-    public List<R> parseRegistration(InputStream registrationData) throws DataFordelerException {
+    public List<R> parseRegistration(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
         ArrayList<R> allRegistrations = new ArrayList<>();
         String charset = this.getConfiguration().getRegisterCharset(this);
         BufferedReader reader = null;
@@ -240,7 +241,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
             for (E entity : recordMap.keySet()) {
                 List<T> records = recordMap.get(entity);
-                Collection<R> entityRegistrations = this.parseRegistration(entity, records, queryManager, session);
+                Collection<R> entityRegistrations = this.parseRegistration(entity, records, queryManager, session, importMetadata);
                 allRegistrations.addAll(entityRegistrations);
             }
             transaction.commit();
@@ -273,7 +274,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     }
 
 
-    private Collection<R> parseRegistration(E entity, List<T> records, QueryManager queryManager, Session session) {
+    private Collection<R> parseRegistration(E entity, List<T> records, QueryManager queryManager, Session session, ImportMetadata importMetadata) {
 
         HashSet<R> allRegistrations = new HashSet<>();
         ListHashMap<Bitemporality, T> groups = this.sortIntoGroups(records);
@@ -334,6 +335,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         ArrayList<R> registrationList = new ArrayList<>(allRegistrations);
         Collections.sort(registrationList);
         for (R registration : registrationList) {
+            registration.setLastImportTime(importMetadata.getImportTime());
             try {
                 queryManager.saveRegistration(session, entity, registration, false, false);
             } catch (DataFordelerException e) {

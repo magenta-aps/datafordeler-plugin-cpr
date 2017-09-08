@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.*;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
@@ -70,8 +71,8 @@ public class ResidenceEntityManager extends CprEntityManager<ResidenceRecord, Re
     }
 
     @Override
-    public List<ResidenceRegistration> parseRegistration(String registrationData) throws DataFordelerException {
-        return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)));
+    public List<ResidenceRegistration> parseRegistration(String registrationData, ImportMetadata importMetadata) throws DataFordelerException {
+        return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)), importMetadata);
     }
 /*
     @Override

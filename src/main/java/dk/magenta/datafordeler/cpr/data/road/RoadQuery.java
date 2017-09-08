@@ -85,7 +85,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
             lookupDefinition.put(LookupDefinition.entityref + ".vejkode", this.vejkode);
         }
         if (this.navn != null) {
-            lookupDefinition.put("coreData.navn", this.navn);
+            lookupDefinition.put("coreData.vejnavn", this.navn);
         }
         if (this.kommunekode != null) {
             lookupDefinition.put(LookupDefinition.entityref + ".kommunekode", this.kommunekode);

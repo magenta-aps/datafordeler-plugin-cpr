@@ -6,6 +6,7 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.cpr.data.person.*;
@@ -59,9 +60,10 @@ public class ParseTest {
     @Test
     public void testParsePerson() throws DataFordelerException {
         Session session = null;
+        ImportMetadata importMetadata = new ImportMetadata();
         try {
             InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
-            personEntityManager.parseRegistration(testData);
+            personEntityManager.parseRegistration(testData, importMetadata);
 
             PersonQuery query = new PersonQuery();
             //query.setPersonnummer("121008217");
@@ -85,10 +87,11 @@ public class ParseTest {
     @Test
     public void testParseRoad() throws IOException, DataFordelerException {
         Session session = null;
+        ImportMetadata importMetadata = new ImportMetadata();
         try {
             InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
             long start = Instant.now().toEpochMilli();
-            roadEntityManager.parseRegistration(testData);
+            roadEntityManager.parseRegistration(testData, importMetadata);
             System.out.println("Parsed road data in "+ (Instant.now().toEpochMilli() - start) + " ms");
             session = sessionManager.getSessionFactory().openSession();
 
@@ -167,9 +170,10 @@ public class ParseTest {
     @Test
     public void testParseResidence() throws DataFordelerException {
         Session session = null;
+        ImportMetadata importMetadata = new ImportMetadata();
         try {
             InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-            residenceEntityManager.parseRegistration(testData);
+            residenceEntityManager.parseRegistration(testData, importMetadata);
 
             ResidenceQuery query = new ResidenceQuery();
             //query.setCprKommunekode("0730");
