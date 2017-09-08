@@ -13,6 +13,7 @@ import dk.magenta.datafordeler.cpr.data.person.PersonQuery;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Session;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,7 @@ public class FullTest {
     @Autowired
     private CprRegisterManager registerManager;
 
+    @Ignore
     @Test
     public void test() throws Exception {
         File tempFile = null;
