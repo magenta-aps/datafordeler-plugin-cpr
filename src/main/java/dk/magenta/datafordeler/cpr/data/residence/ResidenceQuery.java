@@ -110,19 +110,19 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = new LookupDefinition(this);
         if (this.kommunekode != null) {
-            lookupDefinition.put(KOMMUNEKODE, this.kommunekode);
+            lookupDefinition.put(ResidenceBaseData.DB_FIELD_MUNICIPALITY_CODE, this.kommunekode);
         }
         if (this.vejkode != null) {
-            lookupDefinition.put(VEJKODE, this.vejkode);
+            lookupDefinition.put(ResidenceBaseData.DB_FIELD_ROAD_CODE, this.vejkode);
         }
         if (this.husnummer != null) {
-            lookupDefinition.put(HUSNUMMER, this.husnummer);
+            lookupDefinition.put(ResidenceBaseData.DB_FIELD_HOUSENUMBER, this.husnummer);
         }
         if (this.etage != null) {
-            lookupDefinition.put(ETAGE, this.etage);
+            lookupDefinition.put(ResidenceBaseData.DB_FIELD_FLOOR, this.etage);
         }
         if (this.sideDoer != null) {
-            lookupDefinition.put(SIDE_DOER, this.sideDoer);
+            lookupDefinition.put(ResidenceBaseData.DB_FIELD_DOOR, this.sideDoer);
         }
         return lookupDefinition;
     }

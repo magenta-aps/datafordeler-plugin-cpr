@@ -5,9 +5,13 @@ import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.fapi.QueryField;
 import dk.magenta.datafordeler.cpr.data.CprQuery;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
+import dk.magenta.datafordeler.cpr.data.road.data.RoadCoreData;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_MUNICIPALITYCODE;
+import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_ROADCODE;
 
 /**
  * Created by lars on 19-05-17.
@@ -82,13 +86,13 @@ public class RoadQuery extends CprQuery<RoadEntity> {
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = new LookupDefinition(this);
         if (this.vejkode != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".vejkode", this.vejkode);
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + DB_FIELD_ROADCODE, this.vejkode);
         }
         if (this.navn != null) {
-            lookupDefinition.put("coreData.navn", this.navn);
+            lookupDefinition.put(RoadBaseData.DB_FIELD_CORE + LookupDefinition.separator + RoadCoreData.DB_FIELD_ROAD_NAME, this.navn);
         }
         if (this.kommunekode != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".kommunekode", this.kommunekode);
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + DB_FIELD_MUNICIPALITYCODE, this.kommunekode);
         }
         return lookupDefinition;
     }

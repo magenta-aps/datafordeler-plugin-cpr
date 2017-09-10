@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.road.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.unversioned.PostCode;
@@ -19,9 +20,11 @@ import java.util.Map;
 @Table(name="cpr_road_city")
 public class RoadCityData extends DetailData {
 
-    @Column
-    @JsonProperty(value = "husnummerFra")
-    @XmlElement(name = "husnummerFra")
+    public static final String DB_FIELD_HOUSENUMBER_FROM = "housenumberFrom";
+    public static final String IO_FIELD_HOUSENUMBER_FROM = "husnummerFra";
+    @Column(name = DB_FIELD_HOUSENUMBER_FROM)
+    @JsonProperty(value = IO_FIELD_HOUSENUMBER_FROM)
+    @XmlElement(name = IO_FIELD_HOUSENUMBER_FROM)
     private String houseNumberFrom;
 
     public String getHouseNumberFrom() {
@@ -32,9 +35,11 @@ public class RoadCityData extends DetailData {
         this.houseNumberFrom = houseNumberFrom;
     }
 
-    @Column
-    @JsonProperty(value = "husnummerTil")
-    @XmlElement(name = "husnummerTil")
+    public static final String DB_FIELD_HOUSENUMBER_TO = "housenumberTo";
+    public static final String IO_FIELD_HOUSENUMBER_TO = "husnummerTil";
+    @Column(name = DB_FIELD_HOUSENUMBER_TO)
+    @JsonProperty(value = IO_FIELD_HOUSENUMBER_TO)
+    @XmlElement(name = IO_FIELD_HOUSENUMBER_TO)
     private String houseNumberTo;
 
     public String getHouseNumberTo() {
@@ -45,9 +50,11 @@ public class RoadCityData extends DetailData {
         this.houseNumberTo = houseNumberTo;
     }
 
-    @Column
-    @JsonProperty(value = "lige")
-    @XmlElement(name = "lige")
+    public static final String DB_FIELD_EVEN = "even";
+    public static final String IO_FIELD_EVEN = "lige";
+    @Column(name = DB_FIELD_EVEN)
+    @JsonProperty(value = IO_FIELD_EVEN)
+    @XmlElement(name = IO_FIELD_EVEN)
     private boolean even;
 
     public boolean isEven() {
@@ -58,9 +65,11 @@ public class RoadCityData extends DetailData {
         this.even = even;
     }
 
-    @Column
-    @JsonProperty(value = "bynavn")
-    @XmlElement(name = "bynavn")
+    public static final String DB_FIELD_CITYNAME = "cityName";
+    public static final String IO_FIELD_CITYNAME = "bynavn";
+    @Column(name = DB_FIELD_CITYNAME)
+    @JsonProperty(value = IO_FIELD_CITYNAME)
+    @XmlElement(name = IO_FIELD_CITYNAME)
     private String cityName;
 
     public String getCityName() {
@@ -87,4 +96,15 @@ public class RoadCityData extends DetailData {
         }
         return map;
     }
+
+    @JsonIgnore
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(DB_FIELD_CITYNAME, this.cityName);
+        map.put(DB_FIELD_EVEN, this.even);
+        map.put(DB_FIELD_HOUSENUMBER_FROM, this.houseNumberFrom);
+        map.put(DB_FIELD_HOUSENUMBER_TO, this.houseNumberTo);
+        return map;
+    }
+
 }

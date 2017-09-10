@@ -21,15 +21,26 @@ import org.hibernate.Session;
 @Table(name="cpr_road_data")
 public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
 
+    public static final String DB_FIELD_CORE = "coreData";
+
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private RoadCoreData coreData;
+
+
+    public static final String DB_FIELD_MEMO = "memoData";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OrderBy("memoNumber")
     private List<RoadMemoData> memoData = new ArrayList<>();
 
+
+    public static final String DB_FIELD_POSTCODE = "postcodeData";
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RoadPostcodeData> postcodeData = new ArrayList<>();
+
+
+    public static final String DB_FIELD_CITY = "cityData";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RoadCityData> cityData = new ArrayList<>();
@@ -39,12 +50,12 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         if (this.coreData == null) {
             this.coreData = new RoadCoreData();
         }
-        this.coreData.setTilKommunekode(toMunicipalityCode);
-        this.coreData.setTilVejkode(toRoadCode);
-        this.coreData.setFraKommunekode(fromMunicipalityCode);
-        this.coreData.setFraVejkode(fromRoadCode);
-        this.coreData.setAddresseringsnavn(addressingName);
-        this.coreData.setVejnavn(name);
+        this.coreData.setToMunicipality(toMunicipalityCode);
+        this.coreData.setToRoad(toRoadCode);
+        this.coreData.setFromMunicipality(fromMunicipalityCode);
+        this.coreData.setFromRoad(fromRoadCode);
+        this.coreData.setAddressingName(addressingName);
+        this.coreData.setName(name);
     }
 
     public void addMemo(int memoNumber, String memoText) {
@@ -100,16 +111,16 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         lookupDefinition.setMatchNulls(true);
 
         if (this.coreData != null) {
-            lookupDefinition.putAll("coreData", this.coreData.databaseFields());
+            lookupDefinition.putAll(DB_FIELD_CORE, this.coreData.databaseFields());
         }
         if (this.memoData != null) {
-            lookupDefinition.putAll("memoData", DetailData.listDatabaseFields(this.memoData));
+            lookupDefinition.putAll(DB_FIELD_MEMO, DetailData.listDatabaseFields(this.memoData));
         }
         if (this.postcodeData != null) {
-            lookupDefinition.putAll("postcodeData", DetailData.listDatabaseFields(this.postcodeData));
+            lookupDefinition.putAll(DB_FIELD_POSTCODE, DetailData.listDatabaseFields(this.postcodeData));
         }
         if (this.cityData != null) {
-            lookupDefinition.putAll("cityData", DetailData.listDatabaseFields(this.cityData));
+            lookupDefinition.putAll(DB_FIELD_CITY, DetailData.listDatabaseFields(this.cityData));
         }
         return lookupDefinition;
     }

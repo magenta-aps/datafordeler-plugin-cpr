@@ -115,7 +115,7 @@ public class ParseTest {
 
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1900-01-01T12:00:00+01:00"), effect11.getEffectFrom()));
             Assert.assertNull(effect11.getEffectTo());
-            Assert.assertEquals("Aalborggade", effect11.getData().get("addresseringsnavn"));
+            Assert.assertEquals("Aalborggade", effect11.getData().get("adresseringsnavn"));
             Assert.assertEquals("Aalborggade", effect11.getData().get("vejnavn"));
             Assert.assertFalse(effect11.getEffectFromUncertain());
             Assert.assertFalse(effect11.getEffectToUncertain());

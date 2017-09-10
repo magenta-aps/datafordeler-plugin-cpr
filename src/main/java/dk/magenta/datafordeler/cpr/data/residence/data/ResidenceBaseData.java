@@ -1,7 +1,9 @@
 package dk.magenta.datafordeler.cpr.data.residence.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.cpr.data.CprData;
+import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
 
 import javax.persistence.Column;
@@ -19,94 +21,120 @@ import org.hibernate.Session;
 @Table(name="cpr_residence_data")
 public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseData> {
 
-    @Column
-    @JsonProperty(value = "kommunekode")
-    @XmlElement(name = "kommuneKode")
-    private int kommunekode;
+    public static final String DB_FIELD_MUNICIPALITY_CODE = "municipalityCode";
+    public static final String IO_FIELD_MUNICIPALITY_CODE = "kommunekode";
+    @Column(name = DB_FIELD_MUNICIPALITY_CODE)
+    @JsonProperty(value = IO_FIELD_MUNICIPALITY_CODE)
+    @XmlElement(name = IO_FIELD_MUNICIPALITY_CODE)
+    private int municipalityCode;
 
     public int getKommunekode() {
-        return this.kommunekode;
+        return this.municipalityCode;
     }
 
     public void setKommunekode(int kommunekode) {
-        this.kommunekode = kommunekode;
+        this.municipalityCode = kommunekode;
     }
 
-    @Column
-    @JsonProperty(value = "vejkode")
-    @XmlElement(name = "vejkode")
-    private int vejkode;
+    public static final String DB_FIELD_ROAD_CODE = "roadCode";
+    public static final String IO_FIELD_ROAD_CODE = "vejkode";
+    @Column(name = DB_FIELD_ROAD_CODE)
+    @JsonProperty(value = IO_FIELD_ROAD_CODE)
+    @XmlElement(name = IO_FIELD_ROAD_CODE)
+    private int roadCode;
 
     public int getVejkode() {
-        return this.vejkode;
+        return this.roadCode;
     }
 
     public void setVejkode(int vejkode) {
-        this.vejkode = vejkode;
+        this.roadCode = vejkode;
     }
 
-    @Column
-    @JsonProperty(value = "husnummer")
-    @XmlElement(name = "husnummer")
-    private String husnummer;
+    public static final String DB_FIELD_HOUSENUMBER = "houseNumber";
+    public static final String IO_FIELD_HOUSENUMBER = "husnummer";
+    @Column(name = DB_FIELD_HOUSENUMBER)
+    @JsonProperty(value = IO_FIELD_HOUSENUMBER)
+    @XmlElement(name = IO_FIELD_HOUSENUMBER)
+    private String houseNumber;
 
     public String getHusnummer() {
-        return this.husnummer;
+        return this.houseNumber;
     }
 
     public void setHusnummer(String husnummer) {
-        this.husnummer = husnummer;
+        this.houseNumber = husnummer;
     }
 
-    @Column
-    @JsonProperty(value = "etage")
-    @XmlElement(name = "etage")
-    private String etage;
+    public static final String DB_FIELD_FLOOR = "floor";
+    public static final String IO_FIELD_FLOOR = "etage";
+    @Column(name = DB_FIELD_FLOOR)
+    @JsonProperty(value = IO_FIELD_FLOOR)
+    @XmlElement(name = IO_FIELD_FLOOR)
+    private String floor;
 
     public String getEtage() {
-        return this.etage;
+        return this.floor;
     }
 
     public void setEtage(String etage) {
-        this.etage = etage;
+        this.floor = etage;
     }
 
-    @Column
-    @JsonProperty(value = "sideDoer")
-    @XmlElement(name = "sideDoer")
-    private String sideDoer;
+    public static final String DB_FIELD_DOOR = "door";
+    public static final String IO_FIELD_DOOR = "sideDoer";
+    @Column(name = DB_FIELD_DOOR)
+    @JsonProperty(value = IO_FIELD_DOOR)
+    @XmlElement(name = IO_FIELD_DOOR)
+    private String door;
 
     public String getSideDoer() {
-        return this.sideDoer;
+        return this.door;
     }
 
     public void setSideDoer(String sideDoer) {
-        this.sideDoer = sideDoer;
+        this.door = sideDoer;
     }
 
-    @Column
-    @JsonProperty(value = "lokalitet")
-    @XmlElement(name = "lokalitet")
-    private String lokalitet;
+    public static final String DB_FIELD_LOCALITY = "locality";
+    public static final String IO_FIELD_LOCALITY = "lokalitet";
+    @Column(name = DB_FIELD_LOCALITY)
+    @JsonProperty(value = IO_FIELD_LOCALITY)
+    @XmlElement(name = IO_FIELD_LOCALITY)
+    private String locality;
 
     public String getLokalitet() {
-        return this.lokalitet;
+        return this.locality;
     }
 
     public void setLokalitet(String lokalitet) {
-        this.lokalitet = lokalitet;
+        this.locality = lokalitet;
     }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("kommunekode", this.kommunekode);
-        map.put("vejkode", this.vejkode);
-        map.put("husnummer", this.husnummer);
-        map.put("etage", this.etage);
-        map.put("sideDoer", this.sideDoer);
-        map.put("lokalitet", this.lokalitet);
+        map.put(IO_FIELD_MUNICIPALITY_CODE, this.municipalityCode);
+        map.put(IO_FIELD_ROAD_CODE, this.roadCode);
+        map.put(IO_FIELD_HOUSENUMBER, this.houseNumber);
+        map.put(IO_FIELD_FLOOR, this.floor);
+        map.put(IO_FIELD_DOOR, this.door);
+        map.put(IO_FIELD_LOCALITY, this.locality);
         return map;
+    }
+
+    public LookupDefinition getLookupDefinition() {
+        LookupDefinition lookupDefinition = new LookupDefinition();
+        lookupDefinition.setMatchNulls(true);
+
+        lookupDefinition.put(DB_FIELD_MUNICIPALITY_CODE, this.municipalityCode);
+        lookupDefinition.put(DB_FIELD_ROAD_CODE, this.roadCode);
+        lookupDefinition.put(DB_FIELD_LOCALITY, this.locality);
+        lookupDefinition.put(DB_FIELD_HOUSENUMBER, this.houseNumber);
+        lookupDefinition.put(DB_FIELD_FLOOR, this.floor);
+        lookupDefinition.put(DB_FIELD_DOOR, this.door);
+
+        return lookupDefinition;
     }
 
     @Override
