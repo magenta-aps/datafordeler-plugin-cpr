@@ -11,8 +11,8 @@ import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.cpr.data.person.*;
 import dk.magenta.datafordeler.cpr.data.person.PersonOutputWrapper;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
+import dk.magenta.datafordeler.cpr.data.residence.*;
+import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.data.road.*;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadMemoData;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadPostcodeData;
@@ -198,28 +198,68 @@ public class ParseTest {
             }
         }
     }
-/*
+
     @Test
     public void testParseResidence() throws Exception {
         Session session = null;
         try {
             InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
             residenceEntityManager.parseRegistration(testData);
+            testData.close();
 
             ResidenceQuery query = new ResidenceQuery();
-            query.setKommunekode("0730");
-            query.setVejkode("0012");
+            query.setKommunekode("0360");
+            query.setVejkode("0206");
             session = sessionManager.getSessionFactory().openSession();
 
-            List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
-            System.out.println(objectMapper.writeValueAsString(entities));
+            List<ResidenceEntity> entities = queryManager.getAllEntities(session, query, ResidenceEntity.class);
+            Assert.assertEquals(1, entities.size());
+            List<ResidenceRegistration> registrations = entities.get(0).getRegistrations();
+            Assert.assertEquals(1, registrations.size());
+            ResidenceRegistration registration = registrations.get(0);
+            Assert.assertTrue(OffsetDateTime.parse("2006-12-22T12:00:00+01:00").isEqual(registration.getRegistrationFrom()));
+            Assert.assertNull(registration.getRegistrationTo());
+            List<ResidenceEffect> effects = registration.getEffects();
+            Assert.assertEquals(1, effects.size());
+            ResidenceEffect effect = effects.get(0);
+            Assert.assertTrue(OffsetDateTime.parse("1991-09-23T12:00:00+02:00").isEqual(effect.getEffectFrom()));
+            Assert.assertNull(effect.getEffectTo());
+            Assert.assertFalse(effect.getEffectFromUncertain());
+            Assert.assertFalse(effect.getEffectToUncertain());
+            List<ResidenceBaseData> dataItems = effect.getDataItems();
+            Assert.assertEquals(1, dataItems.size());
+            ResidenceBaseData data = dataItems.get(0);
+            Assert.assertEquals("", data.getEtage());
+            Assert.assertEquals("44E", data.getHusnummer());
+            Assert.assertEquals(360, data.getKommunekode());
+            Assert.assertEquals("Provstelunden", data.getLokalitet());
+            Assert.assertEquals("", data.getSideDoer());
+            Assert.assertEquals(206, data.getVejkode());
+            session.close();
+
+
+            String firstImport = objectMapper.writeValueAsString(entities);
+
+
+
+            testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+            residenceEntityManager.parseRegistration(testData);
+            testData.close();
+
+            session = sessionManager.getSessionFactory().openSession();
+
+            entities = queryManager.getAllEntities(session, query, ResidenceEntity.class);
+            String secondImport = objectMapper.writeValueAsString(entities);
+
+            assertJsonEquality(objectMapper.readTree(firstImport), objectMapper.readTree(secondImport), true, true);
+
 
         } finally {
             if (session != null) {
                 session.close();
             }
         }
-    }*/
+    }
 
     @Test
     public void testFindRegistrations() {

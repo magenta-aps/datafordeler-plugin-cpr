@@ -49,7 +49,6 @@ public class FullTest {
     @Autowired
     private CprRegisterManager registerManager;
 
-    @Ignore
     @Test
     public void test() throws Exception {
         File tempFile = null;

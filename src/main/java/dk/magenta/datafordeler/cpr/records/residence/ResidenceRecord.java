@@ -50,6 +50,7 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
             data.setHusnummer(this.getString("husnr", true));
             data.setEtage(this.getString("etage", true));
             data.setSideDoer(this.getString("sidedoer", true));
+            data.setLokalitet(this.getString("lokalitet", true));
         }
     }
 
