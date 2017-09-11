@@ -19,64 +19,70 @@ import java.util.Map;
 @Table(name = "cpr_person_parent")
 public class PersonParentData extends AuthorityDetailData {
 
-    @Column
+    public static final String DB_FIELD_IS_MOTHER = "isMother";
+    @Column(name = DB_FIELD_IS_MOTHER)
     @JsonIgnore
     @XmlTransient
-    private boolean isMor;
+    private boolean isMother;
 
     @JsonIgnore
     @XmlTransient
-    public boolean isMor() {
-        return this.isMor;
+    public boolean isMother() {
+        return this.isMother;
     }
 
-    public void setMor(boolean mor) {
-        isMor = mor;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "personnummer")
-    @XmlElement(name = "personnummer")
-    private String personnummer;
-
-    public String getPersonnummer() {
-        return this.personnummer;
-    }
-
-    public void setPersonnummer(String personnummer) {
-        this.personnummer = personnummer;
+    public void setMother(boolean mother) {
+        isMother = mother;
     }
 
 
+    public static final String DB_FIELD_CPR_NUMBER = "cprNumber";
+    public static final String IO_FIELD_CPR_NUMBER = "personnummer";
+    @Column(name = DB_FIELD_CPR_NUMBER)
+    @JsonProperty(value = IO_FIELD_CPR_NUMBER)
+    @XmlElement(name = IO_FIELD_CPR_NUMBER)
+    private String cprNumber;
 
-    @Column
-    @JsonProperty(value = "foedselsdato")
-    @XmlElement(name = "foedselsdato")
-    private LocalDate foedselsdato;
-
-    public LocalDate getFoedselsdato() {
-        return this.foedselsdato;
+    public String getCprNumber() {
+        return this.cprNumber;
     }
 
-    public void setFoedselsdato(LocalDate foedselsdato) {
-        this.foedselsdato = foedselsdato;
+    public void setCprNumber(String cprNumber) {
+        this.cprNumber = cprNumber;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "foedselsdatoUsikker")
-    @XmlElement(name = "foedselsdatoUsikker")
-    private boolean foedselsdatoUsikker;
+    public static final String DB_FIELD_BIRTHDATE = "birthDate";
+    public static final String IO_FIELD_BIRTHDATE = "foedselsdato";
+    @Column(name = DB_FIELD_BIRTHDATE)
+    @JsonProperty(value = IO_FIELD_BIRTHDATE)
+    @XmlElement(name = IO_FIELD_BIRTHDATE)
+    private LocalDate birthDate;
 
-    public boolean isFoedselsdatoUsikker() {
-        return this.foedselsdatoUsikker;
+    public LocalDate getBirthDate() {
+        return this.birthDate;
     }
 
-    public void setFoedselsdatoUsikker(boolean foedselsdatoUsikker) {
-        this.foedselsdatoUsikker = foedselsdatoUsikker;
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+
+
+    public static final String DB_FIELD_BIRTHDATE_UNCERTAIN = "birthDateUncertain";
+    public static final String IO_FIELD_BIRTHDATE_UNCERTAIN = "foedselsdatoUsikker";
+    @Column(name = DB_FIELD_BIRTHDATE_UNCERTAIN)
+    @JsonProperty(value = IO_FIELD_BIRTHDATE_UNCERTAIN)
+    @XmlElement(name = IO_FIELD_BIRTHDATE_UNCERTAIN)
+    private boolean birthDateUncertain;
+
+    public boolean isBirthDateUncertain() {
+        return this.birthDateUncertain;
+    }
+
+    public void setBirthDateUncertain(boolean birthDateUncertain) {
+        this.birthDateUncertain = birthDateUncertain;
     }
 
 
@@ -114,9 +120,9 @@ public class PersonParentData extends AuthorityDetailData {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("personnummer", this.personnummer);
-        map.put("foedselsdato", this.foedselsdato);
-        map.put("foedselsdatoUsikker", this.foedselsdatoUsikker);
+        map.put("cprNumber", this.cprNumber);
+        map.put("birthDate", this.birthDate);
+        map.put("birthDateUncertain", this.birthDateUncertain);
         map.put("navn", this.navn);
         map.put("navneMarkering", this.navneMarkering);
         return map;

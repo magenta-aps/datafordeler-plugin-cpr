@@ -64,7 +64,7 @@ public class ParseTest {
             personEntityManager.parseRegistration(testData);
 
             PersonQuery query = new PersonQuery();
-            //query.setPersonnummer("121008217");
+            //query.setCprNumber("121008217");
             query.setFornavn("Tester");
             session = sessionManager.getSessionFactory().openSession();
 

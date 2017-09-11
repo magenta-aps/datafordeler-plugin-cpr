@@ -85,14 +85,14 @@ public class RoadPostcodeData extends DetailData {
         HashMap<String, Object> map = new HashMap<>();
 
         if (this.houseNumberFrom != null) {
-            map.put("houseNumberFrom", this.houseNumberFrom);
+            map.put(IO_FIELD_HOUSENUMBER_FROM, this.houseNumberFrom);
         }
         if (this.houseNumberTo != null) {
-            map.put("houseNumberTo", this.houseNumberTo);
+            map.put(IO_FIELD_HOUSENUMBER_TO, this.houseNumberTo);
         }
-        map.put("even", this.even);
+        map.put(IO_FIELD_EVEN, this.even);
         if (this.postCode != null) {
-            map.put("postCode", this.postCode);
+            map.put(IO_FIELD_POSTCODE, this.postCode);
         }
         return map;
     }

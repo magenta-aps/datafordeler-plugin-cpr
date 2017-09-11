@@ -176,26 +176,26 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     public void setMother(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode) {
         if (this.mor == null) {
             this.mor = new PersonParentData();
-            this.mor.setMor(true);
+            this.mor.setMother(true);
         }
         this.mor.setNavn(name);
         this.mor.setNavneMarkering(nameMarking);
-        this.mor.setPersonnummer(cprNumber);
-        this.mor.setFoedselsdato(birthDate);
-        this.mor.setFoedselsdatoUsikker(birthDateUncertain);
+        this.mor.setCprNumber(cprNumber);
+        this.mor.setBirthDate(birthDate);
+        this.mor.setBirthDateUncertain(birthDateUncertain);
         this.mor.setMyndighed(authorityCode);
     }
 
     public void setFather(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode) {
         if (this.far == null) {
             this.far = new PersonParentData();
-            this.far.setMor(false);
+            this.far.setMother(false);
         }
         this.far.setNavn(name);
         this.far.setNavneMarkering(nameMarking);
-        this.far.setPersonnummer(cprNumber);
-        this.far.setFoedselsdato(birthDate);
-        this.far.setFoedselsdatoUsikker(birthDateUncertain);
+        this.far.setCprNumber(cprNumber);
+        this.far.setBirthDate(birthDate);
+        this.far.setBirthDateUncertain(birthDateUncertain);
         this.far.setMyndighed(authorityCode);
     }
 

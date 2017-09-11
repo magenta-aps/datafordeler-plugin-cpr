@@ -214,7 +214,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
       Effect virkning, String foraelderrolle, PersonParentData personParentData
   ) {
     ObjectNode output = createVirkningObjectNode(virkning, false);
-    output.put("personnummer", personParentData.getPersonnummer());
+    output.put("personnummer", personParentData.getCprNumber());
     output.put("foraelderrolle", foraelderrolle);
     return output;
   }
