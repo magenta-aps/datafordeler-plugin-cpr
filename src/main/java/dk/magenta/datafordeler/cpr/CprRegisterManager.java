@@ -143,7 +143,6 @@ public class CprRegisterManager extends RegisterManager {
         CprEntityManager cprEntityManager = (CprEntityManager) entityManager;
         InputStream responseBody = null;
         String scheme = eventInterface.getScheme();
-        System.out.println("pulling with "+scheme);
         switch (scheme) {
             case "file":
                 try {
@@ -165,9 +164,7 @@ public class CprRegisterManager extends RegisterManager {
                             this.proxyString,
                             this.localCopyFolder
                     );
-                    System.out.println("fetching");
                     responseBody = ftpFetcher.fetch(eventInterface);
-                    System.out.println("fetched");
                 } catch (IOException e) {
                     this.log.error(e);
                     throw new DataStreamException(e);

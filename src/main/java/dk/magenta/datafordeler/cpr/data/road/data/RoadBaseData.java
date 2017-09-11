@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.road.data;
 
 import dk.magenta.datafordeler.core.database.LookupDefinition;
+import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
@@ -59,28 +60,52 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     }
 
     public void addMemo(int memoNumber, String memoText) {
-        RoadMemoData memoData = new RoadMemoData();
-        memoData.setMemoNumber(memoNumber);
+        RoadMemoData memoData = null;
+        for (RoadMemoData existing : this.memoData) {
+            if (existing.getMemoNumber() == memoNumber) {
+                memoData = existing;
+            }
+        }
+        if (memoData == null) {
+            memoData = new RoadMemoData();
+            memoData.setMemoNumber(memoNumber);
+            this.memoData.add(memoData);
+        }
         memoData.setMemoText(memoText);
-        this.memoData.add(memoData);
     }
 
     public void addPostcode(String houseNumberFrom, String houseNumberTo, boolean even, PostCode postCode) {
-        RoadPostcodeData postcodeData = new RoadPostcodeData();
-        postcodeData.setHouseNumberFrom(houseNumberFrom);
-        postcodeData.setHouseNumberTo(houseNumberTo);
-        postcodeData.setEven(even);
+        RoadPostcodeData postcodeData = null;
+        for (RoadPostcodeData existing : this.postcodeData) {
+            if (Equality.equal(existing.getHouseNumberFrom(), houseNumberFrom) && Equality.equal(existing.getHouseNumberTo(), houseNumberTo) && existing.isEven() == even) {
+                postcodeData = existing;
+            }
+        }
+        if (postcodeData == null) {
+            postcodeData = new RoadPostcodeData();
+            postcodeData.setHouseNumberFrom(houseNumberFrom);
+            postcodeData.setHouseNumberTo(houseNumberTo);
+            postcodeData.setEven(even);
+            this.postcodeData.add(postcodeData);
+        }
         postcodeData.setPostCode(postCode);
-        this.postcodeData.add(postcodeData);
     }
 
     public void addCity(String houseNumberFrom, String houseNumberTo, boolean even, String cityName) {
-        RoadCityData cityData = new RoadCityData();
-        cityData.setHouseNumberFrom(houseNumberFrom);
-        cityData.setHouseNumberTo(houseNumberTo);
-        cityData.setEven(even);
+        RoadCityData cityData = null;
+        for (RoadCityData existing : this.cityData) {
+            if (Equality.equal(existing.getHouseNumberFrom(), houseNumberFrom) && Equality.equal(existing.getHouseNumberTo(), houseNumberTo) && existing.isEven() == even) {
+                cityData = existing;
+            }
+        }
+        if (cityData == null) {
+            cityData = new RoadCityData();
+            cityData.setHouseNumberFrom(houseNumberFrom);
+            cityData.setHouseNumberTo(houseNumberTo);
+            cityData.setEven(even);
+            this.cityData.add(cityData);
+        }
         cityData.setCityName(cityName);
-        this.cityData.add(cityData);
     }
 
 

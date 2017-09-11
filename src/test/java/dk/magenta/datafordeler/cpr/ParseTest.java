@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
@@ -15,6 +16,7 @@ import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.*;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadMemoData;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadPostcodeData;
+import jdk.nashorn.internal.ir.ObjectNode;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,24 +59,38 @@ public class ParseTest {
     private OutputWrapper<PersonEntity> personOutputWrapper = new PersonOutputWrapper();
 
     @Test
-    public void testParsePerson() throws DataFordelerException {
+    public void testParsePerson() throws Exception {
         Session session = null;
         try {
             InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
             personEntityManager.parseRegistration(testData);
+            testData.close();
 
             PersonQuery query = new PersonQuery();
             //query.setCprNumber("121008217");
             query.setFornavn("Tester");
             session = sessionManager.getSessionFactory().openSession();
 
-            try {
-                List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
-                personOutputWrapper.wrapResults(entities);
-                System.out.println(objectMapper.writeValueAsString(entities));
-            } catch (JsonProcessingException e) {
-                throw new DataStreamException(e);
-            }
+            List<PersonEntity> firstEntities = queryManager.getAllEntities(session, query, PersonEntity.class);
+            List<Object> output = personOutputWrapper.wrapResults(firstEntities);
+            Assert.assertEquals(1, output.size());
+
+            String firstImport = objectMapper.writeValueAsString(output);
+            session.close();
+
+            testData = ParseTest.class.getResourceAsStream("/persondata.txt");
+            personEntityManager.parseRegistration(testData);
+            testData.close();
+
+            session = sessionManager.getSessionFactory().openSession();
+
+            List<PersonEntity> secondEntities = queryManager.getAllEntities(session, query, PersonEntity.class);
+
+            String secondImport = objectMapper.writeValueAsString(personOutputWrapper.wrapResults(secondEntities));
+            assertJsonEquality(objectMapper.readTree(firstImport), objectMapper.readTree(secondImport), true, true);
+
+            session.close();
+
         } finally {
             if (session != null) {
                 session.close();
@@ -89,6 +105,7 @@ public class ParseTest {
             InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
             long start = Instant.now().toEpochMilli();
             roadEntityManager.parseRegistration(testData);
+            testData.close();
             System.out.println("Parsed road data in "+ (Instant.now().toEpochMilli() - start) + " ms");
             session = sessionManager.getSessionFactory().openSession();
 
@@ -157,38 +174,52 @@ public class ParseTest {
             Assert.assertFalse(effect21.getEffectFromUncertain());
             Assert.assertFalse(effect21.getEffectToUncertain());
 
+            String firstImport = objectMapper.writeValueAsString(entities);
+
+
+
+
+
+
+            testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+            roadEntityManager.parseRegistration(testData);
+            testData.close();
+            session = sessionManager.getSessionFactory().openSession();
+            entities = queryManager.getAllEntities(session, query, RoadEntity.class);
+            String secondImport = objectMapper.writeValueAsString(entities);
+            session.close();
+
+
+            assertJsonEquality(objectMapper.readTree(firstImport), objectMapper.readTree(secondImport), true, true);
+
         } finally {
             if (session != null) {
                 session.close();
             }
         }
     }
-
+/*
     @Test
-    public void testParseResidence() throws DataFordelerException {
+    public void testParseResidence() throws Exception {
         Session session = null;
         try {
             InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
             residenceEntityManager.parseRegistration(testData);
 
             ResidenceQuery query = new ResidenceQuery();
-            //query.setCprKommunekode("0730");
-            //query.setPostnummer("0012");
-            //query.setCprKommunekode();
-            /*session = sessionManager.getSessionFactory().openSession();
+            query.setKommunekode("0730");
+            query.setVejkode("0012");
+            session = sessionManager.getSessionFactory().openSession();
 
-            try {
-                List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
-                System.out.println(objectMapper.writeValueAsString(entities));
-            } catch (DataFordelerException e) {
-                e.printStackTrace();
-            }*/
+            List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
+            System.out.println(objectMapper.writeValueAsString(entities));
+
         } finally {
             if (session != null) {
                 session.close();
             }
         }
-    }
+    }*/
 
     @Test
     public void testFindRegistrations() {
@@ -333,6 +364,60 @@ public class ParseTest {
         List<RoadRegistration> result11a = entity11.findRegistrations(open, open);
         Assert.assertEquals(5, result11a.size());
         Assert.assertEquals(5, entity11.getRegistrations().size());
+    }
+
+    private static void assertJsonEquality(JsonNode node1, JsonNode node2) {
+        assertJsonEquality(node1, node2, false, true);
+    }
+
+    private static void assertJsonEquality(JsonNode node1, JsonNode node2, boolean ignoreArrayOrdering, boolean printDifference) {
+        try {
+            Assert.assertEquals(node1.isNull(), node2.isNull());
+            Assert.assertEquals(node1.isArray(), node2.isArray());
+            Assert.assertEquals(node1.isObject(), node2.isObject());
+            Assert.assertEquals(node1.isLong(), node2.isLong());
+            Assert.assertEquals(node1.isInt(), node2.isInt());
+            Assert.assertEquals(node1.isShort(), node2.isShort());
+            Assert.assertEquals(node1.isBoolean(), node2.isBoolean());
+            Assert.assertEquals(node1.isTextual(), node2.isTextual());
+            if (node1.isArray()) {
+                Assert.assertEquals(node1.size(), node2.size());
+                if (ignoreArrayOrdering) {
+                    for (int i = 0; i < node1.size(); i++) {
+                        boolean match = false;
+                        for (int j = 0; j < node2.size(); j++) {
+                            try {
+                                assertJsonEquality(node1.get(i), node2.get(j), true, false);
+                                match = true;
+                            } catch (AssertionError e) {
+                            }
+                        }
+                        if (!match) {
+                            throw new AssertionError();
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < node1.size(); i++) {
+                        assertJsonEquality(node1.get(i), node2.get(i), false, printDifference);
+                    }
+                }
+            } else if (node1.isObject()) {
+                Assert.assertEquals(node1.size(), node2.size());
+                Iterator<String> keys = node1.fieldNames();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    Assert.assertNotNull(node2.get(key));
+                    assertJsonEquality(node1.get(key), node2.get(key), ignoreArrayOrdering, printDifference);
+                }
+            } else {
+                Assert.assertEquals(node1.asText(), node2.asText());
+            }
+        } catch (AssertionError e) {
+            if (printDifference) {
+                System.out.println("\n" + node1 + "\n != \n" + node2 + "\n\n\n");
+            }
+            throw e;
+        }
     }
 
 }

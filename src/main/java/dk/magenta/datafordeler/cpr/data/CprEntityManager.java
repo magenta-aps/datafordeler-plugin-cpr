@@ -282,12 +282,16 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
             timer.start(TASK_FIND_REGISTRATIONS);
             List<T> groupRecords = groups.get(bitemporality);
+
             List<R> registrations = entity.findRegistrations(bitemporality.registrationFrom, bitemporality.registrationTo);
             ArrayList<V> effects = new ArrayList<>();
             for (R registration : registrations) {
                 V effect = registration.getEffect(bitemporality);
                 if (effect == null) {
+                    log.debug("Create new effect");
                     effect = registration.createEffect(bitemporality);
+                } else {
+                    log.debug("Use existing effect");
                 }
                 effects.add(effect);
             }
@@ -303,6 +307,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             for (V effect : effects) {
                 searchPool.addAll(effect.getDataItems());
             }
+
+            // Find a basedata that matches our effects perfectly
             for (D data : searchPool) {
                 if (data.getEffects().containsAll(effects) && effects.containsAll(data.getEffects())) {
                     baseData = data;
@@ -321,10 +327,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             timer.measure(TASK_FIND_ITEMS);
 
             timer.start(TASK_POPULATE_DATA);
+
             for (V effect : effects) {
-                OffsetDateTime registrationFrom = effect.getRegistration().getRegistrationFrom();
                 for (T record : groupRecords) {
-                    record.populateBaseData(baseData, effect, registrationFrom, queryManager, session);
+                    record.populateBaseData(baseData, effect, bitemporality.registrationFrom, queryManager, session);
                 }
             }
             timer.measure(TASK_POPULATE_DATA);

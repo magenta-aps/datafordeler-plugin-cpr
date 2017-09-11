@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr;
 import dk.magenta.datafordeler.core.Application;
 import dk.magenta.datafordeler.core.Engine;
 import dk.magenta.datafordeler.core.Pull;
+import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.plugin.Plugin;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
@@ -36,6 +37,9 @@ public class QueryTest {
 
     @Autowired
     private Engine engine;
+
+    @Autowired
+    private QueryManager queryManager;
 
     @Test
     public void pull() throws Exception {
