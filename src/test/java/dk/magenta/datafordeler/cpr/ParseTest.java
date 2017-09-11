@@ -406,10 +406,6 @@ public class ParseTest {
         Assert.assertEquals(5, entity11.getRegistrations().size());
     }
 
-    private static void assertJsonEquality(JsonNode node1, JsonNode node2) {
-        assertJsonEquality(node1, node2, false, true);
-    }
-
     private static void assertJsonEquality(JsonNode node1, JsonNode node2, boolean ignoreArrayOrdering, boolean printDifference) {
         try {
             Assert.assertEquals(node1.isNull(), node2.isNull());
