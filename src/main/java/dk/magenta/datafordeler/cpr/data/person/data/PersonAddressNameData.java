@@ -16,23 +16,32 @@ import java.util.Map;
 @Table(name = "cpr_person_addressname")
 public class PersonAddressNameData extends AuthorityDetailData {
 
-    @Column
-    @JsonProperty(value = "adressenavn")
-    @XmlElement(name = "adressenavn")
-    private String adressenavn;
+    public static final String DB_FIELD_ADDRESS_NAME = "addressName";
+    public static final String IO_FIELD_ADDRESS_NAME = "adressenavn";
+    @Column(name = DB_FIELD_ADDRESS_NAME)
+    @JsonProperty(value = IO_FIELD_ADDRESS_NAME)
+    @XmlElement(name = IO_FIELD_ADDRESS_NAME)
+    private String addressName;
 
-    public String getAdressenavn() {
-        return this.adressenavn;
+    public String getAddressName() {
+        return this.addressName;
     }
 
-    public void setAdressenavn(String adressenavn) {
-        this.adressenavn = adressenavn;
+    public void setAddressName(String addressName) {
+        this.addressName = addressName;
+    }
+
+    @Override
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>(super.databaseFields());
+        map.put(DB_FIELD_ADDRESS_NAME, this.addressName);
+        return map;
     }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("adressenavn", this.adressenavn);
+        map.put("addressName", this.addressName);
         return map;
     }
 }

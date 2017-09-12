@@ -17,37 +17,51 @@ import java.util.Map;
 public class PersonProtectionData extends AuthorityDetailData {
 
 
-    @Column
-    @JsonProperty(value = "beskyttelsestype")
-    @XmlElement(name = "beskyttelsestype")
-    private int beskyttelsestype;
+    public static final String DB_FIELD_TYPE = "protectionType";
+    public static final String IO_FIELD_TYPE = "beskyttelsestype";
+    @Column(name = DB_FIELD_TYPE)
+    @JsonProperty(value = IO_FIELD_TYPE)
+    @XmlElement(name = IO_FIELD_TYPE)
+    private int protectionType;
 
-    public int getBeskyttelsestype() {
-        return beskyttelsestype;
+    public int getProtectionType() {
+        return protectionType;
     }
 
-    public void setBeskyttelsestype(int beskyttelsestype) {
-        this.beskyttelsestype = beskyttelsestype;
+    public void setProtectionType(int protectionType) {
+        this.protectionType = protectionType;
     }
 
-    @Column
-    @JsonProperty(value = "rapportMarkering")
-    @XmlElement(name = "rapportMarkering")
-    private boolean rapportMarkering;
 
-    public boolean getRapportMarkering() {
-        return rapportMarkering;
+
+    public static final String DB_FIELD_REPORTMARKING = "reportMarking";
+    public static final String IO_FIELD_REPORTMARKING = "rapportMarkering";
+    @Column(name = DB_FIELD_REPORTMARKING)
+    @JsonProperty(value = IO_FIELD_REPORTMARKING)
+    @XmlElement(name = IO_FIELD_REPORTMARKING)
+    private boolean reportMarking;
+
+    public boolean getReportMarking() {
+        return reportMarking;
     }
 
-    public void setRapportMarkering(boolean rapportMarkering) {
-        this.rapportMarkering = rapportMarkering;
+    public void setReportMarking(boolean reportMarking) {
+        this.reportMarking = reportMarking;
+    }
+
+    @Override
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>(super.databaseFields());
+        map.put(DB_FIELD_TYPE, this.protectionType);
+        map.put(DB_FIELD_REPORTMARKING, this.reportMarking);
+        return map;
     }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("beskyttelsestype", this.beskyttelsestype);
-        map.put("rapportMarkering", this.rapportMarkering);
+        map.put("protectionType", this.protectionType);
+        map.put("reportMarking", this.reportMarking);
         return map;
     }
 }

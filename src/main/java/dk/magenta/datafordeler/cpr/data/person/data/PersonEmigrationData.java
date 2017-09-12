@@ -17,23 +17,32 @@ import java.util.Map;
 public class PersonEmigrationData extends AuthorityDetailData {
 
 
-    @Column
-    @JsonProperty(value = "landekode")
-    @XmlElement(name = "landekode")
-    private int landekode;
+    public static final String DB_FIELD_COUNTRY_CODE = "countryCode";
+    public static final String IO_FIELD_COUNTRY_CODE = "landekode";
+    @Column(name = DB_FIELD_COUNTRY_CODE)
+    @JsonProperty(value = IO_FIELD_COUNTRY_CODE)
+    @XmlElement(name = IO_FIELD_COUNTRY_CODE)
+    private int countryCode;
 
-    public int getLandekode() {
-        return landekode;
+    public int getCountryCode() {
+        return countryCode;
     }
 
-    public void setLandekode(int landekode) {
-        this.landekode = landekode;
+    public void setCountryCode(int countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    @Override
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>(super.databaseFields());
+        map.put(DB_FIELD_COUNTRY_CODE, this.countryCode);
+        return map;
     }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("landekode", this.landekode);
+        map.put("countryCode", this.countryCode);
         return map;
     }
 }

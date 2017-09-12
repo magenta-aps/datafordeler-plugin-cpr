@@ -6,6 +6,7 @@ import dk.magenta.datafordeler.cpr.data.DetailData;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,24 +16,28 @@ import java.util.Map;
 @MappedSuperclass
 public abstract class AuthorityDetailData extends DetailData {
 
-    @Column
-    @JsonProperty(value = "myndighed")
-    @XmlElement(name = "myndighed")
-    private int myndighed;
+    public static final String DB_FIELD_AUTHORITY = "authority";
+    public static final String IO_FIELD_AUTHORITY = "myndighed";
+    @Column(name = DB_FIELD_AUTHORITY)
+    @JsonProperty(value = IO_FIELD_AUTHORITY)
+    @XmlElement(name = IO_FIELD_AUTHORITY)
+    private int authority;
 
-    public int getMyndighed() {
-        return this.myndighed;
+    public int getAuthority() {
+        return this.authority;
     }
 
-    public void setMyndighed(int myndighed) {
-        this.myndighed = myndighed;
+    public void setAuthority(int authority) {
+        this.authority = authority;
     }
 
+    @Override
+    public Map<String, Object> databaseFields() {
+        return Collections.singletonMap(DB_FIELD_AUTHORITY, this.authority);
+    }
 
     @Override
     public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("myndighed", this.myndighed);
-        return map;
+        return Collections.singletonMap("authority", this.authority);
     }
 }

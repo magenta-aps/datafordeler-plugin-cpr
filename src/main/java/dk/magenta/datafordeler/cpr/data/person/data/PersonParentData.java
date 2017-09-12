@@ -87,34 +87,49 @@ public class PersonParentData extends AuthorityDetailData {
 
 
 
-    @Column
-    @JsonProperty(value = "navn")
-    @XmlElement(name = "navn")
-    private String navn;
+    public static final String DB_FIELD_NAME = "name";
+    public static final String IO_FIELD_NAME = "navn";
+    @Column(name = DB_FIELD_NAME)
+    @JsonProperty(value = IO_FIELD_NAME)
+    @XmlElement(name = IO_FIELD_NAME)
+    private String name;
 
-    public String getNavn() {
-        return this.navn;
+    public String getName() {
+        return this.name;
     }
 
-    public void setNavn(String navn) {
-        this.navn = navn;
+    public void setName(String name) {
+        this.name = name;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "navneMarkering")
-    @XmlElement(name = "navneMarkering")
-    private boolean navneMarkering;
+    public static final String DB_FIELD_NAME_MARKING = "nameMarking";
+    public static final String IO_FIELD_NAME_MARKING = "navneMarkering";
+    @Column(name = DB_FIELD_NAME_MARKING)
+    @JsonProperty(value = IO_FIELD_NAME_MARKING)
+    @XmlElement(name = IO_FIELD_NAME_MARKING)
+    private boolean nameMarking;
 
-    public boolean isNavneMarkering() {
-        return this.navneMarkering;
+    public boolean hasNameMarking() {
+        return this.nameMarking;
     }
 
-    public void setNavneMarkering(boolean navneMarkering) {
-        this.navneMarkering = navneMarkering;
+    public void setNameMarking(boolean nameMarking) {
+        this.nameMarking = nameMarking;
     }
 
+
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(DB_FIELD_BIRTHDATE, this.birthDate);
+        map.put(DB_FIELD_BIRTHDATE_UNCERTAIN, this.birthDateUncertain);
+        map.put(DB_FIELD_CPR_NUMBER, this.cprNumber);
+        map.put(DB_FIELD_IS_MOTHER, this.isMother);
+        map.put(DB_FIELD_NAME, this.name);
+        map.put(DB_FIELD_NAME_MARKING, this.nameMarking);
+        return map;
+    }
 
 
     @Override
@@ -123,8 +138,8 @@ public class PersonParentData extends AuthorityDetailData {
         map.put("cprNumber", this.cprNumber);
         map.put("birthDate", this.birthDate);
         map.put("birthDateUncertain", this.birthDateUncertain);
-        map.put("navn", this.navn);
-        map.put("navneMarkering", this.navneMarkering);
+        map.put("name", this.name);
+        map.put("nameMarking", this.nameMarking);
         return map;
     }
 }

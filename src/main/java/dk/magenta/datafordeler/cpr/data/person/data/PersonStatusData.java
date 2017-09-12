@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,9 +18,11 @@ import java.util.Map;
 @Table(name = "cpr_person_status")
 public class PersonStatusData extends DetailData {
 
-    @Column
-    @JsonProperty(value = "status")
-    @XmlElement(name = "status")
+    public static final String DB_FIELD_STATUS = "status";
+    public static final String IO_FIELD_STATUS = "status";
+    @Column(name = DB_FIELD_STATUS)
+    @JsonProperty(value = IO_FIELD_STATUS)
+    @XmlElement(name = IO_FIELD_STATUS)
     private String status;
 
     public String getStatus() {
@@ -28,6 +31,11 @@ public class PersonStatusData extends DetailData {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    @Override
+    public Map<String, Object> databaseFields() {
+        return Collections.singletonMap(DB_FIELD_STATUS, this.status);
     }
 
     @Override

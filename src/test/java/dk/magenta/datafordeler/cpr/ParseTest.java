@@ -89,6 +89,8 @@ public class ParseTest {
             String secondImport = objectMapper.writeValueAsString(personOutputWrapper.wrapResults(secondEntities));
             assertJsonEquality(objectMapper.readTree(firstImport), objectMapper.readTree(secondImport), true, true);
 
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectMapper.readTree(secondImport)));
+
             session.close();
 
         } finally {
@@ -252,6 +254,7 @@ public class ParseTest {
             String secondImport = objectMapper.writeValueAsString(entities);
 
             assertJsonEquality(objectMapper.readTree(firstImport), objectMapper.readTree(secondImport), true, true);
+
 
 
         } finally {

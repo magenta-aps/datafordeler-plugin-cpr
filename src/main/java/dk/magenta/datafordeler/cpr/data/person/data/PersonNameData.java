@@ -18,96 +18,121 @@ import java.util.Map;
 public class PersonNameData extends AuthorityDetailData {
 
 
-    @Column
-    @JsonProperty(value = "adresseringsnavn")
-    @XmlElement(name = "adresseringsnavn")
-    private String adresseringsnavn;
+    public static final String DB_FIELD_ADDRESSING_NAME = "addressingName";
+    public static final String IO_FIELD_ADDRESSING_NAME = "adresseringsnavn";
+    @Column(name = DB_FIELD_ADDRESSING_NAME)
+    @JsonProperty(value = IO_FIELD_ADDRESSING_NAME)
+    @XmlElement(name = IO_FIELD_ADDRESSING_NAME)
+    private String addressingName;
 
-    public String getAdresseringsnavn() {
-        return this.adresseringsnavn;
+    public String getAddressingName() {
+        return this.addressingName;
     }
 
-    public void setAdresseringsnavn(String adresseringsnavn) {
-        this.adresseringsnavn = adresseringsnavn;
+    public void setAddressingName(String addressingName) {
+        this.addressingName = addressingName;
     }
 
 
-    @Column
-    @JsonProperty(value = "fornavne")
-    @XmlElement(name = "fornavne")
-    private String fornavne;
 
-    public String getFornavne() {
-        return this.fornavne;
+    public static final String DB_FIELD_FIRST_NAMES = "firstNames";
+    public static final String IO_FIELD_FIRST_NAMES = "fornavne";
+    @Column(name = DB_FIELD_FIRST_NAMES)
+    @JsonProperty(value = IO_FIELD_FIRST_NAMES)
+    @XmlElement(name = IO_FIELD_FIRST_NAMES)
+    private String firstNames;
+
+    public String getFirstNames() {
+        return this.firstNames;
     }
 
-    public void setFornavne(String fornavne) {
-        this.fornavne = fornavne;
+    public void setFirstNames(String firstNames) {
+        this.firstNames = firstNames;
     }
 
-    @Column
-    @JsonProperty(value = "fornavneMarkering")
-    @XmlElement(name = "fornavneMarkering")
-    private boolean fornavneMarkering;
 
-    public boolean isFornavneMarkering() {
-        return this.fornavneMarkering;
+
+    public static final String DB_FIELD_FIRST_NAMES_MARKING = "firstNamesMarking";
+    public static final String IO_FIELD_FIRST_NAMES_MARKING = "fornavneMarkering";
+    @Column(name = DB_FIELD_FIRST_NAMES_MARKING)
+    @JsonProperty(value = IO_FIELD_FIRST_NAMES_MARKING)
+    @XmlElement(name = IO_FIELD_FIRST_NAMES_MARKING)
+    private boolean firstNamesMarking;
+
+    public boolean isFirstNamesMarking() {
+        return this.firstNamesMarking;
     }
 
-    public void setFornavneMarkering(boolean fornavneMarkering) {
-        this.fornavneMarkering = fornavneMarkering;
+    public void setFirstNamesMarking(boolean firstNamesMarking) {
+        this.firstNamesMarking = firstNamesMarking;
     }
 
-    @Column
-    @JsonProperty(value = "mellemnavn")
-    @XmlElement(name = "mellemnavn")
-    private String mellemnavn;
 
-    public String getMellemnavn() {
-        return this.mellemnavn;
+
+    public static final String DB_FIELD_MIDDLE_NAME = "middleName";
+    public static final String IO_FIELD_MIDDLE_NAME = "mellemnavn";
+    @Column(name = DB_FIELD_MIDDLE_NAME)
+    @JsonProperty(value = IO_FIELD_MIDDLE_NAME)
+    @XmlElement(name = IO_FIELD_MIDDLE_NAME)
+    private String middleName;
+
+    public String getMiddleName() {
+        return this.middleName;
     }
 
-    public void setMellemnavn(String mellemnavn) {
-        this.mellemnavn = mellemnavn;
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
     }
 
-    @Column
-    @JsonProperty(value = "mellemnavnMarkering")
-    @XmlElement(name = "mellemnavnMarkering")
-    private boolean mellemnavnMarkering;
 
-    public boolean isMellemnavnMarkering() {
-        return this.mellemnavnMarkering;
+
+    public static final String DB_FIELD_MIDDLE_NAME_MARKING = "middleNameMarking";
+    public static final String IO_FIELD_MIDDLE_NAME_MARKING = "mellemnavnMarkering";
+    @Column(name = DB_FIELD_MIDDLE_NAME_MARKING)
+    @JsonProperty(value = IO_FIELD_MIDDLE_NAME_MARKING)
+    @XmlElement(name = IO_FIELD_MIDDLE_NAME_MARKING)
+    private boolean middleNameMarking;
+
+    public boolean isMiddleNameMarking() {
+        return this.middleNameMarking;
     }
 
-    public void setMellemnavnMarkering(boolean mellemnavnMarkering) {
-        this.mellemnavnMarkering = mellemnavnMarkering;
+    public void setMiddleNameMarking(boolean middleNameMarking) {
+        this.middleNameMarking = middleNameMarking;
     }
 
-    @Column
-    @JsonProperty(value = "efternavn")
-    @XmlElement(name = "efternavn")
-    private String efternavn;
 
-    public String getEfternavn() {
-        return this.efternavn;
+
+    public static final String DB_FIELD_LAST_NAME = "lastName";
+    public static final String IO_FIELD_LAST_NAME = "efternavn";
+    @Column(name = DB_FIELD_LAST_NAME)
+    @JsonProperty(value = IO_FIELD_LAST_NAME)
+    @XmlElement(name = IO_FIELD_LAST_NAME)
+    private String lastName;
+
+    public String getLastName() {
+        return this.lastName;
     }
 
-    public void setEfternavn(String efternavn) {
-        this.efternavn = efternavn;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    @Column
-    @JsonProperty(value = "efternavnMarkering")
-    @XmlElement(name = "efternavnMarkering")
-    private boolean efternavnMarkering;
 
-    public boolean isEfternavnMarkering() {
-        return this.efternavnMarkering;
+
+    public static final String DB_FIELD_LAST_NAME_MARKING = "lastNameMarking";
+    public static final String IO_FIELD_LAST_NAME_MARKING = "efternavnMarkering";
+    @Column(name = DB_FIELD_LAST_NAME_MARKING)
+    @JsonProperty(value = IO_FIELD_LAST_NAME_MARKING)
+    @XmlElement(name = IO_FIELD_LAST_NAME_MARKING)
+    private boolean lastNameMarking;
+
+    public boolean isLastNameMarking() {
+        return this.lastNameMarking;
     }
 
-    public void setEfternavnMarkering(boolean efternavnMarkering) {
-        this.efternavnMarkering = efternavnMarkering;
+    public void setLastNameMarking(boolean lastNameMarking) {
+        this.lastNameMarking = lastNameMarking;
     }
 
 
@@ -150,19 +175,32 @@ public class PersonNameData extends AuthorityDetailData {
         this.rapportnavne = rapportnavne;
     }
 
+
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(DB_FIELD_ADDRESSING_NAME, this.addressingName);
+        map.put(DB_FIELD_FIRST_NAMES, this.firstNames);
+        map.put(DB_FIELD_FIRST_NAMES_MARKING, this.firstNamesMarking);
+        map.put(DB_FIELD_MIDDLE_NAME, this.middleName);
+        map.put(DB_FIELD_MIDDLE_NAME_MARKING, this.middleNameMarking);
+        map.put(DB_FIELD_LAST_NAME, this.lastName);
+        map.put(DB_FIELD_LAST_NAME_MARKING, this.lastNameMarking);
+        return map;
+    }
+
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
         //Navn
-        map.put("adresseringsnavn", this.adresseringsnavn);
-        map.put("efternavn", this.efternavn);
-        map.put("fornavne", this.fornavne);
-        map.put("mellemnavn", this.mellemnavn);
+        map.put("addressingName", this.addressingName);
+        map.put("lastName", this.lastName);
+        map.put("firstNames", this.firstNames);
+        map.put("middleName", this.middleName);
 
         //NavneMarkering
-        map.put("efternavnMarkering", this.efternavnMarkering);
-        map.put("fornavneMarkering", this.fornavneMarkering);
-        map.put("mellemnavnMarkering", this.mellemnavnMarkering);
+        map.put("lastNameMarking", this.lastNameMarking);
+        map.put("firstNamesMarking", this.firstNamesMarking);
+        map.put("middleNameMarking", this.middleNameMarking);
 
         //Ikke i grunddatamodellen
         map.put("rapportnavne", this.rapportnavne);

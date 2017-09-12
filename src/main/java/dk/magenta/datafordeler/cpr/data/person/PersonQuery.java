@@ -5,6 +5,8 @@ import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.fapi.QueryField;
 import dk.magenta.datafordeler.cpr.data.CprQuery;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonCoreData;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonNameData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -82,13 +84,13 @@ public class PersonQuery extends CprQuery<PersonEntity> {
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = new LookupDefinition(this);
         if (this.personnummer != null) {
-            lookupDefinition.put(LookupDefinition.entityref + "." + PERSONNUMMER, this.personnummer);
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonCoreData.DB_FIELD_CPR_NUMBER, this.personnummer);
         }
         if (this.fornavn != null) {
-            lookupDefinition.put("navn." + FORNAVNE, this.fornavn);
+            lookupDefinition.put(PersonBaseData.DB_FIELD_NAME + LookupDefinition.separator + PersonNameData.DB_FIELD_FIRST_NAMES, this.fornavn);
         }
         if (this.efternavn != null) {
-            lookupDefinition.put("navn." + EFTERNAVN, this.efternavn);
+            lookupDefinition.put(PersonBaseData.DB_FIELD_NAME + LookupDefinition.separator + PersonNameData.DB_FIELD_LAST_NAME, this.efternavn);
         }
         return lookupDefinition;
     }

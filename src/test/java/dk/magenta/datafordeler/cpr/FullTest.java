@@ -71,18 +71,15 @@ public class FullTest {
                 @Override
                 public Boolean call() throws Exception {
                     ftp.startServer(username, password, port, Collections.singletonList(tempFileClosure));
-                    System.out.println("server started on port "+port);
                     URI dataLocation = new URI("ftps://localhost:"+port+"/"+tempFileClosure.getName());
 
                     ItemInputStream<? extends PluginSourceData> eventStream = plugin.getRegisterManager().pullEvents(dataLocation, personEntityManager);
-                    System.out.println("pulled");
                     if (eventStream != null) {
                         PluginSourceData data;
                         while ((data = eventStream.next()) != null) {
                             personEntityManager.parseRegistration(data.getData());
                         }
                         eventStream.close();
-                        System.out.println("parsed & stored");
 
                         Session session = null;
                         try {
@@ -91,7 +88,6 @@ public class FullTest {
                             query.setFornavn("Tester");
                             List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
                             Assert.assertEquals(1, entities.size());
-                            System.out.println("stored");
                         } catch (DataFordelerException e) {
                             e.printStackTrace();
                         } finally {

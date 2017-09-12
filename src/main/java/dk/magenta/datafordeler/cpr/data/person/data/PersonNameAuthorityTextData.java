@@ -17,23 +17,32 @@ import java.util.Map;
 public class PersonNameAuthorityTextData extends AuthorityDetailData {
 
 
-    @Column
-    @JsonProperty(value = "tekst")
-    @XmlElement(name = "tekst")
-    private String tekst;
+    public static final String DB_FIELD_TEXT = "text";
+    public static final String IO_FIELD_TEXT = "tekst";
+    @Column(name = DB_FIELD_TEXT)
+    @JsonProperty(value = IO_FIELD_TEXT)
+    @XmlElement(name = IO_FIELD_TEXT)
+    private String text;
 
-    public String getTekst() {
-        return this.tekst;
+    public String getText() {
+        return this.text;
     }
 
-    public void setTekst(String tekst) {
-        this.tekst = tekst;
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    @Override
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>(super.databaseFields());
+        map.put(DB_FIELD_TEXT, this.text);
+        return map;
     }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("tekst", this.tekst);
+        map.put("text", this.text);
         return map;
     }
 }

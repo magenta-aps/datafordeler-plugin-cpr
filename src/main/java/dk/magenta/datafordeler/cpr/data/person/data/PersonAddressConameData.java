@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -17,21 +18,28 @@ import java.util.Map;
 @Table(name = "cpr_person_address_coname")
 public class PersonAddressConameData extends DetailData {
 
-    @Column
-    @JsonProperty(value = "conavn")
-    @XmlElement(name = "conavn")
-    private String conavn;
+    public static final String DB_FIELD_CONAME = "coname";
+    public static final String IO_FIELD_CONAME = "conavn";
+    @Column(name = DB_FIELD_CONAME)
+    @JsonProperty(value = IO_FIELD_CONAME)
+    @XmlElement(name = IO_FIELD_CONAME)
+    private String coname;
 
-    public String getConavn() {
-        return this.conavn;
+    public String getConame() {
+        return this.coname;
     }
 
-    public void setConavn(String conavn) {
-        this.conavn = conavn;
+    public void setConame(String coname) {
+        this.coname = coname;
+    }
+
+    @Override
+    public Map<String, Object> databaseFields() {
+        return Collections.singletonMap(DB_FIELD_CONAME, this.coname);
     }
 
     @Override
     public Map<String, Object> asMap() {
-        return Collections.singletonMap("conavn", this.conavn);
+        return Collections.singletonMap("coname", this.coname);
     }
 }

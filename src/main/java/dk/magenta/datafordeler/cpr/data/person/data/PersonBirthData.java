@@ -19,62 +19,70 @@ import java.util.Map;
 @Table(name = "cpr_person_birth")
 public class PersonBirthData extends DetailData {
 
-    @Column
-    @JsonProperty(value = "cprFoedselsregistreringsstedskode")
-    @XmlElement(name = "cprFoedselsregistreringsstedskode")
-    private String cprFoedselsregistreringsstedskode;
+    public static final String DB_FIELD_BIRTH_PLACE_CODE = "birthPlaceCode";
+    public static final String IO_FIELD_BIRTH_PLACE_CODE = "cprFoedselsregistreringsstedskode";
+    @Column(name = DB_FIELD_BIRTH_PLACE_CODE)
+    @JsonProperty(value = IO_FIELD_BIRTH_PLACE_CODE)
+    @XmlElement(name = IO_FIELD_BIRTH_PLACE_CODE)
+    private String birthPlaceCode;
 
-    public String getCprFoedselsregistreringsstedskode() {
-        return this.cprFoedselsregistreringsstedskode;
+    public String getBirthPlaceCode() {
+        return this.birthPlaceCode;
     }
 
-    public void setCprFoedselsregistreringsstedskode(String cprFoedselsregistreringsstedskode) {
-        this.cprFoedselsregistreringsstedskode = cprFoedselsregistreringsstedskode;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "cprFoedselsregistreringsstedsnavn")
-    @XmlElement(name = "cprFoedselsregistreringsstedsnavn")
-    private String cprFoedselsregistreringsstedsnavn;
-
-    public String getCprFoedselsregistreringsstedsnavn() {
-        return this.cprFoedselsregistreringsstedsnavn;
-    }
-
-    public void setCprFoedselsregistreringsstedsnavn(String cprFoedselsregistreringsstedsnavn) {
-        this.cprFoedselsregistreringsstedsnavn = cprFoedselsregistreringsstedsnavn;
+    public void setBirthPlaceCode(String birthPlaceCode) {
+        this.birthPlaceCode = birthPlaceCode;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "foedselsdato")
-    @XmlElement(name = "foedselsdato")
-    private LocalDateTime foedselsdato;
+    public static final String DB_FIELD_BIRTH_PLACE_NAME = "birthPlaceName";
+    public static final String IO_FIELD_BIRTH_PLACE_NAME = "cprFoedselsregistreringsstedsnavn";
+    @Column(name = DB_FIELD_BIRTH_PLACE_NAME)
+    @JsonProperty(value = IO_FIELD_BIRTH_PLACE_NAME)
+    @XmlElement(name = IO_FIELD_BIRTH_PLACE_NAME)
+    private String birthPlaceName;
 
-    public LocalDateTime getFoedselsdato() {
-        return this.foedselsdato;
+    public String getBirthPlaceName() {
+        return this.birthPlaceName;
     }
 
-    public void setFoedselsdato(LocalDateTime foedselsdato) {
-        this.foedselsdato = foedselsdato;
+    public void setBirthPlaceName(String birthPlaceName) {
+        this.birthPlaceName = birthPlaceName;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "foedselsdatoUsikkerhedsmarkering")
-    @XmlElement(name = "foedselsdatoUsikkerhedsmarkering")
-    private boolean foedselsdatoUsikkerhedsmarkering;
+    public static final String DB_FIELD_BIRTH_DATETIME = "birthDatetime";
+    public static final String IO_FIELD_BIRTH_DATETIME = "foedselsdato";
+    @Column(name = DB_FIELD_BIRTH_DATETIME)
+    @JsonProperty(value = IO_FIELD_BIRTH_DATETIME)
+    @XmlElement(name = IO_FIELD_BIRTH_DATETIME)
+    private LocalDateTime birthDatetime;
 
-    public boolean isFoedselsdatoUsikkerhedsmarkering() {
-        return this.foedselsdatoUsikkerhedsmarkering;
+    public LocalDateTime getBirthDatetime() {
+        return this.birthDatetime;
     }
 
-    public void setFoedselsdatoUsikkerhedsmarkering(boolean foedselsdatoUsikkerhedsmarkering) {
-        this.foedselsdatoUsikkerhedsmarkering = foedselsdatoUsikkerhedsmarkering;
+    public void setBirthDatetime(LocalDateTime birthDatetime) {
+        this.birthDatetime = birthDatetime;
+    }
+
+
+
+    public static final String DB_FIELD_BIRTH_DATETIME_UNCERTAIN = "birthDatetimeUncertain";
+    public static final String IO_FIELD_BIRTH_DATETIME_UNCERTAIN = "foedselsdatoUsikkerhedsmarkering";
+    @Column(name = DB_FIELD_BIRTH_DATETIME_UNCERTAIN)
+    @JsonProperty(value = IO_FIELD_BIRTH_DATETIME_UNCERTAIN)
+    @XmlElement(name = IO_FIELD_BIRTH_DATETIME_UNCERTAIN)
+    private boolean birthDatetimeUncertain;
+
+    public boolean isBirthDatetimeUncertain() {
+        return this.birthDatetimeUncertain;
+    }
+
+    public void setBirthDatetimeUncertain(boolean birthDatetimeUncertain) {
+        this.birthDatetimeUncertain = birthDatetimeUncertain;
     }
 
 
@@ -92,16 +100,24 @@ public class PersonBirthData extends DetailData {
         this.foedselsraekkefoelge = foedselsraekkefoelge;
     }
 
-
+    @Override
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(DB_FIELD_BIRTH_PLACE_CODE, this.birthPlaceCode);
+        map.put(DB_FIELD_BIRTH_PLACE_NAME, this.birthPlaceName);
+        map.put(DB_FIELD_BIRTH_DATETIME, this.birthDatetime);
+        map.put(DB_FIELD_BIRTH_DATETIME_UNCERTAIN, this.birthDatetimeUncertain);
+        return map;
+    }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>();
         //Person
-        map.put("cprFoedselsregistreringsstedskode", this.cprFoedselsregistreringsstedskode);
-        map.put("cprFoedselsregistreringsstedsnavn", this.cprFoedselsregistreringsstedsnavn);
-        map.put("foedselsdato", this.foedselsdato);
-        map.put("foedselsdatoUsikkerhedsmarkering", this.foedselsdatoUsikkerhedsmarkering);
+        map.put("birthPlaceCode", this.birthPlaceCode);
+        map.put("birthPlaceName", this.birthPlaceName);
+        map.put("birthDatetime", this.birthDatetime);
+        map.put("birthDatetimeUncertain", this.birthDatetimeUncertain);
 
         //Ikke i grunddatamodellen
         //map.put("foedselsraekkefoelge", this.foedselsraekkefoelge);
