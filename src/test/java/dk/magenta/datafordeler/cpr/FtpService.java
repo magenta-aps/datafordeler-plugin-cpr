@@ -41,7 +41,7 @@ public class FtpService {
         factory.setPort(port);
 
         SslConfigurationFactory ssl = new SslConfigurationFactory();
-        ssl.setKeystoreFile(new File(ClassLoader.getSystemResource("test.jks").toURI()));
+        ssl.setKeystoreFile(new File(ClassLoader.getSystemResource("dafo.keystore").toURI()));
         ssl.setKeystorePassword("password");
         factory.setSslConfiguration(ssl.createSslConfiguration());
         factory.setImplicitSsl(true);
