@@ -17,17 +17,4 @@ public class PersonRegistration extends CprRegistration<PersonEntity, PersonRegi
         return new PersonEffect(this, effectFrom, effectTo);
     }
 
-    public PersonEffect getEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
-        for (PersonEffect effect : this.effects) {
-            if (
-                    (effect.getEffectFrom() == null ? effectFrom == null : effect.getEffectFrom().equals(effectFrom)) &&
-                    (effect.getEffectTo() == null ? effectTo == null : effect.getEffectTo().equals(effectTo)) &&
-                    (effect.getEffectFromUncertain() == effectFromUncertain) &&
-                    (effect.getEffectToUncertain() == effectToUncertain)
-            ) {
-                return effect;
-            }
-        }
-        return null;
-    }
 }

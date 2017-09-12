@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.database.Registration;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -12,6 +13,7 @@ import java.time.temporal.TemporalAccessor;
 /**
  * Created by lars on 29-06-17.
  */
+@JsonPropertyOrder({"effectFrom", "effectFromUncertain", "effectTo", "effectToUncertain", "dataItems"})
 public abstract class CprEffect<R extends Registration, V extends CprEffect, D extends CprData> extends Effect<R, V, D> {
 
     private boolean effectFromUncertain;
