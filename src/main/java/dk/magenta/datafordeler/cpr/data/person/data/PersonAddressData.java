@@ -58,13 +58,13 @@ public class PersonAddressData extends AuthorityDetailData {
     @Column(name = DB_FIELD_MUNICIPALITY_CODE)
     @JsonProperty(value = IO_FIELD_MUNICIPALITY_CODE)
     @XmlElement(name = IO_FIELD_MUNICIPALITY_CODE)
-    private String municipalityCode;
+    private int municipalityCode;
 
-    public String getMunicipalityCode() {
+    public int getMunicipalityCode() {
         return this.municipalityCode;
     }
 
-    public void setMunicipalityCode(String municipalityCode) {
+    public void setMunicipalityCode(int municipalityCode) {
         this.municipalityCode = municipalityCode;
     }
 

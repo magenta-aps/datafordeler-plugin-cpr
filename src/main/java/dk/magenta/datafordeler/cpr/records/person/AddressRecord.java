@@ -74,7 +74,7 @@ public class AddressRecord extends PersonDataRecord {
                 // String bynavn,
                 null,
                 // String cprKommunekode,
-                this.getString("komkod", false),
+                this.getInt("komkod", false),
                 // String cprKommunenavn,
                 null,
                 // String cprVejkode,

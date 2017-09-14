@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr;
 
 import dk.magenta.datafordeler.core.configuration.ConfigurationManager;
+import dk.magenta.datafordeler.core.plugin.AreaRestrictionDefinition;
 import dk.magenta.datafordeler.core.plugin.Plugin;
 import dk.magenta.datafordeler.core.plugin.RegisterManager;
 import dk.magenta.datafordeler.core.plugin.RolesDefinition;
@@ -43,6 +44,12 @@ public class CprPlugin extends Plugin {
     private RoadEntityManager roadEntityManager;
 
     private CprRolesDefinition rolesDefinition = new CprRolesDefinition();
+
+    private CprAreaRestrictionDefinition areaRestrictionDefinition;
+
+    public CprPlugin() {
+        this.areaRestrictionDefinition = new CprAreaRestrictionDefinition(this);
+    }
 
     /**
      * Plugin initialization
@@ -96,5 +103,10 @@ public class CprPlugin extends Plugin {
     @Override
     public RolesDefinition getRolesDefinition() {
         return this.rolesDefinition;
+    }
+
+    @Override
+    public AreaRestrictionDefinition getAreaRestrictionDefinition() {
+        return this.areaRestrictionDefinition;
     }
 }

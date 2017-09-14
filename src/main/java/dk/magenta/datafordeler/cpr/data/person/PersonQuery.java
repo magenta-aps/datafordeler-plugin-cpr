@@ -9,8 +9,7 @@ import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonCoreData;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonNameData;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lars on 19-05-17.
@@ -57,16 +56,19 @@ public class PersonQuery extends CprQuery<PersonEntity> {
 
 
 
-
     @QueryField(type = QueryField.FieldType.STRING, queryName = KOMMUNEKODE)
-    private String kommunekode;
+    private List<String> kommunekoder = new ArrayList<>();
 
-    public String getKommunekode() {
-        return this.kommunekode;
+    public Collection<String> getKommunekoder() {
+        return this.kommunekoder;
     }
 
-    public void setKommunekode(String kommunekode) {
-        this.kommunekode = kommunekode;
+    public void addKommunekode(String kommunekode) {
+        this.kommunekoder.add(kommunekode);
+    }
+
+    public void addKommunekode(int kommunekode) {
+        this.addKommunekode(String.format("%03d", kommunekode));
     }
 
 
@@ -77,7 +79,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
         map.put(PERSONNUMMER, this.personnummer);
         map.put(FORNAVNE, this.fornavn);
         map.put(EFTERNAVN, this.efternavn);
-        map.put(KOMMUNEKODE, this.kommunekode);
+        map.put(KOMMUNEKODE, this.kommunekoder);
         return map;
     }
 
@@ -86,7 +88,11 @@ public class PersonQuery extends CprQuery<PersonEntity> {
         this.setPersonnummer(parameters.getFirst(PERSONNUMMER));
         this.setFornavn(parameters.getFirst(FORNAVNE));
         this.setEfternavn(parameters.getFirst(EFTERNAVN));
-        this.setKommunekode(parameters.getFirst(KOMMUNEKODE));
+        if (parameters.containsKey(KOMMUNEKODE)) {
+            for (String kommunekode : parameters.get(KOMMUNEKODE)) {
+                this.addKommunekode(kommunekode);
+            }
+        }
     }
 
     @Override
@@ -112,8 +118,8 @@ public class PersonQuery extends CprQuery<PersonEntity> {
         if (this.efternavn != null) {
             lookupDefinition.put(PersonBaseData.DB_FIELD_NAME + LookupDefinition.separator + PersonNameData.DB_FIELD_LAST_NAME, this.efternavn, String.class);
         }
-        if (this.kommunekode != null) {
-            lookupDefinition.put(PersonBaseData.DB_FIELD_ADDRESS + LookupDefinition.separator + PersonAddressData.DB_FIELD_MUNICIPALITY_CODE, this.kommunekode, Integer.class);
+        if (!this.kommunekoder.isEmpty()) {
+            lookupDefinition.put(PersonBaseData.DB_FIELD_ADDRESS + LookupDefinition.separator + PersonAddressData.DB_FIELD_MUNICIPALITY_CODE, this.kommunekoder, Integer.class);
         }
         return lookupDefinition;
     }

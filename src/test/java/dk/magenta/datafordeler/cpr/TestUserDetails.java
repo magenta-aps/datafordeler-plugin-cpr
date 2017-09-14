@@ -1,24 +1,35 @@
 package dk.magenta.datafordeler.cpr;
 
+import dk.magenta.datafordeler.core.arearestriction.AreaRestriction;
+import dk.magenta.datafordeler.core.role.SystemRole;
 import dk.magenta.datafordeler.core.user.DafoUserDetails;
 import dk.magenta.datafordeler.core.user.UserProfile;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
+
+import static org.mockito.Mockito.when;
 
 public class TestUserDetails extends DafoUserDetails {
 
     private HashMap<String, UserProfile> userProfiles = new HashMap<>();
-    private HashMap<String, Collection<UserProfile>> systemRoles = new HashMap<>();
+    private HashMap<String, Set<UserProfile>> systemRoles = new HashMap<>();
+    private static final String profileName = "TestProfile";
 
     public void addUserProfile(UserProfile userprofile) {
         this.userProfiles.put(userprofile.getName(), userprofile);
-        for (String systemRole : userprofile.getSystemRoles()) {
-            if (systemRoles.containsKey(systemRole)) {
-                systemRoles.get(systemRole).add(userprofile);
-            } else {
-                systemRoles.put(systemRole, Collections.singletonList(userprofile));
+        this.commitUserProfiles();
+    }
+
+    private void commitUserProfiles() {
+        for (UserProfile userprofile : this.userProfiles.values()) {
+            for (String systemRole : userprofile.getSystemRoles()) {
+                if (systemRoles.containsKey(systemRole)) {
+                    systemRoles.get(systemRole).add(userprofile);
+                } else {
+                    HashSet<UserProfile> set = new HashSet<>();
+                    set.add(userprofile);
+                    systemRoles.put(systemRole, set);
+                }
             }
         }
     }
@@ -65,6 +76,29 @@ public class TestUserDetails extends DafoUserDetails {
 
     @Override
     public Collection<UserProfile> getUserProfilesForRole(String role) {
-        return systemRoles.getOrDefault(role, Collections.EMPTY_LIST);
+        return systemRoles.getOrDefault(role, Collections.EMPTY_SET);
+    }
+
+    public void giveAccess(SystemRole... rolesDefinitions) {
+        ArrayList<String> roleNames = new ArrayList<>();
+        for (SystemRole role : rolesDefinitions) {
+            roleNames.add(role.getRoleName());
+        }
+        UserProfile testUserProfile = this.userProfiles.get(profileName);
+        if (testUserProfile == null) {
+            testUserProfile = new UserProfile(profileName);
+            this.addUserProfile(testUserProfile);
+        }
+        testUserProfile.addSystemRoles(roleNames);
+        this.commitUserProfiles();
+    }
+
+    public void giveAccess(AreaRestriction... areaRestrictions) {
+        UserProfile testUserProfile = this.userProfiles.get(profileName);
+        if (testUserProfile == null) {
+            testUserProfile = new UserProfile(profileName);
+            this.addUserProfile(testUserProfile);
+        }
+        testUserProfile.addAreaRestrictions(Arrays.asList(areaRestrictions));
     }
 }

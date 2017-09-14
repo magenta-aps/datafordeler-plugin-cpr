@@ -6,8 +6,7 @@ import dk.magenta.datafordeler.core.fapi.QueryField;
 import dk.magenta.datafordeler.cpr.data.CprQuery;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lars on 19-05-17.
@@ -20,15 +19,20 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
     public static final String ETAGE = "etage";
     public static final String SIDE_DOER = "sideDoer";
 
-    @QueryField(type = QueryField.FieldType.INT, queryName = KOMMUNEKODE)
-    private String kommunekode;
 
-    public String getKommunekode() {
-        return this.kommunekode;
+    @QueryField(type = QueryField.FieldType.STRING, queryName = KOMMUNEKODE)
+    private List<String> kommunekoder = new ArrayList<>();
+
+    public Collection<String> getKommunekoder() {
+        return this.kommunekoder;
     }
 
-    public void setKommunekode(String kommunekode) {
-        this.kommunekode = kommunekode;
+    public void addKommunekode(String kommunekode) {
+        this.kommunekoder.add(kommunekode);
+    }
+
+    public void addKommunekode(int kommunekode) {
+        this.addKommunekode(String.format("%03d", kommunekode));
     }
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = VEJKODE)
@@ -78,7 +82,7 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
     @Override
     public Map<String, Object> getSearchParameters() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put(KOMMUNEKODE, this.kommunekode);
+        map.put(KOMMUNEKODE, this.kommunekoder);
         map.put(VEJKODE, this.vejkode);
         map.put(HUSNUMMER, this.husnummer);
         map.put(ETAGE, this.etage);
@@ -88,11 +92,15 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
 
     @Override
     public void setFromParameters(ParameterMap parameters) {
-        this.setKommunekode(parameters.getFirst(KOMMUNEKODE));
         this.setVejkode(parameters.getFirst(VEJKODE));
         this.setHusnummer(parameters.getFirst(HUSNUMMER));
         this.setEtage(parameters.getFirst(ETAGE));
         this.setSideDoer(parameters.getFirst(SIDE_DOER));
+        if (parameters.containsKey(KOMMUNEKODE)) {
+            for (String kommunekode : parameters.get(KOMMUNEKODE)) {
+                this.addKommunekode(kommunekode);
+            }
+        }
     }
 
     @Override
@@ -109,8 +117,8 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
     @Override
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = new LookupDefinition(this);
-        if (this.kommunekode != null) {
-            lookupDefinition.put(ResidenceBaseData.DB_FIELD_MUNICIPALITY_CODE, this.kommunekode, Integer.class);
+        if (!this.kommunekoder.isEmpty()) {
+            lookupDefinition.put(ResidenceBaseData.DB_FIELD_MUNICIPALITY_CODE, this.kommunekoder, Integer.class);
         }
         if (this.vejkode != null) {
             lookupDefinition.put(ResidenceBaseData.DB_FIELD_ROAD_CODE, this.vejkode, Integer.class);

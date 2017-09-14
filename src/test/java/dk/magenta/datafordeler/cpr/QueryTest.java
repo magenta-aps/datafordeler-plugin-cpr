@@ -1,13 +1,16 @@
 package dk.magenta.datafordeler.cpr;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.Application;
 import dk.magenta.datafordeler.core.Engine;
 import dk.magenta.datafordeler.core.Pull;
+import dk.magenta.datafordeler.core.arearestriction.AreaRestriction;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
+import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.plugin.Plugin;
 import dk.magenta.datafordeler.core.role.SystemRole;
 import dk.magenta.datafordeler.core.user.DafoUserManager;
@@ -28,6 +31,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,12 +65,6 @@ public class QueryTest {
     @Autowired
     private Engine engine;
 
-    @Autowired
-    private QueryManager queryManager;
-
-    @Autowired
-    private SessionManager sessionManager;
-
     @SpyBean
     private DafoUserManager dafoUserManager;
 
@@ -78,50 +80,10 @@ public class QueryTest {
     @Autowired
     private ResidenceEntityManager residenceEntityManager;
 
+    @Autowired
+    private TestRestTemplate restTemplate;
+
     private PersonOutputWrapper personOutputWrapper = new PersonOutputWrapper();
-
-    @Test
-    public void pull() throws Exception {
-        this.setupFTP();
-        Pull pull = new Pull(engine, plugin);
-        pull.run();
-    }
-
-    @Test
-    public void loadPerson() throws Exception {
-        InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
-        personEntityManager.parseRegistration(testData);
-        testData.close();
-    }
-
-    @Test
-    public void testQueryPerson() throws Exception {
-        Session session = null;
-        try {
-            loadPerson();
-
-            PersonQuery query = new PersonQuery();
-            query.setEfternavn("Testersen");
-            session = sessionManager.getSessionFactory().openSession();
-
-            List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
-            long start = Instant.now().toEpochMilli();
-            List<Object> wrapped = personOutputWrapper.wrapResults(entities);
-            System.out.println(Instant.now().toEpochMilli() - start + "ms");
-
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(wrapped));
-
-            //Assert.assertEquals(1, wrapped.size());
-            //Assert.assertTrue(wrapped.get(0) instanceof ObjectNode);
-            //ObjectNode objectNode = (ObjectNode) wrapped.get(0);
-
-
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-    }
 
     private void setupFTP() throws Exception {
         int port = 2101;
@@ -137,15 +99,210 @@ public class QueryTest {
         ftp.startServer(username, password, port, Collections.singletonList(tempFile));
     }
 
-    private void giveAccess(SystemRole... rolesDefinitions) {
-        ArrayList<String> roleNames = new ArrayList<>();
-        for (SystemRole role : rolesDefinitions) {
-            roleNames.add(role.getRoleName());
-        }
-        UserProfile testUserProfile = new UserProfile("TestProfile", roleNames);
+    public void loadPerson() throws Exception {
+        InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
+        personEntityManager.parseRegistration(testData);
+        testData.close();
+    }
 
-        TestUserDetails testUserDetails = new TestUserDetails();
-        testUserDetails.addUserProfile(testUserProfile);
+    public void loadResidence() throws Exception {
+        InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+        residenceEntityManager.parseRegistration(testData);
+        testData.close();
+    }
+
+    public void loadRoad() throws Exception {
+        InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+        roadEntityManager.parseRegistration(testData);
+        testData.close();
+    }
+
+    private void applyAccess(TestUserDetails testUserDetails) {
         when(dafoUserManager.getFallbackUser()).thenReturn(testUserDetails);
     }
+
+    private ResponseEntity<String> restSearch(ParameterMap parameters, String type) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/json");
+        HttpEntity<String> httpEntity = new HttpEntity<String>("", headers);
+        return this.restTemplate.exchange("/cpr/"+type+"/1/rest/search?" + parameters.asUrlParams(), HttpMethod.GET, httpEntity, String.class);
+    }
+
+    @Test
+    public void pull() throws Exception {
+        this.setupFTP();
+        Pull pull = new Pull(engine, plugin);
+        pull.run();
+    }
+
+    @Test
+    public void testPersonAccess() throws Exception {
+        loadPerson();
+        TestUserDetails testUserDetails = new TestUserDetails();
+
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("fornavn", "Tester");
+        ResponseEntity<String> response = restSearch(searchParameters, "person");
+        Assert.assertEquals(403, response.getStatusCode().value());
+
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "person");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = objectMapper.readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("UUID").asText());
+
+        testUserDetails.giveAccess(
+            plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                    CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+            ).getRestriction(
+                    CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_SERMERSOOQ
+            )
+        );
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "person");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
+
+        testUserDetails.giveAccess(
+                plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+                ).getRestriction(
+                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_QAASUITSUP
+                )
+        );
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "person");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("UUID").asText());
+    }
+
+
+    @Test
+    public void testResidenceAccess() throws Exception {
+        loadResidence();
+        TestUserDetails testUserDetails = new TestUserDetails();
+
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("vejkode", "001");
+        searchParameters.add("husnummer", "1");
+        ResponseEntity<String> response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(403, response.getStatusCode().value());
+
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = objectMapper.readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("UUID").asText());
+
+        testUserDetails.giveAccess(
+                plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+                ).getRestriction(
+                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_SERMERSOOQ
+                )
+        );
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
+
+        testUserDetails.giveAccess(
+                plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+                ).getRestriction(
+                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_KUJALLEQ
+                )
+        );
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("UUID").asText());
+    }
+
+
+    @Test
+    public void testRoadAccess() throws Exception {
+        loadRoad();
+        TestUserDetails testUserDetails = new TestUserDetails();
+
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("vejnavn", "TestVej");
+        ResponseEntity<String> response = restSearch(searchParameters, "road");
+        Assert.assertEquals(403, response.getStatusCode().value());
+
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = objectMapper.readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        System.out.println(results);
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("d318815f-1959-3b37-b173-b99b88935c82", results.get(0).get("UUID").asText());
+
+        testUserDetails.giveAccess(
+                plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+                ).getRestriction(
+                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_SERMERSOOQ
+                )
+        );
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
+
+        testUserDetails.giveAccess(
+                plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+                ).getRestriction(
+                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_KUJALLEQ
+                )
+        );
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("d318815f-1959-3b37-b173-b99b88935c82", results.get(0).get("UUID").asText());
+    }
+
+
 }

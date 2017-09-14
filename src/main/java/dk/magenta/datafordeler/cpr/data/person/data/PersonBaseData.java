@@ -257,7 +257,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.birth.setFoedselsraekkefoelge(foedselsraekkefoelge);
     }
 
-    public void setAddress(int authority, String bygningsnummer, String bynavn, String cprKommunekode,
+    public void setAddress(int authority, String bygningsnummer, String bynavn, int cprKommunekode,
                            String cprKommunenavn, String cprVejkode, String darAdresse, String etage,
                            String husnummer, String postdistrikt, String postnummer, String sideDoer,
                            String adresselinie1, String adresselinie2, String adresselinie3, String adresselinie4,

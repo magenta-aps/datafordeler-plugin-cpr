@@ -113,7 +113,7 @@ public class ParseTest {
 
 
             RoadQuery query = new RoadQuery();
-            query.setKommunekode("0730");
+            query.addKommunekode("0730");
             query.setVejkode("0004");
 
             List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
@@ -210,7 +210,7 @@ public class ParseTest {
             testData.close();
 
             ResidenceQuery query = new ResidenceQuery();
-            query.setKommunekode("0360");
+            query.addKommunekode("0360");
             query.setVejkode("0206");
             session = sessionManager.getSessionFactory().openSession();
 
