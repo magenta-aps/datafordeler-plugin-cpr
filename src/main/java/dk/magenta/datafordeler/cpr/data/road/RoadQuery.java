@@ -32,6 +32,10 @@ public class RoadQuery extends CprQuery<RoadEntity> {
         this.vejkode = vejkode;
     }
 
+    public void setVejkode(int vejkode) {
+        this.setVejkode(String.format("%03d", vejkode));
+    }
+
     @QueryField(type = QueryField.FieldType.STRING, queryName = VEJNAVN)
     private String navn;
 

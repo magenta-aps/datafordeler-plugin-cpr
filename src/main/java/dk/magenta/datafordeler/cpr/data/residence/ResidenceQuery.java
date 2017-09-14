@@ -46,6 +46,10 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
         this.vejkode = vejkode;
     }
 
+    public void setVejkode(int vejkode) {
+        this.setVejkode(String.format("%03d", vejkode));
+    }
+
     @QueryField(type = QueryField.FieldType.STRING, queryName = HUSNUMMER)
     private String husnummer;
 
