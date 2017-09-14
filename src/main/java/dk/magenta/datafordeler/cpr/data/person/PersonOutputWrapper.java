@@ -245,17 +245,17 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
 
     protected ObjectNode createCprAdresseNode(PersonAddressData adresse) {
         ObjectNode output = objectMapper.createObjectNode();
-        output.put("bygningsnummer", adresse.getBygningsnummer());
-        output.put("bynavn", adresse.getBynavn());
-        output.put("cprKommunekode", adresse.getCprKommunekode());
-        output.put("cprKommunenavn", adresse.getCprKommunenavn());
-        output.put("cprVejkode", adresse.getCprVejkode());
-        output.put("etage", adresse.getEtage());
-        output.put("husnummer", adresse.getHusnummer());
-        output.put("postdistrikt", adresse.getPostdistrikt());
-        output.put("postnummer", adresse.getPostnummer());
-        output.put("sideDoer", adresse.getSideDoer());
-        output.put("vejaddresseringsnavn", adresse.getVejadresseringsnavn());
+        output.put("bygningsnummer", adresse.getBuildingNumber());
+        output.put("bynavn", adresse.getCityName());
+        output.put("cprKommunekode", adresse.getMunicipalityCode());
+        output.put("cprKommunenavn", adresse.getMunicipalityName());
+        output.put("cprVejkode", adresse.getRoadCode());
+        output.put("etage", adresse.getFloor());
+        output.put("husnummer", adresse.getHouseNumber());
+        output.put("postdistrikt", adresse.getPostalDistrict());
+        output.put("postnummer", adresse.getPostalCode());
+        output.put("sideDoer", adresse.getDoor());
+        output.put("vejaddresseringsnavn", adresse.getRoadAddressName());
         return output;
     }
 

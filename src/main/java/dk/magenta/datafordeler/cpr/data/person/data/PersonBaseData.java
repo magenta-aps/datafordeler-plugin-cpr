@@ -266,23 +266,23 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             this.address = new PersonAddressData();
         }
         this.address.setAuthority(authority);
-        this.address.setBygningsnummer(bygningsnummer);
-        this.address.setBynavn(bynavn);
-        this.address.setCprKommunekode(cprKommunekode);
-        this.address.setCprKommunenavn(cprKommunenavn);
-        this.address.setCprVejkode(cprVejkode);
-        this.address.setDarAdresse(darAdresse);
-        this.address.setEtage(etage);
-        this.address.setHusnummer(husnummer);
-        this.address.setPostdistrikt(postdistrikt);
-        this.address.setPostnummer(postnummer);
-        this.address.setSideDoer(sideDoer);
+        this.address.setBuildingNumber(bygningsnummer);
+        this.address.setCityName(bynavn);
+        this.address.setMunicipalityCode(cprKommunekode);
+        this.address.setMunicipalityName(cprKommunenavn);
+        this.address.setRoadCode(cprVejkode);
+        this.address.setDarAddress(darAdresse);
+        this.address.setFloor(etage);
+        this.address.setHouseNumber(husnummer);
+        this.address.setPostalDistrict(postdistrikt);
+        this.address.setPostalCode(postnummer);
+        this.address.setDoor(sideDoer);
 
-        this.address.setAdresselinie1(adresselinie1);
-        this.address.setAdresselinie2(adresselinie2);
-        this.address.setAdresselinie3(adresselinie3);
-        this.address.setAdresselinie4(adresselinie4);
-        this.address.setAdresselinie5(adresselinie5);
+        this.address.setRoadAddressLine1(adresselinie1);
+        this.address.setRoadAddressLine2(adresselinie2);
+        this.address.setRoadAddressLine3(adresselinie3);
+        this.address.setRoadAddressLine4(adresselinie4);
+        this.address.setRoadAddressLine5(adresselinie5);
 
         this.address.setAdressetekststype(addressTextType);
         this.address.setStartautoritet(startAuthority);

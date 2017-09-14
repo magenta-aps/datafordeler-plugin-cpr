@@ -86,13 +86,13 @@ public class RoadQuery extends CprQuery<RoadEntity> {
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = new LookupDefinition(this);
         if (this.vejkode != null) {
-            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + DB_FIELD_ROADCODE, this.vejkode);
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + DB_FIELD_ROADCODE, this.vejkode, Integer.class);
         }
         if (this.navn != null) {
-            lookupDefinition.put(RoadBaseData.DB_FIELD_CORE + LookupDefinition.separator + RoadCoreData.DB_FIELD_ROAD_NAME, this.navn);
+            lookupDefinition.put(RoadBaseData.DB_FIELD_CORE + LookupDefinition.separator + RoadCoreData.DB_FIELD_ROAD_NAME, this.navn, String.class);
         }
         if (this.kommunekode != null) {
-            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + DB_FIELD_MUNICIPALITYCODE, this.kommunekode);
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + DB_FIELD_MUNICIPALITYCODE, this.kommunekode, Integer.class);
         }
         return lookupDefinition;
     }
