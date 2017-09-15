@@ -7,9 +7,11 @@ import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.person.*;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.residence.*;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.data.road.*;
+import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadMemoData;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadPostcodeData;
 import org.hibernate.Session;
@@ -96,7 +98,7 @@ public class ParseTest {
             PersonQuery query = new PersonQuery();
             query.setFornavn("Tester");
 
-            List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
+            List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class, PersonBaseData.class);
             Assert.assertEquals(1, entities.size());
             PersonEntity entity = entities.get(0);
             Assert.assertEquals(PersonEntity.generateUUID("0101001234"), entity.getUUID());
@@ -134,7 +136,7 @@ public class ParseTest {
             query.addKommunekode("0730");
             query.setVejkode("0004");
 
-            List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
+            List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class, RoadBaseData.class);
             Assert.assertEquals(1, entities.size());
             RoadEntity entity = entities.get(0);
             Assert.assertEquals(RoadEntity.generateUUID(730, 4), entity.getUUID());
@@ -227,7 +229,7 @@ public class ParseTest {
             query.addKommunekode(360);
             query.setVejkode(206);
 
-            List<ResidenceEntity> entities = queryManager.getAllEntities(session, query, ResidenceEntity.class);
+            List<ResidenceEntity> entities = queryManager.getAllEntities(session, query, ResidenceEntity.class, ResidenceBaseData.class);
             Assert.assertEquals(1, entities.size());
             ResidenceEntity entity = entities.get(0);
             Assert.assertEquals(ResidenceEntity.generateUUID(360, 206, "44E", "", ""), entity.getUUID());
