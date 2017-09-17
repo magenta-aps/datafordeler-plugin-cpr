@@ -34,7 +34,7 @@ public class RoadMemoData extends DetailData {
         this.memoNumber = memoNumber;
     }
 
-    public static final String DB_FIELD_MEMOLINE = "memoLine";
+    public static final String DB_FIELD_MEMOLINE = "memoText";
     public static final String IO_FIELD_MEMOLINE = "notatLinie";
     @Column(name = DB_FIELD_MEMOLINE)
     @JsonProperty(value = IO_FIELD_MEMOLINE)

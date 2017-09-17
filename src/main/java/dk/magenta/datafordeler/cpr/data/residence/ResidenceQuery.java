@@ -120,7 +120,7 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
 
     @Override
     public LookupDefinition getLookupDefinition() {
-        LookupDefinition lookupDefinition = new LookupDefinition(this);
+        LookupDefinition lookupDefinition = new LookupDefinition(this, ResidenceBaseData.class);
         if (!this.kommunekoder.isEmpty()) {
             lookupDefinition.put(ResidenceBaseData.DB_FIELD_MUNICIPALITY_CODE, this.kommunekoder, Integer.class);
         }

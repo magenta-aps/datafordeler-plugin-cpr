@@ -20,7 +20,7 @@ import java.util.Map;
 @Table(name="cpr_road_postcode")
 public class RoadPostcodeData extends DetailData {
 
-    public static final String DB_FIELD_HOUSENUMBER_FROM = "housenumberFrom";
+    public static final String DB_FIELD_HOUSENUMBER_FROM = "houseNumberFrom";
     public static final String IO_FIELD_HOUSENUMBER_FROM = "husnummerFra";
     @Column(name = DB_FIELD_HOUSENUMBER_FROM)
     @JsonProperty(value = IO_FIELD_HOUSENUMBER_FROM)
@@ -35,7 +35,7 @@ public class RoadPostcodeData extends DetailData {
         this.houseNumberFrom = houseNumberFrom;
     }
 
-    public static final String DB_FIELD_HOUSENUMBER_TO = "housenumberTo";
+    public static final String DB_FIELD_HOUSENUMBER_TO = "houseNumberTo";
     public static final String IO_FIELD_HOUSENUMBER_TO = "husnummerTil";
     @Column(name = DB_FIELD_HOUSENUMBER_TO)
     @JsonProperty(value = IO_FIELD_HOUSENUMBER_TO)

@@ -124,7 +124,7 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
     }
 
     public LookupDefinition getLookupDefinition() {
-        LookupDefinition lookupDefinition = new LookupDefinition();
+        LookupDefinition lookupDefinition = new LookupDefinition(ResidenceBaseData.class);
         lookupDefinition.setMatchNulls(true);
 
         lookupDefinition.put(DB_FIELD_MUNICIPALITY_CODE, this.municipalityCode);

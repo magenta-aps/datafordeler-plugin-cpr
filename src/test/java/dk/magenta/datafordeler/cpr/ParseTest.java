@@ -15,6 +15,8 @@ import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadMemoData;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadPostcodeData;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,13 +63,33 @@ public class ParseTest {
 
     private void loadRoad() throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-        roadEntityManager.parseRegistration(testData);
+        ArrayList<RoadRegistration> registrations = new ArrayList<>(roadEntityManager.parseRegistration(testData));
+        Collections.sort(registrations);
+
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        for (RoadRegistration registration : registrations) {
+            registration = (RoadRegistration) session.merge(registration);
+            queryManager.saveRegistration(session, registration.getEntity(), registration);
+        }
+        transaction.commit();
+        session.close();
         testData.close();
     }
 
     private void loadResidence() throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-        residenceEntityManager.parseRegistration(testData);
+        ArrayList<ResidenceRegistration> registrations = new ArrayList<>(residenceEntityManager.parseRegistration(testData));
+        Collections.sort(registrations);
+
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        for (ResidenceRegistration registration : registrations) {
+            registration = (ResidenceRegistration) session.merge(registration);
+            queryManager.saveRegistration(session, registration.getEntity(), registration);
+        }
+        transaction.commit();
+        session.close();
         testData.close();
     }
 
@@ -98,7 +120,7 @@ public class ParseTest {
             PersonQuery query = new PersonQuery();
             query.setFornavn("Tester");
 
-            List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class, PersonBaseData.class);
+            List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
             Assert.assertEquals(1, entities.size());
             PersonEntity entity = entities.get(0);
             Assert.assertEquals(PersonEntity.generateUUID("0101001234"), entity.getUUID());
@@ -136,7 +158,7 @@ public class ParseTest {
             query.addKommunekode("0730");
             query.setVejkode("0004");
 
-            List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class, RoadBaseData.class);
+            List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
             Assert.assertEquals(1, entities.size());
             RoadEntity entity = entities.get(0);
             Assert.assertEquals(RoadEntity.generateUUID(730, 4), entity.getUUID());
@@ -229,7 +251,7 @@ public class ParseTest {
             query.addKommunekode(360);
             query.setVejkode(206);
 
-            List<ResidenceEntity> entities = queryManager.getAllEntities(session, query, ResidenceEntity.class, ResidenceBaseData.class);
+            List<ResidenceEntity> entities = queryManager.getAllEntities(session, query, ResidenceEntity.class);
             Assert.assertEquals(1, entities.size());
             ResidenceEntity entity = entities.get(0);
             Assert.assertEquals(ResidenceEntity.generateUUID(360, 206, "44E", "", ""), entity.getUUID());

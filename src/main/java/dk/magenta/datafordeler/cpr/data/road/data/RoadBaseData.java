@@ -132,7 +132,7 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     }
 
     public LookupDefinition getLookupDefinition() {
-        LookupDefinition lookupDefinition = new LookupDefinition();
+        LookupDefinition lookupDefinition = new LookupDefinition(RoadBaseData.class);
         lookupDefinition.setMatchNulls(true);
 
         if (this.coreData != null) {

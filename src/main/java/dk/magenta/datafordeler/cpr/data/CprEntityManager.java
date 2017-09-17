@@ -227,6 +227,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 if (entity == null) {
                     entity = queryManager.getEntity(session, uuid, this.getEntityClass());
                     if (entity == null) {
+                        System.out.println("Create new entity for uuid "+uuid);
                         entity = this.createBasicEntity(record);
                         entity.setUUID(uuid);
                         entity.setDomain(CprPlugin.getDomain());
@@ -364,6 +365,11 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             }
         }
         return recordGroups;
+    }
+
+    @Override
+    public boolean handlesOwnSaves() {
+        return true;
     }
 
 }

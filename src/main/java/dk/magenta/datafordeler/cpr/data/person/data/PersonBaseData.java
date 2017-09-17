@@ -447,7 +447,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     @Override
     public LookupDefinition getLookupDefinition() {
-        LookupDefinition lookupDefinition = new LookupDefinition();
+        LookupDefinition lookupDefinition = new LookupDefinition(PersonBaseData.class);
         lookupDefinition.setMatchNulls(true);
 
         if (this.coreData != null) {

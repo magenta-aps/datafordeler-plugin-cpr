@@ -82,14 +82,14 @@ public class PullTest {
 
             PersonQuery personQuery = new PersonQuery();
             personQuery.setFornavn("Tester");
-            List<PersonEntity> personEntities = queryManager.getAllEntities(session, personQuery, PersonEntity.class, PersonBaseData.class);
+            List<PersonEntity> personEntities = queryManager.getAllEntities(session, personQuery, PersonEntity.class);
             Assert.assertEquals(1, personEntities.size());
             Assert.assertEquals(PersonEntity.generateUUID("0101001234"), personEntities.get(0).getUUID());
 
             RoadQuery roadQuery = new RoadQuery();
             roadQuery.addKommunekode(730);
             roadQuery.setVejkode(4);
-            List<RoadEntity> roadEntities = queryManager.getAllEntities(session, roadQuery, RoadEntity.class, RoadBaseData.class);
+            List<RoadEntity> roadEntities = queryManager.getAllEntities(session, roadQuery, RoadEntity.class);
             Assert.assertEquals(1, roadEntities.size());
             Assert.assertEquals(RoadEntity.generateUUID(730, 4), roadEntities.get(0).getUUID());
 
@@ -97,7 +97,7 @@ public class PullTest {
             residenceQuery.addKommunekode(360);
             residenceQuery.setVejkode(206);
             residenceQuery.setHusnummer("44E");
-            List<ResidenceEntity> residenceEntities = queryManager.getAllEntities(session, residenceQuery, ResidenceEntity.class, ResidenceBaseData.class);
+            List<ResidenceEntity> residenceEntities = queryManager.getAllEntities(session, residenceQuery, ResidenceEntity.class);
             Assert.assertEquals(1, residenceEntities.size());
             Assert.assertEquals(ResidenceEntity.generateUUID(360, 206, "44E", "", ""), residenceEntities.get(0).getUUID());
 

@@ -108,7 +108,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
 
     @Override
     public LookupDefinition getLookupDefinition() {
-        LookupDefinition lookupDefinition = new LookupDefinition(this);
+        LookupDefinition lookupDefinition = new LookupDefinition(this, PersonBaseData.class);
         if (this.personnummer != null) {
             lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonCoreData.DB_FIELD_CPR_NUMBER, this.personnummer, String.class);
         }
