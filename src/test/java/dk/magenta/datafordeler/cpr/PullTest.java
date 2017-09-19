@@ -4,18 +4,17 @@ import dk.magenta.datafordeler.core.Application;
 import dk.magenta.datafordeler.core.Engine;
 import dk.magenta.datafordeler.core.Pull;
 import dk.magenta.datafordeler.core.database.QueryManager;
+import dk.magenta.datafordeler.core.database.RecordCollection;
+import dk.magenta.datafordeler.core.database.RecordData;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.person.PersonQuery;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
-import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
 import dk.magenta.datafordeler.cpr.data.road.RoadQuery;
-import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -100,6 +99,11 @@ public class PullTest {
             List<ResidenceEntity> residenceEntities = queryManager.getAllEntities(session, residenceQuery, ResidenceEntity.class);
             Assert.assertEquals(1, residenceEntities.size());
             Assert.assertEquals(ResidenceEntity.generateUUID(360, 206, "44E", "", ""), residenceEntities.get(0).getUUID());
+
+            RecordCollection firstRecordCollection = residenceEntities.get(0).getRegistrations().get(0).getEffects().get(0).getDataItems().get(0).getRecordSet();
+            Assert.assertEquals(1, firstRecordCollection.getRecords().size());
+            RecordData firstRecordData = firstRecordCollection.getRecords().iterator().next();
+            Assert.assertEquals("00203600206044E      200612221200 199109231200000000000000Provstelunden", firstRecordData.getSourceData());
 
         } finally {
             session.close();

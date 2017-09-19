@@ -37,7 +37,7 @@ public class RoadCityRecord extends RoadDataRecord {
     }
 
     @Override
-    public void populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
         if (this.cityTemporality.matches(registrationTime, effect)) {
             data.addCity(
                     this.get("husnrfra"),
@@ -45,7 +45,9 @@ public class RoadCityRecord extends RoadDataRecord {
                     this.getEven("ligeulige"),
                     this.get("bynvn")
             );
+            return true;
         }
+        return false;
     }
 
     @Override

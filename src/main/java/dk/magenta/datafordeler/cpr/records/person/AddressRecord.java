@@ -64,7 +64,8 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+        boolean updated = false;
         if (this.addressTemporality.matches(registrationTime, effect)) {
             data.setAddress(
                 // int authority,
@@ -106,9 +107,11 @@ public class AddressRecord extends PersonDataRecord {
                 // int startAuthority
                 this.getInt("start_mynkod-adrtxt")
             );
+            updated = true;
         }
         if (this.conameTemporality.matches(registrationTime, effect)) {
             data.setCoName(this.get("convn"));
+            updated = true;
         }
         if (this.municipalityTemporality.matches(registrationTime, effect)) {
             data.setMoveMunicipality(
@@ -125,7 +128,9 @@ public class AddressRecord extends PersonDataRecord {
                 // boolean tilflytningsdatoKommuneUsikkerhedsmarkering
                 this.getBoolean("fraflykomdt_umrk")
             );
+            updated = true;
         }
+        return updated;
     }
 
     @Override

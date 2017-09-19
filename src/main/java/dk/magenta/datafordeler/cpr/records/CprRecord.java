@@ -2,7 +2,6 @@ package dk.magenta.datafordeler.cpr.records;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
 
-import java.util.HashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -69,6 +68,10 @@ public abstract class CprRecord extends Record {
 
     protected String getMarkingCharacter(String key) {
         return this.get(key);
+    }
+
+    public String getLine() {
+        return this.line;
     }
 
 }

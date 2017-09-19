@@ -43,13 +43,17 @@ public class ForeignAddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+        boolean updated = false;
         if (this.emigrationTemporality.matches(registrationTime, effect)) {
             data.setEmigration(this.getInt("start_mynkod-udrindrejs"), this.getInt("udr_landekod"));
+            updated = true;
         }
         if (this.foreignAddressTemporality.matches(registrationTime, effect)) {
             data.setForeignAddress(this.getInt("udlandadr_mynkod"), this.get("udlandadr1"), this.get("udlandadr2"), this.get("udlandadr3"), this.get("udlandadr4"), this.get("udlandadr5"));
+            updated = true;
         }
+        return updated;
     }
 
 

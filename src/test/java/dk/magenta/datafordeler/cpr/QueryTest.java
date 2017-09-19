@@ -23,6 +23,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.InputStream;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.mockito.Mockito.when;
 
@@ -138,6 +140,37 @@ public class QueryTest {
         Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("UUID").asText());
     }
 
+    @Test
+    public void testPersonRecordTime() throws Exception {
+        OffsetDateTime now = OffsetDateTime.now();
+        loadPerson();
+        TestUserDetails testUserDetails = new TestUserDetails();
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
+
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        ResponseEntity<String> response = restSearch(searchParameters, "person");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = objectMapper.readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
+
+        searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        response = restSearch(searchParameters, "person");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+    }
+
 
     @Test
     public void testResidenceAccess() throws Exception {
@@ -197,6 +230,38 @@ public class QueryTest {
 
 
     @Test
+    public void testResidenceRecordTime() throws Exception {
+        OffsetDateTime now = OffsetDateTime.now();
+        loadResidence();
+        TestUserDetails testUserDetails = new TestUserDetails();
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
+
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        ResponseEntity<String> response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = objectMapper.readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
+
+        searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(2, results.size());
+    }
+
+
+    @Test
     public void testRoadAccess() throws Exception {
         loadRoad();
         TestUserDetails testUserDetails = new TestUserDetails();
@@ -249,6 +314,37 @@ public class QueryTest {
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(1, results.size());
         Assert.assertEquals("d318815f-1959-3b37-b173-b99b88935c82", results.get(0).get("UUID").asText());
+    }
+
+    @Test
+    public void testRoadRecordTime() throws Exception {
+        OffsetDateTime now = OffsetDateTime.now();
+        loadRoad();
+        TestUserDetails testUserDetails = new TestUserDetails();
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
+
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        ResponseEntity<String> response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = objectMapper.readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
+
+        searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(9, results.size());
     }
 
 

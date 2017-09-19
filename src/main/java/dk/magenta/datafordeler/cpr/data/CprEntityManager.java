@@ -178,6 +178,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
         CprSubParser<T> parser = this.getParser();
         QueryManager queryManager = this.getQueryManager();
+        OffsetDateTime timestamp = OffsetDateTime.now();
 
         boolean done = false;
         long linesRead = 0;
@@ -241,7 +242,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
             for (E entity : recordMap.keySet()) {
                 List<T> records = recordMap.get(entity);
-                Collection<R> entityRegistrations = this.parseRegistration(entity, records, queryManager, session);
+                Collection<R> entityRegistrations = this.parseRegistration(entity, records, queryManager, session, timestamp);
                 allRegistrations.addAll(entityRegistrations);
             }
             transaction.commit();
@@ -274,7 +275,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     }
 
 
-    private Collection<R> parseRegistration(E entity, List<T> records, QueryManager queryManager, Session session) {
+    private Collection<R> parseRegistration(E entity, List<T> records, QueryManager queryManager, Session session, OffsetDateTime timestamp) {
 
         HashSet<R> allRegistrations = new HashSet<>();
         ListHashMap<Bitemporality, T> groups = this.sortIntoGroups(records);
@@ -329,9 +330,17 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
             timer.start(TASK_POPULATE_DATA);
 
-            for (V effect : effects) {
-                for (T record : groupRecords) {
-                    record.populateBaseData(baseData, effect, bitemporality.registrationFrom, queryManager, session);
+            for (T record : groupRecords) {
+                boolean updated = false;
+                for (V effect : effects) {
+                    if (record.populateBaseData(baseData, effect, bitemporality.registrationFrom, queryManager, session)) {
+                        updated = true;
+                    }
+                }
+                if (updated) {
+                    RecordData recordData = new RecordData(timestamp);
+                    recordData.setSourceData(record.getLine());
+                    baseData.addRecordData(recordData);
                 }
             }
             timer.measure(TASK_POPULATE_DATA);

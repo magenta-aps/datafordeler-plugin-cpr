@@ -26,7 +26,7 @@ public abstract class CprDataRecord<V extends CprEffect, B extends CprData> exte
         super(line);
     }
 
-    public abstract void populateBaseData(B data, V effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session);
+    public abstract boolean populateBaseData(B data, V effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session);
 
 
     protected B getBaseDataItem(HashMap<V, B> data) {

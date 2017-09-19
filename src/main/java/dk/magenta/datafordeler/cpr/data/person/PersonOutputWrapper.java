@@ -8,6 +8,9 @@ import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.cpr.data.person.data.*;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
 
     private ObjectMapper objectMapper;
@@ -45,12 +48,12 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     protected ObjectNode wrapRegistrering(PersonRegistration input) {
         ObjectNode output = objectMapper.createObjectNode();
         output.put(
-                        "registreringFra",
-                        input.getRegistrationFrom() != null ? input.getRegistrationFrom().toString() : null
+            "registreringFra",
+            input.getRegistrationFrom() != null ? input.getRegistrationFrom().toString() : null
         );
         output.put(
-                        "registreringTil",
-                        input.getRegistrationTo() != null ? input.getRegistrationTo().toString() : null
+            "registreringTil",
+            input.getRegistrationTo() != null ? input.getRegistrationTo().toString() : null
         );
 
         for (PersonEffect virkning : input.getEffects()) {
@@ -71,63 +74,66 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                 PersonForeignAddressData udenlandsadresse = personBaseData.getForeignAddress();
                 PersonNameAuthorityTextData navnemyndighed = personBaseData.getNameAuthority();
 
+                OffsetDateTime timestamp = personBaseData.getRecordSet().getNewestRecord().getTimestamp();
+
                 if (personCoreData != null) {
                     addEffectDataToRegistration(
-                                    output, "personnummer", createPersonNummerNode(virkning, personCoreData)
+                            output, "personnummer",
+                            createPersonNummerNode(virkning, timestamp, personCoreData)
                     );
                     addEffectDataToRegistration(
-                                    output,
-                                    "person",
-                                    createKerneDataNode(virkning, personCoreData, personStatusData, stilling, foedsel)
+                            output,
+                            "person",
+                            createKerneDataNode(virkning, timestamp, personCoreData, personStatusData, stilling, foedsel)
                     );
                 }
                 if (far != null) {
                     addEffectDataToRegistration(
-                                    output,
-                                    "foraeldreoplysning",
-                                    createForaeldreoplysningNode(virkning, "FAR_MEDMOR", far)
+                            output,
+                            "foraeldreoplysning",
+                            createForaeldreoplysningNode(virkning, timestamp, "FAR_MEDMOR", far)
                     );
                 }
                 if (mor != null) {
                     addEffectDataToRegistration(
-                                    output,
-                                    "foraeldreoplysning",
-                                    createForaeldreoplysningNode(virkning, "MOR", mor)
+                            output,
+                            "foraeldreoplysning",
+                            createForaeldreoplysningNode(virkning, timestamp, "MOR", mor)
                     );
                 }
                 if (adresse != null || conavn != null || flytteKommune != null) {
                     addEffectDataToRegistration(
-                                    output,
-                                    "adresseoplysninger",
-                                    createAdresseOplysningNode(virkning, adresse, conavn, flytteKommune)
+                            output,
+                            "adresseoplysninger",
+                            createAdresseOplysningNode(virkning, timestamp, adresse, conavn, flytteKommune)
                     );
                 }
                 if (navn != null || adressenavn != null) {
                     addEffectDataToRegistration(
-                                    output,
-                                    "navn",
-                                    createNavnNode(virkning, navn, adressenavn)
+                            output,
+                            "navn",
+                            createNavnNode(virkning, timestamp, navn, adressenavn)
                     );
                 }
                 if (beskyttelse != null) {
                     addEffectDataToRegistration(
-                                    output,
-                                    "beskyttelse",
-                                    createBeskyttelseNode(virkning, beskyttelse)
+                            output,
+                            "beskyttelse",
+                            createBeskyttelseNode(virkning, timestamp, beskyttelse)
                     );
                 }
                 if (udrejseIndrejse != null) {
                     addEffectDataToRegistration(
-                                    output,
-                                    "udrejseindrejse",
-                                    createUdrejseIndrejseNode(virkning, udrejseIndrejse, udenlandsadresse)
+                            output,
+                            "udrejseindrejse",
+                            createUdrejseIndrejseNode(virkning, timestamp, udrejseIndrejse, udenlandsadresse)
                     );
                 }
                 if (navnemyndighed != null) {
                     addEffectDataToRegistration(
-                                    output,
-                                    "navnemyndighed",
-                                    createNavneMyndighedNode(virkning, navnemyndighed)
+                            output,
+                            "navnemyndighed",
+                            createNavneMyndighedNode(virkning, timestamp, navnemyndighed)
                     );
                 }
             }
@@ -136,6 +142,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return output;
     }
 
+
     protected void addEffectDataToRegistration(ObjectNode output, String key, JsonNode value) {
         if (!output.has(key) || output.get(key).isNull()) {
             output.set(key, objectMapper.createArrayNode());
@@ -143,38 +150,38 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         ((ArrayNode) output.get(key)).add(value);
     }
 
-
-    protected ObjectNode createVirkningObjectNode(Effect virkning) {
-        return createVirkningObjectNode(virkning, true);
+    protected ObjectNode createVirkningObjectNode(Effect virkning, OffsetDateTime lastUpdated) {
+        return createVirkningObjectNode(virkning, true, lastUpdated);
     }
 
-    protected ObjectNode createVirkningObjectNode(Effect virkning, boolean includeVirkningTil) {
+    protected ObjectNode createVirkningObjectNode(Effect virkning, boolean includeVirkningTil, OffsetDateTime lastUpdated) {
         ObjectNode output = objectMapper.createObjectNode();
         output.put(
-                        "virkningFra",
-                        virkning.getEffectFrom() != null ? virkning.getEffectFrom().toString() : null
+            "virkningFra",
+            virkning.getEffectFrom() != null ? virkning.getEffectFrom().toString() : null
         );
         if (includeVirkningTil) {
             output.put(
-                            "virkningTil",
-                            virkning.getEffectTo() != null ? virkning.getEffectTo().toString() : null
+                "virkningTil",
+                virkning.getEffectTo() != null ? virkning.getEffectTo().toString() : null
             );
         }
+        output.put("lastUpdated", lastUpdated != null ? lastUpdated.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null);
         return output;
     }
 
-    protected ObjectNode createPersonNummerNode(Effect virkning, PersonCoreData personCoreData) {
-        ObjectNode personnummer = createVirkningObjectNode(virkning);
+    protected ObjectNode createPersonNummerNode(Effect virkning, OffsetDateTime lastUpdated, PersonCoreData personCoreData) {
+        ObjectNode personnummer = createVirkningObjectNode(virkning, lastUpdated);
         personnummer.put("personnummer", personCoreData.getCprNumber());
         // TODO: Personnummer status enum?
         return personnummer;
     }
 
     protected ObjectNode createKerneDataNode(
-                    Effect virkning, PersonCoreData personCoreData, PersonStatusData personStatusData,
+                    Effect virkning, OffsetDateTime lastUpdated, PersonCoreData personCoreData, PersonStatusData personStatusData,
                     PersonPositionData stilling, PersonBirthData foedsel
     ) {
-        ObjectNode output = createVirkningObjectNode(virkning);
+        ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
         output.put(
                         "koen",
                         personCoreData.getGender() != null ? personCoreData.getGender().toString() : null
@@ -206,33 +213,33 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createForaeldreoplysningNode(
-                    Effect virkning, String foraelderrolle, PersonParentData personParentData
+                    Effect virkning, OffsetDateTime lastUpdated, String foraelderrolle, PersonParentData personParentData
     ) {
-        ObjectNode output = createVirkningObjectNode(virkning, false);
+        ObjectNode output = createVirkningObjectNode(virkning, false, lastUpdated);
         output.put("personnummer", personParentData.getCprNumber());
         output.put("foraelderrolle", foraelderrolle);
         return output;
     }
 
     protected ObjectNode createAdresseOplysningNode(
-                    Effect virkning, PersonAddressData adresse, PersonAddressConameData conavn,
+                    Effect virkning, OffsetDateTime lastUpdated, PersonAddressData adresse, PersonAddressConameData conavn,
                     PersonMoveMunicipalityData flytteKommune
     ) {
-        ObjectNode output = createVirkningObjectNode(virkning);
+        ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
         output.put("conavn", conavn != null ? conavn.getConame() : null);
         if (flytteKommune != null) {
             output.put(
-                            "fraflytningsdatoKommune",
-                            flytteKommune.getOutDatetime() != null ?
-                                            flytteKommune.getOutDatetime().toLocalDate().toString() :
-                                            null
+                "fraflytningsdatoKommune",
+                flytteKommune.getOutDatetime() != null ?
+                    flytteKommune.getOutDatetime().toLocalDate().toString() :
+                    null
             );
             output.put("fraflytningsKommunekode", flytteKommune.getOutMunicipality());
             output.put(
-                            "tilflytningsdatoKommune",
-                            flytteKommune.getInDatetime() != null ?
-                                            flytteKommune.getInDatetime().toLocalDate().toString() :
-                                            null
+                "tilflytningsdatoKommune",
+                flytteKommune.getInDatetime() != null ?
+                    flytteKommune.getInDatetime().toLocalDate().toString() :
+                    null
             );
         }
         if (adresse != null) {
@@ -260,25 +267,25 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createNavnNode(
-                    Effect virkning, PersonNameData navn, PersonAddressNameData addresseringsnavn
+                    Effect virkning, OffsetDateTime lastUpdated, PersonNameData navn, PersonAddressNameData addresseringsnavn
     ) {
-        ObjectNode output = createVirkningObjectNode(virkning);
+        ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
         output.put(
                         "addresseringsnavn",
                         addresseringsnavn != null ? addresseringsnavn.getAddressName() : null
         );
         if (navn != null) {
             output.put(
-                            "efternavn",
-                            navn.getLastName()
+                "efternavn",
+                navn.getLastName()
             );
             output.put(
-                            "fornavne",
-                            navn.getFirstNames()
+                "fornavne",
+                navn.getFirstNames()
             );
             output.put(
-                            "mellemnavn",
-                            navn.getMiddleName()
+                "mellemnavn",
+                navn.getMiddleName()
             );
         } else {
             output.putNull("efternavn");
@@ -289,17 +296,17 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return output;
     }
 
-    protected ObjectNode createBeskyttelseNode(Effect virkning, PersonProtectionData beskyttelse) {
-        ObjectNode output = createVirkningObjectNode(virkning);
+    protected ObjectNode createBeskyttelseNode(Effect virkning, OffsetDateTime lastUpdated, PersonProtectionData beskyttelse) {
+        ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
         output.put("beskyttelsestype", beskyttelse.getProtectionType());
         return output;
     }
 
     protected ObjectNode createUdrejseIndrejseNode(
-                    Effect virkning, PersonEmigrationData udrejseIndrejse,
+                    Effect virkning, OffsetDateTime lastUpdated, PersonEmigrationData udrejseIndrejse,
                     PersonForeignAddressData udenlandsadresse
     ) {
-        ObjectNode output = createVirkningObjectNode(virkning);
+        ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
         output.put("cprLandekodeUdrejse", udrejseIndrejse.getCountryCode());
         if (udenlandsadresse != null) {
             output.set("simpeladresse", createUdrejseAdresseNode(udenlandsadresse));
@@ -317,8 +324,8 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return output;
     }
 
-    protected ObjectNode createNavneMyndighedNode(Effect virkning, PersonNameAuthorityTextData navnemyndighed) {
-        ObjectNode output = createVirkningObjectNode(virkning);
+    protected ObjectNode createNavneMyndighedNode(Effect virkning, OffsetDateTime lastUpdated, PersonNameAuthorityTextData navnemyndighed) {
+        ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
         output.put("myndighed", navnemyndighed.getText());
         return output;
     }

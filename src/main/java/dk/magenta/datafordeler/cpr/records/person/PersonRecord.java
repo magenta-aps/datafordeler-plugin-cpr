@@ -90,10 +90,11 @@ public class PersonRecord extends PersonDataRecord {
      * @return
      */
     @Override
-    public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
-
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+        boolean updated = true;
         if (this.statusTemporality.matches(registrationTime, effect)) {
             data.setStatus(this.get("status"));
+            updated = true;
         }
 
         if (this.motherTemporality.matches(registrationTime, effect)) {
@@ -111,6 +112,7 @@ public class PersonRecord extends PersonDataRecord {
                 // int authorityCode
                 this.getInt("mor_mynkod")
             );
+            updated = true;
         }
 
         if (this.fatherTemporality.matches(registrationTime, effect)) {
@@ -128,6 +130,7 @@ public class PersonRecord extends PersonDataRecord {
                 // int authorityCode
                 this.getInt("far_mynkod")
             );
+            updated = true;
         }
 
         if (this.motherVerificationTemporality.matches(registrationTime, effect)) {
@@ -137,6 +140,7 @@ public class PersonRecord extends PersonDataRecord {
                 // boolean verified
                 this.getBoolean("mor_dok")
             );
+            updated = true;
         }
 
         if (this.fatherVerificationTemporality.matches(registrationTime, effect)) {
@@ -146,6 +150,7 @@ public class PersonRecord extends PersonDataRecord {
                 // boolean verified
                 this.getBoolean("far_dok")
             );
+            updated = true;
         }
 
         if (this.positionTemporality.matches(registrationTime, effect)) {
@@ -155,6 +160,7 @@ public class PersonRecord extends PersonDataRecord {
                 // String position
                 this.get("stilling")
             );
+            updated = true;
         }
 
         if (this.birthTemporality.matches(registrationTime, effect)) {
@@ -174,7 +180,9 @@ public class PersonRecord extends PersonDataRecord {
             data.setPersonnummer(this.getString("pnr", false));
             data.setKoen(this.get("koen"));
             data.setStartAuthority(this.getInt("start_mynkod-person"));
+            updated = true;
         }
+        return updated;
     }
 
     @Override

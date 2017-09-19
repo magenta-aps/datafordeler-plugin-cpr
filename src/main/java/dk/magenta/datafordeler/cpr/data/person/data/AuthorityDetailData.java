@@ -7,7 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**

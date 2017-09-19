@@ -95,7 +95,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
 
     @Override
     public LookupDefinition getLookupDefinition() {
-        LookupDefinition lookupDefinition = new LookupDefinition(this, RoadBaseData.class);
+        LookupDefinition lookupDefinition = super.getLookupDefinition();
         if (this.vejkode != null) {
             lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + DB_FIELD_ROADCODE, this.vejkode, Integer.class);
         }

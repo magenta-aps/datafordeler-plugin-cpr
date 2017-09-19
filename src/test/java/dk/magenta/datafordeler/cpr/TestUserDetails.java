@@ -1,13 +1,12 @@
 package dk.magenta.datafordeler.cpr;
 
 import dk.magenta.datafordeler.core.arearestriction.AreaRestriction;
+import dk.magenta.datafordeler.core.exception.AccessDeniedException;
 import dk.magenta.datafordeler.core.role.SystemRole;
 import dk.magenta.datafordeler.core.user.DafoUserDetails;
 import dk.magenta.datafordeler.core.user.UserProfile;
 
 import java.util.*;
-
-import static org.mockito.Mockito.when;
 
 public class TestUserDetails extends DafoUserDetails {
 
@@ -71,7 +70,17 @@ public class TestUserDetails extends DafoUserDetails {
 
     @Override
     public boolean hasSystemRole(String role) {
+        System.out.println("hasSystemRole "+role);
+        System.out.println(systemRoles.keySet());
         return systemRoles.containsKey(role);
+    }
+
+    public void checkHasSystemRole(String role) throws AccessDeniedException {
+        if (!hasSystemRole(role)) {
+            throw new AccessDeniedException(
+                    "User " + this.toString() + " does not have access to " + role
+            );
+        }
     }
 
     @Override
