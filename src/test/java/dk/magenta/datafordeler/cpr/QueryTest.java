@@ -56,19 +56,19 @@ public class QueryTest {
 
 
     public void loadPerson() throws Exception {
-        InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
+        InputStream testData = QueryTest.class.getResourceAsStream("/persondata.txt");
         personEntityManager.parseRegistration(testData);
         testData.close();
     }
 
     public void loadResidence() throws Exception {
-        InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+        InputStream testData = QueryTest.class.getResourceAsStream("/roaddata.txt");
         residenceEntityManager.parseRegistration(testData);
         testData.close();
     }
 
     public void loadRoad() throws Exception {
-        InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+        InputStream testData = QueryTest.class.getResourceAsStream("/roaddata.txt");
         roadEntityManager.parseRegistration(testData);
         testData.close();
     }
