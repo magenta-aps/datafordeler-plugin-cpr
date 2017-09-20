@@ -373,7 +373,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             this.migration = new PersonEmigrationData();
         }
         this.migration.setAuthority(authority);
-        this.migration.setCountryCode(countryCode);;
+        this.migration.setCountryCode(countryCode);
     }
 
     public void setForeignAddress(int authority, String adresselinie1, String adresselinie2, String adresselinie3, String adresselinie4, String adresselinie5) {
