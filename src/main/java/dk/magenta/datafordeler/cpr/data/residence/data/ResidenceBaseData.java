@@ -3,8 +3,8 @@ package dk.magenta.datafordeler.cpr.data.residence.data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.cpr.data.CprData;
-import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
+import org.hibernate.Session;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +12,6 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
-import org.hibernate.Session;
 
 /**
  * Created by lars on 29-06-17.

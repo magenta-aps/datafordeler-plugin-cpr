@@ -1,32 +1,19 @@
 package dk.magenta.datafordeler.cpr.data.road;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
-import dk.magenta.datafordeler.core.exception.DataFordelerException;
-import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.util.DoubleHashMap;
-import dk.magenta.datafordeler.core.util.ListHashMap;
-import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.parsers.RoadParser;
-import dk.magenta.datafordeler.cpr.records.CprDataRecord;
-import dk.magenta.datafordeler.cpr.records.Record;
 import dk.magenta.datafordeler.cpr.records.road.RoadDataRecord;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.UUID;
 
 /**
  * Created by lars on 16-05-17.

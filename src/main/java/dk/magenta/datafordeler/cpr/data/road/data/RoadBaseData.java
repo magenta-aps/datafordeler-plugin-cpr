@@ -6,14 +6,14 @@ import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.unversioned.PostCode;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.hibernate.Hibernate;
-import org.hibernate.Session;
 
 /**
  * Created by lars on 16-05-17.

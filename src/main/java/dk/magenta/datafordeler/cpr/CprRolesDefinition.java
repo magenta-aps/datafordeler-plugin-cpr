@@ -4,7 +4,6 @@ import dk.magenta.datafordeler.core.plugin.RolesDefinition;
 import dk.magenta.datafordeler.core.role.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 

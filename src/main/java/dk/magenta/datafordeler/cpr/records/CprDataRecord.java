@@ -1,21 +1,15 @@
 package dk.magenta.datafordeler.cpr.records;
 
-import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.CprEffect;
-import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
-import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Created by lars on 04-11-14.

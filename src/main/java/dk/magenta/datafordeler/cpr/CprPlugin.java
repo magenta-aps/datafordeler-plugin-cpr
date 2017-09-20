@@ -98,7 +98,7 @@ public class CprPlugin extends Plugin {
     }
 
     /**
-     * Get a defintion of user roles
+     * Get a definition of user roles
      */
     @Override
     public RolesDefinition getRolesDefinition() {
