@@ -63,4 +63,8 @@ public class CprRolesDefinition extends RolesDefinition {
         roles.add(STOP_CPR_PULL_ROLE);
         return roles;
     }
+
+    public ReadServiceRole getDefaultReadRole() {
+        return READ_CPR_ROLE;
+    }
 }
