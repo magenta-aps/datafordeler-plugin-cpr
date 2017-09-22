@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.*;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
@@ -43,6 +44,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     private ObjectMapper objectMapper;
 
     @Autowired
+    private XmlMapper xmlMapper;
+
+    @Autowired
     CprConfigurationManager cprConfigurationManager;
 
     @Autowired
@@ -74,9 +78,12 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     }
 
     @Override
-    protected ObjectMapper getObjectMapper() {
+    public ObjectMapper getObjectMapper() {
         return this.objectMapper;
     }
+
+    @Override
+    public XmlMapper getXmlMapper() { return xmlMapper; }
 
     @Override
     protected Communicator getRegistrationFetcher() {
