@@ -118,15 +118,15 @@ public class AddressRecord extends PersonDataRecord {
                 //int authority,
                 this.getInt("tilfra_mynkod"),
                 // LocalDateTime fraflytningsdatoKommune,
-                this.getDateTime("tilflykomdto"),
+                this.getDateTime("fraflykomdto"),
                 // boolean fraflytningsdatoKommuneUsikkerhedsmarkering,
-                this.getBoolean("tilflykomdt_umrk"),
+                this.getBoolean("fraflykomdt_umrk"),
                 // int fraflytningskommunekode,
                 this.getInt("fraflykomkod"),
                 // LocalDateTime tilflytningsdatoKommune,
-                this.getDateTime("fraflykomdto"),
+                this.getDateTime("tilflykomdto"),
                 // boolean tilflytningsdatoKommuneUsikkerhedsmarkering
-                this.getBoolean("fraflykomdt_umrk")
+                this.getBoolean("tilflykomdt_umrk")
             );
             updated = true;
         }
