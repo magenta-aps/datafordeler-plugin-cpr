@@ -39,7 +39,7 @@ public abstract class RoadDataRecord extends CprDataRecord<RoadEffect, RoadBaseD
 
     protected RoadBaseData createEmptyBaseData() {
         return new RoadBaseData();
-    };
+    }
 
     @Override
     protected RoadEffect createEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {

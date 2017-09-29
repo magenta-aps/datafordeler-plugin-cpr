@@ -17,18 +17,4 @@ public class RoadRegistration extends CprRegistration<RoadEntity, RoadRegistrati
         return new RoadEffect(this, effectFrom, effectTo);
     }
 
-    public RoadEffect getEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
-        for (RoadEffect effect : this.effects) {
-            if (
-                    (effect.getEffectFrom() == null ? effectFrom == null : effect.getEffectFrom().equals(effectFrom)) &&
-                            (effect.getEffectTo() == null ? effectTo == null : effect.getEffectTo().equals(effectTo)) &&
-                            (effect.getEffectFromUncertain() == effectFromUncertain) &&
-                            (effect.getEffectToUncertain() == effectToUncertain)
-                    ) {
-                return effect;
-            }
-        }
-        return null;
-    }
-
 }

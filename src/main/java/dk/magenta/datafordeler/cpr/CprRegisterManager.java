@@ -1,23 +1,22 @@
 package dk.magenta.datafordeler.cpr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.magenta.datafordeler.core.configuration.Configuration;
-import dk.magenta.datafordeler.core.exception.*;
+import dk.magenta.datafordeler.core.exception.DataFordelerException;
+import dk.magenta.datafordeler.core.exception.DataStreamException;
+import dk.magenta.datafordeler.core.exception.WrongSubclassException;
 import dk.magenta.datafordeler.core.io.PluginSourceData;
-import dk.magenta.datafordeler.core.plugin.*;
+import dk.magenta.datafordeler.core.plugin.Communicator;
+import dk.magenta.datafordeler.core.plugin.EntityManager;
+import dk.magenta.datafordeler.core.plugin.Plugin;
+import dk.magenta.datafordeler.core.plugin.RegisterManager;
 import dk.magenta.datafordeler.core.util.ItemInputStream;
-import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
-import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
 import dk.magenta.datafordeler.cpr.synchronization.CprSourceData;
 import dk.magenta.datafordeler.cpr.synchronization.LocalCopyFtpCommunicator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,11 +24,11 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * Created by lars on 16-05-17.
@@ -136,14 +135,13 @@ public class CprRegisterManager extends RegisterManager {
     * returning.
     */
     @Override
-    public ItemInputStream<? extends PluginSourceData> pullEvents(URI eventInterface, EntityManager entityManager) throws DataFordelerException {
+    protected ItemInputStream<? extends PluginSourceData> pullEvents(URI eventInterface, EntityManager entityManager) throws DataFordelerException {
         if (!(entityManager instanceof CprEntityManager)) {
             throw new WrongSubclassException(CprEntityManager.class, entityManager);
         }
         CprEntityManager cprEntityManager = (CprEntityManager) entityManager;
         InputStream responseBody = null;
         String scheme = eventInterface.getScheme();
-        System.out.println("pulling with "+scheme);
         switch (scheme) {
             case "file":
                 try {
@@ -165,9 +163,7 @@ public class CprRegisterManager extends RegisterManager {
                             this.proxyString,
                             this.localCopyFolder
                     );
-                    System.out.println("fetching");
                     responseBody = ftpFetcher.fetch(eventInterface);
-                    System.out.println("fetched");
                 } catch (IOException e) {
                     this.log.error(e);
                     throw new DataStreamException(e);

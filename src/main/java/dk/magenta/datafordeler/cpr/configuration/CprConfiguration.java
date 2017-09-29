@@ -10,7 +10,6 @@ import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
 
 import javax.persistence.*;
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 

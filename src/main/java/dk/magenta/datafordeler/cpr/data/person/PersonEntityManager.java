@@ -14,10 +14,11 @@ import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by lars on 16-05-17.

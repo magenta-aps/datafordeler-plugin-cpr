@@ -8,7 +8,10 @@ import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by lars on 28-06-17.
@@ -44,7 +47,7 @@ public class RoadRecord extends RoadDataRecord {
     }
 
     @Override
-    public void populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
         if (registrationTime.equals(this.getOffsetDateTime("timestamp"))) {
             data.setCore(
                     this.getInt("tilkomkod"),
@@ -54,7 +57,9 @@ public class RoadRecord extends RoadDataRecord {
                     this.get("vejadrnvn"),
                     this.get("vejnvn")
             );
+            return true;
         }
+        return false;
     }
 
     @Override

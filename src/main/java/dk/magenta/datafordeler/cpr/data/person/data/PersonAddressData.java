@@ -19,254 +19,289 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PersonAddressData extends AuthorityDetailData {
 
-    @Column
-    @JsonProperty(value = "bygningsnummer")
-    @XmlElement(name = "bygningsnummer")
-    private String bygningsnummer;
+    public static final String DB_FIELD_BUILDING_NUMBER = "buildingNumber";
+    public static final String IO_FIELD_BUILDING_NUMBER = "bygningsnummer";
+    @Column(name = DB_FIELD_BUILDING_NUMBER)
+    @JsonProperty(value = IO_FIELD_BUILDING_NUMBER)
+    @XmlElement(name = IO_FIELD_BUILDING_NUMBER)
+    private String buildingNumber;
 
-    public String getBygningsnummer() {
-        return this.bygningsnummer;
+    public String getBuildingNumber() {
+        return this.buildingNumber;
     }
 
-    public void setBygningsnummer(String bygningsnummer) {
-        this.bygningsnummer = bygningsnummer;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "bynavn")
-    @XmlElement(name = "bynavn")
-    private String bynavn;
-
-    public String getBynavn() {
-        return this.bynavn;
-    }
-
-    public void setBynavn(String bynavn) {
-        this.bynavn = bynavn;
+    public void setBuildingNumber(String buildingNumber) {
+        this.buildingNumber = buildingNumber;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "cprKommunekode")
-    @XmlElement(name = "cprKommunekode")
-    private String cprKommunekode;
+    public static final String DB_FIELD_CITY_NAME = "cityName";
+    public static final String IO_FIELD_CITY_NAME = "bynavn";
+    @Column(name = DB_FIELD_CITY_NAME)
+    @JsonProperty(value = IO_FIELD_CITY_NAME)
+    @XmlElement(name = IO_FIELD_CITY_NAME)
+    private String cityName;
 
-    public String getCprKommunekode() {
-        return this.cprKommunekode;
+    public String getCityName() {
+        return this.cityName;
     }
 
-    public void setCprKommunekode(String cprKommunekode) {
-        this.cprKommunekode = cprKommunekode;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "cprKommunenavn")
-    @XmlElement(name = "cprKommunenavn")
-    private String cprKommunenavn;
-
-    public String getCprKommunenavn() {
-        return this.cprKommunenavn;
-    }
-
-    public void setCprKommunenavn(String cprKommunenavn) {
-        this.cprKommunenavn = cprKommunenavn;
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "cprVejkode")
-    @XmlElement(name = "cprVejkode")
-    private String cprVejkode;
+    public static final String DB_FIELD_MUNICIPALITY_CODE = "municipalityCode";
+    public static final String IO_FIELD_MUNICIPALITY_CODE = "cprKommunekode";
+    @Column(name = DB_FIELD_MUNICIPALITY_CODE)
+    @JsonProperty(value = IO_FIELD_MUNICIPALITY_CODE)
+    @XmlElement(name = IO_FIELD_MUNICIPALITY_CODE)
+    private int municipalityCode;
 
-    public String getCprVejkode() { return this.cprVejkode; }
+    public int getMunicipalityCode() {
+        return this.municipalityCode;
+    }
 
-    public void setCprVejkode(String cprVejkode) {
-        this.cprVejkode = cprVejkode;
+    public void setMunicipalityCode(int municipalityCode) {
+        this.municipalityCode = municipalityCode;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "darAdresse")
-    @XmlElement(name = "darAdresse")
-    private String darAdresse;
+    public static final String DB_FIELD_MUNICIPALITY_NAME = "municipalityName";
+    public static final String IO_FIELD_MUNICIPALITY_NAME = "cprKommunenavn";
+    @Column(name = DB_FIELD_MUNICIPALITY_NAME)
+    @JsonProperty(value = IO_FIELD_MUNICIPALITY_NAME)
+    @XmlElement(name = IO_FIELD_MUNICIPALITY_NAME)
+    private String municipalityName;
 
-    public String getDarAdresse() {
-        return this.darAdresse;
+    public String getMunicipalityName() {
+        return this.municipalityName;
     }
 
-    public void setDarAdresse(String darAdresse) {
-        this.darAdresse = darAdresse;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "etage")
-    @XmlElement(name = "etage")
-    private String etage;
-
-    public String getEtage() {
-        return this.etage;
-    }
-
-    public void setEtage(String etage) {
-        this.etage = etage;
+    public void setMunicipalityName(String municipalityName) {
+        this.municipalityName = municipalityName;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "husnummer")
-    @XmlElement(name = "husnummer")
-    private String husnummer;
+    public static final String DB_FIELD_ROAD_CODE = "roadCode";
+    public static final String IO_FIELD_ROAD_CODE = "cprVejkode";
+    @Column(name = DB_FIELD_ROAD_CODE)
+    @JsonProperty(value = IO_FIELD_ROAD_CODE)
+    @XmlElement(name = IO_FIELD_ROAD_CODE)
+    private String roadCode;
 
-    public String getHusnummer() {
-        return this.husnummer;
-    }
+    public String getRoadCode() { return this.roadCode; }
 
-    public void setHusnummer(String husnummer) {
-        this.husnummer = husnummer;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "postdistrikt")
-    @XmlElement(name = "postdistrikt")
-    private String postdistrikt;
-
-    public String getPostdistrikt() {
-        return this.postdistrikt;
-    }
-
-    public void setPostdistrikt(String postdistrikt) {
-        this.postdistrikt = postdistrikt;
+    public void setRoadCode(String roadCode) {
+        this.roadCode = roadCode;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "postnummer")
-    @XmlElement(name = "postnummer")
-    private String postnummer;
+    public static final String DB_FIELD_DAR_ADDRESS = "darAddress";
+    public static final String IO_FIELD_DAR_ADDRESS = "darAdresse";
+    @Column(name = DB_FIELD_DAR_ADDRESS)
+    @JsonProperty(value = IO_FIELD_DAR_ADDRESS)
+    @XmlElement(name = IO_FIELD_DAR_ADDRESS)
+    private String darAddress;
 
-    public String getPostnummer() {
-        return this.postnummer;
+    public String getDarAddress() {
+        return this.darAddress;
     }
 
-    public void setPostnummer(String postnummer) {
-        this.postnummer = postnummer;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "sideDoer")
-    @XmlElement(name = "sideDoer")
-    private String sideDoer;
-
-    public String getSideDoer() {
-        return this.sideDoer;
-    }
-
-    public void setSideDoer(String sideDoer) {
-        this.sideDoer = sideDoer;
+    public void setDarAddress(String darAddress) {
+        this.darAddress = darAddress;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "vejadresseringsnavn")
-    @XmlElement(name = "vejadresseringsnavn")
-    private String vejadresseringsnavn;
+    public static final String DB_FIELD_FLOOR = "floor";
+    public static final String IO_FIELD_FLOOR = "etage";
+    @Column(name = DB_FIELD_FLOOR)
+    @JsonProperty(value = IO_FIELD_FLOOR)
+    @XmlElement(name = IO_FIELD_FLOOR)
+    private String floor;
 
-    public String getVejadresseringsnavn() {
-        return this.vejadresseringsnavn;
+    public String getFloor() {
+        return this.floor;
     }
 
-    public void setVejadresseringsnavn(String vejadresseringsnavn) {
-        this.vejadresseringsnavn = vejadresseringsnavn;
-    }
-
-
-    @Column
-    @JsonProperty(value = "adresselinie1")
-    @XmlElement(name = "adresselinie1")
-    private String adresselinie1;
-
-    public String getAdresselinie1() {
-        return this.adresselinie1;
-    }
-
-    public void setAdresselinie1(String adresselinie1) {
-        this.adresselinie1 = adresselinie1;
+    public void setFloor(String floor) {
+        this.floor = floor;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "adresselinie2")
-    @XmlElement(name = "adresselinie2")
-    private String adresselinie2;
+    public static final String DB_FIELD_HOUSENUMBER = "houseNumber";
+    public static final String IO_FIELD_HOUSENUMBER = "husnummer";
+    @Column(name = DB_FIELD_HOUSENUMBER)
+    @JsonProperty(value = IO_FIELD_HOUSENUMBER)
+    @XmlElement(name = IO_FIELD_HOUSENUMBER)
+    private String houseNumber;
 
-    public String getAdresselinie2() {
-        return this.adresselinie2;
+    public String getHouseNumber() {
+        return this.houseNumber;
     }
 
-    public void setAdresselinie2(String adresselinie2) {
-        this.adresselinie2 = adresselinie2;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "adresselinie3")
-    @XmlElement(name = "adresselinie3")
-    private String adresselinie3;
-
-    public String getAdresselinie3() {
-        return this.adresselinie3;
-    }
-
-    public void setAdresselinie3(String adresselinie3) {
-        this.adresselinie3 = adresselinie3;
+    public void setHouseNumber(String houseNumber) {
+        this.houseNumber = houseNumber;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "adresselinie4")
-    @XmlElement(name = "adresselinie4")
-    private String adresselinie4;
+    public static final String DB_FIELD_POSTAL_DISTRICT = "postalDistrict";
+    public static final String IO_FIELD_POSTAL_DISTRICT = "postdistrikt";
+    @Column(name = DB_FIELD_POSTAL_DISTRICT)
+    @JsonProperty(value = IO_FIELD_POSTAL_DISTRICT)
+    @XmlElement(name = IO_FIELD_POSTAL_DISTRICT)
+    private String postalDistrict;
 
-    public String getAdresselinie4() {
-        return this.adresselinie4;
+    public String getPostalDistrict() {
+        return this.postalDistrict;
     }
 
-    public void setAdresselinie4(String adresselinie4) {
-        this.adresselinie4 = adresselinie4;
+    public void setPostalDistrict(String postalDistrict) {
+        this.postalDistrict = postalDistrict;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "adresselinie5")
-    @XmlElement(name = "adresselinie5")
-    private String adresselinie5;
+    public static final String DB_FIELD_POSTAL_CODE = "postalCode";
+    public static final String IO_FIELD_POSTAL_CODE = "postnummer";
+    @Column(name = DB_FIELD_POSTAL_CODE)
+    @JsonProperty(value = IO_FIELD_POSTAL_CODE)
+    @XmlElement(name = IO_FIELD_POSTAL_CODE)
+    private String postalCode;
 
-    public String getAdresselinie5() {
-        return this.adresselinie5;
+    public String getPostalCode() {
+        return this.postalCode;
     }
 
-    public void setAdresselinie5(String adresselinie5) {
-        this.adresselinie5 = adresselinie5;
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+
+
+    public static final String DB_FIELD_DOOR = "door";
+    public static final String IO_FIELD_DOOR = "sideDoer";
+    @Column(name = DB_FIELD_DOOR)
+    @JsonProperty(value = IO_FIELD_DOOR)
+    @XmlElement(name = IO_FIELD_DOOR)
+    private String door;
+
+    public String getDoor() {
+        return this.door;
+    }
+
+    public void setDoor(String door) {
+        this.door = door;
+    }
+
+
+
+    public static final String DB_FIELD_ROAD_ADDRESS_NAME = "roadAddressName";
+    public static final String IO_FIELD_ROAD_ADDRESS_NAME = "vejadresseringsnavn";
+    @Column(name = DB_FIELD_ROAD_ADDRESS_NAME)
+    @JsonProperty(value = IO_FIELD_ROAD_ADDRESS_NAME)
+    @XmlElement(name = IO_FIELD_ROAD_ADDRESS_NAME)
+    private String roadAddressName;
+
+    public String getRoadAddressName() {
+        return this.roadAddressName;
+    }
+
+    public void setRoadAddressName(String roadAddressName) {
+        this.roadAddressName = roadAddressName;
+    }
+
+
+
+    public static final String DB_FIELD_ADDRESS_LINE1 = "roadAddressLine1";
+    public static final String IO_FIELD_ADDRESS_LINE1 = "adresselinie1";
+    @Column(name = DB_FIELD_ADDRESS_LINE1)
+    @JsonProperty(value = IO_FIELD_ADDRESS_LINE1)
+    @XmlElement(name = IO_FIELD_ADDRESS_LINE1)
+    private String roadAddressLine1;
+
+    public String getRoadAddressLine1() {
+        return this.roadAddressLine1;
+    }
+
+    public void setRoadAddressLine1(String roadAddressLine1) {
+        this.roadAddressLine1 = roadAddressLine1;
+    }
+
+
+
+    public static final String DB_FIELD_ADDRESS_LINE2 = "roadAddressLine2";
+    public static final String IO_FIELD_ADDRESS_LINE2 = "adresselinie2";
+    @Column(name = DB_FIELD_ADDRESS_LINE2)
+    @JsonProperty(value = IO_FIELD_ADDRESS_LINE2)
+    @XmlElement(name = IO_FIELD_ADDRESS_LINE2)
+    private String roadAddressLine2;
+
+    public String getRoadAddressLine2() {
+        return this.roadAddressLine2;
+    }
+
+    public void setRoadAddressLine2(String roadAddressLine2) {
+        this.roadAddressLine2 = roadAddressLine2;
+    }
+
+
+
+    public static final String DB_FIELD_ADDRESS_LINE3 = "roadAddressLine3";
+    public static final String IO_FIELD_ADDRESS_LINE3 = "adresselinie3";
+    @Column(name = DB_FIELD_ADDRESS_LINE3)
+    @JsonProperty(value = IO_FIELD_ADDRESS_LINE3)
+    @XmlElement(name = IO_FIELD_ADDRESS_LINE3)
+    private String roadAddressLine3;
+
+    public String getRoadAddressLine3() {
+        return this.roadAddressLine3;
+    }
+
+    public void setRoadAddressLine3(String roadAddressLine3) {
+        this.roadAddressLine3 = roadAddressLine3;
+    }
+
+
+
+    public static final String DB_FIELD_ADDRESS_LINE4 = "roadAddressLine4";
+    public static final String IO_FIELD_ADDRESS_LINE4 = "adresselinie4";
+    @Column(name = DB_FIELD_ADDRESS_LINE4)
+    @JsonProperty(value = IO_FIELD_ADDRESS_LINE4)
+    @XmlElement(name = IO_FIELD_ADDRESS_LINE4)
+    private String roadAddressLine4;
+
+    public String getRoadAddressLine4() {
+        return this.roadAddressLine4;
+    }
+
+    public void setRoadAddressLine4(String roadAddressLine4) {
+        this.roadAddressLine4 = roadAddressLine4;
+    }
+
+
+
+    public static final String DB_FIELD_ADDRESS_LINE5 = "roadAddressLine5";
+    public static final String IO_FIELD_ADDRESS_LINE5 = "adresselinie5";
+    @Column(name = DB_FIELD_ADDRESS_LINE5)
+    @JsonProperty(value = IO_FIELD_ADDRESS_LINE5)
+    @XmlElement(name = IO_FIELD_ADDRESS_LINE5)
+    private String roadAddressLine5;
+
+    public String getRoadAddressLine5() {
+        return this.roadAddressLine5;
+    }
+
+    public void setRoadAddressLine5(String roadAddressLine5) {
+        this.roadAddressLine5 = roadAddressLine5;
     }
 
 
@@ -301,25 +336,25 @@ public class PersonAddressData extends AuthorityDetailData {
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
         //CprAdresse
-        map.put("bygningsnummer", this.bygningsnummer);
-        map.put("bynavn", this.bynavn);
-        map.put("cprKommunekode", this.cprKommunekode);
-        map.put("cprKommunenavn", this.cprKommunenavn);
-        map.put("cprVejkode", this.cprVejkode);
-        map.put("darAdresse", this.darAdresse);
-        map.put("etage", this.etage);
-        map.put("husnummer", this.husnummer);
-        map.put("postdistrikt", this.postdistrikt);
-        map.put("postnummer", this.postnummer);
-        map.put("sideDoer", this.sideDoer);
-        map.put("vejadresseringsnavn", this.vejadresseringsnavn);
+        map.put("buildingNumber", this.buildingNumber);
+        map.put("cityName", this.cityName);
+        map.put("municipalityCode", this.municipalityCode);
+        map.put("municipalityName", this.municipalityName);
+        map.put("roadCode", this.roadCode);
+        map.put("darAddress", this.darAddress);
+        map.put("floor", this.floor);
+        map.put("houseNumber", this.houseNumber);
+        map.put("postalDistrict", this.postalDistrict);
+        map.put("postalCode", this.postalCode);
+        map.put("door", this.door);
+        map.put("roadAddressName", this.roadAddressName);
 
         //SimpelAdresse
-        map.put("adresselinie1", this.adresselinie1);
-        map.put("adresselinie2", this.adresselinie2);
-        map.put("adresselinie3", this.adresselinie3);
-        map.put("adresselinie4", this.adresselinie4);
-        map.put("adresselinie5", this.adresselinie5);
+        map.put("roadAddressLine1", this.roadAddressLine1);
+        map.put("roadAddressLine2", this.roadAddressLine2);
+        map.put("roadAddressLine3", this.roadAddressLine3);
+        map.put("roadAddressLine4", this.roadAddressLine4);
+        map.put("roadAddressLine5", this.roadAddressLine5);
 
         //Ikke i grunddatamodellen
         //map.put("adressetekststype", this.adressetekststype);

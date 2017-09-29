@@ -17,23 +17,33 @@ import java.util.Map;
 public class PersonPositionData extends AuthorityDetailData {
 
 
-    @Column
-    @JsonProperty(value = "stilling")
-    @XmlElement(name = "stilling")
-    private String stilling;
+    public static final String DB_FIELD_POSITION = "position";
+    public static final String IO_FIELD_POSITION = "stilling";
+    @Column(name = DB_FIELD_POSITION)
+    @JsonProperty(value = IO_FIELD_POSITION)
+    @XmlElement(name = IO_FIELD_POSITION)
+    private String position;
 
-    public String getStilling() {
-        return this.stilling;
+    public String getPosition() {
+        return this.position;
     }
 
-    public void setStilling(String stilling) {
-        this.stilling = stilling;
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+
+    @Override
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>(super.databaseFields());
+        map.put(DB_FIELD_POSITION, this.position);
+        return map;
     }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("stilling", this.stilling);
+        map.put("position", this.position);
         return map;
     }
 }

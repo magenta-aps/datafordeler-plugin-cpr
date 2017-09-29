@@ -5,9 +5,12 @@ import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.fapi.QueryField;
 import dk.magenta.datafordeler.cpr.data.CprQuery;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
+import dk.magenta.datafordeler.cpr.data.road.data.RoadCoreData;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_MUNICIPALITYCODE;
+import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_ROADCODE;
 
 /**
  * Created by lars on 19-05-17.
@@ -29,6 +32,10 @@ public class RoadQuery extends CprQuery<RoadEntity> {
         this.vejkode = vejkode;
     }
 
+    public void setVejkode(int vejkode) {
+        this.setVejkode(String.format("%03d", vejkode));
+    }
+
     @QueryField(type = QueryField.FieldType.STRING, queryName = VEJNAVN)
     private String navn;
 
@@ -40,15 +47,19 @@ public class RoadQuery extends CprQuery<RoadEntity> {
         this.navn = navn;
     }
 
-    @QueryField(type = QueryField.FieldType.INT, queryName = KOMMUNEKODE)
-    private String kommunekode;
+    @QueryField(type = QueryField.FieldType.STRING, queryName = KOMMUNEKODE)
+    private List<String> kommunekoder = new ArrayList<>();
 
-    public String getKommunekode() {
-        return kommunekode;
+    public Collection<String> getKommunekoder() {
+        return this.kommunekoder;
     }
 
-    public void setKommunekode(String kommunekode) {
-        this.kommunekode = kommunekode;
+    public void addKommunekode(String kommunekode) {
+        this.kommunekoder.add(kommunekode);
+    }
+
+    public void addKommunekode(int kommunekode) {
+        this.addKommunekode(String.format("%03d", kommunekode));
     }
 
     @Override
@@ -56,7 +67,7 @@ public class RoadQuery extends CprQuery<RoadEntity> {
         HashMap<String, Object> map = new HashMap<>();
         map.put(VEJKODE, this.vejkode);
         map.put(VEJNAVN, this.navn);
-        map.put(KOMMUNEKODE, this.kommunekode);
+        map.put(KOMMUNEKODE, this.kommunekoder);
         return map;
     }
 
@@ -64,7 +75,11 @@ public class RoadQuery extends CprQuery<RoadEntity> {
     public void setFromParameters(ParameterMap parameters) {
         this.setVejkode(parameters.getFirst(VEJKODE));
         this.setNavn(parameters.getFirst(VEJNAVN));
-        this.setKommunekode(parameters.getFirst(KOMMUNEKODE));
+        if (parameters.containsKey(KOMMUNEKODE)) {
+            for (String kommunekode : parameters.get(KOMMUNEKODE)) {
+                this.addKommunekode(kommunekode);
+            }
+        }
     }
 
     @Override
@@ -80,15 +95,15 @@ public class RoadQuery extends CprQuery<RoadEntity> {
 
     @Override
     public LookupDefinition getLookupDefinition() {
-        LookupDefinition lookupDefinition = new LookupDefinition(this);
+        LookupDefinition lookupDefinition = super.getLookupDefinition();
         if (this.vejkode != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".vejkode", this.vejkode);
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + DB_FIELD_ROADCODE, this.vejkode, Integer.class);
         }
         if (this.navn != null) {
-            lookupDefinition.put("coreData.vejnavn", this.navn);
+            lookupDefinition.put(RoadBaseData.DB_FIELD_CORE + LookupDefinition.separator + RoadCoreData.DB_FIELD_ROAD_NAME, this.navn, String.class);
         }
-        if (this.kommunekode != null) {
-            lookupDefinition.put(LookupDefinition.entityref + ".kommunekode", this.kommunekode);
+        if (!this.kommunekoder.isEmpty()) {
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + DB_FIELD_MUNICIPALITYCODE, this.kommunekoder, Integer.class);
         }
         return lookupDefinition;
     }

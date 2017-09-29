@@ -39,7 +39,7 @@ public class RoadPostcodeRecord extends RoadDataRecord {
     }
 
     @Override
-    public void populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
         if (this.postcodeTemporality.matches(registrationTime, effect)) {
             data.addPostcode(
                     this.getString("husnrfra", false),
@@ -47,7 +47,9 @@ public class RoadPostcodeRecord extends RoadDataRecord {
                     this.getEven("ligeulige"),
                     PostCode.getPostcode(this.getInt("postnr"), this.getString("postdisttxt", true), queryManager, session)
             );
+            return true;
         }
+        return false;
     }
 
     @Override

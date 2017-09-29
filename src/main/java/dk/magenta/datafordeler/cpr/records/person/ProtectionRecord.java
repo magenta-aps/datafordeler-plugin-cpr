@@ -38,7 +38,7 @@ public class ProtectionRecord extends PersonDataRecord {
     }
 
     @Override
-    public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
         if (this.protectionTemporality.matches(registrationTime, effect)) {
             data.setProtection(
                 // int authority,
@@ -48,7 +48,9 @@ public class ProtectionRecord extends PersonDataRecord {
                 // boolean reportMarking
                 this.getBoolean("indrap-beskyttelse")
             );
+            return true;
         }
+        return false;
     }
 
     @Override

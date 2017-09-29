@@ -58,8 +58,8 @@ public class HistoricNameRecord extends PersonDataRecord {
     }
 
     @Override
-    public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
-
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+        boolean updated = false;
         if (this.nameTemporality.matches(registrationTime, effect)) {
             data.setName(
                 // int authority,
@@ -85,6 +85,7 @@ public class HistoricNameRecord extends PersonDataRecord {
                 // boolean reportNames
                 false
             );
+            updated = true;
         }
         if (this.addressNameTemporality.matches(registrationTime, effect)) {
             data.setAddressName(
@@ -93,6 +94,7 @@ public class HistoricNameRecord extends PersonDataRecord {
                 // String addressName
                 this.get("adrnvn")
             );
+            updated = true;
         }
         if (this.documentNameTemporality.matches(registrationTime, effect)) {
             data.setNameVerification(
@@ -101,6 +103,7 @@ public class HistoricNameRecord extends PersonDataRecord {
                 // boolean verification
                 this.getBoolean("dok-navne")
             );
+            updated = true;
         }
         if (this.officiaryTemporality.matches(registrationTime, effect)) {
             data.setNameAuthorityText(
@@ -109,7 +112,9 @@ public class HistoricNameRecord extends PersonDataRecord {
                 // String text
                 this.get("myntxt-navne")
             );
+            updated = true;
         }
+        return updated;
     }
 
     @Override

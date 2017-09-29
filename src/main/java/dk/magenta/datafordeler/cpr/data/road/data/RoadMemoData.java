@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.road.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
@@ -18,9 +19,11 @@ import java.util.Map;
 public class RoadMemoData extends DetailData {
 
 
-    @Column
-    @JsonProperty(value = "notatNummer")
-    @XmlElement(name = "notatNummer")
+    public static final String DB_FIELD_MEMONUMBER = "memoNumber";
+    public static final String IO_FIELD_MEMONUMBER = "notatNummer";
+    @Column(name = DB_FIELD_MEMONUMBER)
+    @JsonProperty(value = IO_FIELD_MEMONUMBER)
+    @XmlElement(name = IO_FIELD_MEMONUMBER)
     private int memoNumber;
 
     public int getMemoNumber() {
@@ -31,9 +34,11 @@ public class RoadMemoData extends DetailData {
         this.memoNumber = memoNumber;
     }
 
-    @Column
-    @JsonProperty(value = "notatLinie")
-    @XmlElement(name = "notatLinje")
+    public static final String DB_FIELD_MEMOLINE = "memoText";
+    public static final String IO_FIELD_MEMOLINE = "notatLinie";
+    @Column(name = DB_FIELD_MEMOLINE)
+    @JsonProperty(value = IO_FIELD_MEMOLINE)
+    @XmlElement(name = IO_FIELD_MEMOLINE)
     private String memoText;
 
     public String getMemoText() {
@@ -59,6 +64,15 @@ public class RoadMemoData extends DetailData {
         if (this.memoText != null) {
             map.put("memoText", this.memoText);
         }
+        return map;
+    }
+
+
+    @JsonIgnore
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(DB_FIELD_MEMOLINE, this.memoText);
+        map.put(DB_FIELD_MEMONUMBER, this.memoNumber);
         return map;
     }
 

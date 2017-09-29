@@ -6,7 +6,9 @@ import dk.magenta.datafordeler.core.database.Identification;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 
 import javax.persistence.MappedSuperclass;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by lars on 12-06-17.

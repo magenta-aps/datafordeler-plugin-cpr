@@ -1,6 +1,6 @@
 package dk.magenta.datafordeler.cpr;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
@@ -8,15 +8,14 @@ import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.util.Equality;
-import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.cpr.data.person.*;
-import dk.magenta.datafordeler.cpr.data.person.PersonOutputWrapper;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
+import dk.magenta.datafordeler.cpr.data.residence.*;
+import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.data.road.*;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadMemoData;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadPostcodeData;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +25,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -55,60 +53,121 @@ public class ParseTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private OutputWrapper<PersonEntity> personOutputWrapper = new PersonOutputWrapper();
+
+    private void loadPerson() throws DataFordelerException, IOException {
+        InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
+        ImportMetadata importMetadata = new ImportMetadata();
+        personEntityManager.parseRegistration(testData, importMetadata);
+        testData.close();
+    }
+
+    private void loadRoad() throws DataFordelerException, IOException {
+        InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+        ImportMetadata importMetadata = new ImportMetadata();
+        ArrayList<RoadRegistration> registrations = new ArrayList<>(roadEntityManager.parseRegistration(testData, importMetadata));
+        Collections.sort(registrations);
+
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        for (RoadRegistration registration : registrations) {
+            registration = (RoadRegistration) session.merge(registration);
+            queryManager.saveRegistration(session, registration.getEntity(), registration);
+        }
+        transaction.commit();
+        session.close();
+        testData.close();
+    }
+
+    private void loadResidence() throws DataFordelerException, IOException {
+        InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
+        ImportMetadata importMetadata = new ImportMetadata();
+        ArrayList<ResidenceRegistration> registrations = new ArrayList<>(residenceEntityManager.parseRegistration(testData, importMetadata));
+        Collections.sort(registrations);
+
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        for (ResidenceRegistration registration : registrations) {
+            registration = (ResidenceRegistration) session.merge(registration);
+            queryManager.saveRegistration(session, registration.getEntity(), registration);
+        }
+        transaction.commit();
+        session.close();
+        testData.close();
+    }
 
     @Test
-    public void testParsePerson() throws DataFordelerException {
-        Session session = null;
-        ImportMetadata importMetadata = new ImportMetadata();
+    public void testPersonIdempotence() throws Exception {
+        Session session = sessionManager.getSessionFactory().openSession();
         try {
-            InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
-            personEntityManager.parseRegistration(testData, importMetadata);
+            loadPerson();
+            List<PersonEntity> entities = queryManager.getAllEntities(session, PersonEntity.class);
+            JsonNode firstImport = objectMapper.valueToTree(entities);
+
+            loadPerson();
+            entities = queryManager.getAllEntities(session, PersonEntity.class);
+            JsonNode secondImport = objectMapper.valueToTree(entities);
+            assertJsonEquality(firstImport, secondImport, true, true);
+
+        } finally {
+            session.close();
+        }
+    }
+
+    @Test
+    public void testParsePerson() throws Exception {
+        Session session = sessionManager.getSessionFactory().openSession();
+        try {
+            loadPerson();
 
             PersonQuery query = new PersonQuery();
-            //query.setPersonnummer("121008217");
             query.setFornavn("Tester");
-            session = sessionManager.getSessionFactory().openSession();
 
-            try {
-                List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
-                personOutputWrapper.wrapResults(entities);
-                System.out.println(objectMapper.writeValueAsString(entities));
-            } catch (JsonProcessingException e) {
-                throw new DataStreamException(e);
-            }
+            List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
+            Assert.assertEquals(1, entities.size());
+            PersonEntity entity = entities.get(0);
+            Assert.assertEquals(PersonEntity.generateUUID("0101001234"), entity.getUUID());
+
         } finally {
-            if (session != null) {
-                session.close();
-            }
+            session.close();
+        }
+    }
+
+    @Test
+    public void testRoadIdempotence() throws IOException, DataFordelerException {
+        Session session = sessionManager.getSessionFactory().openSession();
+        try {
+            loadRoad();
+            List<RoadEntity> entities = queryManager.getAllEntities(session, RoadEntity.class);
+            JsonNode firstImport = objectMapper.valueToTree(entities);
+
+            loadRoad();
+            entities = queryManager.getAllEntities(session, RoadEntity.class);
+            JsonNode secondImport = objectMapper.valueToTree(entities);
+            assertJsonEquality(firstImport, secondImport, true, true);
+        } finally {
+            session.close();
         }
     }
 
     @Test
     public void testParseRoad() throws IOException, DataFordelerException {
-        Session session = null;
-        ImportMetadata importMetadata = new ImportMetadata();
+        Session session = sessionManager.getSessionFactory().openSession();
         try {
-            InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-            long start = Instant.now().toEpochMilli();
-            roadEntityManager.parseRegistration(testData, importMetadata);
-            System.out.println("Parsed road data in "+ (Instant.now().toEpochMilli() - start) + " ms");
-            session = sessionManager.getSessionFactory().openSession();
-
+            loadRoad();
 
             RoadQuery query = new RoadQuery();
-            query.setKommunekode("0730");
+            query.addKommunekode("0730");
             query.setVejkode("0004");
 
             List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entities));
             Assert.assertEquals(1, entities.size());
-            RoadEntity roadEntity = entities.get(0);
-            Assert.assertEquals(CprPlugin.getDomain(), roadEntity.getDomain());
-            Assert.assertEquals(730, roadEntity.getKommunekode());
-            Assert.assertEquals(4, roadEntity.getVejkode());
-            Assert.assertEquals(2, roadEntity.getRegistrations().size());
-            RoadRegistration registration1 = roadEntity.getRegistrations().get(0);
+            RoadEntity entity = entities.get(0);
+            Assert.assertEquals(RoadEntity.generateUUID(730, 4), entity.getUUID());
+            Assert.assertEquals(CprPlugin.getDomain(), entity.getDomain());
+            Assert.assertEquals(730, entity.getKommunekode());
+            Assert.assertEquals(4, entity.getVejkode());
+            Assert.assertEquals(2, entity.getRegistrations().size());
+            RoadRegistration registration1 = entity.getRegistrations().get(0);
             Assert.assertEquals(0, registration1.getSequenceNumber());
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), registration1.getRegistrationFrom()));
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2008-05-30T09:11:00+02:00"), registration1.getRegistrationTo()));
@@ -118,7 +177,7 @@ public class ParseTest {
 
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1900-01-01T12:00:00+01:00"), effect11.getEffectFrom()));
             Assert.assertNull(effect11.getEffectTo());
-            Assert.assertEquals("Aalborggade", effect11.getData().get("addresseringsnavn"));
+            Assert.assertEquals("Aalborggade", effect11.getData().get("adresseringsnavn"));
             Assert.assertEquals("Aalborggade", effect11.getData().get("vejnavn"));
             Assert.assertFalse(effect11.getEffectFromUncertain());
             Assert.assertFalse(effect11.getEffectToUncertain());
@@ -134,7 +193,7 @@ public class ParseTest {
             Assert.assertEquals(3, memo.get(2).getMemoNumber());
             Assert.assertEquals("HUSNR.3 - KIRKE -", memo.get(2).getMemoText());
 
-            RoadRegistration registration2 = roadEntity.getRegistrations().get(1);
+            RoadRegistration registration2 = entity.getRegistrations().get(1);
             Assert.assertEquals(1, registration2.getSequenceNumber());
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2008-05-30T09:11:00+02:00"), registration2.getRegistrationFrom()));
             Assert.assertNull(registration2.getRegistrationTo());
@@ -161,38 +220,73 @@ public class ParseTest {
             Assert.assertFalse(effect21.getEffectToUncertain());
 
         } finally {
-            if (session != null) {
-                session.close();
-            }
+            session.close();
         }
     }
 
     @Test
-    public void testParseResidence() throws DataFordelerException {
-        Session session = null;
-        ImportMetadata importMetadata = new ImportMetadata();
+    public void testResidenceIdempotence() throws IOException, DataFordelerException {
+        Session session = sessionManager.getSessionFactory().openSession();
         try {
-            InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-            residenceEntityManager.parseRegistration(testData, importMetadata);
+            loadResidence();
+            List<ResidenceEntity> entities = queryManager.getAllEntities(session, ResidenceEntity.class);
+            JsonNode firstImport = objectMapper.valueToTree(entities);
 
-            ResidenceQuery query = new ResidenceQuery();
-            //query.setCprKommunekode("0730");
-            //query.setPostnummer("0012");
-            //query.setCprKommunekode();
-            /*session = sessionManager.getSessionFactory().openSession();
+            loadResidence();
+            entities = queryManager.getAllEntities(session, ResidenceEntity.class);
+            JsonNode secondImport = objectMapper.valueToTree(entities);
+            assertJsonEquality(firstImport, secondImport, true, true);
 
-            try {
-                List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
-                System.out.println(objectMapper.writeValueAsString(entities));
-            } catch (DataFordelerException e) {
-                e.printStackTrace();
-            }*/
         } finally {
-            if (session != null) {
-                session.close();
-            }
+            session.close();
         }
     }
+
+    @Test
+    public void testParseResidence() throws Exception {
+        Session session = sessionManager.getSessionFactory().openSession();
+        try {
+            loadResidence();
+
+            ResidenceQuery query = new ResidenceQuery();
+            query.addKommunekode(360);
+            query.setVejkode(206);
+
+            List<ResidenceEntity> entities = queryManager.getAllEntities(session, query, ResidenceEntity.class);
+            Assert.assertEquals(1, entities.size());
+            ResidenceEntity entity = entities.get(0);
+            Assert.assertEquals(ResidenceEntity.generateUUID(360, 206, "44E", "", ""), entity.getUUID());
+
+            List<ResidenceRegistration> registrations = entities.get(0).getRegistrations();
+            Assert.assertEquals(1, registrations.size());
+            ResidenceRegistration registration = registrations.get(0);
+            Assert.assertTrue(OffsetDateTime.parse("2006-12-22T12:00:00+01:00").isEqual(registration.getRegistrationFrom()));
+            Assert.assertNull(registration.getRegistrationTo());
+            List<ResidenceEffect> effects = registration.getEffects();
+            Assert.assertEquals(1, effects.size());
+            ResidenceEffect effect = effects.get(0);
+            Assert.assertTrue(OffsetDateTime.parse("1991-09-23T12:00:00+02:00").isEqual(effect.getEffectFrom()));
+            Assert.assertNull(effect.getEffectTo());
+            Assert.assertFalse(effect.getEffectFromUncertain());
+            Assert.assertFalse(effect.getEffectToUncertain());
+            List<ResidenceBaseData> dataItems = effect.getDataItems();
+            Assert.assertEquals(1, dataItems.size());
+            ResidenceBaseData data = dataItems.get(0);
+            Assert.assertEquals("", data.getEtage());
+            Assert.assertEquals("44E", data.getHusnummer());
+            Assert.assertEquals(360, data.getKommunekode());
+            Assert.assertEquals("Provstelunden", data.getLokalitet());
+            Assert.assertEquals("", data.getSideDoer());
+            Assert.assertEquals(206, data.getVejkode());
+
+        } finally {
+            session.close();
+        }
+    }
+
+
+
+
 
     @Test
     public void testFindRegistrations() {
@@ -337,6 +431,56 @@ public class ParseTest {
         List<RoadRegistration> result11a = entity11.findRegistrations(open, open);
         Assert.assertEquals(5, result11a.size());
         Assert.assertEquals(5, entity11.getRegistrations().size());
+    }
+
+    private static void assertJsonEquality(JsonNode node1, JsonNode node2, boolean ignoreArrayOrdering, boolean printDifference) {
+        try {
+            Assert.assertEquals(node1.isNull(), node2.isNull());
+            Assert.assertEquals(node1.isArray(), node2.isArray());
+            Assert.assertEquals(node1.isObject(), node2.isObject());
+            Assert.assertEquals(node1.isLong(), node2.isLong());
+            Assert.assertEquals(node1.isInt(), node2.isInt());
+            Assert.assertEquals(node1.isShort(), node2.isShort());
+            Assert.assertEquals(node1.isBoolean(), node2.isBoolean());
+            Assert.assertEquals(node1.isTextual(), node2.isTextual());
+            if (node1.isArray()) {
+                Assert.assertEquals(node1.size(), node2.size());
+                if (ignoreArrayOrdering) {
+                    for (int i = 0; i < node1.size(); i++) {
+                        boolean match = false;
+                        for (int j = 0; j < node2.size(); j++) {
+                            try {
+                                assertJsonEquality(node1.get(i), node2.get(j), true, false);
+                                match = true;
+                            } catch (AssertionError e) {
+                            }
+                        }
+                        if (!match) {
+                            throw new AssertionError();
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < node1.size(); i++) {
+                        assertJsonEquality(node1.get(i), node2.get(i), false, printDifference);
+                    }
+                }
+            } else if (node1.isObject()) {
+                Assert.assertEquals(node1.size(), node2.size());
+                Iterator<String> keys = node1.fieldNames();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    Assert.assertNotNull(node2.get(key));
+                    assertJsonEquality(node1.get(key), node2.get(key), ignoreArrayOrdering, printDifference);
+                }
+            } else {
+                Assert.assertEquals(node1.asText(), node2.asText());
+            }
+        } catch (AssertionError e) {
+            if (printDifference) {
+                System.out.println("\n" + node1 + "\n != \n" + node2 + "\n\n\n");
+            }
+            throw e;
+        }
     }
 
 }

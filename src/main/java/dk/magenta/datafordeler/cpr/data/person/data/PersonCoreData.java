@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,7 +9,6 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Created by lars on 21-06-17.
@@ -22,53 +22,64 @@ public class PersonCoreData extends AuthorityDetailData {
         KVINDE
     }
 
-    @Column
-    @JsonProperty(value = "personnummer")
-    @XmlElement(name = "personnummer")
-    private String personnummer;
+    public static final String DB_FIELD_CPR_NUMBER = "cprNumber";
+    public static final String IO_FIELD_CPR_NUMBER = "personnummer";
+    @Column(name = DB_FIELD_CPR_NUMBER)
+    @JsonProperty(value = IO_FIELD_CPR_NUMBER)
+    @XmlElement(name = IO_FIELD_CPR_NUMBER)
+    private String cprNumber;
 
-    public String getPersonnummer() {
-        return this.personnummer;
+    public String getCprNumber() {
+        return this.cprNumber;
     }
 
-    public void setPersonnummer(String personnummer) {
-        this.personnummer = personnummer;
+    public void setCprNumber(String cprNumber) {
+        this.cprNumber = cprNumber;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "koen")
-    @XmlElement(name = "koen")
-    private Koen koen;
+    public static final String DB_FIELD_GENDER = "gender";
+    public static final String IO_FIELD_GENDER = "koen";
+    @Column(name = DB_FIELD_GENDER)
+    @JsonProperty(value = IO_FIELD_GENDER)
+    @XmlElement(name = IO_FIELD_GENDER)
+    private Koen gender;
 
-    public Koen getKoen() {
-        return this.koen;
+    public Koen getGender() {
+        return this.gender;
     }
 
-    public void setKoen(Koen koen) {
-        this.koen = koen;
+    public void setGender(Koen gender) {
+        this.gender = gender;
     }
 
     public void setKoen(String koen) {
         if (koen != null) {
             if (koen.equalsIgnoreCase("M")) {
-                this.setKoen(Koen.MAND);
+                this.setGender(Koen.MAND);
             } else if (koen.equalsIgnoreCase("K")) {
-                this.setKoen(Koen.KVINDE);
+                this.setGender(Koen.KVINDE);
             }
         }
     }
 
+    @Override
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(DB_FIELD_CPR_NUMBER, this.cprNumber);
+        map.put(DB_FIELD_GENDER, this.gender);
+        return map;
+    }
 
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        if (StringUtils.isNotEmpty(personnummer)) {
-            map.put("personnummer", this.personnummer);
+        if (StringUtils.isNotEmpty(cprNumber)) {
+            map.put("cprNumber", this.cprNumber);
         }
-        if (this.koen != null) {
-            map.put("koen", this.koen);
+        if (this.gender != null) {
+            map.put("gender", this.gender);
         }
         return map;
     }

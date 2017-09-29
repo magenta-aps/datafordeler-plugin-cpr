@@ -41,7 +41,7 @@ public class FtpService {
         factory.setPort(port);
 
         SslConfigurationFactory ssl = new SslConfigurationFactory();
-        ssl.setKeystoreFile(new File(ClassLoader.getSystemResource("test.jks").toURI()));
+        ssl.setKeystoreFile(new File(ClassLoader.getSystemResource("dafo.keystore").toURI()));
         ssl.setKeystorePassword("password");
         factory.setSslConfiguration(ssl.createSslConfiguration());
         factory.setImplicitSsl(true);
@@ -65,7 +65,7 @@ public class FtpService {
         user.setName(username);
         user.setPassword(password);
 
-        this.tempDir = Files.createTempDirectory(null, new FileAttribute[0]).toFile();
+        this.tempDir = Files.createTempDirectory(null).toFile();
 
         for (File sourcefile : files) {
             File destFile = new File(this.tempDir, sourcefile.getName());

@@ -20,76 +20,86 @@ import java.util.Map;
 public class PersonMoveMunicipalityData extends AuthorityDetailData {
 
 
-    @Column
-    @JsonProperty(value = "fraflytningsdatoKommune")
-    @XmlElement(name = "fraflytningsdatoKommune")
-    private LocalDateTime fraflytningsdatoKommune;
+    public static final String DB_FIELD_OUT_DATETIME = "outDatetime";
+    public static final String IO_FIELD_OUT_DATETIME = "fraflytningsdatoKommune";
+    @Column(name = DB_FIELD_OUT_DATETIME)
+    @JsonProperty(value = IO_FIELD_OUT_DATETIME)
+    @XmlElement(name = IO_FIELD_OUT_DATETIME)
+    private LocalDateTime outDatetime;
 
-    public LocalDateTime getFraflytningsdatoKommune() {
-        return this.fraflytningsdatoKommune;
+    public LocalDateTime getOutDatetime() {
+        return this.outDatetime;
     }
 
-    public void setFraflytningsdatoKommune(LocalDateTime fraflytningsdatoKommune) {
-        this.fraflytningsdatoKommune = fraflytningsdatoKommune;
-    }
-
-
-
-    @Column
-    @JsonProperty(value = "fraflytningsdatoKommuneUsikkerhedsmarkering")
-    @XmlElement(name = "fraflytningsdatoKommuneUsikkerhedsmarkering")
-    private boolean fraflytningsdatoKommuneUsikkerhedsmarkering;
-
-    public boolean isFraflytningsdatoKommuneUsikkerhedsmarkering() {
-        return this.fraflytningsdatoKommuneUsikkerhedsmarkering;
-    }
-
-    public void setFraflytningsdatoKommuneUsikkerhedsmarkering(boolean fraflytningsdatoKommuneUsikkerhedsmarkering) {
-        this.fraflytningsdatoKommuneUsikkerhedsmarkering = fraflytningsdatoKommuneUsikkerhedsmarkering;
+    public void setOutDatetime(LocalDateTime outDatetime) {
+        this.outDatetime = outDatetime;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "fraflytningskommunekode")
-    @XmlElement(name = "fraflytningskommunekode")
-    private int fraflytningskommunekode;
+    public static final String DB_FIELD_OUT_DATETIME_UNCERTAIN = "outDatetimeUncertain";
+    public static final String IO_FIELD_OUT_DATETIME_UNCERTAIN = "fraflytningsdatoKommuneUsikkerhedsmarkering";
+    @Column(name = DB_FIELD_OUT_DATETIME_UNCERTAIN)
+    @JsonProperty(value = IO_FIELD_OUT_DATETIME_UNCERTAIN)
+    @XmlElement(name = IO_FIELD_OUT_DATETIME_UNCERTAIN)
+    private boolean outDatetimeUncertain;
 
-    public int getFraflytningskommunekode() {
-        return this.fraflytningskommunekode;
+    public boolean isOutDatetimeUncertain() {
+        return this.outDatetimeUncertain;
     }
 
-    public void setFraflytningskommunekode(int fraflytningskommunekode) {
-        this.fraflytningskommunekode = fraflytningskommunekode;
-    }
-
-
-    @Column
-    @JsonProperty(value = "tilflytningsdatoKommune")
-    @XmlElement(name = "tilflytningsdatoKommune")
-    private LocalDateTime tilflytningsdatoKommune;
-
-    public LocalDateTime getTilflytningsdatoKommune() {
-        return this.tilflytningsdatoKommune;
-    }
-
-    public void setTilflytningsdatoKommune(LocalDateTime tilflytningsdatoKommune) {
-        this.tilflytningsdatoKommune = tilflytningsdatoKommune;
+    public void setOutDatetimeUncertain(boolean outDatetimeUncertain) {
+        this.outDatetimeUncertain = outDatetimeUncertain;
     }
 
 
 
-    @Column
-    @JsonProperty(value = "tilflytningsdatoKommuneUsikkerhedsmarkering")
-    @XmlElement(name = "tilflytningsdatoKommuneUsikkerhedsmarkering")
-    private boolean tilflytningsdatoKommuneUsikkerhedsmarkering;
+    public static final String DB_FIELD_OUT_MUNICIPALITY = "outMunicipality";
+    public static final String IO_FIELD_OUT_MUNICIPALITY = "fraflytningskommunekode";
+    @Column(name = DB_FIELD_OUT_MUNICIPALITY)
+    @JsonProperty(value = IO_FIELD_OUT_MUNICIPALITY)
+    @XmlElement(name = IO_FIELD_OUT_MUNICIPALITY)
+    private int outMunicipality;
 
-    public boolean isTilflytningsdatoKommuneUsikkerhedsmarkering() {
-        return this.tilflytningsdatoKommuneUsikkerhedsmarkering;
+    public int getOutMunicipality() {
+        return this.outMunicipality;
     }
 
-    public void setTilflytningsdatoKommuneUsikkerhedsmarkering(boolean tilflytningsdatoKommuneUsikkerhedsmarkering) {
-        this.tilflytningsdatoKommuneUsikkerhedsmarkering = tilflytningsdatoKommuneUsikkerhedsmarkering;
+    public void setOutMunicipality(int outMunicipality) {
+        this.outMunicipality = outMunicipality;
+    }
+
+
+    public static final String DB_FIELD_IN_DATETIME = "inDatetime";
+    public static final String IO_FIELD_IN_DATETIME = "tilflytningsdatoKommune";
+    @Column(name = DB_FIELD_IN_DATETIME)
+    @JsonProperty(value = IO_FIELD_IN_DATETIME)
+    @XmlElement(name = IO_FIELD_IN_DATETIME)
+    private LocalDateTime inDatetime;
+
+    public LocalDateTime getInDatetime() {
+        return this.inDatetime;
+    }
+
+    public void setInDatetime(LocalDateTime inDatetime) {
+        this.inDatetime = inDatetime;
+    }
+
+
+
+    public static final String DB_FIELD_IN_DATETIME_UNCERTAIN = "inDatetimeUncertain";
+    public static final String IO_FIELD_IN_DATETIME_UNCERTAIN = "tilflytningsdatoKommuneUsikkerhedsmarkering";
+    @Column(name = DB_FIELD_IN_DATETIME_UNCERTAIN)
+    @JsonProperty(value = IO_FIELD_IN_DATETIME_UNCERTAIN)
+    @XmlElement(name = IO_FIELD_IN_DATETIME_UNCERTAIN)
+    private boolean inDatetimeUncertain;
+
+    public boolean isInDatetimeUncertain() {
+        return this.inDatetimeUncertain;
+    }
+
+    public void setInDatetimeUncertain(boolean inDatetimeUncertain) {
+        this.inDatetimeUncertain = inDatetimeUncertain;
     }
 
 
@@ -97,11 +107,11 @@ public class PersonMoveMunicipalityData extends AuthorityDetailData {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("fraflytningsdatoKommune", this.fraflytningsdatoKommune);
-        map.put("fraflytningsdatoKommuneUsikkerhedsmarkering", this.fraflytningsdatoKommuneUsikkerhedsmarkering);
-        map.put("fraflytningskommunekode", this.fraflytningskommunekode);
-        map.put("tilflytningsdatoKommune", this.tilflytningsdatoKommune);
-        map.put("tilflytningsdatoKommuneUsikkerhedsmarkering", this.tilflytningsdatoKommuneUsikkerhedsmarkering);
+        map.put("outDatetime", this.outDatetime);
+        map.put("outDatetimeUncertain", this.outDatetimeUncertain);
+        map.put("outMunicipality", this.outMunicipality);
+        map.put("inDatetime", this.inDatetime);
+        map.put("inDatetimeUncertain", this.inDatetimeUncertain);
         return map;
     }
 }

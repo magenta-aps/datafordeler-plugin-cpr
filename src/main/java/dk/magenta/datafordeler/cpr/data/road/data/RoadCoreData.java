@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.road.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
@@ -17,83 +18,95 @@ import java.util.Map;
 @Table(name="cpr_road_core")
 public class RoadCoreData extends DetailData {
 
+    public static final String DB_FIELD_TO_MUNICIPALITY = "toMunicipality";
+    public static final String IO_FIELD_TO_MUNICIPALITY = "tilKommunekode";
+    @Column(name = DB_FIELD_TO_MUNICIPALITY)
+    @JsonProperty(value = IO_FIELD_TO_MUNICIPALITY)
+    @XmlElement(name = IO_FIELD_TO_MUNICIPALITY)
+    private int toMunicipality;
 
-    @Column
-    @JsonProperty(value = "tilKommunekode")
-    @XmlElement(name = "tilKommunekode")
-    private int tilKommunekode;
-
-    public int getTilKommunekode() {
-        return this.tilKommunekode;
+    public int getToMunicipality() {
+        return this.toMunicipality;
     }
 
-    public void setTilKommunekode(int tilKommunekode) {
-        this.tilKommunekode = tilKommunekode;
+    public void setToMunicipality(int toMunicipality) {
+        this.toMunicipality = toMunicipality;
     }
 
-    @Column
-    @JsonProperty(value = "tilVejkode")
-    @XmlElement(name = "tilVejkode")
-    private int tilVejkode;
 
-    public int getTilVejkode() {
-        return this.tilVejkode;
+    public static final String DB_FIELD_TO_ROAD = "toRoad";
+    public static final String IO_FIELD_TO_ROAD = "tilVejkode";
+    @Column(name = DB_FIELD_TO_ROAD)
+    @JsonProperty(value = IO_FIELD_TO_ROAD)
+    @XmlElement(name = IO_FIELD_TO_ROAD)
+    private int toRoad;
+
+    public int getToRoad() {
+        return this.toRoad;
     }
 
-    public void setTilVejkode(int tilVejkode) {
-        this.tilVejkode = tilVejkode;
+    public void setToRoad(int toRoad) {
+        this.toRoad = toRoad;
     }
 
-    @Column
-    @JsonProperty(value = "fraKommunekode")
-    @XmlElement(name = "fraKommunekode")
-    private int fraKommunekode;
+    public static final String DB_FIELD_FROM_MUNICIPALITY = "fromMunicipality";
+    public static final String IO_FIELD_FROM_MUNICIPALITY = "fraKommunekode";
+    @Column(name = DB_FIELD_FROM_MUNICIPALITY)
+    @JsonProperty(value = IO_FIELD_FROM_MUNICIPALITY)
+    @XmlElement(name = IO_FIELD_FROM_MUNICIPALITY)
+    private int fromMunicipality;
 
-    public int getFraKommunekode() {
-        return this.fraKommunekode;
+    public int getFromMunicipality() {
+        return this.fromMunicipality;
     }
 
-    public void setFraKommunekode(int fraKommunekode) {
-        this.fraKommunekode = fraKommunekode;
+    public void setFromMunicipality(int fromMunicipality) {
+        this.fromMunicipality = fromMunicipality;
     }
 
-    @Column
-    @JsonProperty(value = "fraVejkode")
-    @XmlElement(name = "fraVejkode")
-    private int fraVejkode;
+    public static final String DB_FIELD_FROM_ROAD = "fromRoad";
+    public static final String IO_FIELD_FROM_ROAD = "fraVejkode";
+    @Column(name = DB_FIELD_FROM_ROAD)
+    @JsonProperty(value = IO_FIELD_FROM_ROAD)
+    @XmlElement(name = IO_FIELD_FROM_ROAD)
+    private int fromRoad;
 
-    public int getFraVejkode() {
-        return this.fraVejkode;
+    public int getFromRoad() {
+        return this.fromRoad;
     }
 
-    public void setFraVejkode(int fraVejkode) {
-        this.fraVejkode = fraVejkode;
+    public void setFromRoad(int fromRoad) {
+        this.fromRoad = fromRoad;
     }
 
-    @Column
-    @JsonProperty(value = "addresseringsnavn")
-    @XmlElement(name = "addresseringsnavn")
-    private String addresseringsnavn;
+    public static final String DB_FIELD_ADDRESS_NAME = "addressingName";
+    public static final String IO_FIELD_ADDRESS_NAME = "adresseringsnavn";
+    @Column(name = DB_FIELD_ADDRESS_NAME)
+    @JsonProperty(value = IO_FIELD_ADDRESS_NAME)
+    @XmlElement(name = IO_FIELD_ADDRESS_NAME)
+    private String addressingName;
 
-    public String getAddresseringsnavn() {
-        return this.addresseringsnavn;
+    public String getAddressingName() {
+        return this.addressingName;
     }
 
-    public void setAddresseringsnavn(String addresseringsnavn) {
-        this.addresseringsnavn = addresseringsnavn;
+    public void setAddressingName(String addressingName) {
+        this.addressingName = addressingName;
     }
 
-    @Column
-    @JsonProperty(value = "vejnavn")
-    @XmlElement(name = "vejnavn")
-    private String vejnavn;
+    public static final String DB_FIELD_ROAD_NAME = "name";
+    public static final String IO_FIELD_ROAD_NAME = "vejnavn";
+    @Column(name = DB_FIELD_ROAD_NAME)
+    @JsonProperty(value = IO_FIELD_ROAD_NAME)
+    @XmlElement(name = IO_FIELD_ROAD_NAME)
+    private String name;
 
-    public String getVejnavn() {
-        return this.vejnavn;
+    public String getName() {
+        return this.name;
     }
 
-    public void setVejnavn(String vejnavn) {
-        this.vejnavn = vejnavn;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -104,24 +117,36 @@ public class RoadCoreData extends DetailData {
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>();
 
-        if (this.tilKommunekode != 0) {
-            map.put("tilKommunekode", this.tilKommunekode);
+        if (this.toMunicipality != 0) {
+            map.put(IO_FIELD_TO_MUNICIPALITY, this.toMunicipality);
         }
-        if (this.tilVejkode != 0) {
-            map.put("tilVejkode", this.tilVejkode);
+        if (this.toRoad != 0) {
+            map.put(IO_FIELD_TO_ROAD, this.toRoad);
         }
-        if (this.fraKommunekode != 0) {
-            map.put("fraKommunekode", this.fraKommunekode);
+        if (this.fromMunicipality != 0) {
+            map.put(IO_FIELD_FROM_MUNICIPALITY, this.fromMunicipality);
         }
-        if (this.fraVejkode != 0) {
-            map.put("fraVejkode", this.fraVejkode);
+        if (this.fromRoad != 0) {
+            map.put(IO_FIELD_FROM_ROAD, this.fromRoad);
         }
-        if (this.addresseringsnavn != null) {
-            map.put("addresseringsnavn", this.addresseringsnavn);
+        if (this.addressingName != null) {
+            map.put(IO_FIELD_ADDRESS_NAME, this.addressingName);
         }
-        if (this.vejnavn != null) {
-            map.put("vejnavn", this.vejnavn);
+        if (this.name != null) {
+            map.put(IO_FIELD_ROAD_NAME, this.name);
         }
+        return map;
+    }
+
+    @JsonIgnore
+    public Map<String, Object> databaseFields() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(DB_FIELD_FROM_MUNICIPALITY, this.fromMunicipality);
+        map.put(DB_FIELD_FROM_ROAD, this.fromRoad);
+        map.put(DB_FIELD_TO_MUNICIPALITY, this.toMunicipality);
+        map.put(DB_FIELD_TO_ROAD, this.toRoad);
+        map.put(DB_FIELD_ADDRESS_NAME, this.addressingName);
+        map.put(DB_FIELD_ROAD_NAME, this.name);
         return map;
     }
 

@@ -64,7 +64,8 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public void populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+        boolean updated = false;
         if (this.addressTemporality.matches(registrationTime, effect)) {
             data.setAddress(
                 // int authority,
@@ -74,7 +75,7 @@ public class AddressRecord extends PersonDataRecord {
                 // String bynavn,
                 null,
                 // String cprKommunekode,
-                this.getString("komkod", false),
+                this.getInt("komkod", false),
                 // String cprKommunenavn,
                 null,
                 // String cprVejkode,
@@ -106,26 +107,30 @@ public class AddressRecord extends PersonDataRecord {
                 // int startAuthority
                 this.getInt("start_mynkod-adrtxt")
             );
+            updated = true;
         }
         if (this.conameTemporality.matches(registrationTime, effect)) {
             data.setCoName(this.get("convn"));
+            updated = true;
         }
         if (this.municipalityTemporality.matches(registrationTime, effect)) {
             data.setMoveMunicipality(
                 //int authority,
                 this.getInt("tilfra_mynkod"),
                 // LocalDateTime fraflytningsdatoKommune,
-                this.getDateTime("tilflykomdto"),
+                this.getDateTime("fraflykomdto"),
                 // boolean fraflytningsdatoKommuneUsikkerhedsmarkering,
-                this.getBoolean("tilflykomdt_umrk"),
+                this.getBoolean("fraflykomdt_umrk"),
                 // int fraflytningskommunekode,
                 this.getInt("fraflykomkod"),
                 // LocalDateTime tilflytningsdatoKommune,
-                this.getDateTime("fraflykomdto"),
+                this.getDateTime("tilflykomdto"),
                 // boolean tilflytningsdatoKommuneUsikkerhedsmarkering
-                this.getBoolean("fraflykomdt_umrk")
+                this.getBoolean("tilflykomdt_umrk")
             );
+            updated = true;
         }
+        return updated;
     }
 
     @Override

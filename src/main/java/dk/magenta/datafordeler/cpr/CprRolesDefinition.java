@@ -4,7 +4,6 @@ import dk.magenta.datafordeler.core.plugin.RolesDefinition;
 import dk.magenta.datafordeler.core.role.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,7 +27,29 @@ public class CprRolesDefinition extends RolesDefinition {
             }},
             new ExecuteCommandRoleVersion(
                     1.0f,
-                    "Role that gives access to start and stop the PULL command for CPR data"
+                    "Role that gives access to start and stop the PULL command for Cpr data"
+            )
+    );
+
+    public static ReadCommandRole READ_CPR_PULL_ROLE = new ReadCommandRole(
+            "Pull",
+            new HashMap<String, Object>() {{
+                put("plugin", "cpr");
+            }},
+            new ReadCommandRoleVersion(
+                    1.0f,
+                    "Role that gives access to read the status of the PULL command for Cpr data"
+            )
+    );
+
+    public static StopCommandRole STOP_CPR_PULL_ROLE = new StopCommandRole(
+            "Pull",
+            new HashMap<String, Object>() {{
+                put("plugin", "cpr");
+            }},
+            new StopCommandRoleVersion(
+                    1.0f,
+                    "Role that gives access to stop the PULL command for Cpr data"
             )
     );
 
@@ -37,6 +58,12 @@ public class CprRolesDefinition extends RolesDefinition {
         ArrayList<SystemRole> roles = new ArrayList<>();
         roles.add(READ_CPR_ROLE);
         roles.add(EXECUTE_CPR_PULL_ROLE);
+        roles.add(READ_CPR_PULL_ROLE);
+        roles.add(STOP_CPR_PULL_ROLE);
         return roles;
+    }
+
+    public ReadServiceRole getDefaultReadRole() {
+        return READ_CPR_ROLE;
     }
 }

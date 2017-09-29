@@ -13,6 +13,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.UUID;
 
+import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_MUNICIPALITYCODE;
+import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_ROADCODE;
+
 /**
  * Created by lars on 16-05-17.
  */
@@ -20,8 +23,8 @@ import java.util.UUID;
 @Table(
     name="cpr_road_entity",
     indexes = {
-        @Index(name = "vejKode", columnList = "vejkode"),
-        @Index(name = "komKodeVejKode", columnList = "kommunekode,vejkode")
+        @Index(name = "vejKode", columnList = DB_FIELD_ROADCODE),
+        @Index(name = "komKodeVejKode", columnList = DB_FIELD_MUNICIPALITYCODE+","+DB_FIELD_ROADCODE)
     }
 )
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -47,30 +50,37 @@ public class RoadEntity extends Entity<RoadEntity, RoadRegistration> {
     public static final String schema = "Vej";
 
 
-    @Column
-    @JsonProperty(value = "kommunekode")
-    @XmlElement(name = "kommunekode")
-    private int kommunekode;
+
+    public static final String DB_FIELD_MUNICIPALITYCODE = "municipalityCode";
+    public static final String IO_FIELD_MUNICIPALITYCODE = "municipalityCode";
+
+    @Column(name = DB_FIELD_MUNICIPALITYCODE)
+    @JsonProperty(value = IO_FIELD_MUNICIPALITYCODE)
+    @XmlElement(name = IO_FIELD_MUNICIPALITYCODE)
+    private int municipalityCode;
 
     public int getKommunekode() {
-        return this.kommunekode;
+        return this.municipalityCode;
     }
 
     public void setKommunekode(int kommunekode) {
-        this.kommunekode = kommunekode;
+        this.municipalityCode = kommunekode;
     }
 
-    @Column
-    @JsonProperty(value = "vejkode")
-    @XmlElement(name = "vejkode")
-    private int vejkode;
+
+    public static final String DB_FIELD_ROADCODE = "roadCode";
+    public static final String IO_FIELD_ROADCODE = "vejkode";
+    @Column(name = DB_FIELD_ROADCODE)
+    @JsonProperty(value = IO_FIELD_ROADCODE)
+    @XmlElement(name = IO_FIELD_ROADCODE)
+    private int roadCode;
 
     public int getVejkode() {
-        return this.vejkode;
+        return this.roadCode;
     }
 
     public void setVejkode(int vejkode) {
-        this.vejkode = vejkode;
+        this.roadCode = vejkode;
     }
 
     public static UUID generateUUID(int municipalityCode, int roadCode) {
