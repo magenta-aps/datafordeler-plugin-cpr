@@ -173,23 +173,6 @@ public class QueryTest {
         results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(1, results.size());
-
-
-
-
-
-        searchParameters = new ParameterMap();
-        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        searchParameters.add("registreringTil", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        searchParameters.add("virkningFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        searchParameters.add("virkningTil", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-
-        response = restSearch(searchParameters, "person");
-        Assert.assertEquals(200, response.getStatusCode().value());
-        jsonBody = objectMapper.readTree(response.getBody());
-        results = jsonBody.get("results");
-        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(results));
-
     }
 
 
