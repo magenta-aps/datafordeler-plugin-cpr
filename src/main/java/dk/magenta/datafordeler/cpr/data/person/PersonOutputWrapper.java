@@ -74,7 +74,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                 PersonForeignAddressData udenlandsadresse = personBaseData.getForeignAddress();
                 PersonNameAuthorityTextData navnemyndighed = personBaseData.getNameAuthority();
 
-                OffsetDateTime timestamp = personBaseData.getRecordSet().getNewestRecord().getTimestamp();
+                OffsetDateTime timestamp = personBaseData.getLatestUpdated();
 
                 if (personCoreData != null) {
                     addEffectDataToRegistration(
