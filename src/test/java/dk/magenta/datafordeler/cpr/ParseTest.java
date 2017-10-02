@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
+import dk.magenta.datafordeler.core.exception.DataStreamException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.person.*;
 import dk.magenta.datafordeler.cpr.data.residence.*;
@@ -54,13 +56,15 @@ public class ParseTest {
 
     private void loadPerson() throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
-        personEntityManager.parseRegistration(testData);
+        ImportMetadata importMetadata = new ImportMetadata();
+        personEntityManager.parseRegistration(testData, importMetadata);
         testData.close();
     }
 
     private void loadRoad() throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-        ArrayList<RoadRegistration> registrations = new ArrayList<>(roadEntityManager.parseRegistration(testData));
+        ImportMetadata importMetadata = new ImportMetadata();
+        ArrayList<RoadRegistration> registrations = new ArrayList<>(roadEntityManager.parseRegistration(testData, importMetadata));
         Collections.sort(registrations);
 
         Session session = sessionManager.getSessionFactory().openSession();
@@ -76,7 +80,8 @@ public class ParseTest {
 
     private void loadResidence() throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-        ArrayList<ResidenceRegistration> registrations = new ArrayList<>(residenceEntityManager.parseRegistration(testData));
+        ImportMetadata importMetadata = new ImportMetadata();
+        ArrayList<ResidenceRegistration> registrations = new ArrayList<>(residenceEntityManager.parseRegistration(testData, importMetadata));
         Collections.sort(registrations);
 
         Session session = sessionManager.getSessionFactory().openSession();
@@ -139,7 +144,6 @@ public class ParseTest {
             entities = queryManager.getAllEntities(session, RoadEntity.class);
             JsonNode secondImport = objectMapper.valueToTree(entities);
             assertJsonEquality(firstImport, secondImport, true, true);
-
         } finally {
             session.close();
         }

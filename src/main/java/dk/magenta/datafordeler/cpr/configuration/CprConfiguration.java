@@ -8,9 +8,7 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,18 +21,38 @@ import java.net.URISyntaxException;
 public class CprConfiguration implements Configuration {
 
     public enum Charset {
-        US_ASCII,
-        ISO_8859_1,
-        UTF_8,
-        UTF_16BE,
-        UTF_16LE,
-        UTF_16
+        US_ASCII(0),
+        ISO_8859_1(1),
+        UTF_8(2),
+        UTF_16BE(3),
+        UTF_16LE(4),
+        UTF_16(5);
+
+        private int value;
+        Charset(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return this.value;
+        }
     }
 
     public enum RegisterType {
-        LOCAL_FILE,
-        REMOTE_FTP
+        LOCAL_FILE(0),
+        REMOTE_FTP(1);
+
+        private int value;
+        RegisterType(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return this.value;
+        }
     }
+
+
 
     @Id
     @Column(name = "id")
@@ -48,6 +66,7 @@ public class CprConfiguration implements Configuration {
     private String personRegisterPullCronSchedule = "0 0 0 1 1 ?";
 
     @Column
+    @Enumerated(EnumType.ORDINAL)
     private RegisterType personRegisterType = RegisterType.LOCAL_FILE;
 
     @Column
@@ -63,6 +82,7 @@ public class CprConfiguration implements Configuration {
     private String personRegisterLocalFile = "data/cprpersondata.txt";
 
     @Column
+    @Enumerated(EnumType.ORDINAL)
     private Charset personRegisterDataCharset = Charset.ISO_8859_1;
 
 
@@ -71,6 +91,7 @@ public class CprConfiguration implements Configuration {
     private String roadRegisterPullCronSchedule = null;
 
     @Column
+    @Enumerated(EnumType.ORDINAL)
     private RegisterType roadRegisterType = RegisterType.LOCAL_FILE;
 
     @Column
@@ -86,6 +107,7 @@ public class CprConfiguration implements Configuration {
     private String roadRegisterLocalFile = "data/cprroaddata_truncated.txt";
 
     @Column
+    @Enumerated(EnumType.ORDINAL)
     private Charset roadRegisterDataCharset = Charset.ISO_8859_1;
 
 
@@ -94,6 +116,7 @@ public class CprConfiguration implements Configuration {
     private String residenceRegisterPullCronSchedule = null;
 
     @Column
+    @Enumerated(EnumType.ORDINAL)
     private RegisterType residenceRegisterType = RegisterType.LOCAL_FILE;
 
     @Column
@@ -109,6 +132,7 @@ public class CprConfiguration implements Configuration {
     private String residenceRegisterLocalFile = "data/cprroaddata_truncated.txt";
 
     @Column
+    @Enumerated(EnumType.ORDINAL)
     private Charset residenceRegisterDataCharset = Charset.ISO_8859_1;
 
 

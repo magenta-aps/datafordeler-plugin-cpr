@@ -198,39 +198,37 @@ public class CprRegisterManager extends RegisterManager {
                 @Override
                 public void run() {
                     BufferedReader responseReader = new BufferedReader(new InputStreamReader(responseBody, Charset.forName("iso-8859-1")));
+                    int eventCount = 0;
+                    try {
+                        String line;
 
-                            int eventCount = 0;
-                            try {
-                                String line;
-
-                                // One line per event
-                                int lineCount = 0;
-                                ArrayList<String> lines = new ArrayList<>();
-                                while ((line = responseReader.readLine()) != null) {
-                                    lines.add(line);
-                                    lineCount++;
-                                    if (lineCount >= linesPerEvent) {
-                                        objectOutputStream.writeObject(CprRegisterManager.this.wrap(lines, schema, dataIdBase, eventCount));
-                                        lines.clear();
-                                        lineCount = 0;
-                                        eventCount++;
-                                    }
-                                }
-                                if (lineCount > 0) {
-                                    objectOutputStream.writeObject(CprRegisterManager.this.wrap(lines, schema, dataIdBase, eventCount));
-                                    eventCount++;
-                                }
-                                CprRegisterManager.this.log.info("Packed "+eventCount+" data objects");
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                        // One line per event
+                        int lineCount = 0;
+                        ArrayList<String> lines = new ArrayList<>();
+                        while ((line = responseReader.readLine()) != null) {
+                            lines.add(line);
+                            lineCount++;
+                            if (lineCount >= linesPerEvent) {
+                                objectOutputStream.writeObject(CprRegisterManager.this.wrap(lines, schema, dataIdBase, eventCount));
+                                lines.clear();
+                                lineCount = 0;
+                                eventCount++;
                             }
-
-                        try {
-                            responseReader.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
+                        if (lineCount > 0) {
+                            objectOutputStream.writeObject(CprRegisterManager.this.wrap(lines, schema, dataIdBase, eventCount));
+                            eventCount++;
+                        }
+                        CprRegisterManager.this.log.info("Packed "+eventCount+" data objects");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
+                    try {
+                        responseReader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     try {
                         objectOutputStream.close();
                     } catch (IOException e1) {

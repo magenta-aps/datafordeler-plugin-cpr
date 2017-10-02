@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.Application;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.user.DafoUserManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
@@ -57,19 +58,22 @@ public class QueryTest {
 
     public void loadPerson() throws Exception {
         InputStream testData = QueryTest.class.getResourceAsStream("/persondata.txt");
-        personEntityManager.parseRegistration(testData);
+        ImportMetadata importMetadata = new ImportMetadata();
+        personEntityManager.parseRegistration(testData, importMetadata);
         testData.close();
     }
 
     public void loadResidence() throws Exception {
         InputStream testData = QueryTest.class.getResourceAsStream("/roaddata.txt");
-        residenceEntityManager.parseRegistration(testData);
+        ImportMetadata importMetadata = new ImportMetadata();
+        residenceEntityManager.parseRegistration(testData, importMetadata);
         testData.close();
     }
 
     public void loadRoad() throws Exception {
         InputStream testData = QueryTest.class.getResourceAsStream("/roaddata.txt");
-        roadEntityManager.parseRegistration(testData);
+        ImportMetadata importMetadata = new ImportMetadata();
+        roadEntityManager.parseRegistration(testData, importMetadata);
         testData.close();
     }
 
