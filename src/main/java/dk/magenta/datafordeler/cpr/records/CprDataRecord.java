@@ -56,4 +56,8 @@ public abstract class CprDataRecord<V extends CprEffect, B extends CprData> exte
 
     public abstract List<Bitemporality> getBitemporality();
 
+    public boolean filter() {
+        return true;
+    }
+
 }

@@ -173,8 +173,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     public List<R> parseRegistration(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
         ArrayList<R> allRegistrations = new ArrayList<>();
         String charset = this.getConfiguration().getRegisterCharset(this);
-        BufferedReader reader = null;
-        reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
 
         CprSubParser<T> parser = this.getParser();
         QueryManager queryManager = this.getQueryManager();
@@ -193,15 +192,14 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             int i;
             try {
                 for (i = 0; i < limit; i++) {
-                String line = null;
-                    line = reader.readLine();
-                if (line != null) {
-                    buffer.add(line);
-                    linesRead++;
-                } else {
-                    done = true;
+                    String line = reader.readLine();
+                    if (line != null) {
+                        buffer.add(line);
+                        linesRead++;
+                    } else {
+                        done = true;
+                    }
                 }
-            }
             } catch (IOException e) {
                 throw new DataStreamException(e);
             }
@@ -223,19 +221,21 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             ListHashMap<E, T> recordMap = new ListHashMap<>();
             HashMap<UUID, E> entityCache = new HashMap<>();
             for (T record : chunkRecords) {
-                UUID uuid = this.generateUUID(record);
-                E entity = entityCache.get(uuid);
-                if (entity == null) {
-                    entity = queryManager.getEntity(session, uuid, this.getEntityClass());
+                if (this.filter(record)) {
+                    UUID uuid = this.generateUUID(record);
+                    E entity = entityCache.get(uuid);
                     if (entity == null) {
-                        System.out.println("Create new entity for uuid "+uuid);
-                        entity = this.createBasicEntity(record);
-                        entity.setUUID(uuid);
-                        entity.setDomain(CprPlugin.getDomain());
+                        entity = queryManager.getEntity(session, uuid, this.getEntityClass());
+                        if (entity == null) {
+                            System.out.println("Create new entity for uuid "+uuid);
+                            entity = this.createBasicEntity(record);
+                            entity.setUUID(uuid);
+                            entity.setDomain(CprPlugin.getDomain());
+                        }
+                        entityCache.put(uuid, entity);
                     }
-                    entityCache.put(uuid, entity);
+                    recordMap.add(entity, record);
                 }
-                recordMap.add(entity, record);
             }
             log.debug("Batch resulted in "+recordMap.keySet().size()+" unique entities");
             timer.measure(TASK_FIND_ENTITY);
@@ -263,6 +263,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         log.info(timer.formatTotal(TASK_SAVE));
 
         return allRegistrations;
+    }
+
+    protected boolean filter(T record) {
+        return record.filter();
     }
 
 

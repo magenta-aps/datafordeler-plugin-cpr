@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -110,4 +111,18 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
         return new PersonBaseData();
     }
 
+
+    HashSet<Long> throttleCprs = new HashSet<>();
+    @Override
+    protected boolean filter(PersonDataRecord record) {
+        long cpr = Long.parseLong(record.getCprNumber());
+        if (throttleCprs.contains(cpr)) {
+            return true;
+        }
+        if (throttleCprs.size() < 1000) {
+            throttleCprs.add(cpr);
+            return true;
+        }
+        return false;
+    }
 }

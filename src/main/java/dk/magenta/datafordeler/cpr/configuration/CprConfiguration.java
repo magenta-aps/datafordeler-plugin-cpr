@@ -104,7 +104,7 @@ public class CprConfiguration implements Configuration {
     private String roadRegisterFtpPassword = null;
 
     @Column
-    private String roadRegisterLocalFile = "data/cprroaddata_truncated.txt";
+    private String roadRegisterLocalFile = "data/cprroaddata.txt";
 
     @Column
     @Enumerated(EnumType.ORDINAL)
@@ -129,7 +129,7 @@ public class CprConfiguration implements Configuration {
     private String residenceRegisterFtpPassword = null;
 
     @Column
-    private String residenceRegisterLocalFile = "data/cprroaddata_truncated.txt";
+    private String residenceRegisterLocalFile = "data/cprroaddata.txt";
 
     @Column
     @Enumerated(EnumType.ORDINAL)

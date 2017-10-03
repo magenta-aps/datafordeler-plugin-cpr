@@ -33,9 +33,6 @@ public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEnti
     @Autowired
     private QueryManager queryManager;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private static class RoadIdentifier {
         public int kommunekode;
         public int vejkode;
