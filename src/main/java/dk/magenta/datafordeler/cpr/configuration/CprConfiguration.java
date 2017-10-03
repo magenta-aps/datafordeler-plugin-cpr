@@ -7,8 +7,6 @@ import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.persistence.*;
 import java.io.File;
@@ -59,6 +57,7 @@ public class CprConfiguration implements Configuration {
     @Id
     @Column(name = "id")
     private final String plugin = CprPlugin.class.getName();
+
 
 
 
@@ -170,7 +169,6 @@ public class CprConfiguration implements Configuration {
     }
 
     public URI getPersonRegisterURI() throws ConfigurationException {
-        System.out.println("CprConfiguration.getPersonRegisterURI()");
         return this.formatURI(this.personRegisterType, this.personRegisterLocalFile, this.personRegisterFtpAddress);
     }
 
@@ -345,7 +343,6 @@ public class CprConfiguration implements Configuration {
     }
 
     public URI getRegisterURI(CprEntityManager entityManager) throws ConfigurationException {
-        System.out.println("CprConfiguration.getRegisterURI()");
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterURI();
         }
@@ -368,18 +365,21 @@ public class CprConfiguration implements Configuration {
     }
 
     private URI formatURI(RegisterType registerType, String localFile, String ftpAddress) throws ConfigurationException {
-        System.out.println("CprConfiguration.formatURI()");
         if (registerType == RegisterType.LOCAL_FILE) {
             File file = new File(localFile);
             if (!file.exists()) {
-                throw new ConfigurationException("Configured file not found: "+localFile);
+                String full = "";
+                try {
+                    full = " (" + file.getAbsolutePath() + ")";
+                } catch (SecurityException e) {}
+                throw new ConfigurationException("Configured file not found: " + localFile + full);
             }
             return file.toURI();
         } else if (registerType == RegisterType.REMOTE_FTP) {
             try {
                 return new URI(ftpAddress);
             } catch (URISyntaxException e) {
-                throw new ConfigurationException("Invalid FTP address configured: "+ftpAddress);
+                throw new ConfigurationException("Invalid FTP address configured: " + ftpAddress);
             }
         }
         return null;
