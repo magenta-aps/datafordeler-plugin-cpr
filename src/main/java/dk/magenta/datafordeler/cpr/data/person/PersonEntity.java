@@ -40,7 +40,10 @@ public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {
     @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="type")
     public static final String schema = "Person";
 
-    @Column
+    public static final String DB_FIELD_CPR_NUMBER = "personnummer";
+    public static final String IO_FIELD_CPR_NUMBER = "personnummer";
+
+    @Column(name = DB_FIELD_CPR_NUMBER)
     @JsonProperty("personnummer")
     @XmlElement(name=("personnummer"))
     private String personnummer;
