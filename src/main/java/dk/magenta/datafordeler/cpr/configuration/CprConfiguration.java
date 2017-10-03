@@ -7,6 +7,8 @@ import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.persistence.*;
 import java.io.File;
@@ -57,6 +59,9 @@ public class CprConfiguration implements Configuration {
     @Id
     @Column(name = "id")
     private final String plugin = CprPlugin.class.getName();
+
+
+    private Logger log = LogManager.getLogger("CprConfiguration");
 
 
 
@@ -169,6 +174,7 @@ public class CprConfiguration implements Configuration {
     }
 
     public URI getPersonRegisterURI() throws ConfigurationException {
+        this.log.info("CprConfiguration.getPersonRegisterURI()");
         return this.formatURI(this.personRegisterType, this.personRegisterLocalFile, this.personRegisterFtpAddress);
     }
 
@@ -343,6 +349,7 @@ public class CprConfiguration implements Configuration {
     }
 
     public URI getRegisterURI(CprEntityManager entityManager) throws ConfigurationException {
+        this.log.info("CprConfiguration.getRegisterURI()");
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterURI();
         }
@@ -365,6 +372,7 @@ public class CprConfiguration implements Configuration {
     }
 
     private URI formatURI(RegisterType registerType, String localFile, String ftpAddress) throws ConfigurationException {
+        this.log.info("CprConfiguration.formatURI()");
         if (registerType == RegisterType.LOCAL_FILE) {
             File file = new File(localFile);
             if (!file.exists()) {
