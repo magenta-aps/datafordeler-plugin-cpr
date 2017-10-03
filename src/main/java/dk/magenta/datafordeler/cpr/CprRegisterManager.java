@@ -136,6 +136,7 @@ public class CprRegisterManager extends RegisterManager {
     */
     @Override
     protected ItemInputStream<? extends PluginSourceData> pullEvents(URI eventInterface, EntityManager entityManager) throws DataFordelerException {
+        this.log.info("CprRegisterManager.pullEvents("+eventInterface.toString()+")");
         if (!(entityManager instanceof CprEntityManager)) {
             throw new WrongSubclassException(CprEntityManager.class, entityManager);
         }
@@ -186,6 +187,7 @@ public class CprRegisterManager extends RegisterManager {
     }
 
     private ItemInputStream<CprSourceData> parseEventResponse(final InputStream responseBody, final String schema) throws DataFordelerException {
+        this.log.info("CprRegisterManager.parseEventResponse()");
         final int linesPerEvent = 100;
         PipedInputStream inputStream = new PipedInputStream();
 

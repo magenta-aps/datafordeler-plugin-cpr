@@ -157,6 +157,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
     @Override
     public List<R> parseRegistration(String registrationData, ImportMetadata importMetadata) throws DataFordelerException {
+        this.log.info("CprEntityManager.parseRegistration(String)");
         String charset = this.getConfiguration().getRegisterCharset(this);
         return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(Charset.forName(charset))), importMetadata);
     }
@@ -171,6 +172,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
     @Override
     public List<R> parseRegistration(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
+        this.log.info("CprEntityManager.parseRegistration(InputStream)");
         ArrayList<R> allRegistrations = new ArrayList<>();
         String charset = this.getConfiguration().getRegisterCharset(this);
         BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
