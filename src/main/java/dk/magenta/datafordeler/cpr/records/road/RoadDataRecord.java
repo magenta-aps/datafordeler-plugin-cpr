@@ -49,9 +49,4 @@ public abstract class RoadDataRecord extends CprDataRecord<RoadEffect, RoadBaseD
         return effect;
     }
 
-    @Override
-    public boolean filter() {
-        return this.getInt("komkod") >= 950;
-    }
-
 }

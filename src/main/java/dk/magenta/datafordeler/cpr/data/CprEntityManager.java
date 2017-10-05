@@ -270,15 +270,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     }
 
 
-    private static long tic() {
-        return Instant.now().toEpochMilli();
-    }
-
-    private static long toc(long s) {
-        return tic() - s;
-    }
-
-
     private Collection<R> parseRegistration(E entity, List<T> records, QueryManager queryManager, Session session, ImportMetadata importMetadata) {
 
         HashSet<R> allRegistrations = new HashSet<>();

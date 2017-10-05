@@ -45,6 +45,9 @@ public class LocalCopyFtpCommunicator extends FtpCommunicator {
       List<String> downloadPaths = this.filterFilesToDownload(remotePaths);
       System.out.println("step 3");
 
+      System.out.println("Filenames on server "+uri+": "+downloadPaths);
+
+      ArrayList<String> currentFiles = new ArrayList<>();
       for (String path : downloadPaths) {
         String fileName = path.substring(path.lastIndexOf('/') + 1);
         Path outputFile = Files.createFile(Paths.get(localCopyFolder.toString(), fileName));
@@ -52,12 +55,14 @@ public class LocalCopyFtpCommunicator extends FtpCommunicator {
         ftpClient.retrieveFile(path, outputStream);
         // ftpClient.completePendingCommand();
         outputStream.close();
+        currentFiles.add(fileName);
       }
       System.out.println("step 4");
       ftpClient.disconnect();
       System.out.println("step 5");
 
-      InputStream inputStream = this.buildChainedInputStream();
+      final List<String> finalList = new ArrayList<>(currentFiles);
+      InputStream inputStream = this.buildChainedInputStream(finalList);
       System.out.println("step 6");
 
       if (inputStream != null) {
@@ -66,7 +71,7 @@ public class LocalCopyFtpCommunicator extends FtpCommunicator {
           @Override
           public void run() {
             try {
-              markLocalFilesAsDone();
+              markLocalFilesAsDone(finalList);
               ftpClient.disconnect();
             } catch (IOException e) {
               e.printStackTrace();
@@ -87,8 +92,8 @@ public class LocalCopyFtpCommunicator extends FtpCommunicator {
     }
   }
 
-  private void markLocalFilesAsDone() throws IOException {
-    for(String fileName : this.getLocalFilenameList()) {
+  private void markLocalFilesAsDone(List<String> fileNames) throws IOException {
+    for(String fileName : fileNames) {
       if(!fileName.endsWith(DONE_FILE_ENDING)) {
         String doneFileName = fileName + DONE_FILE_ENDING;
         Files.move(
@@ -110,8 +115,8 @@ public class LocalCopyFtpCommunicator extends FtpCommunicator {
     return knownFiles;
   }
 
-  protected InputStream buildChainedInputStream() throws IOException {
-    List<String> fileNamesToProcess = new ArrayList<>(getLocalFilenameList());
+  protected InputStream buildChainedInputStream(List<String> fileNames) throws IOException {
+    List<String> fileNamesToProcess = new ArrayList<>(fileNames);
     fileNamesToProcess.sort(Comparator.naturalOrder());
 
     InputStream inputStream = null;

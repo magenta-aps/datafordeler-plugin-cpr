@@ -109,8 +109,4 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
         return this.getString("sidedoer",true);
     }
 
-    @Override
-    public boolean filter() {
-        return this.getInt("komkod") >= 950;
-    }
 }
