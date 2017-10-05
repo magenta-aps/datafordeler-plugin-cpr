@@ -55,7 +55,7 @@ public class NameRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
         boolean updated = false;
         if (this.nameTemporality.matches(registrationTime, effect)) {
             data.setName(

@@ -36,12 +36,6 @@ public class ResidenceEntityManager extends CprEntityManager<ResidenceRecord, Re
     @Autowired
     private SessionManager sessionManager;
 
-    @Autowired
-    private QueryManager queryManager;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     public ResidenceEntityManager() {
         this.managedEntityClass = ResidenceEntity.class;
         this.managedEntityReferenceClass = ResidenceEntityReference.class;
@@ -224,11 +218,6 @@ public class ResidenceEntityManager extends CprEntityManager<ResidenceRecord, Re
     @Override
     protected SessionManager getSessionManager() {
         return this.sessionManager;
-    }
-
-    @Override
-    protected QueryManager getQueryManager() {
-        return this.queryManager;
     }
 
     @Override

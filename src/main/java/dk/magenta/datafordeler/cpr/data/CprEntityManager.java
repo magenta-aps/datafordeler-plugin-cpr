@@ -148,7 +148,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
 
     protected abstract SessionManager getSessionManager();
-    protected abstract QueryManager getQueryManager();
     protected abstract CprSubParser<T> getParser();
     protected abstract Class<E> getEntityClass();
     protected abstract UUID generateUUID(T record);
@@ -177,7 +176,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
 
         CprSubParser<T> parser = this.getParser();
-        QueryManager queryManager = this.getQueryManager();
         OffsetDateTime timestamp = OffsetDateTime.now();
 
         boolean done = false;
@@ -226,12 +224,16 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 UUID uuid = this.generateUUID(record);
                 E entity = entityCache.get(uuid);
                 if (entity == null) {
-                    entity = queryManager.getEntity(session, uuid, this.getEntityClass());
+                    entity = QueryManager.getEntity(session, uuid, this.getEntityClass());
                     if (entity == null) {
-                        System.out.println("Create new entity for uuid "+uuid);
-                        entity = this.createBasicEntity(record);
-                        entity.setUUID(uuid);
-                        entity.setDomain(CprPlugin.getDomain());
+                        entity = QueryManager.getEntity(session, uuid, this.getEntityClass());
+                        if (entity == null) {
+                            System.out.println("Create new entity for uuid "+uuid);
+                            entity = this.createBasicEntity(record);
+                            entity.setUUID(uuid);
+                            entity.setDomain(CprPlugin.getDomain());
+                        }
+                        entityCache.put(uuid, entity);
                     }
                     entityCache.put(uuid, entity);
                 }
@@ -242,7 +244,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
             for (E entity : recordMap.keySet()) {
                 List<T> records = recordMap.get(entity);
-                Collection<R> entityRegistrations = this.parseRegistration(entity, records, queryManager, session, importMetadata);
+                Collection<R> entityRegistrations = this.parseRegistration(entity, records, session, importMetadata);
                 allRegistrations.addAll(entityRegistrations);
             }
             transaction.commit();
@@ -275,7 +277,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     }
 
 
-    private Collection<R> parseRegistration(E entity, List<T> records, QueryManager queryManager, Session session, ImportMetadata importMetadata) {
+    private Collection<R> parseRegistration(E entity, List<T> records, Session session, ImportMetadata importMetadata) {
 
         HashSet<R> allRegistrations = new HashSet<>();
         ListHashMap<Bitemporality, T> groups = this.sortIntoGroups(records);
@@ -333,7 +335,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             for (T record : groupRecords) {
                 boolean updated = false;
                 for (V effect : effects) {
-                    if (record.populateBaseData(baseData, effect, bitemporality.registrationFrom, queryManager, session)) {
+                    if (record.populateBaseData(baseData, effect, bitemporality.registrationFrom, session)) {
                         updated = true;
                     }
                 }
@@ -352,7 +354,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         for (R registration : registrationList) {
             registration.setLastImportTime(importMetadata.getImportTime());
             try {
-                queryManager.saveRegistration(session, entity, registration, false, false);
+                QueryManager.saveRegistration(session, entity, registration, false, false);
             } catch (DataFordelerException e) {
                 e.printStackTrace();
             } catch (javax.persistence.EntityNotFoundException e) {

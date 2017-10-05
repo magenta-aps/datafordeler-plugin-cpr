@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.configuration;
 
 import dk.magenta.datafordeler.core.configuration.ConfigurationManager;
+import dk.magenta.datafordeler.core.database.ConfigurationSessionManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +18,9 @@ public class CprConfigurationManager extends ConfigurationManager<CprConfigurati
 
     @Autowired
     private SessionManager sessionManager;
+
+    @Autowired
+    private ConfigurationSessionManager configurationSessionManager;
 
     private Logger log = LogManager.getLogger("CprConfigurationManager");
 
@@ -37,8 +41,8 @@ public class CprConfigurationManager extends ConfigurationManager<CprConfigurati
     }
 
     @Override
-    protected SessionManager getSessionManager() {
-        return this.sessionManager;
+    protected ConfigurationSessionManager getSessionManager() {
+        return this.configurationSessionManager;
     }
 
     @Override

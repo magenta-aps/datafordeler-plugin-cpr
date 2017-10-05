@@ -38,7 +38,7 @@ public class ProtectionRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
         if (this.protectionTemporality.matches(registrationTime, effect)) {
             data.setProtection(
                 // int authority,

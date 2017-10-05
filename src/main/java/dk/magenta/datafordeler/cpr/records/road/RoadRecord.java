@@ -47,7 +47,7 @@ public class RoadRecord extends RoadDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, Session session) {
         if (registrationTime.equals(this.getOffsetDateTime("timestamp"))) {
             data.setCore(
                     this.getInt("tilkomkod"),

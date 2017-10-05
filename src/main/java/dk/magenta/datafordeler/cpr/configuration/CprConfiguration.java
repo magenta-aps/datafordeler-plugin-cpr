@@ -104,7 +104,7 @@ public class CprConfiguration implements Configuration {
     private String roadRegisterFtpPassword = null;
 
     @Column
-    private String roadRegisterLocalFile = "data/cprroaddata_truncated.txt";
+    private String roadRegisterLocalFile = "data/cprroaddata.txt";
 
     @Column
     @Enumerated(EnumType.ORDINAL)
@@ -129,7 +129,7 @@ public class CprConfiguration implements Configuration {
     private String residenceRegisterFtpPassword = null;
 
     @Column
-    private String residenceRegisterLocalFile = "data/cprroaddata_truncated.txt";
+    private String residenceRegisterLocalFile = "data/cprroaddata.txt";
 
     @Column
     @Enumerated(EnumType.ORDINAL)
@@ -368,25 +368,109 @@ public class CprConfiguration implements Configuration {
         if (registerType == RegisterType.LOCAL_FILE) {
             File file = new File(localFile);
             if (!file.exists()) {
-                throw new ConfigurationException("Configured file not found: "+localFile);
+                String full = "";
+                try {
+                    full = " (" + file.getAbsolutePath() + ")";
+                } catch (SecurityException e) {}
+                throw new ConfigurationException("Configured file not found: " + localFile + full);
             }
             return file.toURI();
         } else if (registerType == RegisterType.REMOTE_FTP) {
             try {
                 return new URI(ftpAddress);
             } catch (URISyntaxException e) {
-                throw new ConfigurationException("Invalid FTP address configured: "+ftpAddress);
+                throw new ConfigurationException("Invalid FTP address configured: " + ftpAddress);
             }
         }
         return null;
     }
 
-    
+
     /**
-     * For testing - test methods will set this, but not save the entity to DB
-     * @param registerAddress
+     * For testing - test methods will set these, but not save the entity to DB
      */
-    public void setPersonRegisterAddress(String registerAddress) {
-        this.personRegisterFtpAddress = registerAddress;
+
+    public void setPersonRegisterPullCronSchedule(String personRegisterPullCronSchedule) {
+        this.personRegisterPullCronSchedule = personRegisterPullCronSchedule;
+    }
+
+    public void setPersonRegisterType(RegisterType personRegisterType) {
+        this.personRegisterType = personRegisterType;
+    }
+
+    public void setPersonRegisterFtpAddress(String personRegisterFtpAddress) {
+        this.personRegisterFtpAddress = personRegisterFtpAddress;
+    }
+
+    public void setPersonRegisterFtpUsername(String personRegisterFtpUsername) {
+        this.personRegisterFtpUsername = personRegisterFtpUsername;
+    }
+
+    public void setPersonRegisterFtpPassword(String personRegisterFtpPassword) {
+        this.personRegisterFtpPassword = personRegisterFtpPassword;
+    }
+
+    public void setPersonRegisterLocalFile(String personRegisterLocalFile) {
+        this.personRegisterLocalFile = personRegisterLocalFile;
+    }
+
+    public void setPersonRegisterDataCharset(Charset personRegisterDataCharset) {
+        this.personRegisterDataCharset = personRegisterDataCharset;
+    }
+
+    public void setRoadRegisterPullCronSchedule(String roadRegisterPullCronSchedule) {
+        this.roadRegisterPullCronSchedule = roadRegisterPullCronSchedule;
+    }
+
+    public void setRoadRegisterType(RegisterType roadRegisterType) {
+        this.roadRegisterType = roadRegisterType;
+    }
+
+    public void setRoadRegisterFtpAddress(String roadRegisterFtpAddress) {
+        this.roadRegisterFtpAddress = roadRegisterFtpAddress;
+    }
+
+    public void setRoadRegisterFtpUsername(String roadRegisterFtpUsername) {
+        this.roadRegisterFtpUsername = roadRegisterFtpUsername;
+    }
+
+    public void setRoadRegisterFtpPassword(String roadRegisterFtpPassword) {
+        this.roadRegisterFtpPassword = roadRegisterFtpPassword;
+    }
+
+    public void setRoadRegisterLocalFile(String roadRegisterLocalFile) {
+        this.roadRegisterLocalFile = roadRegisterLocalFile;
+    }
+
+    public void setRoadRegisterDataCharset(Charset roadRegisterDataCharset) {
+        this.roadRegisterDataCharset = roadRegisterDataCharset;
+    }
+
+    public void setResidenceRegisterPullCronSchedule(String residenceRegisterPullCronSchedule) {
+        this.residenceRegisterPullCronSchedule = residenceRegisterPullCronSchedule;
+    }
+
+    public void setResidenceRegisterType(RegisterType residenceRegisterType) {
+        this.residenceRegisterType = residenceRegisterType;
+    }
+
+    public void setResidenceRegisterFtpAddress(String residenceRegisterFtpAddress) {
+        this.residenceRegisterFtpAddress = residenceRegisterFtpAddress;
+    }
+
+    public void setResidenceRegisterFtpUsername(String residenceRegisterFtpUsername) {
+        this.residenceRegisterFtpUsername = residenceRegisterFtpUsername;
+    }
+
+    public void setResidenceRegisterFtpPassword(String residenceRegisterFtpPassword) {
+        this.residenceRegisterFtpPassword = residenceRegisterFtpPassword;
+    }
+
+    public void setResidenceRegisterLocalFile(String residenceRegisterLocalFile) {
+        this.residenceRegisterLocalFile = residenceRegisterLocalFile;
+    }
+
+    public void setResidenceRegisterDataCharset(Charset residenceRegisterDataCharset) {
+        this.residenceRegisterDataCharset = residenceRegisterDataCharset;
     }
 }
