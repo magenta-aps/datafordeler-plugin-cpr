@@ -25,7 +25,6 @@ public class NameRecord extends PersonDataRecord {
 
     public NameRecord(String line) throws ParseException {
         super(line);
-        System.out.println("new NameRecord");
         this.obtain("start_mynkod-navne", 14, 4);
         this.obtain("nvn_ts", 18, 12);
         this.obtain("fornvn", 30, 50);
