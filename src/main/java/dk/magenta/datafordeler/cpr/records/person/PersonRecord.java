@@ -91,6 +91,9 @@ public class PersonRecord extends PersonDataRecord {
     @Override
     public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
         boolean updated = true;
+
+        data.setPersonnummer(this.getString("pnrgaeld", false));
+
         if (this.statusTemporality.matches(registrationTime, effect)) {
             data.setStatus(this.get("status"));
             updated = true;
@@ -163,7 +166,6 @@ public class PersonRecord extends PersonDataRecord {
         }
 
         if (this.birthTemporality.matches(registrationTime, effect)) {
-
             data.setBirth(
                 // LocalDateTime foedselsdato,
                 this.getDateTime("foed_dt", "foed_tm"),
@@ -176,7 +178,6 @@ public class PersonRecord extends PersonDataRecord {
                 // int foedselsraekkefoelge
                 this.getInt("foedsekvens")
             );
-            data.setPersonnummer(this.getString("pnr", false));
             data.setKoen(this.get("koen"));
             data.setStartAuthority(this.getInt("start_mynkod-person"));
             updated = true;
