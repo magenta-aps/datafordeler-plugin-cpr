@@ -153,8 +153,8 @@ public class QueryTest {
         this.applyAccess(testUserDetails);
 
         ParameterMap searchParameters = new ParameterMap();
-        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
         ResponseEntity<String> response = restSearch(searchParameters, "person");
         Assert.assertEquals(200, response.getStatusCode().value());
@@ -164,8 +164,8 @@ public class QueryTest {
         Assert.assertEquals(0, results.size());
 
         searchParameters = new ParameterMap();
-        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
         response = restSearch(searchParameters, "person");
         Assert.assertEquals(200, response.getStatusCode().value());
@@ -242,8 +242,8 @@ public class QueryTest {
         this.applyAccess(testUserDetails);
 
         ParameterMap searchParameters = new ParameterMap();
-        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
         ResponseEntity<String> response = restSearch(searchParameters, "residence");
         Assert.assertEquals(200, response.getStatusCode().value());
@@ -253,8 +253,8 @@ public class QueryTest {
         Assert.assertEquals(0, results.size());
 
         searchParameters = new ParameterMap();
-        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
         response = restSearch(searchParameters, "residence");
         Assert.assertEquals(200, response.getStatusCode().value());
@@ -329,8 +329,8 @@ public class QueryTest {
         this.applyAccess(testUserDetails);
 
         ParameterMap searchParameters = new ParameterMap();
-        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
         ResponseEntity<String> response = restSearch(searchParameters, "road");
         Assert.assertEquals(200, response.getStatusCode().value());
@@ -340,8 +340,8 @@ public class QueryTest {
         Assert.assertEquals(0, results.size());
 
         searchParameters = new ParameterMap();
-        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
         response = restSearch(searchParameters, "road");
         Assert.assertEquals(200, response.getStatusCode().value());
