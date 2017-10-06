@@ -93,6 +93,23 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private PersonForeignAddressData foreignAddress;
 
+    public static final String DB_FIELD_CIVIL_STATUS = "civilStatus";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonCivilStatusData civilStatus;
+
+    public static final String DB_FIELD_CIVIL_STATUS_VERIFICATION = "civilStatusVerification";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonCivilStatusVerificationData civilStatusVerification;
+
+    public static final String DB_FIELD_CIVIL_STATUS_AUTHORITY = "civilStatusAuthority";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonCivilStatusAuthorityTextData civilStatusAuthority;
+
+    public static final String DB_FIELD_CPRNUMBER = "cprNumber";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonNumberData cprNumber;
+
+
 
     public PersonCoreData getCoreData() {
         return coreData;
@@ -164,6 +181,22 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     public PersonForeignAddressData getForeignAddress() {
         return foreignAddress;
+    }
+
+    public PersonCivilStatusData getCivilStatus() {
+        return this.civilStatus;
+    }
+
+    public PersonCivilStatusVerificationData getCivilStatusVerification() {
+        return this.civilStatusVerification;
+    }
+
+    public PersonCivilStatusAuthorityTextData getCivilStatusAuthority() {
+        return this.civilStatusAuthority;
+    }
+
+    public PersonNumberData getCprNumber() {
+        return this.cprNumber;
     }
 
     public void setPersonnummer(String personnummer) {
@@ -388,6 +421,57 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.foreignAddress.setAddressLine5(adresselinie5);
     }
 
+    public void setCivilStatus(int authority, String civilStatus, String spouseCpr, LocalDate spouseBirthdate, boolean spouseBirthdateUncertain, String spouseName, boolean spouseNameMarking) {
+        this.setCivilStatus(authority, civilStatus, spouseCpr, spouseBirthdate, spouseBirthdateUncertain, spouseName, spouseNameMarking, null);
+    }
+
+    public void setCivilStatus(int authority, String civilStatus, String spouseCpr, LocalDate spouseBirthdate, boolean spouseBirthdateUncertain, String spouseName, boolean spouseNameMarking, String correctionMarking) {
+        if (this.civilStatus == null) {
+            this.civilStatus = new PersonCivilStatusData();
+        }
+        this.civilStatus.setAuthority(authority);
+        this.civilStatus.setCorrectionMarking(correctionMarking);
+        this.civilStatus.setCivilStatus(civilStatus);
+        this.civilStatus.setSpouseCpr(spouseCpr);
+        this.civilStatus.setSpouseBirthdate(spouseBirthdate);
+        this.civilStatus.setSpouseBirthdateUncertain(spouseBirthdateUncertain);
+        this.civilStatus.setSpouseName(spouseName);
+        this.civilStatus.setSpouseNameMarking(spouseNameMarking);
+    }
+
+
+    public void setCivilStatusVerification(int authority, boolean verification) {
+        this.setCivilStatusVerification(authority, verification, null);
+    }
+    public void setCivilStatusVerification(int authority, boolean verification, String correctionMarking) {
+        if (this.civilStatusVerification == null) {
+            this.civilStatusVerification = new PersonCivilStatusVerificationData();
+        }
+        this.civilStatusVerification.setAuthority(authority);
+        this.civilStatusVerification.setVerified(verification);
+        this.civilStatusVerification.setCorrectionMarking(correctionMarking);
+    }
+
+    public void setCivilStatusAuthorityText(int authority, String text) {
+        this.setCivilStatusAuthorityText(authority, text, null);
+    }
+    public void setCivilStatusAuthorityText(int authority, String text, String correctionMarking) {
+        if (this.civilStatusAuthority == null) {
+            this.civilStatusAuthority = new PersonCivilStatusAuthorityTextData();
+        }
+        this.civilStatusAuthority.setAuthority(authority);
+        this.civilStatusAuthority.setText(text);
+        this.civilStatusAuthority.setCorrectionMarking(correctionMarking);
+    }
+
+    public void setCprNumber(int authority, String cprNumber) {
+        if (this.cprNumber == null) {
+            this.cprNumber = new PersonNumberData();
+        }
+        this.cprNumber.setAuthority(authority);
+        this.cprNumber.setCprNumber(cprNumber);
+    }
+
     /**
      * Return a map of attributes, including those from the superclass
      * @return
@@ -442,6 +526,18 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
         if (this.foreignAddress != null) {
             map.put("foreignAddress", this.foreignAddress);
+        }
+        if (this.civilStatus != null) {
+            map.put("civilStatus", this.civilStatus);
+        }
+        if (this.civilStatusVerification != null) {
+            map.put("civilStatusVerification", this.civilStatusVerification);
+        }
+        if (this.civilStatusAuthority != null) {
+            map.put("civilStatusAuthority", this.civilStatusAuthority);
+        }
+        if (this.cprNumber != null) {
+            map.put("cprNumber", this.cprNumber);
         }
 
         return map;
@@ -506,6 +602,18 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
         if (this.foreignAddress != null) {
             lookupDefinition.putAll("foreignAddress", this.foreignAddress.databaseFields());
+        }
+        if (this.civilStatus != null) {
+            lookupDefinition.putAll("civilStatus", this.civilStatus.databaseFields());
+        }
+        if (this.civilStatusVerification != null) {
+            lookupDefinition.putAll("civilStatusVerification", this.civilStatusVerification.databaseFields());
+        }
+        if (this.civilStatusAuthority != null) {
+            lookupDefinition.putAll("civilStatusAuthority", this.civilStatusAuthority.databaseFields());
+        }
+        if (this.cprNumber != null) {
+            lookupDefinition.putAll("cprNumber", this.cprNumber.databaseFields());
         }
         return lookupDefinition;
     }
