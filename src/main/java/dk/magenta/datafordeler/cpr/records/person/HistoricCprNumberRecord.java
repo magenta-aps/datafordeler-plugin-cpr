@@ -32,7 +32,7 @@ public class HistoricCprNumberRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
         boolean updated = false;
         if (this.cprTemporality.matches(registrationTime, effect)) {
             data.setCprNumber(this.getInt("start_mynkod-pnrgaeld"), this.getString("gammelt_pnr", false));

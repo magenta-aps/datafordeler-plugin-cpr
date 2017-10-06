@@ -30,8 +30,6 @@ public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEnti
     @Autowired
     private SessionManager sessionManager;
 
-    @Autowired
-    private QueryManager queryManager;
 
     private static class RoadIdentifier {
         public int kommunekode;
@@ -91,11 +89,6 @@ public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEnti
     @Override
     protected SessionManager getSessionManager() {
         return this.sessionManager;
-    }
-
-    @Override
-    protected QueryManager getQueryManager() {
-        return this.queryManager;
     }
 
     @Override

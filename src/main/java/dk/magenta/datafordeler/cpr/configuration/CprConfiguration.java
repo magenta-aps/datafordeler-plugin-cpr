@@ -385,7 +385,7 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
-    
+
     /**
      * For testing - test methods will set these, but not save the entity to DB
      */

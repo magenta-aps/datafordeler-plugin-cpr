@@ -36,12 +36,6 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     @Autowired
     private SessionManager sessionManager;
 
-    @Autowired
-    private QueryManager queryManager;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     public PersonEntityManager() {
         this.managedEntityClass = PersonEntity.class;
         this.managedEntityReferenceClass = PersonEntityReference.class;
@@ -77,11 +71,6 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     @Override
     protected SessionManager getSessionManager() {
         return this.sessionManager;
-    }
-
-    @Override
-    protected QueryManager getQueryManager() {
-        return this.queryManager;
     }
 
     @Override

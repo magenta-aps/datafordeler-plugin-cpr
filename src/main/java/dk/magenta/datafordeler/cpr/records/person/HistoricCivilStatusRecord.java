@@ -51,7 +51,7 @@ public class HistoricCivilStatusRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
         boolean updated = false;
         if (this.civilTemporality.matches(registrationTime, effect)) {
             data.setCivilStatus(

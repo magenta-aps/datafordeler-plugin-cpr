@@ -43,8 +43,8 @@ public class PostCode extends UnversionedEntity {
         this.postdistrikt = postdistrikt;
     }
 
-    public static PostCode getPostcode(int code, String text, QueryManager queryManager, Session session) {
-        PostCode postcode = queryManager.getItem(session, PostCode.class, Collections.singletonMap("postnummer", code));
+    public static PostCode getPostcode(int code, String text, Session session) {
+        PostCode postcode = QueryManager.getItem(session, PostCode.class, Collections.singletonMap("postnummer", code));
         if (postcode == null) {
             postcode = new PostCode();
             postcode.setPostnummer(code);

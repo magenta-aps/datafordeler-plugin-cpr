@@ -17,7 +17,7 @@ import javax.annotation.PostConstruct;
 public class CprConfigurationManager extends ConfigurationManager<CprConfiguration> {
 
     @Autowired
-    private ConfigurationSessionManager sessionManager;
+    private ConfigurationSessionManager configurationSessionManager;
 
     private Logger log = LogManager.getLogger("CprConfigurationManager");
 
@@ -39,7 +39,7 @@ public class CprConfigurationManager extends ConfigurationManager<CprConfigurati
 
     @Override
     protected ConfigurationSessionManager getSessionManager() {
-        return this.sessionManager;
+        return this.configurationSessionManager;
     }
 
     @Override

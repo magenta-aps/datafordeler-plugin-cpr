@@ -37,7 +37,7 @@ public class RoadCityRecord extends RoadDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, Session session) {
         if (this.cityTemporality.matches(registrationTime, effect)) {
             data.addCity(
                     this.get("husnrfra"),

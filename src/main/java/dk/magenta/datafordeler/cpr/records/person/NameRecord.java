@@ -25,6 +25,7 @@ public class NameRecord extends PersonDataRecord {
 
     public NameRecord(String line) throws ParseException {
         super(line);
+        System.out.println("new NameRecord");
         this.obtain("start_mynkod-navne", 14, 4);
         this.obtain("nvn_ts", 18, 12);
         this.obtain("fornvn", 30, 50);
@@ -55,7 +56,7 @@ public class NameRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
         boolean updated = false;
         if (this.nameTemporality.matches(registrationTime, effect)) {
             data.setName(

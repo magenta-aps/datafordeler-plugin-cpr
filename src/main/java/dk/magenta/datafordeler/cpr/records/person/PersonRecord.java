@@ -89,7 +89,7 @@ public class PersonRecord extends PersonDataRecord {
      * @return
      */
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, QueryManager queryManager, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
         boolean updated = true;
 
         data.setPersonnummer(this.getString("pnrgaeld", false));

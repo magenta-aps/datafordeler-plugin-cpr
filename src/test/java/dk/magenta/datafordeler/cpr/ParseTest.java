@@ -36,9 +36,6 @@ import java.util.*;
 public class ParseTest {
 
     @Autowired
-    private QueryManager queryManager;
-
-    @Autowired
     private SessionManager sessionManager;
 
     @Autowired
@@ -71,7 +68,7 @@ public class ParseTest {
         Transaction transaction = session.beginTransaction();
         for (RoadRegistration registration : registrations) {
             registration = (RoadRegistration) session.merge(registration);
-            queryManager.saveRegistration(session, registration.getEntity(), registration);
+            QueryManager.saveRegistration(session, registration.getEntity(), registration);
         }
         transaction.commit();
         session.close();
@@ -88,7 +85,7 @@ public class ParseTest {
         Transaction transaction = session.beginTransaction();
         for (ResidenceRegistration registration : registrations) {
             registration = (ResidenceRegistration) session.merge(registration);
-            queryManager.saveRegistration(session, registration.getEntity(), registration);
+            QueryManager.saveRegistration(session, registration.getEntity(), registration);
         }
         transaction.commit();
         session.close();
@@ -100,11 +97,11 @@ public class ParseTest {
         Session session = sessionManager.getSessionFactory().openSession();
         try {
             loadPerson();
-            List<PersonEntity> entities = queryManager.getAllEntities(session, PersonEntity.class);
+            List<PersonEntity> entities = QueryManager.getAllEntities(session, PersonEntity.class);
             JsonNode firstImport = objectMapper.valueToTree(entities);
 
             loadPerson();
-            entities = queryManager.getAllEntities(session, PersonEntity.class);
+            entities = QueryManager.getAllEntities(session, PersonEntity.class);
             JsonNode secondImport = objectMapper.valueToTree(entities);
             assertJsonEquality(firstImport, secondImport, true, true);
 
@@ -122,7 +119,7 @@ public class ParseTest {
             PersonQuery query = new PersonQuery();
             query.setFornavn("Tester");
 
-            List<PersonEntity> entities = queryManager.getAllEntities(session, query, PersonEntity.class);
+            List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
             Assert.assertEquals(1, entities.size());
             PersonEntity entity = entities.get(0);
             Assert.assertEquals(PersonEntity.generateUUID("0101001234"), entity.getUUID());
@@ -137,11 +134,11 @@ public class ParseTest {
         Session session = sessionManager.getSessionFactory().openSession();
         try {
             loadRoad();
-            List<RoadEntity> entities = queryManager.getAllEntities(session, RoadEntity.class);
+            List<RoadEntity> entities = QueryManager.getAllEntities(session, RoadEntity.class);
             JsonNode firstImport = objectMapper.valueToTree(entities);
 
             loadRoad();
-            entities = queryManager.getAllEntities(session, RoadEntity.class);
+            entities = QueryManager.getAllEntities(session, RoadEntity.class);
             JsonNode secondImport = objectMapper.valueToTree(entities);
             assertJsonEquality(firstImport, secondImport, true, true);
         } finally {
@@ -159,7 +156,7 @@ public class ParseTest {
             query.addKommunekode("0730");
             query.setVejkode("0004");
 
-            List<RoadEntity> entities = queryManager.getAllEntities(session, query, RoadEntity.class);
+            List<RoadEntity> entities = QueryManager.getAllEntities(session, query, RoadEntity.class);
             Assert.assertEquals(1, entities.size());
             RoadEntity entity = entities.get(0);
             Assert.assertEquals(RoadEntity.generateUUID(730, 4), entity.getUUID());
@@ -229,11 +226,11 @@ public class ParseTest {
         Session session = sessionManager.getSessionFactory().openSession();
         try {
             loadResidence();
-            List<ResidenceEntity> entities = queryManager.getAllEntities(session, ResidenceEntity.class);
+            List<ResidenceEntity> entities = QueryManager.getAllEntities(session, ResidenceEntity.class);
             JsonNode firstImport = objectMapper.valueToTree(entities);
 
             loadResidence();
-            entities = queryManager.getAllEntities(session, ResidenceEntity.class);
+            entities = QueryManager.getAllEntities(session, ResidenceEntity.class);
             JsonNode secondImport = objectMapper.valueToTree(entities);
             assertJsonEquality(firstImport, secondImport, true, true);
 
@@ -252,7 +249,7 @@ public class ParseTest {
             query.addKommunekode(360);
             query.setVejkode(206);
 
-            List<ResidenceEntity> entities = queryManager.getAllEntities(session, query, ResidenceEntity.class);
+            List<ResidenceEntity> entities = QueryManager.getAllEntities(session, query, ResidenceEntity.class);
             Assert.assertEquals(1, entities.size());
             ResidenceEntity entity = entities.get(0);
             Assert.assertEquals(ResidenceEntity.generateUUID(360, 206, "44E", "", ""), entity.getUUID());
