@@ -44,6 +44,8 @@ public class PersonParser extends CprSubParser<PersonDataRecord> {
                     return new CivilStatusRecord(line);
                 case PersonDataRecord.RECORDTYPE_HISTORIC_CIVILSTATUS:
                     return new HistoricCivilStatusRecord(line);
+                case PersonDataRecord.RECORDTYPE_HISTORIC_CPRNUMBER:
+                    return new HistoricCprNumberRecord(line);
                 // TODO: Add one of these for each type...
             }
         } catch (ParseException e) {

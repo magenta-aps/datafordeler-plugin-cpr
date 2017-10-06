@@ -105,6 +105,11 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private PersonCivilStatusAuthorityTextData civilStatusAuthority;
 
+    public static final String DB_FIELD_CPRNUMBER = "cprNumber";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonNumberData cprNumber;
+
+
 
     public PersonCoreData getCoreData() {
         return coreData;
@@ -188,6 +193,10 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     public PersonCivilStatusAuthorityTextData getCivilStatusAuthority() {
         return this.civilStatusAuthority;
+    }
+
+    public PersonNumberData getCprNumber() {
+        return this.cprNumber;
     }
 
     public void setPersonnummer(String personnummer) {
@@ -453,6 +462,14 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.civilStatusAuthority.setAuthority(authority);
         this.civilStatusAuthority.setText(text);
         this.civilStatusAuthority.setCorrectionMarking(correctionMarking);
+    }
+
+    public void setCprNumber(int authority, String cprNumber) {
+        if (this.cprNumber == null) {
+            this.cprNumber = new PersonNumberData();
+        }
+        this.cprNumber.setAuthority(authority);
+        this.cprNumber.setCprNumber(cprNumber);
     }
 
     /**
