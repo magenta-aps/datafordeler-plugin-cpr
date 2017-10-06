@@ -527,6 +527,18 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.foreignAddress != null) {
             map.put("foreignAddress", this.foreignAddress);
         }
+        if (this.civilStatus != null) {
+            map.put("civilStatus", this.civilStatus);
+        }
+        if (this.civilStatusVerification != null) {
+            map.put("civilStatusVerification", this.civilStatusVerification);
+        }
+        if (this.civilStatusAuthority != null) {
+            map.put("civilStatusAuthority", this.civilStatusAuthority);
+        }
+        if (this.cprNumber != null) {
+            map.put("cprNumber", this.cprNumber);
+        }
 
         return map;
     }
@@ -590,6 +602,18 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
         if (this.foreignAddress != null) {
             lookupDefinition.putAll("foreignAddress", this.foreignAddress.databaseFields());
+        }
+        if (this.civilStatus != null) {
+            lookupDefinition.putAll("civilStatus", this.civilStatus.databaseFields());
+        }
+        if (this.civilStatusVerification != null) {
+            lookupDefinition.putAll("civilStatusVerification", this.civilStatusVerification.databaseFields());
+        }
+        if (this.civilStatusAuthority != null) {
+            lookupDefinition.putAll("civilStatusAuthority", this.civilStatusAuthority.databaseFields());
+        }
+        if (this.cprNumber != null) {
+            lookupDefinition.putAll("cprNumber", this.cprNumber.databaseFields());
         }
         return lookupDefinition;
     }
