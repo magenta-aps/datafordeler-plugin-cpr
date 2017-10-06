@@ -33,10 +33,29 @@ public class PersonCivilStatusVerificationData extends AuthorityDetailData {
     }
 
 
+
+    public static final String DB_FIELD_CORRECTION_MARKING = "correctionMarking";
+    public static final String IO_FIELD_CORRECTION_MARKING = "retFortrydMarkering";
+    @Column(name = DB_FIELD_CORRECTION_MARKING, length = 1)
+    @JsonProperty(value = IO_FIELD_CORRECTION_MARKING)
+    @XmlElement(name = IO_FIELD_CORRECTION_MARKING)
+    private String correctionMarking;
+
+    public String getCorrectionMarking() {
+        return this.correctionMarking;
+    }
+
+    public void setCorrectionMarking(String correctionMarking) {
+        this.correctionMarking = correctionMarking;
+    }
+
+
+
     @Override
     public Map<String, Object> databaseFields() {
         HashMap<String, Object> map = new HashMap<>(super.databaseFields());
         map.put(DB_FIELD_VERIFIED, this.verified);
+        map.put(DB_FIELD_CORRECTION_MARKING, this.correctionMarking);
         return map;
     }
 
@@ -44,6 +63,7 @@ public class PersonCivilStatusVerificationData extends AuthorityDetailData {
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("verified", this.verified);
+        map.put("correctionMarking", this.correctionMarking);
         return map;
     }
 }

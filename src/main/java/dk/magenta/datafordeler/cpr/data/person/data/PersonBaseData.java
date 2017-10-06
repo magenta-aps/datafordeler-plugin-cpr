@@ -413,10 +413,15 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     }
 
     public void setCivilStatus(int authority, String civilStatus, String spouseCpr, LocalDate spouseBirthdate, boolean spouseBirthdateUncertain, String spouseName, boolean spouseNameMarking) {
+        this.setCivilStatus(authority, civilStatus, spouseCpr, spouseBirthdate, spouseBirthdateUncertain, spouseName, spouseNameMarking, null);
+    }
+
+    public void setCivilStatus(int authority, String civilStatus, String spouseCpr, LocalDate spouseBirthdate, boolean spouseBirthdateUncertain, String spouseName, boolean spouseNameMarking, String correctionMarking) {
         if (this.civilStatus == null) {
             this.civilStatus = new PersonCivilStatusData();
         }
         this.civilStatus.setAuthority(authority);
+        this.civilStatus.setCorrectionMarking(correctionMarking);
         this.civilStatus.setCivilStatus(civilStatus);
         this.civilStatus.setSpouseCpr(spouseCpr);
         this.civilStatus.setSpouseBirthdate(spouseBirthdate);
@@ -425,20 +430,29 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.civilStatus.setSpouseNameMarking(spouseNameMarking);
     }
 
+
     public void setCivilStatusVerification(int authority, boolean verification) {
+        this.setCivilStatusVerification(authority, verification, null);
+    }
+    public void setCivilStatusVerification(int authority, boolean verification, String correctionMarking) {
         if (this.civilStatusVerification == null) {
             this.civilStatusVerification = new PersonCivilStatusVerificationData();
         }
         this.civilStatusVerification.setAuthority(authority);
         this.civilStatusVerification.setVerified(verification);
+        this.civilStatusVerification.setCorrectionMarking(correctionMarking);
     }
 
     public void setCivilStatusAuthorityText(int authority, String text) {
+        this.setCivilStatusAuthorityText(authority, text, null);
+    }
+    public void setCivilStatusAuthorityText(int authority, String text, String correctionMarking) {
         if (this.civilStatusAuthority == null) {
             this.civilStatusAuthority = new PersonCivilStatusAuthorityTextData();
         }
         this.civilStatusAuthority.setAuthority(authority);
         this.civilStatusAuthority.setText(text);
+        this.civilStatusAuthority.setCorrectionMarking(correctionMarking);
     }
 
     /**

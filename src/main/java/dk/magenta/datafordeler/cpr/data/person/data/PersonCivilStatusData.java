@@ -18,6 +18,23 @@ import java.util.Map;
 public class PersonCivilStatusData extends AuthorityDetailData {
 
 
+
+    public static final String DB_FIELD_CORRECTION_MARKING = "correctionMarking";
+    public static final String IO_FIELD_CORRECTION_MARKING = "retFortrydMarkering";
+    @Column(name = DB_FIELD_CORRECTION_MARKING, length = 1)
+    @JsonProperty(value = IO_FIELD_CORRECTION_MARKING)
+    @XmlElement(name = IO_FIELD_CORRECTION_MARKING)
+    private String correctionMarking;
+
+    public String getCorrectionMarking() {
+        return this.correctionMarking;
+    }
+
+    public void setCorrectionMarking(String correctionMarking) {
+        this.correctionMarking = correctionMarking;
+    }
+
+
     public static final String DB_FIELD_CIVIL_STATUS = "civilStatus";
     public static final String IO_FIELD_CIVIL_STATUS = "civilstand";
     @Column(name = DB_FIELD_CIVIL_STATUS)
