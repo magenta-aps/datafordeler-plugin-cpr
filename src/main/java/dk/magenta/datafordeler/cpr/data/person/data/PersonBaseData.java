@@ -93,6 +93,18 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private PersonForeignAddressData foreignAddress;
 
+    public static final String DB_FIELD_CIVIL_STATUS = "civilStatus";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonCivilStatusData civilStatus;
+
+    public static final String DB_FIELD_CIVIL_STATUS_VERIFICATION = "civilStatusVerification";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonCivilStatusVerificationData civilStatusVerification;
+
+    public static final String DB_FIELD_CIVIL_STATUS_AUTHORITY = "civilStatusAuthority";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    private PersonCivilStatusAuthorityTextData civilStatusAuthority;
+
 
     public PersonCoreData getCoreData() {
         return coreData;
@@ -164,6 +176,18 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     public PersonForeignAddressData getForeignAddress() {
         return foreignAddress;
+    }
+
+    public PersonCivilStatusData getCivilStatus() {
+        return this.civilStatus;
+    }
+
+    public PersonCivilStatusVerificationData getCivilStatusVerification() {
+        return this.civilStatusVerification;
+    }
+
+    public PersonCivilStatusAuthorityTextData getCivilStatusAuthority() {
+        return this.civilStatusAuthority;
     }
 
     public void setPersonnummer(String personnummer) {
@@ -386,6 +410,35 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.foreignAddress.setAddressLine3(adresselinie3);
         this.foreignAddress.setAddressLine4(adresselinie4);
         this.foreignAddress.setAddressLine5(adresselinie5);
+    }
+
+    public void setCivilStatus(int authority, String civilStatus, String spouseCpr, LocalDate spouseBirthdate, boolean spouseBirthdateUncertain, String spouseName, boolean spouseNameMarking) {
+        if (this.civilStatus == null) {
+            this.civilStatus = new PersonCivilStatusData();
+        }
+        this.civilStatus.setAuthority(authority);
+        this.civilStatus.setCivilStatus(civilStatus);
+        this.civilStatus.setSpouseCpr(spouseCpr);
+        this.civilStatus.setSpouseBirthdate(spouseBirthdate);
+        this.civilStatus.setSpouseBirthdateUncertain(spouseBirthdateUncertain);
+        this.civilStatus.setSpouseName(spouseName);
+        this.civilStatus.setSpouseNameMarking(spouseNameMarking);
+    }
+
+    public void setCivilStatusVerification(int authority, boolean verification) {
+        if (this.civilStatusVerification == null) {
+            this.civilStatusVerification = new PersonCivilStatusVerificationData();
+        }
+        this.civilStatusVerification.setAuthority(authority);
+        this.civilStatusVerification.setVerified(verification);
+    }
+
+    public void setCivilStatusAuthorityText(int authority, String text) {
+        if (this.civilStatusAuthority == null) {
+            this.civilStatusAuthority = new PersonCivilStatusAuthorityTextData();
+        }
+        this.civilStatusAuthority.setAuthority(authority);
+        this.civilStatusAuthority.setText(text);
     }
 
     /**
