@@ -43,7 +43,7 @@ public class HistoricCprNumberRecord extends PersonDataRecord {
 
     @Override
     public String getRecordType() {
-        return RECORDTYPE_CURRENT_NAME;
+        return RECORDTYPE_HISTORIC_CPRNUMBER;
     }
 
     @Override

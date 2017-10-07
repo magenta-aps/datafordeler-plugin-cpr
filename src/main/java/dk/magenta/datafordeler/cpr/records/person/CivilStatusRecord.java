@@ -84,7 +84,7 @@ public class CivilStatusRecord extends PersonDataRecord {
 
     @Override
     public String getRecordType() {
-        return RECORDTYPE_CURRENT_NAME;
+        return RECORDTYPE_CIVILSTATUS;
     }
 
     @Override
