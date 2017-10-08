@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.database.Identification;
 
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -13,7 +14,9 @@ import java.util.UUID;
  * Created by lars on 16-05-17.
  */
 @javax.persistence.Entity
-@Table(name="cpr_residence_entity")
+@Table(name="cpr_residence_entity",  indexes = {
+        @Index(name = "identification", columnList = "identification_id")
+})
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ResidenceEntity extends Entity<ResidenceEntity, ResidenceRegistration> {
 
