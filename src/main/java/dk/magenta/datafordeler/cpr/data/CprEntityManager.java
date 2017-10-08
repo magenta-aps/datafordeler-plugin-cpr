@@ -252,6 +252,11 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             if (!chunkRecords.isEmpty()) {
                 log.info(i + " lines => " + chunkRecords.size() + " records handled in " + chunkTime + " ms (" + ((float) chunkTime / (float) chunkRecords.size()) + " ms avg)");
             }
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         log.info(timer.formatTotal(TASK_PARSE));
