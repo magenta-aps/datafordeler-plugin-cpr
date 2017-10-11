@@ -112,6 +112,16 @@
             <scope>test</scope>
         </dependency>
 
+
+
+
+        <dependency>
+            <groupId>dk.magenta.datafordeler</groupId>
+            <artifactId>datafordeler-plugin-gladdrreg</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

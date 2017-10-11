@@ -10,6 +10,7 @@ import dk.magenta.datafordeler.cpr.data.person.data.*;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 
 public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
 
@@ -69,7 +70,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                 PersonMoveMunicipalityData flytteKommune = personBaseData.getMoveMunicipality();
                 PersonNameData navn = personBaseData.getName();
                 PersonAddressNameData adressenavn = personBaseData.getAddressingName();
-                PersonProtectionData beskyttelse = personBaseData.getProtection();
+                Collection<PersonProtectionData> beskyttelse = personBaseData.getProtection();
                 PersonEmigrationData udrejseIndrejse = personBaseData.getMigration();
                 PersonForeignAddressData udenlandsadresse = personBaseData.getForeignAddress();
                 PersonNameAuthorityTextData navnemyndighed = personBaseData.getNameAuthority();
@@ -296,9 +297,13 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return output;
     }
 
-    protected ObjectNode createBeskyttelseNode(Effect virkning, OffsetDateTime lastUpdated, PersonProtectionData beskyttelse) {
-        ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
-        output.put("beskyttelsestype", beskyttelse.getProtectionType());
+    protected ArrayNode createBeskyttelseNode(Effect virkning, OffsetDateTime lastUpdated, Collection<PersonProtectionData> beskyttelse) {
+        ArrayNode output = objectMapper.createArrayNode();
+        for (PersonProtectionData personProtectionData : beskyttelse) {
+            ObjectNode item = createVirkningObjectNode(virkning, lastUpdated);
+            item.put("beskyttelsestype", personProtectionData.getProtectionType());
+            output.add(item);
+        }
         return output;
     }
 

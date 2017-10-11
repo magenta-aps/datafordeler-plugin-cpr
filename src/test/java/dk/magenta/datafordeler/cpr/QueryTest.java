@@ -3,10 +3,12 @@ package dk.magenta.datafordeler.cpr;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.Application;
+import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.user.DafoUserManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
+import dk.magenta.datafordeler.cpr.data.person.PersonEntityService;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
 import org.junit.Assert;
@@ -97,7 +99,7 @@ public class QueryTest {
         ParameterMap searchParameters = new ParameterMap();
         searchParameters.add("fornavn", "Tester");
         ResponseEntity<String> response = restSearch(searchParameters, "person");
-        Assert.assertEquals(403, response.getStatusCode().value());
+        Assert.assertEquals(FapiService.getDebugDisableSecurity() ? 200 : 403, response.getStatusCode().value());
 
         testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
         this.applyAccess(testUserDetails);
@@ -185,7 +187,7 @@ public class QueryTest {
         searchParameters.add("vejkode", "001");
         searchParameters.add("husnummer", "1");
         ResponseEntity<String> response = restSearch(searchParameters, "residence");
-        Assert.assertEquals(403, response.getStatusCode().value());
+        Assert.assertEquals(FapiService.getDebugDisableSecurity() ? 200 : 403, response.getStatusCode().value());
 
         testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
         this.applyAccess(testUserDetails);
@@ -273,7 +275,7 @@ public class QueryTest {
         ParameterMap searchParameters = new ParameterMap();
         searchParameters.add("vejnavn", "TestVej");
         ResponseEntity<String> response = restSearch(searchParameters, "road");
-        Assert.assertEquals(403, response.getStatusCode().value());
+        Assert.assertEquals(FapiService.getDebugDisableSecurity() ? 200 : 403, response.getStatusCode().value());
 
         testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
         this.applyAccess(testUserDetails);

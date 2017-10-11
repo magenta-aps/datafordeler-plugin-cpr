@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * Created by lars on 22-06-17.
@@ -123,5 +124,25 @@ public class PersonForeignAddressData extends AuthorityDetailData {
         map.put("addressLine4", this.addressLine4);
         map.put("addressLine5", this.addressLine5);
         return map;
+    }
+
+    public String join(String separator) {
+        StringJoiner joiner = new StringJoiner(separator);
+        if (this.addressLine1 != null && !this.addressLine1.isEmpty()) {
+            joiner.add(this.addressLine1);
+        }
+        if (this.addressLine2 != null && !this.addressLine2.isEmpty()) {
+            joiner.add(this.addressLine2);
+        }
+        if (this.addressLine3 != null && !this.addressLine3.isEmpty()) {
+            joiner.add(this.addressLine3);
+        }
+        if (this.addressLine4 != null && !this.addressLine4.isEmpty()) {
+            joiner.add(this.addressLine4);
+        }
+        if (this.addressLine5 != null && !this.addressLine5.isEmpty()) {
+            joiner.add(this.addressLine5);
+        }
+        return joiner.toString();
     }
 }

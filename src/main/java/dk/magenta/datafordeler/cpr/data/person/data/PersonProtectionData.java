@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
@@ -16,6 +17,14 @@ import java.util.Map;
 @Table(name = "cpr_person_protection")
 public class PersonProtectionData extends AuthorityDetailData {
 
+/*
+    public static final String DB_FIELD_BASEDATA = "baseData";
+    @ManyToOne
+    private PersonBaseData baseData;
+
+    public void setBaseData(PersonBaseData baseData) {
+        this.baseData = baseData;
+    }*/
 
     public static final String DB_FIELD_TYPE = "protectionType";
     public static final String IO_FIELD_TYPE = "beskyttelsestype";

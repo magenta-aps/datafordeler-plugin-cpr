@@ -2,17 +2,14 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.cpr.data.CprData;
+import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import org.hibernate.Session;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lars on 16-05-17.
@@ -82,8 +79,8 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private PersonNameAuthorityTextData nameAuthority;
 
     public static final String DB_FIELD_PROTECTION = "protection";
-    @OneToOne(optional = true, cascade = CascadeType.ALL)
-    private PersonProtectionData protection;
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<PersonProtectionData> protection = new HashSet<>();
 
     public static final String DB_FIELD_MIGRATION = "migration";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
@@ -171,7 +168,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         return nameAuthority;
     }
 
-    public PersonProtectionData getProtection() {
+    public Collection<PersonProtectionData> getProtection() {
         return protection;
     }
 
@@ -220,7 +217,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.coreData.setAuthority(authority);
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         if (this.status == null) {
             this.status = new PersonStatusData();
         }
@@ -294,7 +291,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     }
 
     public void setAddress(int authority, String bygningsnummer, String bynavn, int cprKommunekode,
-                           String cprKommunenavn, String cprVejkode, String darAdresse, String etage,
+                           String cprKommunenavn, int cprVejkode, String darAdresse, String etage,
                            String husnummer, String postdistrikt, String postnummer, String sideDoer,
                            String adresselinie1, String adresselinie2, String adresselinie3, String adresselinie4,
                            String adresselinie5, int addressTextType, int startAuthority) {
@@ -392,13 +389,17 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.nameAuthority.setText(text);
     }
 
-    public void setProtection(int authority, int beskyttelsestype, boolean reportMarking) {
-        if (this.protection == null) {
-            this.protection = new PersonProtectionData();
+    public void addProtection(int authority, int beskyttelsestype, boolean reportMarking) {
+        for (PersonProtectionData existing : this.protection) {
+            if (existing.getProtectionType() == beskyttelsestype && existing.getReportMarking() == reportMarking) {
+                return;
+            }
         }
-        this.protection.setAuthority(authority);
-        this.protection.setProtectionType(beskyttelsestype);
-        this.protection.setReportMarking(reportMarking);
+        PersonProtectionData protection = new PersonProtectionData();
+        protection.setAuthority(authority);
+        protection.setProtectionType(beskyttelsestype);
+        protection.setReportMarking(reportMarking);
+        this.protection.add(protection);
     }
 
     public void setEmigration(int authority, int countryCode) {
@@ -595,7 +596,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             lookupDefinition.putAll("nameAuthority", this.nameAuthority.databaseFields());
         }
         if (this.protection != null) {
-            lookupDefinition.putAll("protection", this.protection.databaseFields());
+            lookupDefinition.putAll("protection", DetailData.listDatabaseFields(this.protection));
         }
         if (this.migration != null) {
             lookupDefinition.putAll("migration", this.migration.databaseFields());

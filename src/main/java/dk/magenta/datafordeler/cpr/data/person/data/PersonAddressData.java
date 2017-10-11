@@ -92,11 +92,11 @@ public class PersonAddressData extends AuthorityDetailData {
     @Column(name = DB_FIELD_ROAD_CODE)
     @JsonProperty(value = IO_FIELD_ROAD_CODE)
     @XmlElement(name = IO_FIELD_ROAD_CODE)
-    private String roadCode;
+    private int roadCode;
 
-    public String getRoadCode() { return this.roadCode; }
+    public int getRoadCode() { return this.roadCode; }
 
-    public void setRoadCode(String roadCode) {
+    public void setRoadCode(int roadCode) {
         this.roadCode = roadCode;
     }
 
@@ -306,6 +306,7 @@ public class PersonAddressData extends AuthorityDetailData {
 
 
 
+
     //Ikke i grunddatamodellen
 
     @Transient
@@ -361,4 +362,5 @@ public class PersonAddressData extends AuthorityDetailData {
         //map.put("startautoritet", this.startautoritet);
         return map;
     }
+
 }

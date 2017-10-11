@@ -83,7 +83,6 @@ public abstract class LineParser<T extends CprRecord> {
                     batchSize = 0;
                 }
             }
-            this.log.trace("    parsed " + (batchCount * 100000 + batchSize) + " lines");
             int count = records.size();
             this.log.info("Parse complete (" + count + " usable entries found)");
             return records;

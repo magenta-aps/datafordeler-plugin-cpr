@@ -196,7 +196,7 @@ public class CprRegisterManager extends RegisterManager {
     }
 
     private ItemInputStream<CprSourceData> parseEventResponse(final InputStream responseBody, final String schema) throws DataFordelerException {
-        final int linesPerEvent = 100;
+        final int linesPerEvent = 1000;
         PipedInputStream inputStream = new PipedInputStream();
 
         try {
@@ -209,6 +209,7 @@ public class CprRegisterManager extends RegisterManager {
                 public void run() {
                     BufferedReader responseReader = new BufferedReader(new InputStreamReader(responseBody, Charset.forName("iso-8859-1")));
                     int eventCount = 0;
+                    long totalLines = 0;
                     try {
                         String line;
 
@@ -223,13 +224,14 @@ public class CprRegisterManager extends RegisterManager {
                                 lines.clear();
                                 lineCount = 0;
                                 eventCount++;
+                                totalLines++;
                             }
                         }
                         if (lineCount > 0) {
                             objectOutputStream.writeObject(CprRegisterManager.this.wrap(lines, schema, dataIdBase, eventCount));
                             eventCount++;
                         }
-                        CprRegisterManager.this.log.info("Packed "+eventCount+" data objects");
+                        CprRegisterManager.this.log.info("Packed "+eventCount+" data objects with " + totalLines + " lines");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

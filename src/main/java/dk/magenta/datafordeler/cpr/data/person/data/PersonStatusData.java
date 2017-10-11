@@ -23,13 +23,13 @@ public class PersonStatusData extends DetailData {
     @Column(name = DB_FIELD_STATUS)
     @JsonProperty(value = IO_FIELD_STATUS)
     @XmlElement(name = IO_FIELD_STATUS)
-    private String status;
+    private int status;
 
-    public String getStatus() {
+    public int getStatus() {
         return this.status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
@@ -41,9 +41,7 @@ public class PersonStatusData extends DetailData {
     @Override
     public Map<String, Object> asMap() {
         HashMap<String, Object> map = new HashMap<>();
-        if (this.status != null) {
-            map.put("status", this.status);
-        }
+        map.put("status", this.status);
         return map;
     }
 }

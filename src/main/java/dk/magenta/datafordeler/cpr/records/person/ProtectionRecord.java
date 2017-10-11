@@ -40,7 +40,7 @@ public class ProtectionRecord extends PersonDataRecord {
     @Override
     public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
         if (this.protectionTemporality.matches(registrationTime, effect)) {
-            data.setProtection(
+            data.addProtection(
                 // int authority,
                 this.getInt("start_mynkod-beskyttelse"),
                 // int beskyttelsestype,

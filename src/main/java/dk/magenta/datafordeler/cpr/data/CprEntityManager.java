@@ -203,7 +203,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             }
             log.debug("Loaded a total of "+linesRead+" lines");
             log.debug("Processing batch of "+i+" lines");
-            InputStream chunk = null;
+            InputStream chunk;
             try {
                 chunk = new ByteArrayInputStream(buffer.toString().getBytes(charset));
             } catch (UnsupportedEncodingException e) {
@@ -226,7 +226,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     if (entity == null) {
                         entity = QueryManager.getEntity(session, uuid, this.getEntityClass());
                         if (entity == null) {
-                            System.out.println("Create new entity for uuid " + uuid);
                             entity = this.createBasicEntity(record);
                             entity.setUUID(uuid);
                             entity.setDomain(CprPlugin.getDomain());
@@ -342,7 +341,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     baseData.addRecordData(recordData);
                 }
             }
-            System.out.println(baseData.asMap());
             timer.measure(TASK_POPULATE_DATA);
         }
 

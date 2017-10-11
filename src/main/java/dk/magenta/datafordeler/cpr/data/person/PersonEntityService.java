@@ -74,14 +74,11 @@ public class PersonEntityService extends FapiService<PersonEntity, PersonQuery> 
 
     @Override
     protected void applyAreaRestrictionsToQuery(PersonQuery query, DafoUserDetails user) throws InvalidClientInputException {
-        System.out.println("Applying restrictions to query");
         Collection<AreaRestriction> restrictions = user.getAreaRestrictionsForRole(CprRolesDefinition.READ_CPR_ROLE);
         AreaRestrictionDefinition areaRestrictionDefinition = this.cprPlugin.getAreaRestrictionDefinition();
         AreaRestrictionType municipalityType = areaRestrictionDefinition.getAreaRestrictionTypeByName(CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER);
         for (AreaRestriction restriction : restrictions) {
-            System.out.println("type: "+restriction.getType());
             if (restriction.getType() == municipalityType) {
-                System.out.println("restriction.getValue(): "+restriction.getValue());
                 query.addKommunekode(restriction.getValue());
             }
         }

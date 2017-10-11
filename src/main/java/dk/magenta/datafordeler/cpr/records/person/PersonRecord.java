@@ -95,7 +95,7 @@ public class PersonRecord extends PersonDataRecord {
         data.setPersonnummer(this.getString("pnrgaeld", false));
 
         if (this.statusTemporality.matches(registrationTime, effect)) {
-            data.setStatus(this.get("status"));
+            data.setStatus(this.getInt("status", true));
             updated = true;
         }
 
