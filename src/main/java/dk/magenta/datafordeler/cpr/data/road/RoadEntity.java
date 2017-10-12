@@ -23,9 +23,9 @@ import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_ROADCODE
 @Table(
     name="cpr_road_entity",
     indexes = {
-            @Index(name = "identification", columnList = "identification_id"),
-        @Index(name = "vejKode", columnList = DB_FIELD_ROADCODE),
-        @Index(name = "komKodeVejKode", columnList = DB_FIELD_MUNICIPALITYCODE+","+DB_FIELD_ROADCODE)
+            @Index(name = "cpr_road_identification", columnList = "identification_id"),
+            @Index(name = "cpr_road_municipality_code", columnList = DB_FIELD_MUNICIPALITYCODE),
+            @Index(name = "cpr_road_code", columnList = DB_FIELD_ROADCODE)
     }
 )
 @XmlAccessorType(XmlAccessType.FIELD)

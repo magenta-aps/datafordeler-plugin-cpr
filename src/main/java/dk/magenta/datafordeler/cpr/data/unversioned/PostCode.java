@@ -6,6 +6,7 @@ import org.hibernate.Session;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Collections;
@@ -14,7 +15,9 @@ import java.util.Collections;
  * Created by lars on 29-06-17.
  */
 @Entity
-@Table(name="cpr_postcode")
+@Table(name="cpr_postcode", indexes = {
+        @Index(name = "cpr_postcode", columnList = "postnummer")
+})
 public class PostCode extends UnversionedEntity {
 
     @Column

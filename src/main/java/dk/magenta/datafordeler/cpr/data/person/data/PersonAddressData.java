@@ -3,19 +3,20 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
+
+import static dk.magenta.datafordeler.cpr.data.person.data.PersonAddressData.DB_FIELD_MUNICIPALITY_CODE;
 
 /**
  * Created by lars on 22-06-17.
  */
 @Entity
-@Table(name = "cpr_person_address")
+@Table(name = "cpr_person_address", indexes = {
+        @Index(name = "cpr_person_address_municipality", columnList = DB_FIELD_MUNICIPALITY_CODE)
+})
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PersonAddressData extends AuthorityDetailData {
 

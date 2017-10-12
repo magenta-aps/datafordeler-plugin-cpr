@@ -20,8 +20,8 @@ import static dk.magenta.datafordeler.cpr.data.person.PersonEntity.DB_FIELD_CPR_
  */
 @javax.persistence.Entity
 @Table(name="cpr_person_entity", indexes = {
-        @Index(name = "identification", columnList = "identification_id"),
-        @Index(name = "personnummer", columnList = DB_FIELD_CPR_NUMBER)
+        @Index(name = "cpr_person_identification", columnList = "identification_id"),
+        @Index(name = "cpr_person_personnummer", columnList = DB_FIELD_CPR_NUMBER)
 })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {

@@ -2,19 +2,22 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
+
+import static dk.magenta.datafordeler.cpr.data.person.data.PersonNameData.DB_FIELD_FIRST_NAMES;
+import static dk.magenta.datafordeler.cpr.data.person.data.PersonNameData.DB_FIELD_LAST_NAME;
 
 /**
  * Created by lars on 22-06-17.
  */
 @Entity
-@Table(name = "cpr_person_name")
+@Table(name = "cpr_person_name", indexes = {
+        @Index(name = "cpr_person_name_firstname", columnList = DB_FIELD_FIRST_NAMES),
+        @Index(name = "cpr_person_name_lastname", columnList = DB_FIELD_LAST_NAME),
+})
 public class PersonNameData extends AuthorityDetailData {
 
 

@@ -11,7 +11,9 @@ import java.time.OffsetDateTime;
  */
 @javax.persistence.Entity
 @Table(name="cpr_residence_registration", indexes = {
-        @Index(name = "entity", columnList = "entity_id")
+        @Index(name = "cpr_residence_entity", columnList = "entity_id"),
+        @Index(name = "cpr_residence_registration_from", columnList = "registrationFrom"),
+        @Index(name = "cpr_residence_registration_to", columnList = "registrationTo")
 })
 public class ResidenceRegistration extends CprRegistration<ResidenceEntity, ResidenceRegistration, ResidenceEffect> {
 

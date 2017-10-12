@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 @javax.persistence.Entity
 @Table(name="cpr_residence_entity",  indexes = {
-        @Index(name = "identification", columnList = "identification_id")
+        @Index(name = "cpr_residence_identification", columnList = "identification_id")
 })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ResidenceEntity extends Entity<ResidenceEntity, ResidenceRegistration> {

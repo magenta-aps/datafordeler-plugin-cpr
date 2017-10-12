@@ -19,7 +19,9 @@ import java.util.Map;
  * Created by lars on 16-05-17.
  */
 @Entity
-@Table(name="cpr_road_data")
+@Table(name="cpr_road_data", indexes = {
+        @Index(name = "cpr_road_lastUpdated", columnList = "lastUpdated")
+})
 public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
 
     public static final String DB_FIELD_CORE = "coreData";

@@ -6,16 +6,22 @@ import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
 
+import static dk.magenta.datafordeler.cpr.data.road.data.RoadCoreData.DB_FIELD_ROAD_NAME;
+
+
 /**
  * Created by lars on 16-05-17.
  */
 @Entity
-@Table(name="cpr_road_core")
+@Table(name="cpr_road_core", indexes = {
+        @Index(name = "cpr_road_name", columnList = DB_FIELD_ROAD_NAME),
+})
 public class RoadCoreData extends DetailData {
 
     public static final String DB_FIELD_TO_MUNICIPALITY = "toMunicipality";

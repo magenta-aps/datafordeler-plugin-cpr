@@ -8,16 +8,26 @@ import org.hibernate.Session;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
 
+import static dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData.*;
+
 /**
  * Created by lars on 29-06-17.
  */
 @Entity
-@Table(name="cpr_residence_data")
+@Table(name="cpr_residence_data", indexes = {
+        @Index(name = "cpr_residence_lastUpdated", columnList = "lastUpdated"),
+        @Index(name = "cpr_residence_municipality_code", columnList = DB_FIELD_MUNICIPALITY_CODE),
+        @Index(name = "cpr_residence_road_code", columnList = DB_FIELD_ROAD_CODE),
+        @Index(name = "cpr_residence_housenumber", columnList = DB_FIELD_HOUSENUMBER),
+        @Index(name = "cpr_residence_floor", columnList = DB_FIELD_FLOOR),
+        @Index(name = "cpr_residence_door", columnList = DB_FIELD_DOOR),
+})
 public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseData> {
 
     public static final String DB_FIELD_MUNICIPALITY_CODE = "municipalityCode";

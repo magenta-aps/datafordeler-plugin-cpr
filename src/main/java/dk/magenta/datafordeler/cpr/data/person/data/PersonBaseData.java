@@ -11,11 +11,18 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData.DB_FIELD_ADDRESS;
+import static dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData.DB_FIELD_NAME;
+
 /**
  * Created by lars on 16-05-17.
  */
 @Entity
-@Table(name="cpr_person_data")
+@Table(name="cpr_person_data", indexes = {
+        @Index(name = "cpr_person_lastUpdated", columnList = "lastUpdated"),
+        @Index(name = "cpr_person_name", columnList = DB_FIELD_NAME + "_id"),
+        @Index(name = "cpr_person_address", columnList = DB_FIELD_ADDRESS + "_id")
+})
 public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     public static final String DB_FIELD_CORE = "coreData";

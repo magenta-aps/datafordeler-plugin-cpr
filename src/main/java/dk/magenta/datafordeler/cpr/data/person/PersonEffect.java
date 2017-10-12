@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.data.person;
 import dk.magenta.datafordeler.cpr.data.CprEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
+import javax.persistence.Index;
 import javax.persistence.Table;
 import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
@@ -11,7 +12,10 @@ import java.time.temporal.TemporalAccessor;
  * Created by lars on 16-05-17.
  */
 @javax.persistence.Entity
-@Table(name="cpr_person_effect")
+@Table(name="cpr_person_effect", indexes = {
+        @Index(name = "cpr_person_effect_from", columnList = "effectFrom"),
+        @Index(name = "cpr_person_effect_to", columnList = "effectTo")
+})
 public class PersonEffect extends CprEffect<PersonRegistration, PersonEffect, PersonBaseData> {
 
     public PersonEffect() {
