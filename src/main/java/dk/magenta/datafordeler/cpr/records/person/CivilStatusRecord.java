@@ -55,7 +55,7 @@ public class CivilStatusRecord extends PersonDataRecord {
                 // String civilStatus,
                 this.getString("civst", true),
                 // String spouseCpr,
-                this.getString("aegtepnr", true),
+                this.getString("aegtepnr", false),
                 // LocalDate spouseBirthdate,
                 this.getDate("aegtefoed_dt"),
                 // boolean spouseBirthdateUncertain,
