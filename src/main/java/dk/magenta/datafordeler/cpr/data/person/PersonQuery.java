@@ -22,15 +22,21 @@ public class PersonQuery extends CprQuery<PersonEntity> {
     public static final String KOMMUNEKODE = "kommunekode";
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = PERSONNUMMER)
-    private String personnummer;
+    private List<String> personnumre = new ArrayList<>();
 
-    public String getPersonnummer() {
-        return this.personnummer;
+    public Collection<String> getPersonnumre() {
+        return this.personnumre;
+    }
+
+    public void addPersonnummer(String personnummer) {
+        this.personnumre.add(personnummer);
     }
 
     public void setPersonnummer(String personnummer) {
-        this.personnummer = personnummer;
+        this.personnumre.clear();
+        this.addPersonnummer(personnummer);
     }
+
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = FORNAVNE)
     private String fornavn;
@@ -76,7 +82,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
     @Override
     public Map<String, Object> getSearchParameters() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put(PERSONNUMMER, this.personnummer);
+        map.put(PERSONNUMMER, this.personnumre);
         map.put(FORNAVNE, this.fornavn);
         map.put(EFTERNAVN, this.efternavn);
         map.put(KOMMUNEKODE, this.kommunekoder);
@@ -85,7 +91,11 @@ public class PersonQuery extends CprQuery<PersonEntity> {
 
     @Override
     public void setFromParameters(ParameterMap parameters) {
-        this.setPersonnummer(parameters.getFirst(PERSONNUMMER));
+        if (parameters.containsKey(PERSONNUMMER)) {
+            for (String personnummer : parameters.get(PERSONNUMMER)) {
+                this.addPersonnummer(personnummer);
+            }
+        }
         this.setFornavn(parameters.getFirst(FORNAVNE));
         this.setEfternavn(parameters.getFirst(EFTERNAVN));
         if (parameters.containsKey(KOMMUNEKODE)) {
@@ -109,8 +119,8 @@ public class PersonQuery extends CprQuery<PersonEntity> {
     @Override
     public LookupDefinition getLookupDefinition() {
         LookupDefinition lookupDefinition = super.getLookupDefinition();
-        if (this.personnummer != null) {
-            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_CPR_NUMBER, this.personnummer, String.class);
+        if (!this.personnumre.isEmpty()) {
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_CPR_NUMBER, this.personnumre, String.class);
         }
         if (this.fornavn != null) {
             lookupDefinition.put(PersonBaseData.DB_FIELD_NAME + LookupDefinition.separator + PersonNameData.DB_FIELD_FIRST_NAMES, this.fornavn, String.class);
