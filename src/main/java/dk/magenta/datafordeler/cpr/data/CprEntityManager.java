@@ -345,21 +345,21 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             }
             timer.measure(TASK_POPULATE_DATA);
         }
-
-        timer.start(TASK_SAVE);
-        ArrayList<R> registrationList = new ArrayList<>(allRegistrations);
-        Collections.sort(registrationList);
-        for (R registration : registrationList) {
-            registration.setLastImportTime(importMetadata.getImportTime());
-            try {
-                QueryManager.saveRegistration(session, entity, registration, false, false);
-            } catch (DataFordelerException e) {
-                e.printStackTrace();
-            } catch (javax.persistence.EntityNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        timer.measure(TASK_SAVE);
+//
+//        timer.start(TASK_SAVE);
+//        ArrayList<R> registrationList = new ArrayList<>(allRegistrations);
+//        Collections.sort(registrationList);
+//        for (R registration : registrationList) {
+//            registration.setLastImportTime(importMetadata.getImportTime());
+//            try {
+//                QueryManager.saveRegistration(session, entity, registration, false, false);
+//            } catch (DataFordelerException e) {
+//                e.printStackTrace();
+//            } catch (javax.persistence.EntityNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        timer.measure(TASK_SAVE);
 
         return allRegistrations;
     }

@@ -57,8 +57,8 @@ public class CprPlugin extends Plugin {
     @PostConstruct
     public void init() {
         this.registerManager.addEntityManager(this.personEntityManager);
-        this.registerManager.addEntityManager(this.residenceEntityManager);
-        this.registerManager.addEntityManager(this.roadEntityManager);
+        //this.registerManager.addEntityManager(this.residenceEntityManager);
+        //this.registerManager.addEntityManager(this.roadEntityManager);
     }
 
     /**
