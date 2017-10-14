@@ -170,10 +170,10 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
                 }
             }
             linesRead++;
-            System.out.println(linesRead + "lines read");
+            System.out.println(linesRead + " lines read");
         }
         rejectList.clear();
-        System.out.println(linesRead + "lines read into memory");
+        System.out.println(linesRead + " lines read into memory");
         int count = cache.size();
 
         Session session = this.getSessionManager().getSessionFactory().openSession();
@@ -190,12 +190,18 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
                 entity.setUUID(uuid);
                 entity.setDomain(CprPlugin.getDomain());
             }
+            int komkod = 0;
+            for (PersonDataRecord record : records) {
+                if (record.getRecordType() == RECORDTYPE_DOMESTIC_ADDRESS) {
+                    komkod = ((AddressRecord) record).getMunicipalityCode();
+                }
+            }
 
             Collection<PersonRegistration> entityRegistrations = this.parseRegistration(entity, records, session, importMetadata);
             allRegistrations.addAll(entityRegistrations);
 
             counter++;
-            System.out.println(counter + " / " + count);
+            System.out.println(counter + " / " + count + " " + komkod);
         }
 
         transaction.commit();
