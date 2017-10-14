@@ -97,6 +97,6 @@ public abstract class LineParser<T extends CprRecord> {
 
 
 
-    protected abstract T parseLine(String line);
+    public abstract T parseLine(String line);
 
 }

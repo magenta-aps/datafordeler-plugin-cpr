@@ -24,7 +24,7 @@ public class RoadParser extends CprSubParser<RoadDataRecord> {
     }
 
     @Override
-    protected RoadDataRecord parseLine(String recordType, String line) {
+    public RoadDataRecord parseLine(String recordType, String line) {
         this.logType(recordType);
         try {
             switch (recordType) {

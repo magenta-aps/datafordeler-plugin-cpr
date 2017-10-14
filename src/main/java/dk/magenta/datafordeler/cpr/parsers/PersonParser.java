@@ -24,7 +24,7 @@ public class PersonParser extends CprSubParser<PersonDataRecord> {
     }
 
     @Override
-    protected PersonDataRecord parseLine(String recordType, String line) {
+    public PersonDataRecord parseLine(String recordType, String line) {
         this.logType(recordType);
         try {
             switch (recordType) {

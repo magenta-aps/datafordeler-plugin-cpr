@@ -213,7 +213,6 @@ public class CprRegisterManager extends RegisterManager {
                     try {
                         String line;
 
-                        // One line per event
                         int lineCount = 0;
                         ArrayList<String> lines = new ArrayList<>();
                         while ((line = responseReader.readLine()) != null) {

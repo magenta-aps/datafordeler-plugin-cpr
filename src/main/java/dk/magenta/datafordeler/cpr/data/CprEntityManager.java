@@ -20,6 +20,7 @@ import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
+import dk.magenta.datafordeler.cpr.records.Record;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -142,7 +143,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         return this.log;
     }
 
-    private CprConfiguration getConfiguration() {
+    protected CprConfiguration getConfiguration() {
         return this.cprConfigurationManager.getConfiguration();
     }
 
@@ -175,7 +176,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
 
         CprSubParser<T> parser = this.getParser();
-        OffsetDateTime timestamp = OffsetDateTime.now();
+
+
 
         boolean done = false;
         long linesRead = 0;
@@ -273,7 +275,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     }
 
 
-    private Collection<R> parseRegistration(E entity, List<T> records, Session session, ImportMetadata importMetadata) {
+    protected Collection<R> parseRegistration(E entity, List<T> records, Session session, ImportMetadata importMetadata) {
 
         HashSet<R> allRegistrations = new HashSet<>();
         ListHashMap<Bitemporality, T> groups = this.sortIntoGroups(records);

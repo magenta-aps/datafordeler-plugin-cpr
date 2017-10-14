@@ -22,7 +22,7 @@ public abstract class CprSubParser<T extends CprRecord> extends LineParser<T> {
     }
 
     @Override
-    protected T parseLine(String line) {
+    public T parseLine(String line) {
         return this.parseLine(line.substring(0, 3), line);
     }
 
@@ -30,6 +30,6 @@ public abstract class CprSubParser<T extends CprRecord> extends LineParser<T> {
         this.getLog().debug("Parsing record of type "+recordType);
     }
 
-    protected abstract T parseLine(String recordType, String line);
+    public abstract T parseLine(String recordType, String line);
 
 }
