@@ -177,10 +177,11 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
         int count = cache.size();
 
         Session session = this.getSessionManager().getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-
         int counter = 0;
         for (String cprNumber : acceptList) {
+
+            Transaction transaction = session.beginTransaction();
+
             List<PersonDataRecord> records = cache.get(cprNumber);
             UUID uuid = this.generateUUID(records.get(0));
             PersonEntity entity = QueryManager.getEntity(session, uuid, PersonEntity.class);
@@ -202,9 +203,10 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
 
             counter++;
             System.out.println(counter + " / " + count + " " + komkod);
+
+            transaction.commit();
         }
 
-        transaction.commit();
         session.close();
 
         return allRegistrations;
