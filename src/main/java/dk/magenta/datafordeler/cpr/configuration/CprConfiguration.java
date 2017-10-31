@@ -384,6 +384,7 @@ public class CprConfiguration implements Configuration {
             } catch (URISyntaxException e) {
                 throw new ConfigurationException("Invalid FTP address configured: " + ftpAddress);
             }
+        }
         return null;
     }
 
