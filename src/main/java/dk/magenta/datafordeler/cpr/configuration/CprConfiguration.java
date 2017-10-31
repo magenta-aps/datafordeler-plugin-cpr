@@ -39,6 +39,7 @@ public class CprConfiguration implements Configuration {
     }
 
     public enum RegisterType {
+        DISABLED(-1),
         LOCAL_FILE(0),
         REMOTE_FTP(1);
 
@@ -365,7 +366,9 @@ public class CprConfiguration implements Configuration {
     }
 
     private URI formatURI(RegisterType registerType, String localFile, String ftpAddress) throws ConfigurationException {
-        if (registerType == RegisterType.LOCAL_FILE) {
+        if (registerType == RegisterType.DISABLED) {
+            return null;
+        } else if (registerType == RegisterType.LOCAL_FILE) {
             File file = new File(localFile);
             if (!file.exists()) {
                 String full = "";
@@ -381,7 +384,6 @@ public class CprConfiguration implements Configuration {
             } catch (URISyntaxException e) {
                 throw new ConfigurationException("Invalid FTP address configured: " + ftpAddress);
             }
-        }
         return null;
     }
 

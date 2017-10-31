@@ -147,6 +147,10 @@ public class CprRegisterManager extends RegisterManager {
         if (!(entityManager instanceof CprEntityManager)) {
             throw new WrongSubclassException(CprEntityManager.class, entityManager);
         }
+        if (eventInterface == null) {
+            this.log.info("Not pulling for "+entityManager.toString());
+            return null;
+        }
         this.log.info("Pulling from "+eventInterface.toString() + " for entitymanager "+entityManager);
         CprEntityManager cprEntityManager = (CprEntityManager) entityManager;
         InputStream responseBody = null;
