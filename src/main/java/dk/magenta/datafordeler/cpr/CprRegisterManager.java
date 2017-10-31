@@ -68,7 +68,6 @@ public class CprRegisterManager extends RegisterManager {
     */
     @PostConstruct
     public void init() throws IOException {
-        CprConfiguration configuration = this.configurationManager.getConfiguration();
         if (this.localCopyFolder == null || this.localCopyFolder.isEmpty()) {
             File temp = File.createTempFile("datafordeler-cache","");
             temp.delete();

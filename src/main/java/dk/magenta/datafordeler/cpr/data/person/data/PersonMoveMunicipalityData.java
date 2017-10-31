@@ -15,7 +15,7 @@ import java.util.Map;
  * Created by lars on 22-06-17.
  */
 @Entity
-@Table(name = "cpr_person_address")
+@Table(name = "cpr_person_move_municipality")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PersonMoveMunicipalityData extends AuthorityDetailData {
 
