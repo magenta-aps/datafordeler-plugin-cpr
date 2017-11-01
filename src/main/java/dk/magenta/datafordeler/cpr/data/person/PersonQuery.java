@@ -8,6 +8,7 @@ import dk.magenta.datafordeler.cpr.data.person.data.PersonAddressData;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonCoreData;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonNameData;
+import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 
 import java.util.*;
 
@@ -130,6 +131,9 @@ public class PersonQuery extends CprQuery<PersonEntity> {
         }
         if (!this.kommunekoder.isEmpty()) {
             lookupDefinition.put(PersonBaseData.DB_FIELD_ADDRESS + LookupDefinition.separator + PersonAddressData.DB_FIELD_MUNICIPALITY_CODE, this.kommunekoder, Integer.class);
+        }
+        if (!this.getKommunekodeRestriction().isEmpty()) {
+            lookupDefinition.put(PersonBaseData.DB_FIELD_ADDRESS + LookupDefinition.separator + PersonAddressData.DB_FIELD_MUNICIPALITY_CODE, this.getKommunekodeRestriction(), Integer.class);
         }
         return lookupDefinition;
     }

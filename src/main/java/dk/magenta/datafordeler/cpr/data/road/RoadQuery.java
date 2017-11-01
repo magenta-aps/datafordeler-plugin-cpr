@@ -105,6 +105,9 @@ public class RoadQuery extends CprQuery<RoadEntity> {
         if (!this.kommunekoder.isEmpty()) {
             lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + DB_FIELD_MUNICIPALITYCODE, this.kommunekoder, Integer.class);
         }
+        if (!this.getKommunekodeRestriction().isEmpty()) {
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + DB_FIELD_MUNICIPALITYCODE, this.getKommunekodeRestriction(), Integer.class);
+        }
         return lookupDefinition;
     }
 

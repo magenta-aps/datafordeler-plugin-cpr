@@ -112,6 +112,7 @@ public class QueryTest {
         Assert.assertEquals(1, results.size());
         Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("UUID").asText());
 
+
         testUserDetails.giveAccess(
             plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
                     CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
@@ -121,6 +122,14 @@ public class QueryTest {
         );
         this.applyAccess(testUserDetails);
 
+        response = restSearch(searchParameters, "person");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
+
+        searchParameters.add("kommunekode", "95*");
         response = restSearch(searchParameters, "person");
         Assert.assertEquals(200, response.getStatusCode().value());
         jsonBody = objectMapper.readTree(response.getBody());
