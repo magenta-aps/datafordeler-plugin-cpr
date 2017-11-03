@@ -6,6 +6,7 @@ import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
@@ -17,6 +18,17 @@ import java.util.Map;
 @Entity
 @Table(name="cpr_road_city")
 public class RoadCityData extends DetailData {
+
+    @ManyToOne(targetEntity = RoadBaseData.class)
+    private RoadBaseData roadBaseData;
+
+    public RoadBaseData getRoadBaseData() {
+        return this.roadBaseData;
+    }
+
+    public void setRoadBaseData(RoadBaseData roadBaseData) {
+        this.roadBaseData = roadBaseData;
+    }
 
     public static final String DB_FIELD_HOUSENUMBER_FROM = "houseNumberFrom";
     public static final String IO_FIELD_HOUSENUMBER_FROM = "husnummerFra";

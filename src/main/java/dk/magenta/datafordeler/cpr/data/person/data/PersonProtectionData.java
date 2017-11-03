@@ -17,14 +17,14 @@ import java.util.Map;
 @Table(name = "cpr_person_protection")
 public class PersonProtectionData extends AuthorityDetailData {
 
-/*
-    public static final String DB_FIELD_BASEDATA = "baseData";
-    @ManyToOne
-    private PersonBaseData baseData;
 
-    public void setBaseData(PersonBaseData baseData) {
-        this.baseData = baseData;
-    }*/
+    public static final String DB_FIELD_BASEDATA = "baseData";
+    @ManyToOne(targetEntity = PersonBaseData.class)
+    private PersonBaseData personBaseData;
+
+    public void setBaseData(PersonBaseData personBaseData) {
+        this.personBaseData = personBaseData;
+    }
 
     public static final String DB_FIELD_TYPE = "protectionType";
     public static final String IO_FIELD_TYPE = "beskyttelsestype";

@@ -256,14 +256,15 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            log.info(timer.formatTotal(TASK_PARSE));
+            log.info(timer.formatTotal(TASK_FIND_ENTITY));
+            log.info(timer.formatTotal(TASK_FIND_REGISTRATIONS));
+            log.info(timer.formatTotal(TASK_FIND_ITEMS));
+            log.info(timer.formatTotal(TASK_POPULATE_DATA));
+            log.info(timer.formatTotal(TASK_SAVE));
         }
 
-        log.info(timer.formatTotal(TASK_PARSE));
-        log.info(timer.formatTotal(TASK_FIND_ENTITY));
-        log.info(timer.formatTotal(TASK_FIND_REGISTRATIONS));
-        log.info(timer.formatTotal(TASK_FIND_ITEMS));
-        log.info(timer.formatTotal(TASK_POPULATE_DATA));
-        log.info(timer.formatTotal(TASK_SAVE));
 
         return allRegistrations;
     }

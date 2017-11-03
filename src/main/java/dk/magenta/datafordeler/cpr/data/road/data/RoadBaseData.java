@@ -32,20 +32,20 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
 
     public static final String DB_FIELD_MEMO = "memoData";
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
     @OrderBy("memoNumber")
     private List<RoadMemoData> memoData = new ArrayList<>();
 
 
     public static final String DB_FIELD_POSTCODE = "postcodeData";
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
     private List<RoadPostcodeData> postcodeData = new ArrayList<>();
 
 
     public static final String DB_FIELD_CITY = "cityData";
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
     private List<RoadCityData> cityData = new ArrayList<>();
 
 
@@ -71,6 +71,7 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         if (memoData == null) {
             memoData = new RoadMemoData();
             memoData.setMemoNumber(memoNumber);
+            memoData.setRoadBaseData(this);
             this.memoData.add(memoData);
         }
         memoData.setMemoText(memoText);
@@ -88,6 +89,7 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
             postcodeData.setHouseNumberFrom(houseNumberFrom);
             postcodeData.setHouseNumberTo(houseNumberTo);
             postcodeData.setEven(even);
+            postcodeData.setRoadBaseData(this);
             this.postcodeData.add(postcodeData);
         }
         postcodeData.setPostCode(postCode);
@@ -105,6 +107,7 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
             cityData.setHouseNumberFrom(houseNumberFrom);
             cityData.setHouseNumberTo(houseNumberTo);
             cityData.setEven(even);
+            cityData.setRoadBaseData(this);
             this.cityData.add(cityData);
         }
         cityData.setCityName(cityName);
