@@ -175,7 +175,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
 
         CprSubParser<T> parser = this.getParser();
-        OffsetDateTime timestamp = OffsetDateTime.now();
 
         boolean done = false;
         long linesRead = 0;
@@ -183,7 +182,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         while (!done) {
             timer.start(TASK_CHUNK_HANDLE);
             Session session = this.getSessionManager().getSessionFactory().openSession();
-            Transaction transaction = session.beginTransaction();
 
             timer.start(TASK_PARSE);
             StringJoiner buffer = new StringJoiner("\n");
@@ -218,8 +216,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             // Find Entities (or create those that are missing), and put them in the recordMap
             ListHashMap<E, T> recordMap = new ListHashMap<>();
             HashMap<UUID, E> entityCache = new HashMap<>();
-            for (T record : chunkRecords) {
 
+            Transaction transaction = session.beginTransaction();
+
+            for (T record : chunkRecords) {
                 if (this.filter(record)) {
                     UUID uuid = this.generateUUID(record);
                     E entity = entityCache.get(uuid);
@@ -227,14 +227,17 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                         entity = QueryManager.getEntity(session, uuid, this.getEntityClass());
                         if (entity == null) {
                             entity = this.createBasicEntity(record);
-                            entity.setUUID(uuid);
-                            entity.setDomain(CprPlugin.getDomain());
+                            Identification identification = QueryManager.getOrCreateIdentification(session, uuid, CprPlugin.getDomain());
+                            entity.setIdentifikation(identification);
                         }
                         entityCache.put(uuid, entity);
                     }
                     recordMap.add(entity, record);
                 }
             }
+            session.flush();
+            transaction.commit();
+            transaction = session.beginTransaction();
             log.debug("Batch resulted in "+recordMap.keySet().size()+" unique entities");
             timer.measure(TASK_FIND_ENTITY);
 

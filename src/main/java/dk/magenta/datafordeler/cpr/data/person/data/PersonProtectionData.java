@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Column;
@@ -20,6 +21,7 @@ public class PersonProtectionData extends AuthorityDetailData {
 
     public static final String DB_FIELD_BASEDATA = "baseData";
     @ManyToOne(targetEntity = PersonBaseData.class)
+    @JsonIgnore
     private PersonBaseData personBaseData;
 
     public void setBaseData(PersonBaseData personBaseData) {

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +16,8 @@ import java.util.Map;
 @Table(name="cpr_road_memo")
 public class RoadMemoData extends DetailData {
 
-    @ManyToOne(targetEntity = RoadBaseData.class)
+    @ManyToOne(targetEntity = RoadBaseData.class, fetch = FetchType.EAGER)
+    @JsonIgnore
     private RoadBaseData roadBaseData;
 
     public RoadBaseData getRoadBaseData() {

@@ -33,19 +33,13 @@ public class LocalCopyFtpCommunicator extends FtpCommunicator {
 
   @Override
   public InputStream fetch(URI uri) throws HttpStatusException, DataStreamException {
-    System.out.println("step 1");
-    System.out.println(uri);
 
     try {
       FTPClient ftpClient = this.performConnect(uri);
 
-      System.out.println("step 2");
       List<String> remotePaths = Arrays.asList(ftpClient.listNames(uri.getPath()));
       remotePaths.sort(Comparator.naturalOrder());
       List<String> downloadPaths = this.filterFilesToDownload(remotePaths);
-      System.out.println("step 3");
-
-      System.out.println("Filenames on server "+uri+": "+downloadPaths);
 
       ArrayList<String> currentFiles = new ArrayList<>();
       for (String path : downloadPaths) {
@@ -57,13 +51,10 @@ public class LocalCopyFtpCommunicator extends FtpCommunicator {
         outputStream.close();
         currentFiles.add(fileName);
       }
-      System.out.println("step 4");
       ftpClient.disconnect();
-      System.out.println("step 5");
 
       final List<String> finalList = new ArrayList<>(currentFiles);
       InputStream inputStream = this.buildChainedInputStream(finalList);
-      System.out.println("step 6");
 
       if (inputStream != null) {
         CloseDetectInputStream inputCloser = new CloseDetectInputStream(inputStream);
@@ -86,7 +77,6 @@ public class LocalCopyFtpCommunicator extends FtpCommunicator {
       return inputStream;
 
     } catch (IOException e) {
-      System.out.println("whoa, fail!");
       e.printStackTrace();
       throw new DataStreamException(e);
     }

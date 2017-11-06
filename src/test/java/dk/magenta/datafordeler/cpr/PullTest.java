@@ -17,6 +17,7 @@ import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
 import dk.magenta.datafordeler.cpr.data.road.RoadQuery;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Session;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +52,10 @@ public class PullTest {
     @SpyBean
     private CprConfigurationManager cprConfigurationManager;
 
+    @After
+    public void cleanup() {
+        QueryManager.clearCache();
+    }
 
     @Test
     public void pull() throws Exception {

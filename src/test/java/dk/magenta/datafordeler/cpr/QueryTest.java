@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.Application;
+import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
@@ -11,6 +12,7 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityService;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +59,10 @@ public class QueryTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @After
+    public void cleanup() {
+        QueryManager.clearCache();
+    }
 
     public void loadPerson() throws Exception {
         InputStream testData = QueryTest.class.getResourceAsStream("/persondata.txt");

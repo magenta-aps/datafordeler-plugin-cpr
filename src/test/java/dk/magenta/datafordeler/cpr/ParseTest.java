@@ -16,8 +16,7 @@ import dk.magenta.datafordeler.cpr.data.road.data.RoadMemoData;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadPostcodeData;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -56,6 +55,12 @@ public class ParseTest {
         ImportMetadata importMetadata = new ImportMetadata();
         personEntityManager.parseRegistration(testData, importMetadata);
         testData.close();
+    }
+
+    @Before
+    @After
+    public void cleanup() {
+        QueryManager.clearCache();
     }
 
     private void loadRoad() throws DataFordelerException, IOException {

@@ -22,6 +22,7 @@ public class RoadPostcodeData extends DetailData {
 
 
     @ManyToOne(targetEntity = RoadBaseData.class)
+    @JsonIgnore
     private RoadBaseData roadBaseData;
 
     public RoadBaseData getRoadBaseData() {

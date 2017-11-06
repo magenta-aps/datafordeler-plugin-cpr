@@ -80,7 +80,7 @@ public class CprConfiguration implements Configuration {
     private String personRegisterFtpPassword = "password";
 
     @Column
-    private String personRegisterLocalFile = "data/cprpersondata.txt";
+    private String personRegisterLocalFile = "data/d170608.l534902";
 
     @Column
     @Enumerated(EnumType.ORDINAL)
@@ -93,7 +93,7 @@ public class CprConfiguration implements Configuration {
 
     @Column
     @Enumerated(EnumType.ORDINAL)
-    private RegisterType roadRegisterType = RegisterType.LOCAL_FILE;
+    private RegisterType roadRegisterType = RegisterType.DISABLED;
 
     @Column
     private String roadRegisterFtpAddress = null;
@@ -118,7 +118,7 @@ public class CprConfiguration implements Configuration {
 
     @Column
     @Enumerated(EnumType.ORDINAL)
-    private RegisterType residenceRegisterType = RegisterType.LOCAL_FILE;
+    private RegisterType residenceRegisterType = RegisterType.DISABLED;
 
     @Column
     private String residenceRegisterFtpAddress = null;
