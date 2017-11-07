@@ -314,7 +314,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
             // Find a basedata that matches our effects perfectly
             for (D data : searchPool) {
-                if (data.getEffects().containsAll(effects) && effects.containsAll(data.getEffects())) {
+                Set<V> existingEffects = data.getEffects();
+                if (existingEffects.containsAll(effects) && effects.containsAll(existingEffects)) {
                     baseData = data;
                     log.debug("Reuse existing basedata");
                     break;
@@ -351,10 +352,12 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         timer.start(TASK_SAVE);
         ArrayList<R> registrationList = new ArrayList<>(allRegistrations);
         Collections.sort(registrationList);
+        int i = 0;
         for (R registration : registrationList) {
+            registration.setSequenceNumber(i++);
             registration.setLastImportTime(importMetadata.getImportTime());
             try {
-                QueryManager.saveRegistration(session, entity, registration, false, false);
+                QueryManager.saveRegistration(session, entity, registration, false, false, false);
             } catch (DataFordelerException e) {
                 e.printStackTrace();
             } catch (javax.persistence.EntityNotFoundException e) {
