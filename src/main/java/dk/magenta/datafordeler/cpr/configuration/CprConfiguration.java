@@ -39,9 +39,9 @@ public class CprConfiguration implements Configuration {
     }
 
     public enum RegisterType {
-        DISABLED(-1),
-        LOCAL_FILE(0),
-        REMOTE_FTP(1);
+        DISABLED(0),
+        LOCAL_FILE(1),
+        REMOTE_FTP(2);
 
         private int value;
         RegisterType(int value) {
