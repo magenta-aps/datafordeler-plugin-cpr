@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.Application;
 import dk.magenta.datafordeler.core.database.QueryManager;
+import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
@@ -12,6 +13,8 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityService;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -59,28 +62,34 @@ public class QueryTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private SessionManager sessionManager;
+
     @After
     public void cleanup() {
         QueryManager.clearCache();
     }
 
-    public void loadPerson() throws Exception {
+    public void loadPerson(Session session) throws Exception {
         InputStream testData = QueryTest.class.getResourceAsStream("/persondata.txt");
         ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
         personEntityManager.parseRegistration(testData, importMetadata);
         testData.close();
     }
 
-    public void loadResidence() throws Exception {
+    public void loadResidence(Session session) throws Exception {
         InputStream testData = QueryTest.class.getResourceAsStream("/roaddata.txt");
         ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
         residenceEntityManager.parseRegistration(testData, importMetadata);
         testData.close();
     }
 
-    public void loadRoad() throws Exception {
+    public void loadRoad(Session session) throws Exception {
         InputStream testData = QueryTest.class.getResourceAsStream("/roaddata.txt");
         ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
         roadEntityManager.parseRegistration(testData, importMetadata);
         testData.close();
     }
@@ -99,7 +108,11 @@ public class QueryTest {
 
     @Test
     public void testPersonAccess() throws Exception {
-        loadPerson();
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        loadPerson(session);
+        transaction.commit();
+        session.close();
         TestUserDetails testUserDetails = new TestUserDetails();
 
         ParameterMap searchParameters = new ParameterMap();
@@ -164,7 +177,11 @@ public class QueryTest {
     @Test
     public void testPersonRecordTime() throws Exception {
         OffsetDateTime now = OffsetDateTime.now();
-        loadPerson();
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        loadPerson(session);
+        transaction.commit();
+        session.close();
         TestUserDetails testUserDetails = new TestUserDetails();
         testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
         this.applyAccess(testUserDetails);
@@ -195,7 +212,12 @@ public class QueryTest {
 
     @Test
     public void testResidenceAccess() throws Exception {
-        loadResidence();
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        loadResidence(session);
+        transaction.commit();
+        session.close();
+
         TestUserDetails testUserDetails = new TestUserDetails();
 
         ParameterMap searchParameters = new ParameterMap();
@@ -253,7 +275,12 @@ public class QueryTest {
     @Test
     public void testResidenceRecordTime() throws Exception {
         OffsetDateTime now = OffsetDateTime.now();
-        loadResidence();
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        loadResidence(session);
+        transaction.commit();
+        session.close();
+
         TestUserDetails testUserDetails = new TestUserDetails();
         testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
         this.applyAccess(testUserDetails);
@@ -284,7 +311,12 @@ public class QueryTest {
 
     @Test
     public void testRoadAccess() throws Exception {
-        loadRoad();
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        loadRoad(session);
+        transaction.commit();
+        session.close();
+
         TestUserDetails testUserDetails = new TestUserDetails();
 
         ParameterMap searchParameters = new ParameterMap();
@@ -340,7 +372,12 @@ public class QueryTest {
     @Test
     public void testRoadRecordTime() throws Exception {
         OffsetDateTime now = OffsetDateTime.now();
-        loadRoad();
+        Session session = sessionManager.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        loadRoad(session);
+        transaction.commit();
+        session.close();
+
         TestUserDetails testUserDetails = new TestUserDetails();
         testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
         this.applyAccess(testUserDetails);

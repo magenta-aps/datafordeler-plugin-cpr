@@ -24,7 +24,7 @@ public abstract class LineParser<T extends CprRecord> {
     protected String getEncoding() {
         return null;
     }
-
+/*
     public List<T> parse(InputStream input) {
         BufferedInputStream inputstream = new BufferedInputStream(input);
 
@@ -51,47 +51,38 @@ public abstract class LineParser<T extends CprRecord> {
             }
         }
         return this.parse(inputstream, encoding);
-    }
+    }*/
 
     // TODO: output an objectInputStream
-    public List<T> parse(InputStream input, String encoding) {
-        try {
-            ArrayList<T> records = new ArrayList<>();
+    public List<T> parse(List<String> lines, String encoding) {
+        ArrayList<T> records = new ArrayList<>();
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input, encoding.toUpperCase()));
+        this.log.info("Reading data");
+        int batchSize = 0, batchCount = 0;
 
-            this.log.info("Reading data");
-            int batchSize = 0, batchCount = 0;
-
-            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                line = line.trim();
-                if (line.length() > 3) {
-                    try {
-                        T record = this.parseLine(line);
-                        if (record != null) {
-                            records.add(record);
-                        }
-                    } catch (OutOfMemoryError e) {
-                        System.out.println(line);
+        for (String line : lines) {
+            line = line.trim();
+            if (line.length() > 3) {
+                try {
+                    T record = this.parseLine(line);
+                    if (record != null) {
+                        records.add(record);
                     }
-                }
-                batchSize++;
-                if (batchSize >= 100000) {
-                    batchCount++;
-                    System.gc();
-                    this.log.trace("    parsed " + (batchCount * batchSize) + " lines");
-                    batchSize = 0;
+                } catch (OutOfMemoryError e) {
+                    System.out.println(line);
                 }
             }
-            int count = records.size();
-            this.log.info("Parse complete (" + count + " usable entries found)");
-            return records;
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            batchSize++;
+            if (batchSize >= 100000) {
+                batchCount++;
+                System.gc();
+                this.log.trace("    parsed " + (batchCount * batchSize) + " lines");
+                batchSize = 0;
+            }
         }
-        this.log.warn("Parse failed");
-        return null;
+        int count = records.size();
+        this.log.info("Parse complete (" + count + " usable entries found)");
+        return records;
     }
 
 

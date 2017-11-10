@@ -57,11 +57,11 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     public String getSchema() {
         return PersonEntity.schema;
     }
-
+/*
     @Override
     public List<PersonRegistration> parseRegistration(String registrationData, ImportMetadata importMetadata) throws DataFordelerException {
         return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)), importMetadata);
-    }
+    }*/
 
     @Override
     protected RegistrationReference createRegistrationReference(URI uri) {

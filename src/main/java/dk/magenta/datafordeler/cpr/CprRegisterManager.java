@@ -143,7 +143,7 @@ public class CprRegisterManager extends RegisterManager {
     * returning.
     */
     @Override
-    public ItemInputStream<? extends PluginSourceData> pullEvents(URI eventInterface, EntityManager entityManager) throws DataFordelerException {
+    public InputStream pullRawData(URI eventInterface, EntityManager entityManager) throws DataFordelerException {
         if (!(entityManager instanceof CprEntityManager)) {
             throw new WrongSubclassException(CprEntityManager.class, entityManager);
         }
@@ -187,36 +187,32 @@ public class CprRegisterManager extends RegisterManager {
             throw new DataStreamException("No data received from source " + eventInterface.toString());
         }
 
-        return this.parseEventResponse(responseBody, entityManager);
+        return responseBody;
     }
 
     @Override
-    protected ItemInputStream<? extends PluginSourceData> parseEventResponse(InputStream inputStream, EntityManager entityManager) throws DataFordelerException {
+    protected ItemInputStream<? extends PluginSourceData> parseEventResponse(InputStream rawData, EntityManager entityManager) throws DataFordelerException {
         if (!(entityManager instanceof CprEntityManager)) {
             throw new WrongSubclassException(CprEntityManager.class, entityManager);
         }
-        return this.parseEventResponse(inputStream, entityManager.getSchema());
-    }
 
-    private ItemInputStream<CprSourceData> parseEventResponse(final InputStream responseBody, final String schema) throws DataFordelerException {
         final int linesPerEvent = 1000;
         PipedInputStream inputStream = new PipedInputStream();
 
         try {
             final PipedOutputStream outputStream = new PipedOutputStream(inputStream);
             final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-            final int dataIdBase = responseBody.hashCode();
+            final int dataIdBase = rawData.hashCode();
+            final String schema = entityManager.getSchema();
 
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    BufferedReader responseReader = new BufferedReader(new InputStreamReader(responseBody, Charset.forName("iso-8859-1")));
+                    BufferedReader responseReader = new BufferedReader(new InputStreamReader(rawData, Charset.forName("iso-8859-1")));
                     int eventCount = 0;
                     long totalLines = 0;
                     try {
                         String line;
-
-                        // One line per event
                         int lineCount = 0;
                         ArrayList<String> lines = new ArrayList<>();
                         while ((line = responseReader.readLine()) != null) {
