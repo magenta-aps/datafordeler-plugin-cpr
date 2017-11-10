@@ -442,6 +442,10 @@ public class ParseTest {
         Assert.assertEquals(5, entity11.getRegistrations().size());
     }
 
+    private static HashSet<String> ignoreKeys = new HashSet<String>();
+    static {
+        ignoreKeys.add("sidstImporteret");
+    }
     private static void assertJsonEquality(JsonNode node1, JsonNode node2, boolean ignoreArrayOrdering, boolean printDifference) {
         try {
             Assert.assertEquals(node1.isNull(), node2.isNull());
@@ -479,7 +483,9 @@ public class ParseTest {
                 while (keys.hasNext()) {
                     String key = keys.next();
                     Assert.assertNotNull(node2.get(key));
-                    assertJsonEquality(node1.get(key), node2.get(key), ignoreArrayOrdering, printDifference);
+                    if (!ignoreKeys.contains(key)) {
+                        assertJsonEquality(node1.get(key), node2.get(key), ignoreArrayOrdering, printDifference);
+                    }
                 }
             } else {
                 Assert.assertEquals(node1.asText(), node2.asText());
