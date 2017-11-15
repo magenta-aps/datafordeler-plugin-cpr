@@ -235,39 +235,32 @@ public class QueryTest {
         loadPerson(session);
         transaction.commit();
         session.close();
-        try {
-            TestUserDetails testUserDetails = new TestUserDetails();
-            testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
-            this.applyAccess(testUserDetails);
 
-            ParameterMap searchParameters = new ParameterMap();
-            searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-            searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        TestUserDetails testUserDetails = new TestUserDetails();
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
 
-            ResponseEntity<String> response = restSearch(searchParameters, "person");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            JsonNode jsonBody = objectMapper.readTree(response.getBody());
-            JsonNode results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(0, results.size());
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
-            searchParameters = new ParameterMap();
-            searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-            searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        ResponseEntity<String> response = restSearch(searchParameters, "person");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = objectMapper.readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
 
-            response = restSearch(searchParameters, "person");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            jsonBody = objectMapper.readTree(response.getBody());
-            results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(1, results.size());
-        } finally {
-            session = sessionManager.getSessionFactory().openSession();
-            session.beginTransaction();
-            deletePerson(session);
-            session.getTransaction().commit();
-            session.close();
-        }
+        searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+        response = restSearch(searchParameters, "person");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
     }
 
 
@@ -278,65 +271,58 @@ public class QueryTest {
         loadResidence(session);
         transaction.commit();
         session.close();
-        try {
-            TestUserDetails testUserDetails = new TestUserDetails();
 
-            ParameterMap searchParameters = new ParameterMap();
-            searchParameters.add("vejkode", "001");
-            searchParameters.add("husnummer", "1");
-            ResponseEntity<String> response = restSearch(searchParameters, "residence");
-            Assert.assertEquals(FapiService.getDebugDisableSecurity() ? 200 : 403, response.getStatusCode().value());
+        TestUserDetails testUserDetails = new TestUserDetails();
 
-            testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
-            this.applyAccess(testUserDetails);
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("vejkode", "001");
+        searchParameters.add("husnummer", "1");
+        ResponseEntity<String> response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(FapiService.getDebugDisableSecurity() ? 200 : 403, response.getStatusCode().value());
 
-            response = restSearch(searchParameters, "residence");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            JsonNode jsonBody = objectMapper.readTree(response.getBody());
-            JsonNode results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(1, results.size());
-            Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("UUID").asText());
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
 
-            testUserDetails.giveAccess(
-                    plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
-                            CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
-                    ).getRestriction(
-                            CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_SERMERSOOQ
-                    )
-            );
-            this.applyAccess(testUserDetails);
+        response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = objectMapper.readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("UUID").asText());
 
-            response = restSearch(searchParameters, "residence");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            jsonBody = objectMapper.readTree(response.getBody());
-            results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(0, results.size());
+        testUserDetails.giveAccess(
+                plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+                ).getRestriction(
+                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_SERMERSOOQ
+                )
+        );
+        this.applyAccess(testUserDetails);
 
-            testUserDetails.giveAccess(
-                    plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
-                            CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
-                    ).getRestriction(
-                            CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_KUJALLEQ
-                    )
-            );
-            this.applyAccess(testUserDetails);
+        response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
 
-            response = restSearch(searchParameters, "residence");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            jsonBody = objectMapper.readTree(response.getBody());
-            results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(1, results.size());
-            Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("UUID").asText());
-        } finally {
-            session = sessionManager.getSessionFactory().openSession();
-            session.beginTransaction();
-            deleteResidence(session);
-            session.getTransaction().commit();
-            session.close();
-        }
+        testUserDetails.giveAccess(
+                plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+                ).getRestriction(
+                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_KUJALLEQ
+                )
+        );
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("UUID").asText());
     }
 
 
@@ -348,40 +334,32 @@ public class QueryTest {
         loadResidence(session);
         transaction.commit();
         session.close();
-        try {
 
-            TestUserDetails testUserDetails = new TestUserDetails();
-            testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
-            this.applyAccess(testUserDetails);
+        TestUserDetails testUserDetails = new TestUserDetails();
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
 
-            ParameterMap searchParameters = new ParameterMap();
-            searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-            searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
-            ResponseEntity<String> response = restSearch(searchParameters, "residence");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            JsonNode jsonBody = objectMapper.readTree(response.getBody());
-            JsonNode results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(0, results.size());
+        ResponseEntity<String> response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = objectMapper.readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
 
-            searchParameters = new ParameterMap();
-            searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-            searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
-            response = restSearch(searchParameters, "residence");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            jsonBody = objectMapper.readTree(response.getBody());
-            results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(2, results.size());
-        } finally {
-            session = sessionManager.getSessionFactory().openSession();
-            session.beginTransaction();
-            deleteResidence(session);
-            session.getTransaction().commit();
-            session.close();
-        }
+        response = restSearch(searchParameters, "residence");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(2, results.size());
     }
 
 
@@ -392,64 +370,58 @@ public class QueryTest {
         loadRoad(session);
         transaction.commit();
         session.close();
-        try {
-            TestUserDetails testUserDetails = new TestUserDetails();
 
-            ParameterMap searchParameters = new ParameterMap();
-            searchParameters.add("vejnavn", "TestVej");
-            ResponseEntity<String> response = restSearch(searchParameters, "road");
-            Assert.assertEquals(FapiService.getDebugDisableSecurity() ? 200 : 403, response.getStatusCode().value());
+        TestUserDetails testUserDetails = new TestUserDetails();
 
-            testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
-            this.applyAccess(testUserDetails);
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("vejnavn", "TestVej");
+        ResponseEntity<String> response = restSearch(searchParameters, "road");
+        Assert.assertEquals(FapiService.getDebugDisableSecurity() ? 200 : 403, response.getStatusCode().value());
 
-            response = restSearch(searchParameters, "road");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            JsonNode jsonBody = objectMapper.readTree(response.getBody());
-            JsonNode results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(1, results.size());
-            Assert.assertEquals("d318815f-1959-3b37-b173-b99b88935c82", results.get(0).get("UUID").asText());
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
 
-            testUserDetails.giveAccess(
-                    plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
-                            CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
-                    ).getRestriction(
-                            CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_SERMERSOOQ
-                    )
-            );
-            this.applyAccess(testUserDetails);
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = objectMapper.readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("d318815f-1959-3b37-b173-b99b88935c82", results.get(0).get("UUID").asText());
 
-            response = restSearch(searchParameters, "road");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            jsonBody = objectMapper.readTree(response.getBody());
-            results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(0, results.size());
+        testUserDetails.giveAccess(
+                plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+                ).getRestriction(
+                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_SERMERSOOQ
+                )
+        );
+        this.applyAccess(testUserDetails);
 
-            testUserDetails.giveAccess(
-                    plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
-                            CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
-                    ).getRestriction(
-                            CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_KUJALLEQ
-                    )
-            );
-            this.applyAccess(testUserDetails);
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
 
-            response = restSearch(searchParameters, "road");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            jsonBody = objectMapper.readTree(response.getBody());
-            results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(1, results.size());
-            Assert.assertEquals("d318815f-1959-3b37-b173-b99b88935c82", results.get(0).get("UUID").asText());
-        } finally {
-            session = sessionManager.getSessionFactory().openSession();
-            session.beginTransaction();
-            deleteRoad(session);
-            session.getTransaction().commit();
-            session.close();
-        }
+        testUserDetails.giveAccess(
+                plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+                ).getRestriction(
+                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_KUJALLEQ
+                )
+        );
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("d318815f-1959-3b37-b173-b99b88935c82", results.get(0).get("UUID").asText());
+
     }
 
     @Test
@@ -460,39 +432,32 @@ public class QueryTest {
         loadRoad(session);
         transaction.commit();
         session.close();
-        try {
-            TestUserDetails testUserDetails = new TestUserDetails();
-            testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
-            this.applyAccess(testUserDetails);
 
-            ParameterMap searchParameters = new ParameterMap();
-            searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-            searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        TestUserDetails testUserDetails = new TestUserDetails();
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
 
-            ResponseEntity<String> response = restSearch(searchParameters, "road");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            JsonNode jsonBody = objectMapper.readTree(response.getBody());
-            JsonNode results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(0, results.size());
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
-            searchParameters = new ParameterMap();
-            searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-            searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        ResponseEntity<String> response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = objectMapper.readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
 
-            response = restSearch(searchParameters, "road");
-            Assert.assertEquals(200, response.getStatusCode().value());
-            jsonBody = objectMapper.readTree(response.getBody());
-            results = jsonBody.get("results");
-            Assert.assertTrue(results.isArray());
-            Assert.assertEquals(9, results.size());
-        } finally {
-            session = sessionManager.getSessionFactory().openSession();
-            session.beginTransaction();
-            deleteRoad(session);
-            session.getTransaction().commit();
-            session.close();
-        }
+        searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(9, results.size());
     }
 
 

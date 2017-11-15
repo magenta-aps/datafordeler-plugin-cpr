@@ -22,8 +22,10 @@ import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.collection.internal.AbstractPersistentCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -257,10 +259,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                         recordMap.add(entity, record);
                     }
                 }
-                session.flush();
-                session.clear();
-                //transaction.commit();
-                //transaction = session.beginTransaction();
                 log.debug("Batch resulted in " + recordMap.keySet().size() + " unique entities");
                 timer.measure(TASK_FIND_ENTITY);
 
@@ -269,8 +267,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     Collection<R> entityRegistrations = this.parseRegistration(entity, records, session, importMetadata);
                     allRegistrations.addAll(entityRegistrations);
                 }
-                //transaction.commit();
-                //session.close();
+                session.flush();
+                session.clear();
                 timer.measure(TASK_CHUNK_HANDLE);
                 long chunkTime = timer.getTotal(TASK_CHUNK_HANDLE);
                 timer.reset(TASK_CHUNK_HANDLE);
@@ -338,8 +336,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
             // Find a basedata that matches our effects perfectly
             System.out.println("session open: "+session.isOpen());
+            Hibernate.initialize(effects);
             for (D data : searchPool) {
                 Set<V> existingEffects = data.getEffects();
+                Hibernate.initialize(existingEffects);
                 if (existingEffects.containsAll(effects) && effects.containsAll(existingEffects)) {
                     baseData = data;
                     log.debug("Reuse existing basedata");
