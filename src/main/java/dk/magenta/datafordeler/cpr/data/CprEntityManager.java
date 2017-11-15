@@ -335,11 +335,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             }
 
             // Find a basedata that matches our effects perfectly
-            System.out.println("session open: "+session.isOpen());
-            Hibernate.initialize(effects);
             for (D data : searchPool) {
                 Set<V> existingEffects = data.getEffects();
-                Hibernate.initialize(existingEffects);
                 if (existingEffects.containsAll(effects) && effects.containsAll(existingEffects)) {
                     baseData = data;
                     log.debug("Reuse existing basedata");
