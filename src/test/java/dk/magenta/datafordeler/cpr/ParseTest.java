@@ -61,7 +61,7 @@ public class ParseTest {
     @Before
     @After
     public void cleanup() {
-        QueryManager.clearCache();
+        QueryManager.clearCaches();
     }
 
     private void loadRoad(Session session) throws DataFordelerException, IOException {

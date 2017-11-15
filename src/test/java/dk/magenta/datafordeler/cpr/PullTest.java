@@ -7,8 +7,10 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RecordCollection;
 import dk.magenta.datafordeler.core.database.RecordData;
 import dk.magenta.datafordeler.core.database.SessionManager;
+import dk.magenta.datafordeler.core.plugin.FtpCommunicator;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
+import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.person.PersonQuery;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
@@ -21,18 +23,31 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -52,9 +67,34 @@ public class PullTest {
     @SpyBean
     private CprConfigurationManager cprConfigurationManager;
 
+    @SpyBean
+    private CprRegisterManager cprRegisterManager;
+
     @After
     public void cleanup() {
-        QueryManager.clearCache();
+        QueryManager.clearCaches();
+    }
+
+    private static SSLSocketFactory getTrustAllSSLSocketFactory() {
+        TrustManager[] trustManager = new TrustManager[] { new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        } };
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustManager, new SecureRandom());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+        return sslContext.getSocketFactory();
     }
 
     @Test
@@ -62,6 +102,19 @@ public class PullTest {
 
         CprConfiguration configuration = ((CprConfigurationManager) plugin.getConfigurationManager()).getConfiguration();
         when(cprConfigurationManager.getConfiguration()).thenReturn(configuration);
+
+        CprRegisterManager registerManager = (CprRegisterManager) plugin.getRegisterManager();
+        registerManager.setProxyString(null);
+
+        doAnswer(new Answer<FtpCommunicator>() {
+            @Override
+            public FtpCommunicator answer(InvocationOnMock invocation) throws Throwable {
+                FtpCommunicator ftpCommunicator = (FtpCommunicator) invocation.callRealMethod();
+                ftpCommunicator.setSslSocketFactory(PullTest.getTrustAllSSLSocketFactory());
+                return ftpCommunicator;
+            }
+        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprEntityManager.class));
+
 
         String username = "test";
         String password = "test";
