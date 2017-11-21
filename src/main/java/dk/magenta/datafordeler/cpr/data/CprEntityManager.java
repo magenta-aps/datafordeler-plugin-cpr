@@ -52,6 +52,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     @Autowired
     Stopwatch timer;
 
+    private static boolean SAVE_RECORD_DATA = false;
+
     private HttpCommunicator commonFetcher;
 
     protected Logger log = LogManager.getLogger(this.getClass().getSimpleName());
@@ -175,9 +177,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         CprSubParser<T> parser = this.getParser();
 
         boolean done = false;
-        long linesRead = 0;
         int limit = 1000;
+        long chunkCount = 0;
         while (!done) {
+            log.info("Handling chunk "+chunkCount);
             timer.start(TASK_CHUNK_HANDLE);
             Session session = importMetadata.getSession();//this.getSessionManager().getSessionFactory().openSession();
 
@@ -186,10 +189,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             timer.start(TASK_PARSE);
             String line;
             int i = 0;
-            ArrayList<String> chunk = new ArrayList<>();
+            ArrayList<String> dataChunk = new ArrayList<>();
             try {
                 for (i = 0; (line = reader.readLine()) != null && i < limit; i++) {
-                    chunk.add(line);
+                    dataChunk.add(line);
                 }
                 if (line == null) {
                     done = true;
@@ -198,7 +201,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 e.printStackTrace();
                 done = true;
             }
-            List<T> chunkRecords = parser.parse(chunk, charset);
+            List<T> chunkRecords = parser.parse(dataChunk, charset);
             log.debug("Batch parsed into "+chunkRecords.size()+" records");
             timer.measure(TASK_PARSE);
 
@@ -218,10 +221,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                             UUID uuid = this.generateUUID(record);
                             E entity = entityCache.get(uuid);
                             if (entity == null) {
-                                entity = QueryManager.getEntity(session, uuid, this.getEntityClass());
+                                Identification identification = QueryManager.getOrCreateIdentification(session, uuid, CprPlugin.getDomain());
+                                entity = QueryManager.getEntity(session, identification, this.getEntityClass());
                                 if (entity == null) {
                                     entity = this.createBasicEntity(record);
-                                    Identification identification = QueryManager.getOrCreateIdentification(session, uuid, CprPlugin.getDomain());
                                     entity.setIdentifikation(identification);
                                 }
                                 entityCache.put(uuid, entity);
@@ -229,7 +232,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                             recordMap.add(entity, record);
                         }
                     }
-                    log.debug("Batch resulted in " + recordMap.keySet().size() + " unique entities");
+                    log.info("Batch resulted in " + recordMap.keySet().size() + " unique entities");
                     timer.measure(TASK_FIND_ENTITY);
 
 
@@ -244,12 +247,15 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     session.getTransaction().rollback();
                     session.flush();
                     session.clear();
+                    log.info("Import aborted in chunk "+chunkCount);
+                    // Write importMetadata.getCurrentURI and chunkCount to the database somehow
                     throw e;
                 }
 
                 session.flush();
                 session.clear();
                 session.getTransaction().commit();
+                chunkCount++;
             }
 
             long chunkTime = timer.getTotal(TASK_CHUNK_HANDLE);
@@ -258,12 +264,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 log.info(i + " lines => " + chunkRecords.size() + " records handled in " + chunkTime + " ms (" + ((float) chunkTime / (float) chunkRecords.size()) + " ms avg)");
             }
 
-            log.info(timer.formatTotal(TASK_PARSE));
-            log.info(timer.formatTotal(TASK_FIND_ENTITY));
-            log.info(timer.formatTotal(TASK_FIND_REGISTRATIONS));
-            log.info(timer.formatTotal(TASK_FIND_ITEMS));
-            log.info(timer.formatTotal(TASK_POPULATE_DATA));
-            log.info(timer.formatTotal(TASK_SAVE));
+            log.info(timer.formatAllTotal());
         }
 
 
@@ -316,6 +317,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             for (D data : searchPool) {
                 this.checkInterrupt();
                 Set<V> existingEffects = data.getEffects();
+                Hibernate.initialize(existingEffects);
                 if (existingEffects.containsAll(effects) && effects.containsAll(existingEffects)) {
                     baseData = data;
                     log.debug("Reuse existing basedata");
@@ -336,6 +338,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
             for (T record : groupRecords) {
                 boolean updated = false;
+                this.checkInterrupt();
                 for (V effect : effects) {
                     this.checkInterrupt();
                     if (record.populateBaseData(baseData, effect, bitemporality.registrationFrom, session)) {
@@ -343,10 +346,12 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     }
                 }
                 if (updated) {
-                    this.checkInterrupt();
-                    RecordData recordData = new RecordData(importMetadata.getImportTime());
-                    recordData.setSourceData(record.getLine());
-                    baseData.addRecordData(recordData);
+                    baseData.setUpdated(importMetadata.getImportTime());
+                    if (SAVE_RECORD_DATA) {
+                        RecordData recordData = new RecordData(importMetadata.getImportTime());
+                        recordData.setSourceData(record.getLine());
+                        baseData.addRecordData(recordData);
+                    }
                 }
             }
             timer.measure(TASK_POPULATE_DATA);
