@@ -6,6 +6,7 @@ import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.ImportInterruptedException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
+import dk.magenta.datafordeler.core.io.ImportInputStream;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.Receipt;
 import dk.magenta.datafordeler.core.plugin.Communicator;
@@ -176,101 +177,117 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         CprSubParser<T> parser = this.getParser();
         Session session = importMetadata.getSession();//this.getSessionManager().getSessionFactory().openSession();
         boolean wrappedInTransaction = (session.getTransaction() != null);
-
+        List<File> cacheFiles = null;
+        if (registrationData instanceof ImportInputStream) {
+            cacheFiles = ((ImportInputStream) registrationData).getCacheFiles();
+        }
+        log.info("Parsing in thread "+Thread.currentThread().getId());
         boolean done = false;
         int limit = 1000;
         long chunkCount = 0;
-        while (!done) {
-            log.info("Handling chunk "+chunkCount);
-            timer.start(TASK_CHUNK_HANDLE);
+        try {
+            while (!done) {
+                this.checkInterrupt(importMetadata);
+                log.info("Handling chunk " + chunkCount);
+                timer.start(TASK_CHUNK_HANDLE);
 
 
-            // Parse up to _limit_ lines into a set of records
-            timer.start(TASK_PARSE);
-            String line;
-            int i = 0;
-            ArrayList<String> dataChunk = new ArrayList<>();
-            try {
-                for (i = 0; (line = reader.readLine()) != null && i < limit; i++) {
-                    dataChunk.add(line);
-                }
-                if (line == null) {
+                // Parse up to _limit_ lines into a set of records
+                timer.start(TASK_PARSE);
+                String line;
+                int i = 0;
+                ArrayList<String> dataChunk = new ArrayList<>();
+                try {
+                    for (i = 0; (line = reader.readLine()) != null && i < limit; i++) {
+                        dataChunk.add(line);
+                    }
+                    if (line == null) {
+                        done = true;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                     done = true;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                done = true;
-            }
-            List<T> chunkRecords = parser.parse(dataChunk, charset);
-            log.debug("Batch parsed into "+chunkRecords.size()+" records");
-            timer.measure(TASK_PARSE);
+                List<T> chunkRecords = parser.parse(dataChunk, charset);
+                log.info("Batch parsed into " + chunkRecords.size() + " records");
+                timer.measure(TASK_PARSE);
 
 
-            if (!chunkRecords.isEmpty()) {
+                if (!chunkRecords.isEmpty()) {
 
-                if (!wrappedInTransaction) {
-                    session.beginTransaction();
-                }
-                try {
-
-                    // Find Entities (or create those that are missing), and put them in the recordMap
-                    timer.start(TASK_FIND_ENTITY);
-                    ListHashMap<E, T> recordMap = new ListHashMap<>();
-                    HashMap<UUID, E> entityCache = new HashMap<>();
-                    for (T record : chunkRecords) {
-                        this.checkInterrupt();
-                        if (this.filter(record)) {
-                            UUID uuid = this.generateUUID(record);
-                            E entity = entityCache.get(uuid);
-                            if (entity == null) {
-                                Identification identification = QueryManager.getOrCreateIdentification(session, uuid, CprPlugin.getDomain());
-                                entity = QueryManager.getEntity(session, identification, this.getEntityClass());
-                                if (entity == null) {
-                                    entity = this.createBasicEntity(record);
-                                    entity.setIdentifikation(identification);
-                                }
-                                entityCache.put(uuid, entity);
-                            }
-                            recordMap.add(entity, record);
-                        }
-                    }
-                    log.info("Batch resulted in " + recordMap.keySet().size() + " unique entities");
-                    timer.measure(TASK_FIND_ENTITY);
-
-
-                    for (E entity : recordMap.keySet()) {
-                        List<T> records = recordMap.get(entity);
-                        Collection<R> entityRegistrations = this.parseRegistration(entity, records, session, importMetadata);
-                        allRegistrations.addAll(entityRegistrations);
-                        this.checkInterrupt();
-                    }
-
-                } catch (ImportInterruptedException e) {
                     if (!wrappedInTransaction) {
-                        session.getTransaction().rollback();
+                        session.beginTransaction();
                     }
+                    try {
+
+                        // Find Entities (or create those that are missing), and put them in the recordMap
+                        timer.start(TASK_FIND_ENTITY);
+                        ListHashMap<E, T> recordMap = new ListHashMap<>();
+                        HashMap<UUID, E> entityCache = new HashMap<>();
+                        for (T record : chunkRecords) {
+                            this.checkInterrupt(importMetadata);
+                            if (this.filter(record)) {
+                                UUID uuid = this.generateUUID(record);
+                                E entity = entityCache.get(uuid);
+                                if (entity == null) {
+                                    Identification identification = QueryManager.getOrCreateIdentification(session, uuid, CprPlugin.getDomain());
+                                    entity = QueryManager.getEntity(session, identification, this.getEntityClass());
+                                    if (entity == null) {
+                                        entity = this.createBasicEntity(record);
+                                        entity.setIdentifikation(identification);
+                                    }
+                                    entityCache.put(uuid, entity);
+                                }
+                                recordMap.add(entity, record);
+                            }
+                        }
+                        log.info("Batch resulted in " + recordMap.keySet().size() + " unique entities");
+                        timer.measure(TASK_FIND_ENTITY);
+
+
+                        for (E entity : recordMap.keySet()) {
+                            List<T> records = recordMap.get(entity);
+                            Collection<R> entityRegistrations = this.parseRegistration(entity, records, session, importMetadata);
+                            allRegistrations.addAll(entityRegistrations);
+                            this.checkInterrupt(importMetadata);
+                        }
+
+                    } catch (ImportInterruptedException e) {
+                        if (!wrappedInTransaction) {
+                            session.getTransaction().rollback();
+                        }
+                        session.clear();
+                        throw e;
+                    }
+
                     session.flush();
                     session.clear();
-                    log.info("Import aborted in chunk "+chunkCount);
-                    // Write importMetadata.getCurrentURI and chunkCount to the database somehow
-                    throw e;
+                    if (!wrappedInTransaction) {
+                        session.getTransaction().commit();
+                    }
+                    chunkCount++;
                 }
 
-                session.flush();
-                session.clear();
-                if (!wrappedInTransaction) {
-                    session.getTransaction().commit();
+                long chunkTime = timer.getTotal(TASK_CHUNK_HANDLE);
+                timer.reset(TASK_CHUNK_HANDLE);
+                if (!chunkRecords.isEmpty()) {
+                    log.info(i + " lines => " + chunkRecords.size() + " records handled in " + chunkTime + " ms (" + ((float) chunkTime / (float) chunkRecords.size()) + " ms avg)");
                 }
-                chunkCount++;
-            }
 
-            long chunkTime = timer.getTotal(TASK_CHUNK_HANDLE);
-            timer.reset(TASK_CHUNK_HANDLE);
-            if (!chunkRecords.isEmpty()) {
-                log.info(i + " lines => " + chunkRecords.size() + " records handled in " + chunkTime + " ms (" + ((float) chunkTime / (float) chunkRecords.size()) + " ms avg)");
+                log.info(timer.formatAllTotal());
             }
-
-            log.info(timer.formatAllTotal());
+        } catch (ImportInterruptedException e) {
+            log.info("Import aborted in chunk " + chunkCount);
+            e.setChunk(chunkCount);
+            if (cacheFiles != null) {
+                log.info("Files are:");
+                for (File file : cacheFiles) {
+                    log.info(file.getAbsolutePath());
+                }
+            }
+            e.setFiles(cacheFiles);
+            // Write importMetadata.getCurrentURI and chunkCount to the database somehow
+            throw e;
         }
 
 
@@ -295,7 +312,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             List<R> registrations = entity.findRegistrations(bitemporality.registrationFrom, bitemporality.registrationTo);
             ArrayList<V> effects = new ArrayList<>();
             for (R registration : registrations) {
-                this.checkInterrupt();
+                this.checkInterrupt(importMetadata);
                 V effect = registration.getEffect(bitemporality);
                 if (effect == null) {
                     log.debug("Create new effect");
@@ -315,13 +332,13 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             D baseData = null;
             HashSet<D> searchPool = new HashSet<>();
             for (V effect : effects) {
-                this.checkInterrupt();
+                this.checkInterrupt(importMetadata);
                 searchPool.addAll(effect.getDataItems());
             }
 
             // Find a basedata that matches our effects perfectly
             for (D data : searchPool) {
-                this.checkInterrupt();
+                this.checkInterrupt(importMetadata);
                 Set<V> existingEffects = data.getEffects();
                 Hibernate.initialize(existingEffects);
                 if (existingEffects.containsAll(effects) && effects.containsAll(existingEffects)) {
@@ -344,13 +361,13 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
             for (T record : groupRecords) {
                 boolean updated = false;
-                this.checkInterrupt();
                 for (V effect : effects) {
-                    this.checkInterrupt();
+                    this.checkInterrupt(importMetadata);
                     if (record.populateBaseData(baseData, effect, bitemporality.registrationFrom, session)) {
                         updated = true;
                     }
                 }
+                this.checkInterrupt(importMetadata);
                 if (updated) {
                     baseData.setUpdated(importMetadata.getImportTime());
                     if (SAVE_RECORD_DATA) {
@@ -368,7 +385,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         Collections.sort(registrationList);
         int i = 0;
         for (R registration : registrationList) {
-            this.checkInterrupt();
+            this.checkInterrupt(importMetadata);
             registration.setSequenceNumber(i++);
             registration.setLastImportTime(importMetadata.getImportTime());
             try {
@@ -402,8 +419,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         return true;
     }
 
-    private void checkInterrupt() throws ImportInterruptedException {
-        if (Thread.interrupted()) {
+    private void checkInterrupt(ImportMetadata importMetadata) throws ImportInterruptedException {
+        if (importMetadata.getStop()) {
             throw new ImportInterruptedException(new InterruptedException());
         }
     }
