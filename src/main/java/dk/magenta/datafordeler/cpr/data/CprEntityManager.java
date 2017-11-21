@@ -173,8 +173,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         ArrayList<R> allRegistrations = new ArrayList<>();
         String charset = this.getConfiguration().getRegisterCharset(this);
         BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
-
         CprSubParser<T> parser = this.getParser();
+        Session session = importMetadata.getSession();//this.getSessionManager().getSessionFactory().openSession();
+        boolean wrappedInTransaction = (session.getTransaction() != null);
 
         boolean done = false;
         int limit = 1000;
@@ -182,7 +183,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         while (!done) {
             log.info("Handling chunk "+chunkCount);
             timer.start(TASK_CHUNK_HANDLE);
-            Session session = importMetadata.getSession();//this.getSessionManager().getSessionFactory().openSession();
 
 
             // Parse up to _limit_ lines into a set of records
@@ -208,7 +208,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
             if (!chunkRecords.isEmpty()) {
 
-                session.beginTransaction();
+                if (!wrappedInTransaction) {
+                    session.beginTransaction();
+                }
                 try {
 
                     // Find Entities (or create those that are missing), and put them in the recordMap
@@ -244,7 +246,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     }
 
                 } catch (ImportInterruptedException e) {
-                    session.getTransaction().rollback();
+                    if (!wrappedInTransaction) {
+                        session.getTransaction().rollback();
+                    }
                     session.flush();
                     session.clear();
                     log.info("Import aborted in chunk "+chunkCount);
@@ -254,7 +258,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
                 session.flush();
                 session.clear();
-                session.getTransaction().commit();
+                if (!wrappedInTransaction) {
+                    session.getTransaction().commit();
+                }
                 chunkCount++;
             }
 
