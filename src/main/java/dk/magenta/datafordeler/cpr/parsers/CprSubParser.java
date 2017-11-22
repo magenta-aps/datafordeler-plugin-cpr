@@ -22,7 +22,7 @@ public abstract class CprSubParser<T extends CprRecord> extends LineParser<T> {
     }
 
     @Override
-    protected T parseLine(String line) {
+    public T parseLine(String line) {
         return this.parseLine(line.substring(0, 3), line);
     }
 
