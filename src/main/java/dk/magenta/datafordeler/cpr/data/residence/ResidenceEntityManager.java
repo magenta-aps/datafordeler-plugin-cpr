@@ -57,12 +57,6 @@ public class ResidenceEntityManager extends CprEntityManager<ResidenceRecord, Re
     public String getSchema() {
         return ResidenceEntity.schema;
     }
-/*
-    @Override
-    public List<ResidenceRegistration> parseRegistration(String registrationData, ImportMetadata importMetadata) throws DataFordelerException {
-        return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)), importMetadata);
-    }
-    */
 
     @Override
     protected RegistrationReference createRegistrationReference(URI uri) {
