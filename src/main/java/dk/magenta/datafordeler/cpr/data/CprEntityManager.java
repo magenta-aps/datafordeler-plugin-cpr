@@ -387,8 +387,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                             session.getTransaction().rollback();
                             importMetadata.setTransactionInProgress(false);
                         }
-
-                        session.flush();
                         session.clear();
                         log.info("Import aborted in chunk " + chunkCount);
                         // Write importMetadata.getCurrentURI and chunkCount to the database somehow
