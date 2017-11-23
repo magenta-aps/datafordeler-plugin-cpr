@@ -287,7 +287,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
                                 D baseData = null;
                                 HashSet<D> searchPool = new HashSet<>();
-                                // Prøv at finde fællesmængden af dataitems
                                 HashMap<D, Integer> foo = new HashMap<>();
                                 for (V effect : effects) {
                                     for (D data : effect.getDataItems()) {
