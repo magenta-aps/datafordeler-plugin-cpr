@@ -29,6 +29,9 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     private RoadCoreData coreData;
 
+    public RoadCoreData getCoreData() {
+        return this.coreData;
+    }
 
     public static final String DB_FIELD_MEMO = "memoData";
 
@@ -36,17 +39,27 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     @OrderBy("memoNumber")
     private List<RoadMemoData> memoData = new ArrayList<>();
 
+    public List<RoadMemoData> getMemoData() {
+        return this.memoData;
+    }
 
     public static final String DB_FIELD_POSTCODE = "postcodeData";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
     private List<RoadPostcodeData> postcodeData = new ArrayList<>();
 
+    public List<RoadPostcodeData> getPostcodeData() {
+        return this.postcodeData;
+    }
 
     public static final String DB_FIELD_CITY = "cityData";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
     private List<RoadCityData> cityData = new ArrayList<>();
+
+    public List<RoadCityData> getCityData() {
+        return this.cityData;
+    }
 
 
     public void setCore(int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode, int fromRoadCode, String addressingName, String name) {
@@ -162,4 +175,6 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         Hibernate.initialize(postcodeData);
         Hibernate.initialize(cityData);
     }
+
+
 }

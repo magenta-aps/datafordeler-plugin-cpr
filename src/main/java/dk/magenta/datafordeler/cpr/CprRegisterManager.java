@@ -5,6 +5,7 @@ import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
+import dk.magenta.datafordeler.core.io.ImportInputStream;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.PluginSourceData;
 import dk.magenta.datafordeler.core.plugin.*;
@@ -124,6 +125,11 @@ public class CprRegisterManager extends RegisterManager {
         return null;
     }
 
+    @Override
+    public boolean pullsEventsCommonly() {
+        return false;
+    }
+
     public String getPullCronSchedule() {
         // TODO: make entitymanager specific
         return this.configurationManager.getConfiguration().getPersonRegisterPullCronSchedule();
@@ -154,7 +160,7 @@ public class CprRegisterManager extends RegisterManager {
     * returning.
     */
     @Override
-    public InputStream pullRawData(URI eventInterface, EntityManager entityManager, ImportMetadata importMetadata) throws DataFordelerException {
+    public ImportInputStream pullRawData(URI eventInterface, EntityManager entityManager, ImportMetadata importMetadata) throws DataFordelerException {
         if (!(entityManager instanceof CprEntityManager)) {
             throw new WrongSubclassException(CprEntityManager.class, entityManager);
         }
@@ -164,14 +170,16 @@ public class CprRegisterManager extends RegisterManager {
         }
         this.log.info("Pulling from "+eventInterface.toString() + " for entitymanager "+entityManager);
         CprEntityManager cprEntityManager = (CprEntityManager) entityManager;
-        InputStream responseBody = null;
+        ImportInputStream responseBody = null;
         String scheme = eventInterface.getScheme();
         this.log.info("scheme: "+scheme);
         this.log.info("eventInterface: "+eventInterface);
         switch (scheme) {
             case "file":
                 try {
-                    responseBody = new FileInputStream(new File(eventInterface));
+                    File file = new File(eventInterface);
+                    responseBody = new ImportInputStream(new FileInputStream(file));
+                    responseBody.addCacheFile(file);
                 } catch (FileNotFoundException e) {
                     this.log.error(e);
                     throw new DataStreamException(e);
