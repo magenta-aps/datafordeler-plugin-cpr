@@ -370,17 +370,18 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                     e.printStackTrace();
                                 }
                             }
-
-                            session.flush();
-                            if (!wrappedInTransaction) {
-                                session.getTransaction().commit();
-                                importMetadata.setTransactionInProgress(false);
-                            }
-                            session.clear();
                             timer.measure(TASK_SAVE);
-
-                            this.checkInterrupt(importMetadata);
                         }
+
+                        session.flush();
+                        if (!wrappedInTransaction) {
+                            session.getTransaction().commit();
+                            importMetadata.setTransactionInProgress(false);
+                        }
+                        session.clear();
+
+                        this.checkInterrupt(importMetadata);
+
 
                     } catch (ImportInterruptedException e) {
                         if (!wrappedInTransaction) {
