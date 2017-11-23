@@ -50,10 +50,8 @@ public class ParseTest {
     private ObjectMapper objectMapper;
 
 
-    private void loadPerson(Session session) throws DataFordelerException, IOException {
+    private void loadPerson(ImportMetadata importMetadata) throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
-        ImportMetadata importMetadata = new ImportMetadata();
-        importMetadata.setSession(session);
         personEntityManager.parseRegistration(testData, importMetadata);
         testData.close();
     }
@@ -64,10 +62,8 @@ public class ParseTest {
         QueryManager.clearCaches();
     }
 
-    private void loadRoad(Session session) throws DataFordelerException, IOException {
+    private void loadRoad(ImportMetadata importMetadata) throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-        ImportMetadata importMetadata = new ImportMetadata();
-        importMetadata.setSession(session);
         ArrayList<RoadRegistration> registrations = new ArrayList<>(roadEntityManager.parseRegistration(testData, importMetadata));
         /*
         Collections.sort(registrations);
@@ -78,17 +74,15 @@ public class ParseTest {
         testData.close();
     }
 
-    private void loadResidence(Session session) throws DataFordelerException, IOException {
+    private void loadResidence(ImportMetadata importMetadata) throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-        ImportMetadata importMetadata = new ImportMetadata();
 
-        importMetadata.setSession(session);
         ArrayList<ResidenceRegistration> registrations = new ArrayList<>(residenceEntityManager.parseRegistration(testData, importMetadata));
         Collections.sort(registrations);
 
         for (ResidenceRegistration registration : registrations) {
-            registration = (ResidenceRegistration) session.merge(registration);
-            QueryManager.saveRegistration(session, registration.getEntity(), registration);
+            registration = (ResidenceRegistration) importMetadata.getSession().merge(registration);
+            QueryManager.saveRegistration(importMetadata.getSession(), registration.getEntity(), registration);
         }
         testData.close();
     }
@@ -97,12 +91,15 @@ public class ParseTest {
     public void testPersonIdempotence() throws Exception {
         Session session = sessionManager.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        importMetadata.setTransactionInProgress(true);
         try {
-            loadPerson(session);
+            loadPerson(importMetadata);
             List<PersonEntity> entities = QueryManager.getAllEntities(session, PersonEntity.class);
             JsonNode firstImport = objectMapper.valueToTree(entities);
 
-            loadPerson(session);
+            loadPerson(importMetadata);
             entities = QueryManager.getAllEntities(session, PersonEntity.class);
             JsonNode secondImport = objectMapper.valueToTree(entities);
             assertJsonEquality(firstImport, secondImport, true, true);
@@ -117,8 +114,11 @@ public class ParseTest {
     public void testParsePerson() throws Exception {
         Session session = sessionManager.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        importMetadata.setTransactionInProgress(true);
         try {
-            loadPerson(session);
+            loadPerson(importMetadata);
 
             PersonQuery query = new PersonQuery();
             query.setFornavn("Tester");
@@ -138,12 +138,15 @@ public class ParseTest {
     public void testRoadIdempotence() throws IOException, DataFordelerException {
         Session session = sessionManager.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        importMetadata.setTransactionInProgress(true);
         try {
-            loadRoad(session);
+            loadRoad(importMetadata);
             List<RoadEntity> entities = QueryManager.getAllEntities(session, RoadEntity.class);
             JsonNode firstImport = objectMapper.valueToTree(entities);
 
-            loadRoad(session);
+            loadRoad(importMetadata);
             entities = QueryManager.getAllEntities(session, RoadEntity.class);
             JsonNode secondImport = objectMapper.valueToTree(entities);
             assertJsonEquality(firstImport, secondImport, true, true);
@@ -157,8 +160,11 @@ public class ParseTest {
     public void testParseRoad() throws IOException, DataFordelerException {
         Session session = sessionManager.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        importMetadata.setTransactionInProgress(true);
         try {
-            loadRoad(session);
+            loadRoad(importMetadata);
 
             RoadQuery query = new RoadQuery();
             query.addKommunekode("0730");
@@ -234,17 +240,21 @@ public class ParseTest {
     public void testResidenceIdempotence() throws IOException, DataFordelerException {
         Session session = sessionManager.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        importMetadata.setTransactionInProgress(true);
         try {
-            loadResidence(session);
+            loadResidence(importMetadata);
             List<ResidenceEntity> entities = QueryManager.getAllEntities(session, ResidenceEntity.class);
             JsonNode firstImport = objectMapper.valueToTree(entities);
 
-            loadResidence(session);
+            loadResidence(importMetadata);
             entities = QueryManager.getAllEntities(session, ResidenceEntity.class);
             JsonNode secondImport = objectMapper.valueToTree(entities);
             assertJsonEquality(firstImport, secondImport, true, true);
 
         } finally {
+            transaction.rollback();
             session.close();
         }
     }
@@ -253,8 +263,11 @@ public class ParseTest {
     public void testParseResidence() throws Exception {
         Session session = sessionManager.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        importMetadata.setTransactionInProgress(true);
         try {
-            loadResidence(session);
+            loadResidence(importMetadata);
 
             ResidenceQuery query = new ResidenceQuery();
             query.addKommunekode(360);
