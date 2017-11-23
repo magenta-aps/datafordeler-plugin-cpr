@@ -5,17 +5,14 @@ import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.PluginSourceData;
-import dk.magenta.datafordeler.core.plugin.Communicator;
-import dk.magenta.datafordeler.core.plugin.EntityManager;
-import dk.magenta.datafordeler.core.plugin.Plugin;
-import dk.magenta.datafordeler.core.plugin.RegisterManager;
+import dk.magenta.datafordeler.core.plugin.*;
 import dk.magenta.datafordeler.core.util.ItemInputStream;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.synchronization.CprSourceData;
-import dk.magenta.datafordeler.cpr.synchronization.LocalCopyFtpCommunicator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,7 +129,21 @@ public class CprRegisterManager extends RegisterManager {
         return this.configurationManager.getConfiguration().getPersonRegisterPullCronSchedule();
     }
 
+    public FtpCommunicator getFtpCommunicator(URI eventInterface, CprEntityManager cprEntityManager) throws DataStreamException {
+        CprConfiguration configuration = this.configurationManager.getConfiguration();
+        return new FtpCommunicator(
+                configuration.getRegisterFtpUsername(cprEntityManager),
+                configuration.getRegisterFtpPassword(cprEntityManager),
+                eventInterface != null && "ftps".equals(eventInterface.getScheme()),
+                this.proxyString,
+                this.localCopyFolder,
+                true
+        );
+    }
 
+    public void setProxyString(String proxyString) {
+        this.proxyString = proxyString;
+    }
 
     /**
     * Pull data from the data source denoted by eventInterface, using the 
@@ -143,7 +154,7 @@ public class CprRegisterManager extends RegisterManager {
     * returning.
     */
     @Override
-    public ItemInputStream<? extends PluginSourceData> pullEvents(URI eventInterface, EntityManager entityManager) throws DataFordelerException {
+    public InputStream pullRawData(URI eventInterface, EntityManager entityManager, ImportMetadata importMetadata) throws DataFordelerException {
         if (!(entityManager instanceof CprEntityManager)) {
             throw new WrongSubclassException(CprEntityManager.class, entityManager);
         }
@@ -155,6 +166,8 @@ public class CprRegisterManager extends RegisterManager {
         CprEntityManager cprEntityManager = (CprEntityManager) entityManager;
         InputStream responseBody = null;
         String scheme = eventInterface.getScheme();
+        this.log.info("scheme: "+scheme);
+        this.log.info("eventInterface: "+eventInterface);
         switch (scheme) {
             case "file":
                 try {
@@ -167,19 +180,12 @@ public class CprRegisterManager extends RegisterManager {
 
             case "ftp":
             case "ftps":
-                CprConfiguration configuration = this.configurationManager.getConfiguration();
                 try {
-                    LocalCopyFtpCommunicator ftpFetcher = new LocalCopyFtpCommunicator(
-                            configuration.getRegisterFtpUsername(cprEntityManager),
-                            configuration.getRegisterFtpPassword(cprEntityManager),
-                            "ftps".equals(scheme),
-                            this.proxyString,
-                            this.localCopyFolder
-                    );
+                    FtpCommunicator ftpFetcher = this.getFtpCommunicator(eventInterface, cprEntityManager);
                     responseBody = ftpFetcher.fetch(eventInterface);
-                } catch (IOException e) {
+                } catch (DataStreamException e) {
                     this.log.error(e);
-                    throw new DataStreamException(e);
+                    throw e;
                 }
                 break;
         }
@@ -187,35 +193,37 @@ public class CprRegisterManager extends RegisterManager {
             throw new DataStreamException("No data received from source " + eventInterface.toString());
         }
 
-        return this.parseEventResponse(responseBody, entityManager);
+        return responseBody;
     }
 
     @Override
-    protected ItemInputStream<? extends PluginSourceData> parseEventResponse(InputStream inputStream, EntityManager entityManager) throws DataFordelerException {
+    public boolean pullsEventsCommonly() {
+        return false;
+    }
+
+    @Override
+    protected ItemInputStream<? extends PluginSourceData> parseEventResponse(InputStream rawData, EntityManager entityManager) throws DataFordelerException {
         if (!(entityManager instanceof CprEntityManager)) {
             throw new WrongSubclassException(CprEntityManager.class, entityManager);
         }
-        return this.parseEventResponse(inputStream, entityManager.getSchema());
-    }
 
-    private ItemInputStream<CprSourceData> parseEventResponse(final InputStream responseBody, final String schema) throws DataFordelerException {
         final int linesPerEvent = 1000;
         PipedInputStream inputStream = new PipedInputStream();
 
         try {
             final PipedOutputStream outputStream = new PipedOutputStream(inputStream);
             final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-            final int dataIdBase = responseBody.hashCode();
+            final int dataIdBase = rawData.hashCode();
+            final String schema = entityManager.getSchema();
 
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    BufferedReader responseReader = new BufferedReader(new InputStreamReader(responseBody, Charset.forName("iso-8859-1")));
+                    BufferedReader responseReader = new BufferedReader(new InputStreamReader(rawData, Charset.forName("iso-8859-1")));
                     int eventCount = 0;
                     long totalLines = 0;
                     try {
                         String line;
-
                         int lineCount = 0;
                         ArrayList<String> lines = new ArrayList<>();
                         while ((line = responseReader.readLine()) != null) {
