@@ -154,12 +154,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     protected abstract UUID generateUUID(T record);
     protected abstract E createBasicEntity(T record);
     protected abstract D createDataItem();
-
-    @Override
-    public List<R> parseRegistration(String registrationData, ImportMetadata importMetadata) throws DataFordelerException {
-        String charset = this.getConfiguration().getRegisterCharset(this);
-        return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(Charset.forName(charset))), importMetadata);
-    }
+    
 
     private static final String TASK_PARSE = "CprParse";
     private static final String TASK_FIND_ENTITY = "CprFindEntity";
@@ -178,14 +173,12 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         CprSubParser<T> parser = this.getParser();
 
 
-
         boolean done = false;
         long linesRead = 0;
         int limit = 1000;
         while (!done) {
             timer.start(TASK_CHUNK_HANDLE);
             Session session = this.getSessionManager().getSessionFactory().openSession();
-            Transaction transaction = session.beginTransaction();
 
             timer.start(TASK_PARSE);
             StringJoiner buffer = new StringJoiner("\n");
@@ -220,8 +213,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             // Find Entities (or create those that are missing), and put them in the recordMap
             ListHashMap<E, T> recordMap = new ListHashMap<>();
             HashMap<UUID, E> entityCache = new HashMap<>();
-            for (T record : chunkRecords) {
 
+            Transaction transaction = session.beginTransaction();
+
+            for (T record : chunkRecords) {
                 if (this.filter(record)) {
                     UUID uuid = this.generateUUID(record);
                     E entity = entityCache.get(uuid);
@@ -229,14 +224,17 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                         entity = QueryManager.getEntity(session, uuid, this.getEntityClass());
                         if (entity == null) {
                             entity = this.createBasicEntity(record);
-                            entity.setUUID(uuid);
-                            entity.setDomain(CprPlugin.getDomain());
+                            Identification identification = QueryManager.getOrCreateIdentification(session, uuid, CprPlugin.getDomain());
+                            entity.setIdentifikation(identification);
                         }
                         entityCache.put(uuid, entity);
                     }
                     recordMap.add(entity, record);
                 }
             }
+            session.flush();
+            transaction.commit();
+            transaction = session.beginTransaction();
             log.debug("Batch resulted in "+recordMap.keySet().size()+" unique entities");
             timer.measure(TASK_FIND_ENTITY);
 
@@ -258,14 +256,15 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            log.info(timer.formatTotal(TASK_PARSE));
+            log.info(timer.formatTotal(TASK_FIND_ENTITY));
+            log.info(timer.formatTotal(TASK_FIND_REGISTRATIONS));
+            log.info(timer.formatTotal(TASK_FIND_ITEMS));
+            log.info(timer.formatTotal(TASK_POPULATE_DATA));
+            log.info(timer.formatTotal(TASK_SAVE));
         }
 
-        log.info(timer.formatTotal(TASK_PARSE));
-        log.info(timer.formatTotal(TASK_FIND_ENTITY));
-        log.info(timer.formatTotal(TASK_FIND_REGISTRATIONS));
-        log.info(timer.formatTotal(TASK_FIND_ITEMS));
-        log.info(timer.formatTotal(TASK_POPULATE_DATA));
-        log.info(timer.formatTotal(TASK_SAVE));
 
         return allRegistrations;
     }
@@ -312,7 +311,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
             // Find a basedata that matches our effects perfectly
             for (D data : searchPool) {
-                if (data.getEffects().containsAll(effects) && effects.containsAll(data.getEffects())) {
+                Set<V> existingEffects = data.getEffects();
+                if (existingEffects.containsAll(effects) && effects.containsAll(existingEffects)) {
                     baseData = data;
                     log.debug("Reuse existing basedata");
                     break;
@@ -349,10 +349,12 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         timer.start(TASK_SAVE);
         ArrayList<R> registrationList = new ArrayList<>(allRegistrations);
         Collections.sort(registrationList);
+        int i = 0;
         for (R registration : registrationList) {
+            registration.setSequenceNumber(i++);
             registration.setLastImportTime(importMetadata.getImportTime());
             try {
-                QueryManager.saveRegistration(session, entity, registration, false, false);
+                QueryManager.saveRegistration(session, entity, registration, false, false, false);
             } catch (DataFordelerException e) {
                 e.printStackTrace();
             } catch (javax.persistence.EntityNotFoundException e) {

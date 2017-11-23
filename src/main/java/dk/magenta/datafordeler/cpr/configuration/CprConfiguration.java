@@ -39,8 +39,9 @@ public class CprConfiguration implements Configuration {
     }
 
     public enum RegisterType {
-        LOCAL_FILE(0),
-        REMOTE_FTP(1);
+        DISABLED(0),
+        LOCAL_FILE(1),
+        REMOTE_FTP(2);
 
         private int value;
         RegisterType(int value) {
@@ -79,7 +80,7 @@ public class CprConfiguration implements Configuration {
     private String personRegisterFtpPassword = "password";
 
     @Column
-    private String personRegisterLocalFile = "data/cprpersondata.txt";
+    private String personRegisterLocalFile = "data/d170608.l534902";
 
     @Column
     @Enumerated(EnumType.ORDINAL)
@@ -92,7 +93,7 @@ public class CprConfiguration implements Configuration {
 
     @Column
     @Enumerated(EnumType.ORDINAL)
-    private RegisterType roadRegisterType = RegisterType.LOCAL_FILE;
+    private RegisterType roadRegisterType = RegisterType.DISABLED;
 
     @Column
     private String roadRegisterFtpAddress = null;
@@ -117,7 +118,7 @@ public class CprConfiguration implements Configuration {
 
     @Column
     @Enumerated(EnumType.ORDINAL)
-    private RegisterType residenceRegisterType = RegisterType.LOCAL_FILE;
+    private RegisterType residenceRegisterType = RegisterType.DISABLED;
 
     @Column
     private String residenceRegisterFtpAddress = null;
@@ -365,7 +366,9 @@ public class CprConfiguration implements Configuration {
     }
 
     private URI formatURI(RegisterType registerType, String localFile, String ftpAddress) throws ConfigurationException {
-        if (registerType == RegisterType.LOCAL_FILE) {
+        if (registerType == RegisterType.DISABLED) {
+            return null;
+        } else if (registerType == RegisterType.LOCAL_FILE) {
             File file = new File(localFile);
             if (!file.exists()) {
                 String full = "";

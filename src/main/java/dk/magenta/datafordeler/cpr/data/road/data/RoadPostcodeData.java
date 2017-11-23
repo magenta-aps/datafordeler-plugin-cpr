@@ -20,6 +20,19 @@ import java.util.Map;
 @Table(name="cpr_road_postcode")
 public class RoadPostcodeData extends DetailData {
 
+
+    @ManyToOne(targetEntity = RoadBaseData.class)
+    @JsonIgnore
+    private RoadBaseData roadBaseData;
+
+    public RoadBaseData getRoadBaseData() {
+        return this.roadBaseData;
+    }
+
+    public void setRoadBaseData(RoadBaseData roadBaseData) {
+        this.roadBaseData = roadBaseData;
+    }
+
     public static final String DB_FIELD_HOUSENUMBER_FROM = "houseNumberFrom";
     public static final String IO_FIELD_HOUSENUMBER_FROM = "husnummerFra";
     @Column(name = DB_FIELD_HOUSENUMBER_FROM)

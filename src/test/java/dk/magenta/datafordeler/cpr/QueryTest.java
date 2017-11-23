@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.Application;
+import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
@@ -11,6 +12,7 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityService;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +59,10 @@ public class QueryTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @After
+    public void cleanup() {
+        QueryManager.clearCache();
+    }
 
     public void loadPerson() throws Exception {
         InputStream testData = QueryTest.class.getResourceAsStream("/persondata.txt");
@@ -112,6 +118,7 @@ public class QueryTest {
         Assert.assertEquals(1, results.size());
         Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("UUID").asText());
 
+
         testUserDetails.giveAccess(
             plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
                     CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
@@ -121,6 +128,14 @@ public class QueryTest {
         );
         this.applyAccess(testUserDetails);
 
+        response = restSearch(searchParameters, "person");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
+
+        searchParameters.add("kommunekode", "95*");
         response = restSearch(searchParameters, "person");
         Assert.assertEquals(200, response.getStatusCode().value());
         jsonBody = objectMapper.readTree(response.getBody());

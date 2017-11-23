@@ -8,6 +8,8 @@ import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 
 import java.util.*;
 
+import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_MUNICIPALITYCODE;
+
 /**
  * Created by lars on 19-05-17.
  */
@@ -135,6 +137,9 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
         }
         if (this.sideDoer != null) {
             lookupDefinition.put(ResidenceBaseData.DB_FIELD_DOOR, this.sideDoer, String.class);
+        }
+        if (!this.getKommunekodeRestriction().isEmpty()) {
+            lookupDefinition.put(ResidenceBaseData.DB_FIELD_MUNICIPALITY_CODE, this.getKommunekodeRestriction(), Integer.class);
         }
         return lookupDefinition;
     }

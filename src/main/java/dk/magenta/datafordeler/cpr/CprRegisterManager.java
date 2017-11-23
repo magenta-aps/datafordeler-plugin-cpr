@@ -68,7 +68,6 @@ public class CprRegisterManager extends RegisterManager {
     */
     @PostConstruct
     public void init() throws IOException {
-        CprConfiguration configuration = this.configurationManager.getConfiguration();
         if (this.localCopyFolder == null || this.localCopyFolder.isEmpty()) {
             File temp = File.createTempFile("datafordeler-cache","");
             temp.delete();
@@ -147,6 +146,10 @@ public class CprRegisterManager extends RegisterManager {
     public ItemInputStream<? extends PluginSourceData> pullEvents(URI eventInterface, EntityManager entityManager) throws DataFordelerException {
         if (!(entityManager instanceof CprEntityManager)) {
             throw new WrongSubclassException(CprEntityManager.class, entityManager);
+        }
+        if (eventInterface == null) {
+            this.log.info("Not pulling for "+entityManager.toString());
+            return null;
         }
         this.log.info("Pulling from "+eventInterface.toString() + " for entitymanager "+entityManager);
         CprEntityManager cprEntityManager = (CprEntityManager) entityManager;

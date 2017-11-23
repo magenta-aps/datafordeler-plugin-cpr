@@ -116,7 +116,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                             createNavnNode(virkning, timestamp, navn, adressenavn)
                     );
                 }
-                if (beskyttelse != null) {
+                if (beskyttelse != null && !beskyttelse.isEmpty()) {
                     addEffectDataToRegistration(
                             output,
                             "beskyttelse",

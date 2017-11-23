@@ -86,7 +86,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private PersonNameAuthorityTextData nameAuthority;
 
     public static final String DB_FIELD_PROTECTION = "protection";
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "personBaseData")
     private Set<PersonProtectionData> protection = new HashSet<>();
 
     public static final String DB_FIELD_MIGRATION = "migration";
@@ -406,6 +406,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         protection.setAuthority(authority);
         protection.setProtectionType(beskyttelsestype);
         protection.setReportMarking(reportMarking);
+        protection.setBaseData(this);
         this.protection.add(protection);
     }
 
