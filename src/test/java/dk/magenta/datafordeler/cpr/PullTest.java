@@ -215,11 +215,12 @@ public class PullTest {
             Assert.assertEquals(1, residenceEntities.size());
             Assert.assertEquals(ResidenceEntity.generateUUID(360, 206, "44E", "", ""), residenceEntities.get(0).getUUID());
 
+            /*
             RecordCollection firstRecordCollection = residenceEntities.get(0).getRegistrations().get(0).getEffects().get(0).getDataItems().get(0).getRecordSet();
             Assert.assertEquals(1, firstRecordCollection.getRecords().size());
             RecordData firstRecordData = firstRecordCollection.getRecords().iterator().next();
             Assert.assertEquals("00203600206044E      200612221200 199109231200000000000000Provstelunden", firstRecordData.getSourceData());
-
+            */
         } finally {
             session.close();
         }
