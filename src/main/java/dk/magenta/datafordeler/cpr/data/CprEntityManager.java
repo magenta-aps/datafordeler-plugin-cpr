@@ -23,6 +23,7 @@ import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import dk.magenta.datafordeler.cpr.records.Record;
+import dk.magenta.datafordeler.cpr.records.person.NameRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -196,10 +197,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 // Parse up to _limit_ lines into a set of records
                 timer.start(TASK_PARSE);
                 String line;
-                int i = 0;
                 ArrayList<String> dataChunk = new ArrayList<>();
                 try {
-                    for (i = 0; (line = reader.readLine()) != null && i < limit; i++) {
+                    for (int i = 0; (line = reader.readLine()) != null && i < limit; i++) {
+                        System.out.println("Line: "+line);
                         dataChunk.add(line);
                     }
                     if (line == null) {
@@ -223,7 +224,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
                     try {
 
-
                         // Find Entities (or create those that are missing), and put them in the recordMap
                         timer.start(TASK_FIND_ENTITY);
                         ListHashMap<E, T> recordMap = new ListHashMap<>();
@@ -242,9 +242,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                         entity = this.createBasicEntity(record);
                                         entity.setIdentifikation(identification);
                                     }
-                                    recordMap.add(entity, record);
                                     entityCache.put(uuid, entity);
                                 }
+                                recordMap.add(entity, record);
                             }
                         }
                         log.info("Batch resulted in " + recordMap.keySet().size() + " unique entities");
@@ -331,6 +331,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
                                 timer.start(TASK_POPULATE_DATA);
                                 for (T record : groupRecords) {
+                                    System.out.println("Inserting record "+record.getClass().getSimpleName());
                                     boolean updated = false;
                                     for (V effect : effects) {
                                         this.checkInterrupt(importMetadata);

@@ -64,26 +64,13 @@ public class ParseTest {
 
     private void loadRoad(ImportMetadata importMetadata) throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-        ArrayList<RoadRegistration> registrations = new ArrayList<>(roadEntityManager.parseRegistration(testData, importMetadata));
-        /*
-        Collections.sort(registrations);
-        for (RoadRegistration registration : registrations) {
-            registration = (RoadRegistration) session.merge(registration);
-            QueryManager.saveRegistration(session, registration.getEntity(), registration);
-        }*/
+        roadEntityManager.parseRegistration(testData, importMetadata);
         testData.close();
     }
 
     private void loadResidence(ImportMetadata importMetadata) throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-
-        ArrayList<ResidenceRegistration> registrations = new ArrayList<>(residenceEntityManager.parseRegistration(testData, importMetadata));
-        Collections.sort(registrations);
-
-        for (ResidenceRegistration registration : registrations) {
-            registration = (ResidenceRegistration) importMetadata.getSession().merge(registration);
-            QueryManager.saveRegistration(importMetadata.getSession(), registration.getEntity(), registration);
-        }
+        residenceEntityManager.parseRegistration(testData, importMetadata);
         testData.close();
     }
 
