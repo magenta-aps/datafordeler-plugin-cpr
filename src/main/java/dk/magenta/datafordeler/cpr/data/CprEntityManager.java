@@ -397,10 +397,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     if (!chunkRecords.isEmpty()) {
                         log.info(i + " lines => " + chunkRecords.size() + " records handled in " + chunkTime + " ms (" + ((float) chunkTime / (float) chunkRecords.size()) + " ms avg)");
                     }
+                    log.info(timer.formatAllTotal());
                 }
                 chunkCount++;
 
-                log.info(timer.formatAllTotal());
             } catch (ImportInterruptedException e) {
                 log.info("Import aborted in chunk " + chunkCount);
                 if (e.getChunk() == null) {
