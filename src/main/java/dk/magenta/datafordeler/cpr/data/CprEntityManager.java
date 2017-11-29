@@ -189,27 +189,27 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         long startChunk = importMetadata.getStartChunk();
         while (!done) {
             try {
+
+                String line;
+                int i = 0;
+                ArrayList<String> dataChunk = new ArrayList<>();
+                try {
+                    for (i = 0; (line = reader.readLine()) != null && i < maxChunkSize; i++) {
+                        dataChunk.add(line);
+                    }
+                    if (line == null) {
+                        done = true;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    done = true;
+                }
+
                 if (chunkCount >= startChunk) {
                     log.info("Handling chunk " + chunkCount);
                     timer.start(TASK_CHUNK_HANDLE);
-
-
-                    // Parse up to _limit_ lines into a set of records
+                    // Parse chunk into a set of records
                     timer.start(TASK_PARSE);
-                    String line;
-                    int i = 0;
-                    ArrayList<String> dataChunk = new ArrayList<>();
-                    try {
-                        for (i = 0; (line = reader.readLine()) != null && i < maxChunkSize; i++) {
-                            dataChunk.add(line);
-                        }
-                        if (line == null) {
-                            done = true;
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        done = true;
-                    }
                     List<T> chunkRecords = parser.parse(dataChunk, charset);
                     log.debug("Batch parsed into " + chunkRecords.size() + " records");
                     timer.measure(TASK_PARSE);
