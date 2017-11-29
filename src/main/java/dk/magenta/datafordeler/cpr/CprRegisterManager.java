@@ -143,7 +143,9 @@ public class CprRegisterManager extends RegisterManager {
                 eventInterface != null && "ftps".equals(eventInterface.getScheme()),
                 this.proxyString,
                 this.localCopyFolder,
-                true
+                true,
+                false,
+                false
         );
     }
 
