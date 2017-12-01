@@ -207,11 +207,6 @@ public class CprRegisterManager extends RegisterManager {
     }
 
     @Override
-    public boolean pullsEventsCommonly() {
-        return false;
-    }
-
-    @Override
     protected ItemInputStream<? extends PluginSourceData> parseEventResponse(InputStream rawData, EntityManager entityManager) throws DataFordelerException {
         if (!(entityManager instanceof CprEntityManager)) {
             throw new WrongSubclassException(CprEntityManager.class, entityManager);
