@@ -8,10 +8,7 @@ import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by lars on 22-06-17.
@@ -91,7 +88,7 @@ public class AddressRecord extends PersonDataRecord {
                 // String postnummer,
                 null,
                 // String sideDoer,
-                this.get("sidedoer"),
+                this.getString("sidedoer", true),
                 // String adresselinie1,
                 this.get("adr1-supladr"),
                 // String adresselinie2,
@@ -144,11 +141,17 @@ public class AddressRecord extends PersonDataRecord {
 
     @Override
     public List<Bitemporality> getBitemporality() {
-        return Arrays.asList(
-                this.addressTemporality,
-                this.conameTemporality,
-                this.municipalityTemporality
-        );
+        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+        if (this.has("komkod") || this.has("vejkod") || this.has("bnr")) {
+            bitemporalities.add(this.addressTemporality);
+        }
+        if (this.has("convn")) {
+            bitemporalities.add(this.conameTemporality);
+        }
+        if (this.has("tilfra_mynkod") || this.has("fraflykomdto") || this.has("fraflykomkod") || this.has("tilflykomdto")) {
+            bitemporalities.add(this.municipalityTemporality);
+        }
+        return bitemporalities;
     }
 
     @Override
