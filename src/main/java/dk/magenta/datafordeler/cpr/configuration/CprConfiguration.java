@@ -68,7 +68,7 @@ public class CprConfiguration implements Configuration {
 
     @Column
     @Enumerated(EnumType.ORDINAL)
-    private RegisterType personRegisterType = RegisterType.REMOTE_FTP;
+    private RegisterType personRegisterType = RegisterType.LOCAL_FILE;
 
     @Column
     private String personRegisterFtpAddress = "ftps://ftp.cpr.dk/ud/";
@@ -80,7 +80,7 @@ public class CprConfiguration implements Configuration {
     private String personRegisterFtpPassword = "";
 
     @Column
-    private String personRegisterLocalFile = "";
+    private String personRegisterLocalFile = "cache/d170608.l534902";
 
     @Column
     @Enumerated(EnumType.ORDINAL)
@@ -366,7 +366,6 @@ public class CprConfiguration implements Configuration {
     }
 
     private URI formatURI(RegisterType registerType, String localFile, String ftpAddress) throws ConfigurationException {
-        System.out.println("registerType: "+registerType);
         if (registerType == RegisterType.DISABLED) {
             return null;
         } else if (registerType == RegisterType.LOCAL_FILE) {
