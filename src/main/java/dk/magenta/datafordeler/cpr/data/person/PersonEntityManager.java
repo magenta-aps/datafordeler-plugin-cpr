@@ -1,11 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
-import dk.magenta.datafordeler.core.exception.DataFordelerException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
@@ -14,11 +10,7 @@ import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.List;
 import java.util.UUID;
 
 /**

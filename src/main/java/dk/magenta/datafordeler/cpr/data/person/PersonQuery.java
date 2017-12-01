@@ -6,9 +6,7 @@ import dk.magenta.datafordeler.core.fapi.QueryField;
 import dk.magenta.datafordeler.cpr.data.CprQuery;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonAddressData;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonCoreData;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonNameData;
-import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 
 import java.util.*;
 

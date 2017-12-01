@@ -3,7 +3,6 @@ package dk.magenta.datafordeler.cpr.data;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.*;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
-import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.ImportInterruptedException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
@@ -25,15 +24,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.collection.internal.AbstractPersistentCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.*;
 

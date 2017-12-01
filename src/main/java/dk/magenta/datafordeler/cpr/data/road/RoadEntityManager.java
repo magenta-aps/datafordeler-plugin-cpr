@@ -1,7 +1,5 @@
 package dk.magenta.datafordeler.cpr.data.road;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;

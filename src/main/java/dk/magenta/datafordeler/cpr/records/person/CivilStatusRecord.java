@@ -1,15 +1,16 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by lars on 22-06-17.

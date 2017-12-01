@@ -23,7 +23,6 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
     public static final String RECORDTYPE_CIVILSTATUS = "035";
     public static final String RECORDTYPE_HISTORIC_CIVILSTATUS = "036";
     public static final String RECORDTYPE_HISTORIC_CPRNUMBER = "065";
-    // TODO: Add one for each data type
 
     public PersonDataRecord(String line) throws ParseException {
         super(line);

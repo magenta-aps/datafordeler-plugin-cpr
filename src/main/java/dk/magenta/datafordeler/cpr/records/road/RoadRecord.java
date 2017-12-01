@@ -1,6 +1,5 @@
 package dk.magenta.datafordeler.cpr.records.road;
 
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
