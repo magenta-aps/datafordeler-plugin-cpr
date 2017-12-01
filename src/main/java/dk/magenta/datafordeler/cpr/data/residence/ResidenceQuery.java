@@ -8,8 +8,6 @@ import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 
 import java.util.*;
 
-import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_MUNICIPALITYCODE;
-
 /**
  * Created by lars on 19-05-17.
  */

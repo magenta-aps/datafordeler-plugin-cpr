@@ -1,6 +1,5 @@
 package dk.magenta.datafordeler.cpr.records.residence;
 
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;

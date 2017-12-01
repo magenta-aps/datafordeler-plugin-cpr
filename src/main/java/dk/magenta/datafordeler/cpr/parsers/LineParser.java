@@ -1,12 +1,9 @@
 package dk.magenta.datafordeler.cpr.parsers;
 
-import com.ibm.icu.text.CharsetDetector;
-import com.ibm.icu.text.CharsetMatch;
 import dk.magenta.datafordeler.cpr.records.CprRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
