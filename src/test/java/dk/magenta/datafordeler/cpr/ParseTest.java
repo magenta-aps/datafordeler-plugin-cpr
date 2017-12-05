@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
-import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.person.*;
@@ -52,7 +51,7 @@ public class ParseTest {
 
     private void loadPerson(ImportMetadata importMetadata) throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
-        personEntityManager.parseRegistration(testData, importMetadata);
+        personEntityManager.parseData(testData, importMetadata);
         testData.close();
     }
 
@@ -64,13 +63,13 @@ public class ParseTest {
 
     private void loadRoad(ImportMetadata importMetadata) throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-        roadEntityManager.parseRegistration(testData, importMetadata);
+        roadEntityManager.parseData(testData, importMetadata);
         testData.close();
     }
 
     private void loadResidence(ImportMetadata importMetadata) throws DataFordelerException, IOException {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
-        residenceEntityManager.parseRegistration(testData, importMetadata);
+        residenceEntityManager.parseData(testData, importMetadata);
         testData.close();
     }
 

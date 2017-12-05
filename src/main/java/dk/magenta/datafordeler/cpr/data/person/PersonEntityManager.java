@@ -51,8 +51,8 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     }
 /*
     @Override
-    public List<PersonRegistration> parseRegistration(String registrationData, ImportMetadata importMetadata) throws DataFordelerException {
-        return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)), importMetadata);
+    public List<PersonRegistration> parseData(String registrationData, ImportMetadata importMetadata) throws DataFordelerException {
+        return this.parseData(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)), importMetadata);
     }*/
 
     @Override
