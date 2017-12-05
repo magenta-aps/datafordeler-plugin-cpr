@@ -196,7 +196,9 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                         stilling != null ? stilling.getPosition() : null
         );
         if (foedsel != null) {
-            output.put("foedselsdato", foedsel.getBirthDatetime().toLocalDate().toString());
+            if (foedsel.getBirthDatetime() != null) {
+                output.put("foedselsdato", foedsel.getBirthDatetime().toLocalDate().toString());
+            }
             output.put(
                             "cprFoedselsregistreringsstedskode",
                             foedsel.getBirthPlaceCode()
