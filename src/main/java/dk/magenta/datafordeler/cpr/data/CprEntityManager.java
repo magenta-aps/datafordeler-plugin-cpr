@@ -167,7 +167,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     private static final String TASK_CHUNK_HANDLE = "CprChunk";
 
     @Override
-    public List<R> parseRegistration(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
+    public List<R> parseData(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
         String charset = this.getConfiguration().getRegisterCharset(this);
         BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
         CprSubParser<T> parser = this.getParser();
