@@ -71,19 +71,19 @@ public class QueryTest {
 
     public void loadPerson(ImportMetadata importMetadata) throws Exception {
         InputStream testData = QueryTest.class.getResourceAsStream("/persondata.txt");
-        personEntityManager.parseRegistration(testData, importMetadata);
+        personEntityManager.parseData(testData, importMetadata);
         testData.close();
     }
 
     public void loadResidence(ImportMetadata importMetadata) throws Exception {
         InputStream testData = QueryTest.class.getResourceAsStream("/roaddata.txt");
-        residenceEntityManager.parseRegistration(testData, importMetadata);
+        residenceEntityManager.parseData(testData, importMetadata);
         testData.close();
     }
 
     public void loadRoad(ImportMetadata importMetadata) throws Exception {
         InputStream testData = QueryTest.class.getResourceAsStream("/roaddata.txt");
-        roadEntityManager.parseRegistration(testData, importMetadata);
+        roadEntityManager.parseData(testData, importMetadata);
         testData.close();
     }
 
