@@ -366,7 +366,6 @@ public class CprConfiguration implements Configuration {
     }
 
     private URI formatURI(RegisterType registerType, String localFile, String ftpAddress) throws ConfigurationException {
-        System.out.println("registerType: "+registerType);
         if (registerType == RegisterType.DISABLED) {
             return null;
         } else if (registerType == RegisterType.LOCAL_FILE) {
