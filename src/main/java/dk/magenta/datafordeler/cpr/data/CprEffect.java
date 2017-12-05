@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.database.Registration;
+import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -64,8 +65,8 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, D e
 
     public boolean compareRange(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         return (
-                (this.getEffectFrom() != null ? this.getEffectFrom().equals(effectFrom) : effectFrom == null) &&
-                        (this.getEffectTo() != null ? this.getEffectTo().equals(effectTo) : effectTo == null) &&
+                Equality.equal(this.getEffectFrom(), effectFrom) &&
+                Equality.equal(this.getEffectTo(), effectTo) &&
                         (this.getEffectFromUncertain() == effectFromUncertain) &&
                         (this.getEffectToUncertain() == effectToUncertain)
         );
