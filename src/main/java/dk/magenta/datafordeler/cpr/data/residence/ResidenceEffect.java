@@ -13,6 +13,7 @@ import java.time.temporal.TemporalAccessor;
  */
 @javax.persistence.Entity
 @Table(name="cpr_residence_effect", indexes = {
+        @Index(name = "cpr_residence_effect_registration", columnList = "registration_id"),
         @Index(name = "cpr_residence_effect_from", columnList = "effectFrom"),
         @Index(name = "cpr_residence_effect_to", columnList = "effectTo")
 })
