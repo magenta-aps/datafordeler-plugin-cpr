@@ -9,9 +9,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
-/**
- * Created by lars on 16-05-17.
- */
 @Component
 public class CprConfigurationManager extends ConfigurationManager<CprConfiguration> {
 

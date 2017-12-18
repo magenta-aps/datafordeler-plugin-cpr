@@ -17,7 +17,7 @@ import java.util.Map;
 import static dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData.*;
 
 /**
- * Created by lars on 29-06-17.
+ * Base class for Residence data, linking to Effects and delegating storage to referred classes
  */
 @Entity
 @Table(name="cpr_residence_data", indexes = {

@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.unversioned;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.QueryManager;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import org.hibernate.Session;
 
 import javax.persistence.Column;
@@ -10,9 +11,10 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Collections;
+import java.util.UUID;
 
 /**
- * Created by lars on 29-06-17.
+ * Nontemporal storage of postcodes, to be referenced by bitemporal data items.
  */
 @Entity
 @Table(name="cpr_postcode", indexes = {
@@ -52,9 +54,17 @@ public class PostCode extends UnversionedEntity {
             postcode = new PostCode();
             postcode.setPostnummer(code);
             postcode.setPostdistrikt(text);
+            postcode.setIdentification(
+                    QueryManager.getOrCreateIdentification(session, generateUUID(code), CprPlugin.getDomain())
+            );
             session.save(postcode);
         }
         return postcode;
+    }
+
+    public static UUID generateUUID(int postnummer) {
+        String uuidInput = "postcode:" + postnummer;
+        return UUID.nameUUIDFromBytes(uuidInput.getBytes());
     }
 
 }

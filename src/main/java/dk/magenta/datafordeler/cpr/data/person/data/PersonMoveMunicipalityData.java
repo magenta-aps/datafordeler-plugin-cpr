@@ -12,7 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lars on 22-06-17.
+ * Storage for data on a Person's moving between municipalities,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
 @Table(name = "cpr_person_move_municipality")

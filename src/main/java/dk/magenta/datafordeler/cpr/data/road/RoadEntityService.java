@@ -21,9 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 
-/**
- * Created by lars on 19-05-17.
- */
 @RestController("CprRoadEntityService")
 @RequestMapping("/cpr/road/1/rest")
 public class RoadEntityService extends FapiService<RoadEntity, RoadQuery> {

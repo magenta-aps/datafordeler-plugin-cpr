@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 /**
- * Created by lars on 16-05-17.
  * Datafordeler Plugin to fetch, parse and serve CPR data (data on people, roads and
  * administrative regions).
  * As with all plugins, it follows the model laid out in the Datafordeler Core

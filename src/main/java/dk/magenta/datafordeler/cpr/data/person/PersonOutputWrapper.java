@@ -16,7 +16,6 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
 
     private ObjectMapper objectMapper;
 
-
     @Override
     public Object wrapResult(PersonEntity input) {
         objectMapper = new ObjectMapper();

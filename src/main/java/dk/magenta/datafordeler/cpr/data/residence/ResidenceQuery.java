@@ -9,7 +9,7 @@ import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import java.util.*;
 
 /**
- * Created by lars on 19-05-17.
+ * Container for a query for Residences, defining fields and database lookup
  */
 public class ResidenceQuery extends CprQuery<ResidenceEntity> {
 

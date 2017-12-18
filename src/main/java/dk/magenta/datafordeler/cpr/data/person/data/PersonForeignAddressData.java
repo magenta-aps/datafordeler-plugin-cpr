@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 /**
- * Created by lars on 22-06-17.
+ * Storage for data on a Person's address in a foreign country,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
 @Table(name = "cpr_person_foreign_address")

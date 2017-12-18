@@ -11,7 +11,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.UUID;
 
 /**
- * Created by lars on 16-05-17.
+ * An Entity representing a residence. Bitemporal data is structured as described
+ * in {@link dk.magenta.datafordeler.core.database.Entity}
  */
 @javax.persistence.Entity
 @Table(name="cpr_residence_entity",  indexes = {
