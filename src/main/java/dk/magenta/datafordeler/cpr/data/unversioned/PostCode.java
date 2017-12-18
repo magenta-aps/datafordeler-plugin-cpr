@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.Collections;
 
 /**
- * Created by lars on 29-06-17.
+ * Nontemporal storage of postcodes, to be referenced by bitemporal data items.
  */
 @Entity
 @Table(name="cpr_postcode", indexes = {

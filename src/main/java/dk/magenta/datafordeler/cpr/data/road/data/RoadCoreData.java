@@ -14,9 +14,9 @@ import java.util.Map;
 
 import static dk.magenta.datafordeler.cpr.data.road.data.RoadCoreData.DB_FIELD_ROAD_NAME;
 
-
 /**
- * Created by lars on 16-05-17.
+ * Storage for data on a Road's core data (name, connections),
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData}
  */
 @Entity
 @Table(name="cpr_road_core", indexes = {

@@ -10,9 +10,6 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.xml.bind.annotation.XmlTransient;
 
-/**
- * Created by lars on 09-06-17.
- */
 @MappedSuperclass
 public abstract class UnversionedEntity extends DatabaseEntry {
 
@@ -21,4 +18,11 @@ public abstract class UnversionedEntity extends DatabaseEntry {
     @XmlTransient
     private Identification identification;
 
+    public Identification getIdentification() {
+        return this.identification;
+    }
+
+    public void setIdentification(Identification identification) {
+        this.identification = identification;
+    }
 }

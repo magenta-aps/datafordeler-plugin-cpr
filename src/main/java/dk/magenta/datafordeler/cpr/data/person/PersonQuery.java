@@ -11,7 +11,7 @@ import dk.magenta.datafordeler.cpr.data.person.data.PersonNameData;
 import java.util.*;
 
 /**
- * Created by lars on 19-05-17.
+ * Container for a query for Persons, defining fields and database lookup
  */
 public class PersonQuery extends CprQuery<PersonEntity> {
 

@@ -17,7 +17,8 @@ import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_MUNICIPA
 import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_ROADCODE;
 
 /**
- * Created by lars on 16-05-17.
+ * An Entity representing a road. Bitemporal data is structured as described
+ * in {@link dk.magenta.datafordeler.core.database.Entity}
  */
 @javax.persistence.Entity
 @Table(

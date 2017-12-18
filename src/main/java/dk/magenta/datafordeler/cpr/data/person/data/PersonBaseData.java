@@ -15,7 +15,7 @@ import static dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData.DB_FIE
 import static dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData.DB_FIELD_NAME;
 
 /**
- * Created by lars on 16-05-17.
+ * Base class for Person data, linking to Effects and delegating storage to referred classes
  */
 @Entity
 @Table(name="cpr_person_data", indexes = {

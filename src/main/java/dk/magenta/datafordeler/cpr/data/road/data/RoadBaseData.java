@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by lars on 16-05-17.
+ * Base class for Road data, linking to Effects and delegating storage to referred classes
  */
 @Entity
 @Table(name="cpr_road_data", indexes = {

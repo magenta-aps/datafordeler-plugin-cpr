@@ -34,9 +34,6 @@ import java.nio.charset.Charset;
 import java.time.OffsetDateTime;
 import java.util.*;
 
-/**
- * Created by lars on 29-05-17.
- */
 @Component
 public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity<E, R>, R extends CprRegistration<E, R, V>, V extends CprEffect<R, V, D>, D extends CprData<V, D>> extends EntityManager {
 

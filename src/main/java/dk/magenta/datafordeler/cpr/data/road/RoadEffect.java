@@ -9,7 +9,8 @@ import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
 
 /**
- * Created by lars on 16-05-17.
+ * Representation of effects in the bitemporal model for roads.
+ * @see dk.magenta.datafordeler.core.database.Entity
  */
 @javax.persistence.Entity
 @Table(name="cpr_road_effect", indexes = {

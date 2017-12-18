@@ -14,9 +14,6 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.util.UUID;
 
-/**
- * Created by lars on 16-05-17.
- */
 @Component
 public class ResidenceEntityManager extends CprEntityManager<ResidenceRecord, ResidenceEntity, ResidenceRegistration, ResidenceEffect, ResidenceBaseData> {
 

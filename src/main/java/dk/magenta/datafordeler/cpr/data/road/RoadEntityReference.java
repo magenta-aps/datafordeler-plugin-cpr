@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by lars on 16-05-17.
- */
 public class RoadEntityReference extends EntityReference<RoadEntity, RoadRegistrationReference> {
     @Override
     public Class<RoadEntity> getEntityClass() {

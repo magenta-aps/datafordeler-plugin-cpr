@@ -5,9 +5,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 
-/**
- * Created by lars on 12-01-17.
- */
 @ComponentScan({
         "dk.magenta.datafordeler",
         "dk.magenta.datafordeler.core", "dk.magenta.datafordeler.core.database", "dk.magenta.datafordeler.core.util",

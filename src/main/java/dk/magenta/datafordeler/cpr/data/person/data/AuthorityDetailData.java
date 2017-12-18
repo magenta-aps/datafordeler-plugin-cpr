@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * Created by lars on 29-06-17.
+ * Superclass for storing data with an authority field
  */
 @MappedSuperclass
 public abstract class AuthorityDetailData extends DetailData {

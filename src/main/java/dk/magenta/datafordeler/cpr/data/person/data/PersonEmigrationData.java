@@ -10,7 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lars on 27-06-17.
+ * Storage for data on a Person's country code,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
 @Table(name = "cpr_person_emigration")

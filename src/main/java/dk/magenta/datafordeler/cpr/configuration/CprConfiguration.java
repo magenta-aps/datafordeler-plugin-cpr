@@ -13,9 +13,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-/**
- * Created by lars on 16-05-17.
- */
 @javax.persistence.Entity
 @Table(name="cpr_config")
 public class CprConfiguration implements Configuration {

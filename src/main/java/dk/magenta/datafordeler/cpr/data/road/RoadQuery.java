@@ -13,7 +13,7 @@ import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_MUNICIPA
 import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_ROADCODE;
 
 /**
- * Created by lars on 19-05-17.
+ * Container for a query for Roads, defining fields and database lookup
  */
 public class RoadQuery extends CprQuery<RoadEntity> {
 

@@ -11,9 +11,6 @@ import javax.xml.bind.annotation.XmlElement;
 import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
 
-/**
- * Created by lars on 29-06-17.
- */
 @JsonPropertyOrder({"effectFrom", "effectFromUncertain", "effectTo", "effectToUncertain", "dataItems"})
 public abstract class CprEffect<R extends Registration, V extends CprEffect, D extends CprData> extends Effect<R, V, D> {
 

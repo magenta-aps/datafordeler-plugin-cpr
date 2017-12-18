@@ -7,7 +7,8 @@ import javax.persistence.Table;
 import java.time.OffsetDateTime;
 
 /**
- * Created by lars on 16-05-17.
+ * Representation of registrations in the bitemporal model for roads.
+ * @see dk.magenta.datafordeler.core.database.Entity
  */
 @javax.persistence.Entity
 @Table(name="cpr_road_registration", indexes = {

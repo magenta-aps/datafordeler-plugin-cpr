@@ -10,9 +10,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by lars on 12-06-17.
- */
 @MappedSuperclass
 //@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class DetailData extends DatabaseEntry {

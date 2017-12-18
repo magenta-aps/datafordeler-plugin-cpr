@@ -10,7 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lars on 16-05-17.
+ * Storage for data on a Road's notes,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData}
  */
 @Entity
 @Table(name="cpr_road_memo")

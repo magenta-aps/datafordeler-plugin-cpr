@@ -11,7 +11,8 @@ import static dk.magenta.datafordeler.cpr.data.person.data.PersonNameData.DB_FIE
 import static dk.magenta.datafordeler.cpr.data.person.data.PersonNameData.DB_FIELD_LAST_NAME;
 
 /**
- * Created by lars on 22-06-17.
+ * Storage for data on a Person's name,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
 @Table(name = "cpr_person_name", indexes = {

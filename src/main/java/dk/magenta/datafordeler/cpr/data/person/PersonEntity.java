@@ -16,7 +16,8 @@ import java.util.UUID;
 import static dk.magenta.datafordeler.cpr.data.person.PersonEntity.DB_FIELD_CPR_NUMBER;
 
 /**
- * Created by lars on 16-05-17.
+ * An Entity representing a person. Bitemporal data is structured as
+ * described in {@link dk.magenta.datafordeler.core.database.Entity}
  */
 @javax.persistence.Entity
 @Table(name="cpr_person_entity", indexes = {
@@ -60,8 +61,6 @@ public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {
     public void setPersonnummer(String personnummer) {
         this.personnummer = personnummer;
     }
-
-
 
     public static UUID generateUUID(String cprNumber) {
         String uuidInput = "person:"+cprNumber;

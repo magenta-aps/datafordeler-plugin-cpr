@@ -9,7 +9,8 @@ import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
 
 /**
- * Created by lars on 16-05-17.
+ * Representation of effects in the bitemporal model for persons.
+ * @see dk.magenta.datafordeler.core.database.Entity
  */
 @javax.persistence.Entity
 @Table(name="cpr_person_effect", indexes = {
@@ -40,6 +41,5 @@ public class PersonEffect extends CprEffect<PersonRegistration, PersonEffect, Pe
         this.setEffectFromUncertain(effectFromUncertain);
         this.setEffectToUncertain(effectToUncertain);
     }
-
 
 }

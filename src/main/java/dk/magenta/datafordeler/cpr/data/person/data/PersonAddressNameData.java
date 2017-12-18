@@ -10,7 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lars on 22-06-17.
+ * Storage for data on a Person's addressing name,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
 @Table(name = "cpr_person_addressname")

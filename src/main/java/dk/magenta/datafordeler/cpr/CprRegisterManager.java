@@ -29,9 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
-/**
- * Created by lars on 16-05-17.
- */
 @Component
 public class CprRegisterManager extends RegisterManager {
 

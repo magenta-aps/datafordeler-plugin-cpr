@@ -26,9 +26,6 @@ import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.util.*;
 
-/**
- * Created by lars on 14-06-17.
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
 public class ParseTest {
