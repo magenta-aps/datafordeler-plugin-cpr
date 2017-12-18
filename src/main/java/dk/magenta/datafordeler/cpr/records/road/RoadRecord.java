@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 28-06-17.
+ * Record for Road names (type 001).
  */
 public class RoadRecord extends RoadDataRecord {
 

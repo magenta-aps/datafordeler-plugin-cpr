@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 22-06-17.
+ * Record for Person base data (type 001).
  */
 public class PersonRecord extends PersonDataRecord {
 

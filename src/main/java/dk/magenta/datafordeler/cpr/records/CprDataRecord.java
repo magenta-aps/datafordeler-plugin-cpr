@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 04-11-14.
+ * Superclass for line records.
  */
-public abstract class CprDataRecord<V extends CprEffect, B extends CprData> extends CprRecord {
+public abstract class CprDataRecord<V extends CprEffect, B extends CprData> extends Record {
 
     public CprDataRecord(String line) throws ParseException {
         super(line);

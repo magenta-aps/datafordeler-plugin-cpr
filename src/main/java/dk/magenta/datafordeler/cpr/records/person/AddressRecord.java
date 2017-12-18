@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 22-06-17.
+ * Record for Person address (type 025).
  */
 public class AddressRecord extends PersonDataRecord {
 

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 29-06-17.
+ * Record for Residence (type 002).
  */
 public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBaseData> {
 

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 27-06-17.
+ * Record for Person foreign address (type 028).
  */
 public class ForeignAddressRecord extends PersonDataRecord {
 
