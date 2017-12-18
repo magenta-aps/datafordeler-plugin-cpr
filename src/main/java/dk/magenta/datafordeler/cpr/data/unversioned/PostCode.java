@@ -63,7 +63,7 @@ public class PostCode extends UnversionedEntity {
     }
 
     public static UUID generateUUID(int postnummer) {
-        String uuidInput = "cprpostcode:" + postnummer;
+        String uuidInput = "postcode:" + postnummer;
         return UUID.nameUUIDFromBytes(uuidInput.getBytes());
     }
 
