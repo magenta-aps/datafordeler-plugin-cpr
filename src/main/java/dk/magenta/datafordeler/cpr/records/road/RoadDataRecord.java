@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.HashSet;
 
 /**
- * Created by lars on 22-06-17.
+ * Superclass for Road records
  */
 public abstract class RoadDataRecord extends CprDataRecord<RoadEffect, RoadBaseData> {
 

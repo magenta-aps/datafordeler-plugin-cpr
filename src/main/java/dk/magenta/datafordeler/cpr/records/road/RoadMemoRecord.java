@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 28-06-17.
+ * Record for Road memos (type 005).
  */
 public class RoadMemoRecord extends RoadDataRecord {
 

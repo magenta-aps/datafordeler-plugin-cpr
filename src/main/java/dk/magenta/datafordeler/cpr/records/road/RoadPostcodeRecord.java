@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 29-06-17.
+ * Record for Road postcodes (type 004).
  */
 public class RoadPostcodeRecord extends RoadDataRecord {
 

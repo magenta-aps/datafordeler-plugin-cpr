@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 27-06-17.
+ * Record for Person protection (type 015).
  */
 public class ProtectionRecord extends PersonDataRecord {
 

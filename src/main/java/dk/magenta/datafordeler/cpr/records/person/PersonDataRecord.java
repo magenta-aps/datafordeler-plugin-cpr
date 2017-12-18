@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /**
- * Created by lars on 22-06-17.
+ * Superclass for Person records
  */
 public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, PersonBaseData> {
 

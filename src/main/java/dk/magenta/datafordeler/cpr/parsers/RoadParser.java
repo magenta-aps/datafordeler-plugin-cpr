@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * Created by lars on 04-11-14.
+ * Parser for the Road line format.
  */
 @Component
 public class RoadParser extends CprSubParser<RoadDataRecord> {
