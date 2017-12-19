@@ -15,19 +15,17 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
 
-import static dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData.*;
-
 /**
  * Base class for Residence data, linking to Effects and delegating storage to referred classes
  */
 @Entity
 @Table(name="cpr_residence_data", indexes = {
         @Index(name = "cpr_residence_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = "cpr_residence_municipality_code", columnList = DB_FIELD_MUNICIPALITY_CODE),
-        @Index(name = "cpr_residence_road_code", columnList = DB_FIELD_ROAD_CODE),
-        @Index(name = "cpr_residence_housenumber", columnList = DB_FIELD_HOUSENUMBER),
-        @Index(name = "cpr_residence_floor", columnList = DB_FIELD_FLOOR),
-        @Index(name = "cpr_residence_door", columnList = DB_FIELD_DOOR),
+        @Index(name = "cpr_residence_municipality_code", columnList = ResidenceBaseData.DB_FIELD_MUNICIPALITY_CODE),
+        @Index(name = "cpr_residence_road_code", columnList = ResidenceBaseData.DB_FIELD_ROAD_CODE),
+        @Index(name = "cpr_residence_housenumber", columnList = ResidenceBaseData.DB_FIELD_HOUSENUMBER),
+        @Index(name = "cpr_residence_floor", columnList = ResidenceBaseData.DB_FIELD_FLOOR),
+        @Index(name = "cpr_residence_door", columnList = ResidenceBaseData.DB_FIELD_DOOR),
 })
 public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseData> {
 
