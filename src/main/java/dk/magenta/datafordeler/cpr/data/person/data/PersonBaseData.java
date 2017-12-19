@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
+import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.DetailData;
@@ -19,7 +20,7 @@ import static dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData.DB_FIE
  */
 @Entity
 @Table(name="cpr_person_data", indexes = {
-        @Index(name = "cpr_person_lastUpdated", columnList = "lastUpdated"),
+        @Index(name = "cpr_person_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
         @Index(name = "cpr_person_name", columnList = DB_FIELD_NAME + "_id"),
         @Index(name = "cpr_person_address", columnList = DB_FIELD_ADDRESS + "_id")
 })

@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.road.data;
 
+import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.CprData;
@@ -22,7 +23,7 @@ import static dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData.DB_FIELD_C
  */
 @Entity
 @Table(name="cpr_road_data", indexes = {
-        @Index(name = "cpr_road_lastUpdated", columnList = "lastUpdated"),
+        @Index(name = "cpr_road_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
         @Index(name = "cpr_road_core", columnList = DB_FIELD_CORE + "_id")
 })
 public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
