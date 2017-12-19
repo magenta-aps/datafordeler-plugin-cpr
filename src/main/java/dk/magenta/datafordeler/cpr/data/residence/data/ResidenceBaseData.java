@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.residence.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
@@ -21,7 +22,7 @@ import static dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData.
  */
 @Entity
 @Table(name="cpr_residence_data", indexes = {
-        @Index(name = "cpr_residence_lastUpdated", columnList = "lastUpdated"),
+        @Index(name = "cpr_residence_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
         @Index(name = "cpr_residence_municipality_code", columnList = DB_FIELD_MUNICIPALITY_CODE),
         @Index(name = "cpr_residence_road_code", columnList = DB_FIELD_ROAD_CODE),
         @Index(name = "cpr_residence_housenumber", columnList = DB_FIELD_HOUSENUMBER),
