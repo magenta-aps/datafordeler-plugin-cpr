@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import dk.magenta.datafordeler.core.database.DataItem;
+import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.DetailData;
@@ -12,78 +13,90 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData.DB_FIELD_ADDRESS;
-import static dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData.DB_FIELD_NAME;
-
 /**
  * Base class for Person data, linking to Effects and delegating storage to referred classes
  */
 @Entity
 @Table(name="cpr_person_data", indexes = {
         @Index(name = "cpr_person_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = "cpr_person_name", columnList = DB_FIELD_NAME + "_id"),
-        @Index(name = "cpr_person_address", columnList = DB_FIELD_ADDRESS + "_id")
+        @Index(name = "cpr_person_name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF),
+        @Index(name = "cpr_person_address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF)
 })
 public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     public static final String DB_FIELD_CORE = "coreData";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_CORE + DatabaseEntry.REF)
     private PersonCoreData coreData;
 
     public static final String DB_FIELD_STATUS = "status";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_STATUS + DatabaseEntry.REF)
     private PersonStatusData status;
 
     public static final String DB_FIELD_MOTHER = "mother";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_MOTHER + DatabaseEntry.REF)
     private PersonParentData mother;
 
     public static final String DB_FIELD_FATHER = "father";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_FATHER + DatabaseEntry.REF)
     private PersonParentData father;
 
     public static final String DB_FIELD_MOTHERVERIFICATION = "motherVerification";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_MOTHERVERIFICATION + DatabaseEntry.REF)
     private PersonParentVerificationData motherVerification;
 
     public static final String DB_FIELD_FATHERVERIFICATION = "fatherVerification";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_FATHERVERIFICATION + DatabaseEntry.REF)
     private PersonParentVerificationData fatherVerification;
 
     public static final String DB_FIELD_POSITION = "position";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_POSITION + DatabaseEntry.REF)
     private PersonPositionData position;
 
     public static final String DB_FIELD_BIRTH = "birth";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_BIRTH + DatabaseEntry.REF)
     private PersonBirthData birth;
 
     public static final String DB_FIELD_ADDRESS = "address";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_ADDRESS + DatabaseEntry.REF)
     private PersonAddressData address;
 
     public static final String DB_FIELD_CONAME = "coname";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_CONAME + DatabaseEntry.REF)
     private PersonAddressConameData coname;
 
     public static final String DB_FIELD_MOVEMUNICIPALITY = "moveMunicipality";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_MOVEMUNICIPALITY + DatabaseEntry.REF)
     private PersonMoveMunicipalityData moveMunicipality;
 
     public static final String DB_FIELD_NAME = "name";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_NAME + DatabaseEntry.REF)
     private PersonNameData name;
 
     public static final String DB_FIELD_ADDRESSING_NAME = "addressingName";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_ADDRESSING_NAME + DatabaseEntry.REF)
     private PersonAddressNameData addressingName;
 
     public static final String DB_FIELD_NAME_VERIFICATION = "nameVerification";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_NAME_VERIFICATION + DatabaseEntry.REF)
     private PersonNameVerificationData nameVerification;
 
     public static final String DB_FIELD_NAME_AUTHORITY = "nameAuthority";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_NAME_AUTHORITY + DatabaseEntry.REF)
     private PersonNameAuthorityTextData nameAuthority;
 
     public static final String DB_FIELD_PROTECTION = "protection";
@@ -92,26 +105,32 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     public static final String DB_FIELD_MIGRATION = "migration";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_MIGRATION + DatabaseEntry.REF)
     private PersonEmigrationData migration;
 
     public static final String DB_FIELD_FOREIGN_ADDRESS = "foreignAddress";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_FOREIGN_ADDRESS + DatabaseEntry.REF)
     private PersonForeignAddressData foreignAddress;
 
     public static final String DB_FIELD_CIVIL_STATUS = "civilStatus";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_CIVIL_STATUS + DatabaseEntry.REF)
     private PersonCivilStatusData civilStatus;
 
     public static final String DB_FIELD_CIVIL_STATUS_VERIFICATION = "civilStatusVerification";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_CIVIL_STATUS_VERIFICATION + DatabaseEntry.REF)
     private PersonCivilStatusVerificationData civilStatusVerification;
 
     public static final String DB_FIELD_CIVIL_STATUS_AUTHORITY = "civilStatusAuthority";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_CIVIL_STATUS_AUTHORITY + DatabaseEntry.REF)
     private PersonCivilStatusAuthorityTextData civilStatusAuthority;
 
     public static final String DB_FIELD_CPRNUMBER = "cprNumber";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_CPRNUMBER + DatabaseEntry.REF)
     private PersonNumberData cprNumber;
 
 

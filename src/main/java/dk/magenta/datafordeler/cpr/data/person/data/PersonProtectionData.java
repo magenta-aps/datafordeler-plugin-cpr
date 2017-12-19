@@ -2,11 +2,9 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.DatabaseEntry;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,13 +14,16 @@ import java.util.Map;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_protection")
+@Table(name = "cpr_person_protection", indexes = {
+        @Index(name = "cpr_person_protection_base", columnList = PersonProtectionData.DB_FIELD_BASEDATA + DatabaseEntry.REF)
+})
 public class PersonProtectionData extends AuthorityDetailData {
 
 
-    public static final String DB_FIELD_BASEDATA = "baseData";
-    @ManyToOne(targetEntity = PersonBaseData.class)
+    public static final String DB_FIELD_BASEDATA = "personBaseData";
     @JsonIgnore
+    @ManyToOne(targetEntity = PersonBaseData.class)
+    @JoinColumn(name = DB_FIELD_BASEDATA + DatabaseEntry.REF)
     private PersonBaseData personBaseData;
 
     public void setBaseData(PersonBaseData personBaseData) {

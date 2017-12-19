@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.road.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.unversioned.PostCode;
 
@@ -18,7 +19,7 @@ import static dk.magenta.datafordeler.cpr.data.road.data.RoadCityData.DB_FIELD_B
  */
 @Entity
 @Table(name="cpr_road_postcode", indexes = {
-        @Index(name = "cpr_road_post_base", columnList = DB_FIELD_BASEDATA + "_id")
+        @Index(name = "cpr_road_post_base", columnList = DB_FIELD_BASEDATA + DatabaseEntry.REF)
 })
 public class RoadPostcodeData extends DetailData {
 
@@ -26,7 +27,7 @@ public class RoadPostcodeData extends DetailData {
 
     @JsonIgnore
     @ManyToOne(targetEntity = RoadBaseData.class)
-    @JoinColumn(name = DB_FIELD_BASEDATA + "_id")
+    @JoinColumn(name = DB_FIELD_BASEDATA + DatabaseEntry.REF)
     private RoadBaseData roadBaseData;
 
     public RoadBaseData getRoadBaseData() {
