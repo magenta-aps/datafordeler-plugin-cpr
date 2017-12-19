@@ -17,15 +17,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData.DB_FIELD_CORE;
-
 /**
  * Base class for Road data, linking to Effects and delegating storage to referred classes
  */
 @Entity
 @Table(name="cpr_road_data", indexes = {
         @Index(name = "cpr_road_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = "cpr_road_core", columnList = DB_FIELD_CORE + DatabaseEntry.REF)
+        @Index(name = "cpr_road_core", columnList = RoadBaseData.DB_FIELD_CORE + DatabaseEntry.REF)
 })
 public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
 
