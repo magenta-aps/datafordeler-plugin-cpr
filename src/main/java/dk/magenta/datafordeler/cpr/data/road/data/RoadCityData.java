@@ -4,24 +4,28 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
+
+import static dk.magenta.datafordeler.cpr.data.road.data.RoadCityData.DB_FIELD_BASEDATA;
 
 /**
  * Storage for data on a Road's city,
  * referenced by {@link dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData}
  */
 @Entity
-@Table(name="cpr_road_city")
+@Table(name="cpr_road_city", indexes = {
+        @Index(name = "cpr_road_city_base", columnList = DB_FIELD_BASEDATA + "_id")
+})
 public class RoadCityData extends DetailData {
 
-    @ManyToOne(targetEntity = RoadBaseData.class)
+    public static final String DB_FIELD_BASEDATA = "roadBaseData";
+
     @JsonIgnore
+    @ManyToOne(targetEntity = RoadBaseData.class)
+    @JoinColumn(name = DB_FIELD_BASEDATA + "_id")
     private RoadBaseData roadBaseData;
 
     public RoadBaseData getRoadBaseData() {

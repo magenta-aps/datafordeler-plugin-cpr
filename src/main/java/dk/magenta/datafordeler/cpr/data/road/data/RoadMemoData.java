@@ -9,16 +9,23 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
 
+import static dk.magenta.datafordeler.cpr.data.road.data.RoadCityData.DB_FIELD_BASEDATA;
+
 /**
  * Storage for data on a Road's notes,
  * referenced by {@link dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData}
  */
 @Entity
-@Table(name="cpr_road_memo")
+@Table(name="cpr_road_memo", indexes = {
+        @Index(name = "cpr_road_memo_base", columnList = DB_FIELD_BASEDATA + "_id")
+})
 public class RoadMemoData extends DetailData {
 
-    @ManyToOne(targetEntity = RoadBaseData.class, fetch = FetchType.EAGER)
+    public static final String DB_FIELD_BASEDATA = "roadBaseData";
+
     @JsonIgnore
+    @ManyToOne(targetEntity = RoadBaseData.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = DB_FIELD_BASEDATA + "_id")
     private RoadBaseData roadBaseData;
 
     public RoadBaseData getRoadBaseData() {
