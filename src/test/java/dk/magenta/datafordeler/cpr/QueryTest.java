@@ -115,7 +115,7 @@ public class QueryTest {
         ParameterMap searchParameters = new ParameterMap();
         searchParameters.add("fornavn", "Tester");
         ResponseEntity<String> response = restSearch(searchParameters, "person");
-        Assert.assertEquals(FapiService.getDebugDisableSecurity() ? 200 : 403, response.getStatusCode().value());
+        Assert.assertEquals(403, response.getStatusCode().value());
 
         testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
         this.applyAccess(testUserDetails);
@@ -228,7 +228,7 @@ public class QueryTest {
         searchParameters.add("vejkode", "001");
         searchParameters.add("husnummer", "1");
         ResponseEntity<String> response = restSearch(searchParameters, "residence");
-        Assert.assertEquals(FapiService.getDebugDisableSecurity() ? 200 : 403, response.getStatusCode().value());
+        Assert.assertEquals(403, response.getStatusCode().value());
 
         testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
         this.applyAccess(testUserDetails);
@@ -332,7 +332,7 @@ public class QueryTest {
         ParameterMap searchParameters = new ParameterMap();
         searchParameters.add("vejnavn", "TestVej");
         ResponseEntity<String> response = restSearch(searchParameters, "road");
-        Assert.assertEquals(FapiService.getDebugDisableSecurity() ? 200 : 403, response.getStatusCode().value());
+        Assert.assertEquals(403, response.getStatusCode().value());
 
         testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
         this.applyAccess(testUserDetails);
