@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.SessionManager;
+import dk.magenta.datafordeler.core.exception.ConfigurationException;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
@@ -24,7 +25,7 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.time.OffsetDateTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -52,6 +53,18 @@ public class CprRegisterManager extends RegisterManager {
     @Value("${dafo.cpr.local-copy-folder:}")
     private String localCopyFolder;
 
+    @Value("${dafo.cpr.subscription-enabled:false}")
+    private boolean setupSubscriptionEnabled;
+
+    @Value("${dafo.cpr.local-subscription-folder:cache}")
+    private String localSubscriptionFolder;
+
+    @Value("${dafo.cpr.jobid:0}")
+    private int jobId;
+
+    @Value("${dafo.cpr.customer-id:0}")
+    private int customerId;
+
 
     public CprRegisterManager() {
 
@@ -69,6 +82,10 @@ public class CprRegisterManager extends RegisterManager {
             temp.mkdir();
             this.localCopyFolder = temp.getAbsolutePath();
         }
+    }
+
+    public int getCustomerId() {
+        return this.customerId;
     }
 
     @Override
@@ -91,7 +108,9 @@ public class CprRegisterManager extends RegisterManager {
         return null;
     }
 
-
+    public boolean isSetupSubscriptionEnabled() {
+        return this.setupSubscriptionEnabled;
+    }
 
     @Override
     protected Communicator getEventFetcher() {
@@ -108,6 +127,14 @@ public class CprRegisterManager extends RegisterManager {
         if (entityManager instanceof CprEntityManager) {
             CprConfiguration configuration = this.configurationManager.getConfiguration();
             return configuration.getRegisterURI((CprEntityManager) entityManager);
+        }
+        return null;
+    }
+
+    public URI getSubscriptionURI(EntityManager entityManager) throws DataFordelerException {
+        if (entityManager instanceof CprEntityManager) {
+            CprConfiguration configuration = this.configurationManager.getConfiguration();
+            return configuration.getRegisterSubscriptionURI((CprEntityManager) entityManager);
         }
         return null;
     }
@@ -275,6 +302,55 @@ public class CprRegisterManager extends RegisterManager {
             s.add(line);
         }
         return new CprSourceData(schema, s.toString(), base + ":" + index);
+    }
+
+    public void addSubscription(String contents, String charset, CprEntityManager entityManager) throws DataFordelerException {
+        if (this.jobId == 0) {
+            throw new ConfigurationException("CPR jobId not set");
+        }
+        if (this.customerId == 0) {
+            throw new ConfigurationException("CPR customerId not set");
+        }
+        // Create file
+        LocalDate subscriptionDate = LocalDate.now();
+        // If it's after noon, CPR will not process the file today.
+        ZonedDateTime dailyDeadline = subscriptionDate.atTime(LocalTime.of(11, 45)).atZone(ZoneId.of("Europe/Copenhagen"));
+        if (ZonedDateTime.now().isAfter(dailyDeadline)) {
+            subscriptionDate = subscriptionDate.plusDays(1);
+        }
+        File subscriptionFile = new File(
+                this.localSubscriptionFolder,
+                String.format(
+                        "d%02d%02d%02d",
+                            subscriptionDate.getYear() % 100,
+                            subscriptionDate.getMonthValue(),
+                            subscriptionDate.getDayOfMonth()
+                        ) +
+                        "." +
+                        String.format("i%06d", this.jobId)
+
+        );
+        try {
+            if (!subscriptionFile.exists()) {
+                subscriptionFile.createNewFile();
+            }
+            FileOutputStream fileOutputStream = new FileOutputStream(subscriptionFile);
+            fileOutputStream.write(contents.getBytes(charset));
+            fileOutputStream.close();
+        } catch (IOException e) {
+            throw new DataStreamException(e);
+        }
+
+        // Upload file
+        /*
+        URI destination = this.getSubscriptionURI(entityManager);
+        FtpCommunicator ftpSender = this.getFtpCommunicator(destination, entityManager);
+        try {
+            ftpSender.send(destination, subscriptionFile);
+        } catch (IOException e) {
+            throw new DataStreamException(e);
+        }
+        */
     }
 
 }
