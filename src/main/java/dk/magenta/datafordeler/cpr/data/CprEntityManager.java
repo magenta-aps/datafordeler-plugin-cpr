@@ -223,6 +223,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                             LinkedHashSet<UUID> uuids = new LinkedHashSet<>();
                             for (T record : chunkRecords) {
                                 this.checkInterrupt(importMetadata);
+                                this.handleRecord(record, importMetadata);
                                 if (this.filter(record)) {
                                     UUID uuid = this.generateUUID(record);
                                     uuids.add(uuid);
@@ -436,4 +437,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             throw new ImportInterruptedException(new InterruptedException());
         }
     }
+
+    protected void handleRecord(T record, ImportMetadata importMetadata) {}
 }
