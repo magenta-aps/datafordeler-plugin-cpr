@@ -85,8 +85,16 @@ public class CprRegisterManager extends RegisterManager {
         }
     }
 
+    public int getJobId() {
+        return this.jobId;
+    }
+
     public int getCustomerId() {
         return this.customerId;
+    }
+
+    public String getLocalSubscriptionFolder() {
+        return this.localSubscriptionFolder;
     }
 
     @Override
@@ -306,10 +314,10 @@ public class CprRegisterManager extends RegisterManager {
     }
 
     public void addSubscription(String contents, String charset, CprEntityManager entityManager) throws DataFordelerException {
-        if (this.jobId == 0) {
+        if (this.getJobId() == 0) {
             throw new ConfigurationException("CPR jobId not set");
         }
-        if (this.customerId == 0) {
+        if (this.getCustomerId() == 0) {
             throw new ConfigurationException("CPR customerId not set");
         }
         // Create file
@@ -320,7 +328,7 @@ public class CprRegisterManager extends RegisterManager {
             subscriptionDate = subscriptionDate.plusDays(1);
         }
         File subscriptionFile = new File(
-                this.localSubscriptionFolder,
+                this.getLocalSubscriptionFolder(),
                 String.format(
                         "d%02d%02d%02d",
                             subscriptionDate.getYear() % 100,
@@ -328,14 +336,14 @@ public class CprRegisterManager extends RegisterManager {
                             subscriptionDate.getDayOfMonth()
                         ) +
                         "." +
-                        String.format("i%06d", this.jobId)
+                        String.format("i%06d", this.getJobId())
 
         );
         try {
             if (!subscriptionFile.exists()) {
                 subscriptionFile.createNewFile();
             }
-            FileOutputStream fileOutputStream = new FileOutputStream(subscriptionFile);
+            FileOutputStream fileOutputStream = new FileOutputStream(subscriptionFile, true);
             fileOutputStream.write(contents.getBytes(charset));
             fileOutputStream.close();
         } catch (IOException e) {
