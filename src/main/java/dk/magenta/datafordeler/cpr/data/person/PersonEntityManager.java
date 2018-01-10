@@ -147,6 +147,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
             addCprNumbers.removeAll(removeCprNumbers);
             addCprNumbers.removeAll(map.keySet());
 
+
             HashMap<String, HashSet<String>> loop = new HashMap<>();
             loop.put("OP", addCprNumbers);
             loop.put("SL", removeCprNumbers);

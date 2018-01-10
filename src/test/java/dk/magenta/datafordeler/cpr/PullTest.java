@@ -12,7 +12,9 @@ import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
+import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonQuery;
+import dk.magenta.datafordeler.cpr.data.person.PersonSubscription;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
@@ -36,6 +38,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.File;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyManagementException;
@@ -69,6 +72,9 @@ public class PullTest {
 
     @SpyBean
     private CprRegisterManager cprRegisterManager;
+
+    @SpyBean
+    private PersonEntityManager personEntityManager;
 
     @After
     public void cleanup() {
@@ -227,4 +233,96 @@ public class PullTest {
 
     }
 
+    @Test
+    public void testSubscription() throws Exception {
+
+        CprConfiguration configuration = ((CprConfigurationManager) plugin.getConfigurationManager()).getConfiguration();
+        when(cprConfigurationManager.getConfiguration()).thenReturn(configuration);
+        when(cprRegisterManager.isSetupSubscriptionEnabled()).thenReturn(true);
+        when(cprRegisterManager.getCustomerId()).thenReturn(1234);
+        when(cprRegisterManager.getJobId()).thenReturn(123456);
+        //when(personEntityManager.getLastUpdated(any(Session.class))).thenReturn(null);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                return null;
+            }
+        }).when(personEntityManager).getLastUpdated(any(Session.class));
+
+        File localSubFolder = File.createTempFile("foo", "bar");
+        localSubFolder.delete();
+        localSubFolder.mkdirs();
+        when(cprRegisterManager.getLocalSubscriptionFolder()).thenReturn(localSubFolder.getAbsolutePath());
+
+        CprRegisterManager registerManager = (CprRegisterManager) plugin.getRegisterManager();
+        registerManager.setProxyString(null);
+
+        doAnswer(new Answer<FtpCommunicator>() {
+            @Override
+            public FtpCommunicator answer(InvocationOnMock invocation) throws Throwable {
+                FtpCommunicator ftpCommunicator = (FtpCommunicator) invocation.callRealMethod();
+                ftpCommunicator.setSslSocketFactory(PullTest.getTrustAllSSLSocketFactory());
+                return ftpCommunicator;
+            }
+        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprEntityManager.class));
+
+
+        String username = "test";
+        String password = "test";
+
+
+        int personPort = 2101;
+        InputStream personContents = this.getClass().getResourceAsStream("/persondata.txt");
+        File personFile = File.createTempFile("persondata", "txt");
+        personFile.createNewFile();
+        FileUtils.copyInputStreamToFile(personContents, personFile);
+        personContents.close();
+
+        FtpService personFtp = new FtpService();
+        personFtp.startServer(username, password, personPort, Collections.singletonList(personFile));
+
+        configuration.setPersonRegisterType(CprConfiguration.RegisterType.REMOTE_FTP);
+        configuration.setPersonRegisterFtpAddress("ftps://localhost:" + personPort);
+        configuration.setPersonRegisterFtpUsername(username);
+        configuration.setPersonRegisterFtpPassword(password);
+        configuration.setPersonRegisterDataCharset(CprConfiguration.Charset.UTF_8);
+
+        configuration.setRoadRegisterType(CprConfiguration.RegisterType.DISABLED);
+        configuration.setResidenceRegisterType(CprConfiguration.RegisterType.DISABLED);
+
+
+        Pull pull = new Pull(engine, plugin);
+        pull.run();
+
+
+        personFtp.stopServer();
+        personFile.delete();
+
+        personContents = this.getClass().getResourceAsStream("/persondata2.txt");
+        personFile = File.createTempFile("persondata2", "txt");
+        personFile.createNewFile();
+        FileUtils.copyInputStreamToFile(personContents, personFile);
+        personContents.close();
+
+        personFtp = new FtpService();
+        personFtp.startServer(username, password, personPort, Collections.singletonList(personFile));
+
+        pull.run();
+
+        personFtp.stopServer();
+        personFile.delete();
+
+        Session session = sessionManager.getSessionFactory().openSession();
+        try {
+            List<PersonSubscription> subscriptions = QueryManager.getAllItems(session, PersonSubscription.class);
+            Assert.assertEquals(1, subscriptions.size());
+            File[] subFiles = localSubFolder.listFiles();
+            Assert.assertEquals(1, subFiles.length);
+            String contents = FileUtils.readFileToString(subFiles[0]);
+            Assert.assertEquals("06123400OP0101001234                                                            ", contents);
+        } finally {
+            session.close();
+            localSubFolder.delete();
+        }
+    }
 }
