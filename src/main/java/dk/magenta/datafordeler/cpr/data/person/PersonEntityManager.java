@@ -1,9 +1,9 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
+import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
-import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.CprRegisterManager;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
@@ -13,16 +13,13 @@ import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.person.AddressRecord;
 import dk.magenta.datafordeler.cpr.records.person.ForeignAddressRecord;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.*;
-
-import static dk.magenta.datafordeler.cpr.records.person.PersonDataRecord.RECORDTYPE_FOREIGN_ADDRESS;
 
 @Component
 public class PersonEntityManager extends CprEntityManager<PersonDataRecord, PersonEntity, PersonRegistration, PersonEffect, PersonBaseData> {
@@ -139,28 +136,61 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
         String keyConstant = "";
         StringJoiner content = new StringJoiner("\r\n");
 
-        HashMap<String, HashSet<String>> loop = new HashMap<>();
-        loop.put("OP", addCprNumbers);
-        loop.put("SL", removeCprNumbers);
-
-        for (String operation : loop.keySet()) {
-            HashSet<String> cprNumbers = loop.get(operation);
-            for (String cprNumber : cprNumbers) {
-                content.add(
-                        String.format(
-                                "%02d%04d%02d%2s%10s%15s%45s",
-                                6,
-                                registerManager.getCustomerId(),
-                                0,
-                                operation,
-                                cprNumber,
-                                keyConstant,
-                                ""
-                        )
-                );
+        Session session = sessionManager.getSessionFactory().openSession();
+        try {
+            List<PersonSubscription> existingSubscriptions = QueryManager.getAllItems(session, PersonSubscription.class);
+            HashMap<String, PersonSubscription> map = new HashMap<>();
+            for (PersonSubscription subscription : existingSubscriptions) {
+                map.put(subscription.getPersonNumber(), subscription);
             }
-        }
 
-        registerManager.addSubscription(content.toString(), charset, this);
+            addCprNumbers.removeAll(removeCprNumbers);
+            addCprNumbers.removeAll(map.keySet());
+
+            HashMap<String, HashSet<String>> loop = new HashMap<>();
+            loop.put("OP", addCprNumbers);
+            loop.put("SL", removeCprNumbers);
+
+            for (String operation : loop.keySet()) {
+                HashSet<String> cprNumbers = loop.get(operation);
+                for (String cprNumber : cprNumbers) {
+                    content.add(
+                            String.format(
+                                    "%02d%04d%02d%2s%10s%15s%45s",
+                                    6,
+                                    registerManager.getCustomerId(),
+                                    0,
+                                    operation,
+                                    cprNumber,
+                                    keyConstant,
+                                    ""
+                            )
+                    );
+                }
+            }
+
+            registerManager.addSubscription(content.toString(), charset, this);
+
+            session.beginTransaction();
+            try {
+                for (String add : addCprNumbers) {
+                    PersonSubscription newSubscription = new PersonSubscription();
+                    newSubscription.setPersonNumber(add);
+                    session.save(newSubscription);
+                }
+                for (String remove : removeCprNumbers) {
+                    PersonSubscription removeSubscription = map.get(remove);
+                    if (removeSubscription != null) {
+                        session.delete(removeSubscription);
+                    }
+                }
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.getTransaction().rollback();
+            }
+        } finally {
+            session.close();
+        }
     }
+
 }
