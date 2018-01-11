@@ -157,4 +157,8 @@ public class AddressRecord extends PersonDataRecord {
         effects.add(new PersonEffect(null, null, false, null, false));
         return effects;
     }
+
+    public int getMunicipalityCode() {
+        return this.getInt("komkod");
+    }
 }

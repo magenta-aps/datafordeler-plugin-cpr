@@ -109,8 +109,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
                 if (addressRecord.getMunicipalityCode() < 900) {
                     this.nonGreenlandicCprNumbers.add(addressRecord.getCprNumber());
                 }
-            }
-            if (record instanceof ForeignAddressRecord) {
+            } else if (record instanceof ForeignAddressRecord) {
                 ForeignAddressRecord foreignAddressRecord = (ForeignAddressRecord) record;
                 this.nonGreenlandicCprNumbers.add(foreignAddressRecord.getCprNumber());
             }

@@ -137,7 +137,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         return this.log;
     }
 
-    private CprConfiguration getConfiguration() {
+    protected CprConfiguration getConfiguration() {
         return this.cprConfigurationManager.getConfiguration();
     }
 
@@ -458,7 +458,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     }
 
     protected URI getSubscriptionURI() throws DataFordelerException {
-        CprConfiguration configuration = this.getRegisterManager().getConfigurationManager().getConfiguration();
+        CprConfiguration configuration = this.getConfiguration();
         return configuration.getRegisterSubscriptionURI(this);
     }
 
