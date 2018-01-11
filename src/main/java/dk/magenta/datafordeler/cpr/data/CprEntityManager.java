@@ -469,6 +469,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         if (this.getCustomerId() == 0) {
             throw new ConfigurationException("CPR customerId not set");
         }
+        if (this.getLocalSubscriptionFolder() == null || this.getLocalSubscriptionFolder().isEmpty()) {
+            throw new ConfigurationException("CPR localSubscriptionFolder not set");
+        }
         // Create file
         LocalDate subscriptionDate = LocalDate.now();
         // If it's after noon, CPR will not process the file today.
@@ -476,8 +479,15 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         if (ZonedDateTime.now().isAfter(dailyDeadline)) {
             subscriptionDate = subscriptionDate.plusDays(1);
         }
+        File localSubscriptionFolder = new File(this.getLocalSubscriptionFolder());
+        if (localSubscriptionFolder.isFile()) {
+            throw new ConfigurationException("CPR localSubscriptionFolder is a file, not a folder");
+        }
+        if (!localSubscriptionFolder.exists()) {
+            localSubscriptionFolder.mkdirs();
+        }
         File subscriptionFile = new File(
-                this.getLocalSubscriptionFolder(),
+                localSubscriptionFolder,
                 String.format(
                         "d%02d%02d%02d",
                         subscriptionDate.getYear() % 100,
