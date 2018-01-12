@@ -21,7 +21,7 @@ import java.util.Map;
 public class PersonBirthData extends DetailData {
 
     public static final String DB_FIELD_BIRTH_PLACE_CODE = "birthPlaceCode";
-    public static final String IO_FIELD_BIRTH_PLACE_CODE = "cprFoedselsregistreringsstedskode";
+    public static final String IO_FIELD_BIRTH_PLACE_CODE = "cprFødselsregistreringsstedskode";
     @Column(name = DB_FIELD_BIRTH_PLACE_CODE)
     @JsonProperty(value = IO_FIELD_BIRTH_PLACE_CODE)
     @XmlElement(name = IO_FIELD_BIRTH_PLACE_CODE)
@@ -38,7 +38,7 @@ public class PersonBirthData extends DetailData {
 
 
     public static final String DB_FIELD_BIRTH_PLACE_NAME = "birthPlaceName";
-    public static final String IO_FIELD_BIRTH_PLACE_NAME = "cprFoedselsregistreringsstedsnavn";
+    public static final String IO_FIELD_BIRTH_PLACE_NAME = "cprFødselsregistreringsstedsnavn";
     @Column(name = DB_FIELD_BIRTH_PLACE_NAME)
     @JsonProperty(value = IO_FIELD_BIRTH_PLACE_NAME)
     @XmlElement(name = IO_FIELD_BIRTH_PLACE_NAME)
@@ -55,7 +55,7 @@ public class PersonBirthData extends DetailData {
 
 
     public static final String DB_FIELD_BIRTH_DATETIME = "birthDatetime";
-    public static final String IO_FIELD_BIRTH_DATETIME = "foedselsdato";
+    public static final String IO_FIELD_BIRTH_DATETIME = "fødselsdato";
     @Column(name = DB_FIELD_BIRTH_DATETIME)
     @JsonProperty(value = IO_FIELD_BIRTH_DATETIME)
     @XmlElement(name = IO_FIELD_BIRTH_DATETIME)
@@ -72,7 +72,7 @@ public class PersonBirthData extends DetailData {
 
 
     public static final String DB_FIELD_BIRTH_DATETIME_UNCERTAIN = "birthDatetimeUncertain";
-    public static final String IO_FIELD_BIRTH_DATETIME_UNCERTAIN = "foedselsdatoUsikkerhedsmarkering";
+    public static final String IO_FIELD_BIRTH_DATETIME_UNCERTAIN = "fødselsdatoUsikkerhedsmarkering";
     @Column(name = DB_FIELD_BIRTH_DATETIME_UNCERTAIN)
     @JsonProperty(value = IO_FIELD_BIRTH_DATETIME_UNCERTAIN)
     @XmlElement(name = IO_FIELD_BIRTH_DATETIME_UNCERTAIN)

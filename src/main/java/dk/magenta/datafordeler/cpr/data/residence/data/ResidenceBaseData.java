@@ -90,7 +90,7 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
     }
 
     public static final String DB_FIELD_DOOR = "door";
-    public static final String IO_FIELD_DOOR = "sideDoer";
+    public static final String IO_FIELD_DOOR = "sidedør";
     @Column(name = DB_FIELD_DOOR)
     @JsonProperty(value = IO_FIELD_DOOR)
     @XmlElement(name = IO_FIELD_DOOR)

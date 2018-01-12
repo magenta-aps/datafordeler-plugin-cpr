@@ -24,35 +24,28 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         ObjectNode root = objectMapper.createObjectNode();
 
 
-        root.put("UUID", input.getUUID().toString());
-        root.put("personnummer", input.getPersonnummer());
+        root.put(PersonEntity.IO_FIELD_UUID, input.getUUID().toString());
+        root.put(PersonEntity.IO_FIELD_CPR_NUMBER, input.getPersonnummer());
         root.putPOJO("id", input.getIdentification());
 
         ArrayNode registreringer = objectMapper.createArrayNode();
-        root.set("registreringer", registreringer);
+        root.set(PersonEntity.IO_FIELD_REGISTRATIONS, registreringer);
 
         for (PersonRegistration personRegistration : input.getRegistrations()) {
             registreringer.add(wrapRegistrering(personRegistration));
         }
-
-        /*
-        try {
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        */
+        
         return root;
     }
 
     protected ObjectNode wrapRegistrering(PersonRegistration input) {
         ObjectNode output = objectMapper.createObjectNode();
         output.put(
-            "registreringFra",
+            PersonRegistration.IO_FIELD_REGISTRATION_FROM,
             input.getRegistrationFrom() != null ? input.getRegistrationFrom().toString() : null
         );
         output.put(
-            "registreringTil",
+            PersonRegistration.IO_FIELD_REGISTRATION_TO,
             input.getRegistrationTo() != null ? input.getRegistrationTo().toString() : null
         );
 
@@ -78,7 +71,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
 
                 if (personCoreData != null) {
                     addEffectDataToRegistration(
-                            output, "personnummer",
+                            output, PersonCoreData.IO_FIELD_CPR_NUMBER,
                             createPersonNummerNode(virkning, timestamp, personCoreData)
                     );
                     addEffectDataToRegistration(
@@ -111,14 +104,14 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                 if (navn != null || adressenavn != null) {
                     addEffectDataToRegistration(
                             output,
-                            "navn",
+                            PersonBaseData.IO_FIELD_NAME,
                             createNavnNode(virkning, timestamp, navn, adressenavn)
                     );
                 }
                 if (beskyttelse != null && !beskyttelse.isEmpty()) {
                     addEffectDataToRegistration(
                             output,
-                            "beskyttelse",
+                            PersonBaseData.IO_FIELD_PROTECTION,
                             createBeskyttelseNode(virkning, timestamp, beskyttelse)
                     );
                 }
@@ -132,7 +125,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                 if (navnemyndighed != null) {
                     addEffectDataToRegistration(
                             output,
-                            "navnemyndighed",
+                            PersonBaseData.IO_FIELD_NAME_AUTHORITY,
                             createNavneMyndighedNode(virkning, timestamp, navnemyndighed)
                     );
                 }
@@ -157,22 +150,25 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     protected ObjectNode createVirkningObjectNode(Effect virkning, boolean includeVirkningTil, OffsetDateTime lastUpdated) {
         ObjectNode output = objectMapper.createObjectNode();
         output.put(
-            "virkningFra",
+            PersonEffect.IO_FIELD_EFFECT_FROM,
             virkning.getEffectFrom() != null ? virkning.getEffectFrom().toString() : null
         );
         if (includeVirkningTil) {
             output.put(
-                "virkningTil",
+                PersonEffect.IO_FIELD_EFFECT_TO,
                 virkning.getEffectTo() != null ? virkning.getEffectTo().toString() : null
             );
         }
-        output.put("lastUpdated", lastUpdated != null ? lastUpdated.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null);
+        output.put(
+                PersonBaseData.IO_FIELD_LAST_UPDATED,
+                lastUpdated != null ? lastUpdated.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null
+        );
         return output;
     }
 
     protected ObjectNode createPersonNummerNode(Effect virkning, OffsetDateTime lastUpdated, PersonCoreData personCoreData) {
         ObjectNode personnummer = createVirkningObjectNode(virkning, lastUpdated);
-        personnummer.put("personnummer", personCoreData.getCprNumber());
+        personnummer.put(PersonCoreData.IO_FIELD_CPR_NUMBER, personCoreData.getCprNumber());
         // TODO: Personnummer status enum?
         return personnummer;
     }
@@ -183,33 +179,40 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     ) {
         ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
         output.put(
-                        "koen",
+                        PersonCoreData.IO_FIELD_GENDER,
                         personCoreData.getGender() != null ? personCoreData.getGender().toString() : null
         );
         output.put(
-                        "personstatus",
+                        PersonStatusData.IO_FIELD_STATUS,
                         personStatusData != null ? personStatusData.getStatus() : null
         );
         output.put(
-                        "stilling",
+                        PersonPositionData.IO_FIELD_POSITION,
                         stilling != null ? stilling.getPosition() : null
         );
         if (foedsel != null) {
             if (foedsel.getBirthDatetime() != null) {
-                output.put("foedselsdato", foedsel.getBirthDatetime().toLocalDate().toString());
+                output.put(
+                        PersonBirthData.IO_FIELD_BIRTH_DATETIME,
+                        foedsel.getBirthDatetime().toLocalDate().toString()
+                );
             }
             output.put(
-                            "cprFoedselsregistreringsstedskode",
-                            foedsel.getBirthPlaceCode()
+                    PersonBirthData.IO_FIELD_BIRTH_DATETIME_UNCERTAIN,
+                    foedsel.isBirthDatetimeUncertain()
             );
-            output.put(
-                            "cprFoedselsregistreringsstedsnavn",
-                            foedsel.getBirthPlaceName()
-            );
-            output.put(
-                            "foedselsdatoUsikkerhedsmarkering",
-                            foedsel.isBirthDatetimeUncertain()
-            );
+            if (foedsel.getBirthPlaceCode() != null) {
+                output.put(
+                        PersonBirthData.IO_FIELD_BIRTH_PLACE_CODE,
+                        foedsel.getBirthPlaceCode()
+                );
+            }
+            if (foedsel.getBirthPlaceName() != null) {
+                output.put(
+                        PersonBirthData.IO_FIELD_BIRTH_PLACE_NAME,
+                        foedsel.getBirthPlaceName()
+                );
+            }
         }
         return output;
     }
@@ -218,7 +221,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                     Effect virkning, OffsetDateTime lastUpdated, String foraelderrolle, PersonParentData personParentData
     ) {
         ObjectNode output = createVirkningObjectNode(virkning, false, lastUpdated);
-        output.put("personnummer", personParentData.getCprNumber());
+        output.put(PersonParentData.IO_FIELD_CPR_NUMBER, personParentData.getCprNumber());
         output.put("foraelderrolle", foraelderrolle);
         return output;
     }
@@ -228,44 +231,49 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                     PersonMoveMunicipalityData flytteKommune
     ) {
         ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
-        output.put("conavn", conavn != null ? conavn.getConame() : null);
+        output.put(
+                PersonAddressConameData.IO_FIELD_CONAME,
+                conavn != null ? conavn.getConame() : null
+        );
         if (flytteKommune != null) {
             output.put(
-                "fraflytningsdatoKommune",
+                PersonMoveMunicipalityData.IO_FIELD_OUT_DATETIME,
                 flytteKommune.getOutDatetime() != null ?
                     flytteKommune.getOutDatetime().toLocalDate().toString() :
                     null
             );
-            output.put("fraflytningsKommunekode", flytteKommune.getOutMunicipality());
             output.put(
-                "tilflytningsdatoKommune",
+                    PersonMoveMunicipalityData.IO_FIELD_OUT_MUNICIPALITY,
+                    flytteKommune.getOutMunicipality()
+            );
+            output.put(
+                PersonMoveMunicipalityData.IO_FIELD_IN_DATETIME,
                 flytteKommune.getInDatetime() != null ?
                     flytteKommune.getInDatetime().toLocalDate().toString() :
                     null
             );
         }
-        if (adresse != null) {
-            output.set("cpradresse", createCprAdresseNode(adresse));
-        } else {
-            output.putNull("cpradresse");
-        }
+        output.set(PersonBaseData.IO_FIELD_ADDRESS, createCprAdresseNode(adresse));
         return output;
     }
 
     protected ObjectNode createCprAdresseNode(PersonAddressData adresse) {
-        ObjectNode output = objectMapper.createObjectNode();
-        output.put("bygningsnummer", adresse.getBuildingNumber());
-        output.put("bynavn", adresse.getCityName());
-        output.put("cprKommunekode", adresse.getMunicipalityCode());
-        output.put("cprKommunenavn", adresse.getMunicipalityName());
-        output.put("cprVejkode", adresse.getRoadCode());
-        output.put("etage", adresse.getFloor());
-        output.put("husnummer", adresse.getHouseNumber());
-        output.put("postdistrikt", adresse.getPostalDistrict());
-        output.put("postnummer", adresse.getPostalCode());
-        output.put("sideDoer", adresse.getDoor());
-        output.put("vejaddresseringsnavn", adresse.getRoadAddressName());
-        return output;
+        if (adresse != null) {
+            ObjectNode output = objectMapper.createObjectNode();
+            output.put(PersonAddressData.IO_FIELD_BUILDING_NUMBER, adresse.getBuildingNumber());
+            output.put(PersonAddressData.IO_FIELD_CITY_NAME, adresse.getCityName());
+            output.put(PersonAddressData.IO_FIELD_MUNICIPALITY_CODE, adresse.getMunicipalityCode());
+            output.put(PersonAddressData.IO_FIELD_MUNICIPALITY_NAME, adresse.getMunicipalityName());
+            output.put(PersonAddressData.IO_FIELD_ROAD_CODE, adresse.getRoadCode());
+            output.put(PersonAddressData.IO_FIELD_FLOOR, adresse.getFloor());
+            output.put(PersonAddressData.IO_FIELD_HOUSENUMBER, adresse.getHouseNumber());
+            output.put(PersonAddressData.IO_FIELD_POSTAL_DISTRICT, adresse.getPostalDistrict());
+            output.put(PersonAddressData.IO_FIELD_POSTAL_CODE, adresse.getPostalCode());
+            output.put(PersonAddressData.IO_FIELD_DOOR, adresse.getDoor());
+            output.put(PersonAddressData.IO_FIELD_ROAD_ADDRESS_NAME, adresse.getRoadAddressName());
+            return output;
+        }
+        return null;
     }
 
     protected ObjectNode createNavnNode(
@@ -273,26 +281,26 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     ) {
         ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
         output.put(
-                        "addresseringsnavn",
-                        addresseringsnavn != null ? addresseringsnavn.getAddressName() : null
+                PersonBaseData.IO_FIELD_ADDRESSING_NAME,
+                addresseringsnavn != null ? addresseringsnavn.getAddressName() : null
         );
         if (navn != null) {
             output.put(
-                "efternavn",
+                PersonNameData.IO_FIELD_LAST_NAME,
                 navn.getLastName()
             );
             output.put(
-                "fornavne",
+                PersonNameData.IO_FIELD_FIRST_NAMES,
                 navn.getFirstNames()
             );
             output.put(
-                "mellemnavn",
+                PersonNameData.IO_FIELD_MIDDLE_NAME,
                 navn.getMiddleName()
             );
         } else {
-            output.putNull("efternavn");
-            output.putNull("fornavne");
-            output.putNull("mellemnavn");
+            output.putNull(PersonNameData.IO_FIELD_LAST_NAME);
+            output.putNull(PersonNameData.IO_FIELD_FIRST_NAMES);
+            output.putNull(PersonNameData.IO_FIELD_MIDDLE_NAME);
         }
 
         return output;
@@ -302,7 +310,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         ArrayNode output = objectMapper.createArrayNode();
         for (PersonProtectionData personProtectionData : beskyttelse) {
             ObjectNode item = createVirkningObjectNode(virkning, lastUpdated);
-            item.put("beskyttelsestype", personProtectionData.getProtectionType());
+            item.put(PersonProtectionData.IO_FIELD_TYPE, personProtectionData.getProtectionType());
             output.add(item);
         }
         return output;
@@ -313,7 +321,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                     PersonForeignAddressData udenlandsadresse
     ) {
         ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
-        output.put("cprLandekodeUdrejse", udrejseIndrejse.getCountryCode());
+        output.put(PersonEmigrationData.IO_FIELD_COUNTRY_CODE, udrejseIndrejse.getCountryCode());
         if (udenlandsadresse != null) {
             output.set("simpeladresse", createUdrejseAdresseNode(udenlandsadresse));
         }
@@ -322,17 +330,17 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
 
     protected ObjectNode createUdrejseAdresseNode(PersonForeignAddressData udenlandsadresse) {
         ObjectNode output = objectMapper.createObjectNode();
-        output.put("adresselinie1", udenlandsadresse.getAddressLine1());
-        output.put("adresselinie2", udenlandsadresse.getAddressLine2());
-        output.put("adresselinie3", udenlandsadresse.getAddressLine3());
-        output.put("adresselinie4", udenlandsadresse.getAddressLine4());
-        output.put("adresselinie5", udenlandsadresse.getAddressLine5());
+        output.put(PersonForeignAddressData.IO_FIELD_ADDRESS_LINE1, udenlandsadresse.getAddressLine1());
+        output.put(PersonForeignAddressData.IO_FIELD_ADDRESS_LINE2, udenlandsadresse.getAddressLine2());
+        output.put(PersonForeignAddressData.IO_FIELD_ADDRESS_LINE3, udenlandsadresse.getAddressLine3());
+        output.put(PersonForeignAddressData.IO_FIELD_ADDRESS_LINE4, udenlandsadresse.getAddressLine4());
+        output.put(PersonForeignAddressData.IO_FIELD_ADDRESS_LINE5, udenlandsadresse.getAddressLine5());
         return output;
     }
 
     protected ObjectNode createNavneMyndighedNode(Effect virkning, OffsetDateTime lastUpdated, PersonNameAuthorityTextData navnemyndighed) {
         ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
-        output.put("myndighed", navnemyndighed.getText());
+        output.put(PersonNameAuthorityTextData.IO_FIELD_AUTHORITY, navnemyndighed.getText());
         return output;
     }
 }

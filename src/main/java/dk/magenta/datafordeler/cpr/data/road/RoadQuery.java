@@ -17,9 +17,9 @@ import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_ROADCODE
  */
 public class RoadQuery extends CprQuery<RoadEntity> {
 
-    public static final String VEJKODE = "vejkode";
-    public static final String VEJNAVN = "vejnavn";
-    public static final String KOMMUNEKODE = "kommunekode";
+    public static final String VEJKODE = RoadEntity.IO_FIELD_ROADCODE;
+    public static final String VEJNAVN = RoadCoreData.IO_FIELD_ROAD_NAME;
+    public static final String KOMMUNEKODE = RoadEntity.IO_FIELD_MUNICIPALITYCODE;
 
     @QueryField(type = QueryField.FieldType.INT, queryName = VEJKODE)
     private String vejkode;
