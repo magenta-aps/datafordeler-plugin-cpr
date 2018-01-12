@@ -24,12 +24,12 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         ObjectNode root = objectMapper.createObjectNode();
 
 
-        root.put("UUID", input.getUUID().toString());
+        root.put(PersonEntity.IO_FIELD_UUID, input.getUUID().toString());
         root.put(PersonEntity.IO_FIELD_CPR_NUMBER, input.getPersonnummer());
         root.putPOJO("id", input.getIdentification());
 
         ArrayNode registreringer = objectMapper.createArrayNode();
-        root.set("registreringer", registreringer);
+        root.set(PersonEntity.IO_FIELD_REGISTRATIONS, registreringer);
 
         for (PersonRegistration personRegistration : input.getRegistrations()) {
             registreringer.add(wrapRegistrering(personRegistration));
@@ -48,11 +48,11 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     protected ObjectNode wrapRegistrering(PersonRegistration input) {
         ObjectNode output = objectMapper.createObjectNode();
         output.put(
-            "registreringFra",
+            PersonRegistration.IO_FIELD_REGISTRATION_FROM,
             input.getRegistrationFrom() != null ? input.getRegistrationFrom().toString() : null
         );
         output.put(
-            "registreringTil",
+            PersonRegistration.IO_FIELD_REGISTRATION_TO,
             input.getRegistrationTo() != null ? input.getRegistrationTo().toString() : null
         );
 
@@ -157,17 +157,17 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     protected ObjectNode createVirkningObjectNode(Effect virkning, boolean includeVirkningTil, OffsetDateTime lastUpdated) {
         ObjectNode output = objectMapper.createObjectNode();
         output.put(
-            "virkningFra",
+            PersonEffect.IO_FIELD_EFFECT_FROM,
             virkning.getEffectFrom() != null ? virkning.getEffectFrom().toString() : null
         );
         if (includeVirkningTil) {
             output.put(
-                "virkningTil",
+                PersonEffect.IO_FIELD_EFFECT_TO,
                 virkning.getEffectTo() != null ? virkning.getEffectTo().toString() : null
             );
         }
         output.put(
-                "lastUpdated",
+                PersonBaseData.IO_FIELD_LAST_UPDATED,
                 lastUpdated != null ? lastUpdated.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null
         );
         return output;
@@ -238,44 +238,49 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                     PersonMoveMunicipalityData flytteKommune
     ) {
         ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
-        output.put("conavn", conavn != null ? conavn.getConame() : null);
+        output.put(
+                PersonAddressConameData.IO_FIELD_CONAME,
+                conavn != null ? conavn.getConame() : null
+        );
         if (flytteKommune != null) {
             output.put(
-                "fraflytningsdatoKommune",
+                PersonMoveMunicipalityData.IO_FIELD_OUT_DATETIME,
                 flytteKommune.getOutDatetime() != null ?
                     flytteKommune.getOutDatetime().toLocalDate().toString() :
                     null
             );
-            output.put("fraflytningsKommunekode", flytteKommune.getOutMunicipality());
             output.put(
-                "tilflytningsdatoKommune",
+                    PersonMoveMunicipalityData.IO_FIELD_OUT_MUNICIPALITY,
+                    flytteKommune.getOutMunicipality()
+            );
+            output.put(
+                PersonMoveMunicipalityData.IO_FIELD_IN_DATETIME,
                 flytteKommune.getInDatetime() != null ?
                     flytteKommune.getInDatetime().toLocalDate().toString() :
                     null
             );
         }
-        if (adresse != null) {
-            output.set("cpradresse", createCprAdresseNode(adresse));
-        } else {
-            output.putNull("cpradresse");
-        }
+        output.set(PersonBaseData.IO_FIELD_ADDRESS, createCprAdresseNode(adresse));
         return output;
     }
 
     protected ObjectNode createCprAdresseNode(PersonAddressData adresse) {
-        ObjectNode output = objectMapper.createObjectNode();
-        output.put(PersonAddressData.IO_FIELD_BUILDING_NUMBER, adresse.getBuildingNumber());
-        output.put(PersonAddressData.IO_FIELD_CITY_NAME, adresse.getCityName());
-        output.put(PersonAddressData.IO_FIELD_MUNICIPALITY_CODE, adresse.getMunicipalityCode());
-        output.put(PersonAddressData.IO_FIELD_MUNICIPALITY_NAME, adresse.getMunicipalityName());
-        output.put(PersonAddressData.IO_FIELD_ROAD_CODE, adresse.getRoadCode());
-        output.put(PersonAddressData.IO_FIELD_FLOOR, adresse.getFloor());
-        output.put(PersonAddressData.IO_FIELD_HOUSENUMBER, adresse.getHouseNumber());
-        output.put(PersonAddressData.IO_FIELD_POSTAL_DISTRICT, adresse.getPostalDistrict());
-        output.put(PersonAddressData.IO_FIELD_POSTAL_CODE, adresse.getPostalCode());
-        output.put(PersonAddressData.IO_FIELD_DOOR, adresse.getDoor());
-        output.put(PersonAddressData.IO_FIELD_ROAD_ADDRESS_NAME, adresse.getRoadAddressName());
-        return output;
+        if (adresse != null) {
+            ObjectNode output = objectMapper.createObjectNode();
+            output.put(PersonAddressData.IO_FIELD_BUILDING_NUMBER, adresse.getBuildingNumber());
+            output.put(PersonAddressData.IO_FIELD_CITY_NAME, adresse.getCityName());
+            output.put(PersonAddressData.IO_FIELD_MUNICIPALITY_CODE, adresse.getMunicipalityCode());
+            output.put(PersonAddressData.IO_FIELD_MUNICIPALITY_NAME, adresse.getMunicipalityName());
+            output.put(PersonAddressData.IO_FIELD_ROAD_CODE, adresse.getRoadCode());
+            output.put(PersonAddressData.IO_FIELD_FLOOR, adresse.getFloor());
+            output.put(PersonAddressData.IO_FIELD_HOUSENUMBER, adresse.getHouseNumber());
+            output.put(PersonAddressData.IO_FIELD_POSTAL_DISTRICT, adresse.getPostalDistrict());
+            output.put(PersonAddressData.IO_FIELD_POSTAL_CODE, adresse.getPostalCode());
+            output.put(PersonAddressData.IO_FIELD_DOOR, adresse.getDoor());
+            output.put(PersonAddressData.IO_FIELD_ROAD_ADDRESS_NAME, adresse.getRoadAddressName());
+            return output;
+        }
+        return null;
     }
 
     protected ObjectNode createNavnNode(

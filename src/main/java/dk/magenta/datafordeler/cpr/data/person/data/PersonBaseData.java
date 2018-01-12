@@ -70,6 +70,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private PersonBirthData birth;
 
     public static final String DB_FIELD_ADDRESS = "address";
+    public static final String IO_FIELD_ADDRESS = "cpradresse";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_ADDRESS + DatabaseEntry.REF)
     private PersonAddressData address;
