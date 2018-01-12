@@ -54,7 +54,7 @@ public class RoadEntity extends Entity<RoadEntity, RoadRegistration> {
 
 
     public static final String DB_FIELD_MUNICIPALITYCODE = "municipalityCode";
-    public static final String IO_FIELD_MUNICIPALITYCODE = "municipalityCode";
+    public static final String IO_FIELD_MUNICIPALITYCODE = "kommunekode";
 
     @Column(name = DB_FIELD_MUNICIPALITYCODE)
     @JsonProperty(value = IO_FIELD_MUNICIPALITYCODE)

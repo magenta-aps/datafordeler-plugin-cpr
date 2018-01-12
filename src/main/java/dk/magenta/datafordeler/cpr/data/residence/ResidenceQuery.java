@@ -13,11 +13,11 @@ import java.util.*;
  */
 public class ResidenceQuery extends CprQuery<ResidenceEntity> {
 
-    public static final String KOMMUNEKODE = "kommunekode";
-    public static final String VEJKODE = "vejkode";
-    public static final String HUSNUMMER = "husnummer";
-    public static final String ETAGE = "etage";
-    public static final String SIDE_DOER = "sideDoer";
+    public static final String KOMMUNEKODE = ResidenceBaseData.IO_FIELD_MUNICIPALITY_CODE;
+    public static final String VEJKODE = ResidenceBaseData.IO_FIELD_ROAD_CODE;
+    public static final String HUSNUMMER = ResidenceBaseData.IO_FIELD_HOUSENUMBER;
+    public static final String ETAGE = ResidenceBaseData.IO_FIELD_FLOOR;
+    public static final String SIDE_DOER = ResidenceBaseData.IO_FIELD_DOOR;
 
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = KOMMUNEKODE)

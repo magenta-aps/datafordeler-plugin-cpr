@@ -15,10 +15,10 @@ import java.util.*;
  */
 public class PersonQuery extends CprQuery<PersonEntity> {
 
-    public static final String PERSONNUMMER = "personnummer";
-    public static final String FORNAVNE = "fornavne";
-    public static final String EFTERNAVN = "efternavn";
-    public static final String KOMMUNEKODE = "kommunekode";
+    public static final String PERSONNUMMER = PersonEntity.IO_FIELD_CPR_NUMBER;
+    public static final String FORNAVNE = PersonNameData.IO_FIELD_FIRST_NAMES;
+    public static final String EFTERNAVN = PersonNameData.IO_FIELD_LAST_NAME;
+    public static final String KOMMUNEKODE = PersonAddressData.IO_FIELD_MUNICIPALITY_CODE;
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = PERSONNUMMER)
     private List<String> personnumre = new ArrayList<>();
