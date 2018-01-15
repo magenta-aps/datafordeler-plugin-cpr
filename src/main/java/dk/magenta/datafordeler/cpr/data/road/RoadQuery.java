@@ -30,6 +30,9 @@ public class RoadQuery extends CprQuery<RoadEntity> {
 
     public void setVejkode(String vejkode) {
         this.vejkode = vejkode;
+        if (vejkode != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     public void setVejkode(int vejkode) {
@@ -45,6 +48,9 @@ public class RoadQuery extends CprQuery<RoadEntity> {
 
     public void setNavn(String navn) {
         this.navn = navn;
+        if (navn != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = KOMMUNEKODE)
@@ -56,6 +62,9 @@ public class RoadQuery extends CprQuery<RoadEntity> {
 
     public void addKommunekode(String kommunekode) {
         this.kommunekoder.add(kommunekode);
+        if (kommunekode != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     public void addKommunekode(int kommunekode) {
