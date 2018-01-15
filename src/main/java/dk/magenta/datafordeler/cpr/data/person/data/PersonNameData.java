@@ -40,7 +40,7 @@ public class PersonNameData extends AuthorityDetailData {
 
 
     public static final String DB_FIELD_FIRST_NAMES = "firstNames";
-    public static final String IO_FIELD_FIRST_NAMES = "fornavne";
+    public static final String IO_FIELD_FIRST_NAMES = "fornavn";
     @Column(name = DB_FIELD_FIRST_NAMES)
     @JsonProperty(value = IO_FIELD_FIRST_NAMES)
     @XmlElement(name = IO_FIELD_FIRST_NAMES)

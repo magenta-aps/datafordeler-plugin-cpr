@@ -29,6 +29,9 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
 
     public void addKommunekode(String kommunekode) {
         this.kommunekoder.add(kommunekode);
+        if (kommunekode != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     public void addKommunekode(int kommunekode) {
@@ -44,6 +47,9 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
 
     public void setVejkode(String vejkode) {
         this.vejkode = vejkode;
+        if (vejkode != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     public void setVejkode(int vejkode) {
@@ -59,6 +65,9 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
 
     public void setHusnummer(String husnummer) {
         this.husnummer = husnummer;
+        if (husnummer != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = ETAGE)
@@ -70,6 +79,9 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
 
     public void setEtage(String etage) {
         this.etage = etage;
+        if (etage != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = SIDE_DOER)
@@ -81,6 +93,9 @@ public class ResidenceQuery extends CprQuery<ResidenceEntity> {
 
     public void setSideDoer(String sideDoer) {
         this.sideDoer = sideDoer;
+        if (sideDoer != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     @Override
