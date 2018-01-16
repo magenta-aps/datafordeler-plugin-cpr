@@ -15,6 +15,7 @@ import dk.magenta.datafordeler.cpr.records.person.ForeignAddressRecord;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -23,6 +24,19 @@ import java.util.*;
 
 @Component
 public class PersonEntityManager extends CprEntityManager<PersonDataRecord, PersonEntity, PersonRegistration, PersonEffect, PersonBaseData> {
+
+    @Value("${dafo.cpr.person.subscription-enabled:false}")
+    private boolean setupSubscriptionEnabled;
+
+    @Value("${dafo.cpr.person.local-subscription-folder:cache}")
+    private String localSubscriptionFolder;
+
+    @Value("${dafo.cpr.person.jobid:0}")
+    private int jobId;
+
+    @Value("${dafo.cpr.person.customer-id:0}")
+    private int customerId;
+
 
     @Autowired
     private PersonEntityService personEntityService;
@@ -38,6 +52,22 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
         this.managedEntityReferenceClass = PersonEntityReference.class;
         this.managedRegistrationClass = PersonRegistration.class;
         this.managedRegistrationReferenceClass = PersonRegistrationReference.class;
+    }
+
+    public int getJobId() {
+        return this.jobId;
+    }
+
+    public int getCustomerId() {
+        return this.customerId;
+    }
+
+    public String getLocalSubscriptionFolder() {
+        return this.localSubscriptionFolder;
+    }
+
+    public boolean isSetupSubscriptionEnabled() {
+        return this.setupSubscriptionEnabled;
     }
 
     @Override
@@ -61,8 +91,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     public List<PersonRegistration> parseData(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
         try {
             List<PersonRegistration> result = super.parseData(registrationData, importMetadata);
-            CprRegisterManager registerManager = (CprRegisterManager) this.getRegisterManager();
-            if (registerManager.isSetupSubscriptionEnabled() && !this.nonGreenlandicCprNumbers.isEmpty()) {
+            if (this.isSetupSubscriptionEnabled() && !this.nonGreenlandicCprNumbers.isEmpty()) {
                 this.createSubscription(this.nonGreenlandicCprNumbers);
             }
             return result;
@@ -80,8 +109,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
                 if (addressRecord.getMunicipalityCode() < 900) {
                     this.nonGreenlandicCprNumbers.add(addressRecord.getCprNumber());
                 }
-            }
-            if (record instanceof ForeignAddressRecord) {
+            } else if (record instanceof ForeignAddressRecord) {
                 ForeignAddressRecord foreignAddressRecord = (ForeignAddressRecord) record;
                 this.nonGreenlandicCprNumbers.add(foreignAddressRecord.getCprNumber());
             }
@@ -137,7 +165,6 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
 
     private void createSubscription(HashSet<String> addCprNumbers, HashSet<String> removeCprNumbers) throws DataFordelerException {
         this.log.info("Collected these numbers for subscription: "+addCprNumbers);
-        CprRegisterManager registerManager = (CprRegisterManager) this.getRegisterManager();
         String charset = this.getConfiguration().getRegisterCharset(this);
         String keyConstant = "";
         StringJoiner content = new StringJoiner("\r\n");
@@ -165,7 +192,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
                             String.format(
                                     "%02d%04d%02d%2s%10s%15s%45s",
                                     6,
-                                    registerManager.getCustomerId(),
+                                    this.getCustomerId(),
                                     0,
                                     operation,
                                     cprNumber,
@@ -176,7 +203,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
                 }
             }
 
-            registerManager.addSubscription(content.toString(), charset, this);
+            this.addSubscription(content.toString(), charset, this);
 
             session.beginTransaction();
             try {

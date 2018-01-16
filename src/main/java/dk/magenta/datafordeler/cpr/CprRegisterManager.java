@@ -54,19 +54,6 @@ public class CprRegisterManager extends RegisterManager {
     @Value("${dafo.cpr.local-copy-folder:}")
     private String localCopyFolder;
 
-    @Value("${dafo.cpr.subscription-enabled:false}")
-    private boolean setupSubscriptionEnabled;
-
-    @Value("${dafo.cpr.local-subscription-folder:cache}")
-    private String localSubscriptionFolder;
-
-    @Value("${dafo.cpr.jobid:0}")
-    private int jobId;
-
-    @Value("${dafo.cpr.customer-id:0}")
-    private int customerId;
-
-
     public CprRegisterManager() {
 
     }
@@ -85,16 +72,8 @@ public class CprRegisterManager extends RegisterManager {
         }
     }
 
-    public int getJobId() {
-        return this.jobId;
-    }
-
-    public int getCustomerId() {
-        return this.customerId;
-    }
-
-    public String getLocalSubscriptionFolder() {
-        return this.localSubscriptionFolder;
+    public CprConfigurationManager getConfigurationManager() {
+        return this.configurationManager;
     }
 
     @Override
@@ -117,10 +96,6 @@ public class CprRegisterManager extends RegisterManager {
         return null;
     }
 
-    public boolean isSetupSubscriptionEnabled() {
-        return this.setupSubscriptionEnabled;
-    }
-
     @Override
     protected Communicator getEventFetcher() {
         return null;
@@ -136,14 +111,6 @@ public class CprRegisterManager extends RegisterManager {
         if (entityManager instanceof CprEntityManager) {
             CprConfiguration configuration = this.configurationManager.getConfiguration();
             return configuration.getRegisterURI((CprEntityManager) entityManager);
-        }
-        return null;
-    }
-
-    public URI getSubscriptionURI(EntityManager entityManager) throws DataFordelerException {
-        if (entityManager instanceof CprEntityManager) {
-            CprConfiguration configuration = this.configurationManager.getConfiguration();
-            return configuration.getRegisterSubscriptionURI((CprEntityManager) entityManager);
         }
         return null;
     }
@@ -311,55 +278,6 @@ public class CprRegisterManager extends RegisterManager {
             s.add(line);
         }
         return new CprSourceData(schema, s.toString(), base + ":" + index);
-    }
-
-    public void addSubscription(String contents, String charset, CprEntityManager entityManager) throws DataFordelerException {
-        if (this.getJobId() == 0) {
-            throw new ConfigurationException("CPR jobId not set");
-        }
-        if (this.getCustomerId() == 0) {
-            throw new ConfigurationException("CPR customerId not set");
-        }
-        // Create file
-        LocalDate subscriptionDate = LocalDate.now();
-        // If it's after noon, CPR will not process the file today.
-        ZonedDateTime dailyDeadline = subscriptionDate.atTime(LocalTime.of(11, 45)).atZone(ZoneId.of("Europe/Copenhagen"));
-        if (ZonedDateTime.now().isAfter(dailyDeadline)) {
-            subscriptionDate = subscriptionDate.plusDays(1);
-        }
-        File subscriptionFile = new File(
-                this.getLocalSubscriptionFolder(),
-                String.format(
-                        "d%02d%02d%02d",
-                            subscriptionDate.getYear() % 100,
-                            subscriptionDate.getMonthValue(),
-                            subscriptionDate.getDayOfMonth()
-                        ) +
-                        "." +
-                        String.format("i%06d", this.getJobId())
-
-        );
-        try {
-            if (!subscriptionFile.exists()) {
-                subscriptionFile.createNewFile();
-            }
-            FileOutputStream fileOutputStream = new FileOutputStream(subscriptionFile, true);
-            fileOutputStream.write(contents.getBytes(charset));
-            fileOutputStream.close();
-        } catch (IOException e) {
-            throw new DataStreamException(e);
-        }
-
-        // Upload file
-        /*
-        URI destination = this.getSubscriptionURI(entityManager);
-        FtpCommunicator ftpSender = this.getFtpCommunicator(destination, entityManager);
-        try {
-            ftpSender.send(destination, subscriptionFile);
-        } catch (IOException e) {
-            throw new DataStreamException(e);
-        }
-        */
     }
 
 }
