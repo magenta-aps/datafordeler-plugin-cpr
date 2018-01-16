@@ -41,7 +41,7 @@ public class PersonCoreData extends AuthorityDetailData {
 
 
     public static final String DB_FIELD_GENDER = "gender";
-    public static final String IO_FIELD_GENDER = "koen";
+    public static final String IO_FIELD_GENDER = "køn";
     @Column(name = DB_FIELD_GENDER)
     @JsonProperty(value = IO_FIELD_GENDER)
     @XmlElement(name = IO_FIELD_GENDER)

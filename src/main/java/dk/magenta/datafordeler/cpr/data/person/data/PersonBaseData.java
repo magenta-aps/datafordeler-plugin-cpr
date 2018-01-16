@@ -35,21 +35,25 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private PersonStatusData status;
 
     public static final String DB_FIELD_MOTHER = "mother";
+    public static final String IO_FIELD_MOTHER = "mor";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_MOTHER + DatabaseEntry.REF)
     private PersonParentData mother;
 
     public static final String DB_FIELD_FATHER = "father";
+    public static final String IO_FIELD_FATHER = "far";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_FATHER + DatabaseEntry.REF)
     private PersonParentData father;
 
     public static final String DB_FIELD_MOTHERVERIFICATION = "motherVerification";
+    public static final String IO_FIELD_MOTHERVERIFICATION = "morVerification";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_MOTHERVERIFICATION + DatabaseEntry.REF)
     private PersonParentVerificationData motherVerification;
 
     public static final String DB_FIELD_FATHERVERIFICATION = "fatherVerification";
+    public static final String IO_FIELD_FATHERVERIFICATION = "farVerification";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_FATHERVERIFICATION + DatabaseEntry.REF)
     private PersonParentVerificationData fatherVerification;
@@ -60,11 +64,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private PersonPositionData position;
 
     public static final String DB_FIELD_BIRTH = "birth";
+    public static final String IO_FIELD_BIRTH = "fødsel";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_BIRTH + DatabaseEntry.REF)
     private PersonBirthData birth;
 
     public static final String DB_FIELD_ADDRESS = "address";
+    public static final String IO_FIELD_ADDRESS = "cpradresse";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_ADDRESS + DatabaseEntry.REF)
     private PersonAddressData address;
@@ -80,11 +86,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private PersonMoveMunicipalityData moveMunicipality;
 
     public static final String DB_FIELD_NAME = "name";
+    public static final String IO_FIELD_NAME = "navn";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_NAME + DatabaseEntry.REF)
     private PersonNameData name;
 
     public static final String DB_FIELD_ADDRESSING_NAME = "addressingName";
+    public static final String IO_FIELD_ADDRESSING_NAME = "adresseringsnavn";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_ADDRESSING_NAME + DatabaseEntry.REF)
     private PersonAddressNameData addressingName;
@@ -95,11 +103,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private PersonNameVerificationData nameVerification;
 
     public static final String DB_FIELD_NAME_AUTHORITY = "nameAuthority";
+    public static final String IO_FIELD_NAME_AUTHORITY = "navnemyndighed";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_NAME_AUTHORITY + DatabaseEntry.REF)
     private PersonNameAuthorityTextData nameAuthority;
 
     public static final String DB_FIELD_PROTECTION = "protection";
+    public static final String IO_FIELD_PROTECTION = "beskyttelse";
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "personBaseData")
     private Set<PersonProtectionData> protection = new HashSet<>();
 

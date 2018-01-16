@@ -15,10 +15,10 @@ import java.util.*;
  */
 public class PersonQuery extends CprQuery<PersonEntity> {
 
-    public static final String PERSONNUMMER = "personnummer";
-    public static final String FORNAVNE = "fornavne";
-    public static final String EFTERNAVN = "efternavn";
-    public static final String KOMMUNEKODE = "kommunekode";
+    public static final String PERSONNUMMER = PersonEntity.IO_FIELD_CPR_NUMBER;
+    public static final String FORNAVNE = PersonNameData.IO_FIELD_FIRST_NAMES;
+    public static final String EFTERNAVN = PersonNameData.IO_FIELD_LAST_NAME;
+    public static final String KOMMUNEKODE = PersonAddressData.IO_FIELD_MUNICIPALITY_CODE;
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = PERSONNUMMER)
     private List<String> personnumre = new ArrayList<>();
@@ -29,6 +29,9 @@ public class PersonQuery extends CprQuery<PersonEntity> {
 
     public void addPersonnummer(String personnummer) {
         this.personnumre.add(personnummer);
+        if (personnummer != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     public void setPersonnummer(String personnummer) {
@@ -46,6 +49,10 @@ public class PersonQuery extends CprQuery<PersonEntity> {
 
     public void setFornavn(String fornavn) {
         this.fornavn = fornavn;
+        System.out.println("SetFornavn "+fornavn);
+        if (fornavn != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = EFTERNAVN)
@@ -57,6 +64,9 @@ public class PersonQuery extends CprQuery<PersonEntity> {
 
     public void setEfternavn(String efternavn) {
         this.efternavn = efternavn;
+        if (efternavn != null) {
+            this.increaseDataParamCount();
+        }
     }
 
 
@@ -102,6 +112,7 @@ public class PersonQuery extends CprQuery<PersonEntity> {
                 this.addKommunekode(kommunekode);
             }
         }
+        System.out.println("paramcnt: "+this.getDataParamCount());
     }
 
     @Override
