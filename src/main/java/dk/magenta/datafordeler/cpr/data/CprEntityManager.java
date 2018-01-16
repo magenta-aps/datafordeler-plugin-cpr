@@ -279,20 +279,20 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
                                     D baseData = null;
                                     HashSet<D> searchPool = new HashSet<>();
-                                    HashMap<D, Integer> foo = new HashMap<>();
+                                    HashMap<D, Integer> counters = new HashMap<>();
                                     for (V effect : effects) {
                                         for (D data : effect.getDataItems()) {
-                                            Integer count = foo.get(data);
+                                            Integer count = counters.get(data);
                                             if (count == null) {
                                                 count = 0;
                                             }
                                             count++;
-                                            foo.put(data, count);
+                                            counters.put(data, count);
                                         }
                                     }
                                     int effectsCount = effects.size();
-                                    for (D data : foo.keySet()) {
-                                        if (foo.get(data) == effectsCount) {
+                                    for (D data : counters.keySet()) {
+                                        if (counters.get(data) == effectsCount) {
                                             searchPool.add(data);
                                         }
                                     }
