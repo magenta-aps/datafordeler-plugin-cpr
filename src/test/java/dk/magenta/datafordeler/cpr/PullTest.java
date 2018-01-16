@@ -238,9 +238,9 @@ public class PullTest {
 
         CprConfiguration configuration = ((CprConfigurationManager) plugin.getConfigurationManager()).getConfiguration();
         when(cprConfigurationManager.getConfiguration()).thenReturn(configuration);
-        when(cprRegisterManager.isSetupSubscriptionEnabled()).thenReturn(true);
-        when(cprRegisterManager.getCustomerId()).thenReturn(1234);
-        when(cprRegisterManager.getJobId()).thenReturn(123456);
+        when(personEntityManager.isSetupSubscriptionEnabled()).thenReturn(true);
+        when(personEntityManager.getCustomerId()).thenReturn(1234);
+        when(personEntityManager.getJobId()).thenReturn(123456);
         //when(personEntityManager.getLastUpdated(any(Session.class))).thenReturn(null);
         doAnswer(new Answer() {
             @Override
@@ -252,7 +252,7 @@ public class PullTest {
         File localSubFolder = File.createTempFile("foo", "bar");
         localSubFolder.delete();
         localSubFolder.mkdirs();
-        when(cprRegisterManager.getLocalSubscriptionFolder()).thenReturn(localSubFolder.getAbsolutePath());
+        when(personEntityManager.getLocalSubscriptionFolder()).thenReturn(localSubFolder.getAbsolutePath());
 
         CprRegisterManager registerManager = (CprRegisterManager) plugin.getRegisterManager();
         registerManager.setProxyString(null);
