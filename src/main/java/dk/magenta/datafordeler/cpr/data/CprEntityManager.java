@@ -2,20 +2,16 @@ package dk.magenta.datafordeler.cpr.data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.*;
-import dk.magenta.datafordeler.core.exception.DataFordelerException;
-import dk.magenta.datafordeler.core.exception.ImportInterruptedException;
-import dk.magenta.datafordeler.core.exception.WrongSubclassException;
+import dk.magenta.datafordeler.core.exception.*;
 import dk.magenta.datafordeler.core.io.ImportInputStream;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.Receipt;
-import dk.magenta.datafordeler.core.plugin.Communicator;
-import dk.magenta.datafordeler.core.plugin.EntityManager;
-import dk.magenta.datafordeler.core.plugin.HttpCommunicator;
-import dk.magenta.datafordeler.core.plugin.RegisterManager;
+import dk.magenta.datafordeler.core.plugin.*;
 import dk.magenta.datafordeler.core.util.ItemInputStream;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.core.util.Stopwatch;
 import dk.magenta.datafordeler.cpr.CprPlugin;
+import dk.magenta.datafordeler.cpr.CprRegisterManager;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
@@ -31,7 +27,7 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.time.OffsetDateTime;
+import java.time.*;
 import java.util.*;
 
 @Component
@@ -141,8 +137,12 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         return this.log;
     }
 
-    private CprConfiguration getConfiguration() {
+    protected CprConfiguration getConfiguration() {
         return this.cprConfigurationManager.getConfiguration();
+    }
+
+    public CprRegisterManager getRegisterManager() {
+        return (CprRegisterManager) super.getRegisterManager();
     }
 
 
@@ -223,6 +223,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                             LinkedHashSet<UUID> uuids = new LinkedHashSet<>();
                             for (T record : chunkRecords) {
                                 this.checkInterrupt(importMetadata);
+                                this.handleRecord(record, importMetadata);
                                 if (this.filter(record)) {
                                     UUID uuid = this.generateUUID(record);
                                     uuids.add(uuid);
@@ -434,6 +435,87 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     private void checkInterrupt(ImportMetadata importMetadata) throws ImportInterruptedException {
         if (importMetadata.getStop()) {
             throw new ImportInterruptedException(new InterruptedException());
+        }
+    }
+
+    protected void handleRecord(T record, ImportMetadata importMetadata) {}
+
+
+    public int getJobId() {
+        return 0;
+    }
+
+    public int getCustomerId() {
+        return 0;
+    }
+
+    public String getLocalSubscriptionFolder() {
+        return null;
+    }
+
+    public boolean isSetupSubscriptionEnabled() {
+        return false;
+    }
+
+    protected URI getSubscriptionURI() throws DataFordelerException {
+        CprConfiguration configuration = this.getConfiguration();
+        return configuration.getRegisterSubscriptionURI(this);
+    }
+
+    public void addSubscription(String contents, String charset, CprEntityManager entityManager) throws DataFordelerException {
+        if (this.getJobId() == 0) {
+            throw new ConfigurationException("CPR jobId not set");
+        }
+        if (this.getCustomerId() == 0) {
+            throw new ConfigurationException("CPR customerId not set");
+        }
+        if (this.getLocalSubscriptionFolder() == null || this.getLocalSubscriptionFolder().isEmpty()) {
+            throw new ConfigurationException("CPR localSubscriptionFolder not set");
+        }
+        // Create file
+        LocalDate subscriptionDate = LocalDate.now();
+        // If it's after noon, CPR will not process the file today.
+        ZonedDateTime dailyDeadline = subscriptionDate.atTime(LocalTime.of(11, 45)).atZone(ZoneId.of("Europe/Copenhagen"));
+        if (ZonedDateTime.now().isAfter(dailyDeadline)) {
+            subscriptionDate = subscriptionDate.plusDays(1);
+        }
+        File localSubscriptionFolder = new File(this.getLocalSubscriptionFolder());
+        if (localSubscriptionFolder.isFile()) {
+            throw new ConfigurationException("CPR localSubscriptionFolder is a file, not a folder");
+        }
+        if (!localSubscriptionFolder.exists()) {
+            localSubscriptionFolder.mkdirs();
+        }
+        File subscriptionFile = new File(
+                localSubscriptionFolder,
+                String.format(
+                        "d%02d%02d%02d",
+                        subscriptionDate.getYear() % 100,
+                        subscriptionDate.getMonthValue(),
+                        subscriptionDate.getDayOfMonth()
+                ) +
+                        "." +
+                        String.format("i%06d", this.getJobId())
+
+        );
+        try {
+            if (!subscriptionFile.exists()) {
+                subscriptionFile.createNewFile();
+            }
+            FileOutputStream fileOutputStream = new FileOutputStream(subscriptionFile, true);
+            fileOutputStream.write(contents.getBytes(charset));
+            fileOutputStream.close();
+        } catch (IOException e) {
+            throw new DataStreamException(e);
+        }
+
+        // Upload file
+        URI destination = this.getSubscriptionURI();
+        FtpCommunicator ftpSender = this.getRegisterManager().getFtpCommunicator(destination, entityManager);
+        try {
+            ftpSender.send(destination, subscriptionFile);
+        } catch (IOException e) {
+            throw new DataStreamException(e);
         }
     }
 }

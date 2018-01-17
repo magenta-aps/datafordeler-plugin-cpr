@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.SessionManager;
+import dk.magenta.datafordeler.core.exception.ConfigurationException;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
@@ -24,9 +25,10 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.time.OffsetDateTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.StringJoiner;
 
 @Component
@@ -52,7 +54,6 @@ public class CprRegisterManager extends RegisterManager {
     @Value("${dafo.cpr.local-copy-folder:}")
     private String localCopyFolder;
 
-
     public CprRegisterManager() {
 
     }
@@ -69,6 +70,10 @@ public class CprRegisterManager extends RegisterManager {
             temp.mkdir();
             this.localCopyFolder = temp.getAbsolutePath();
         }
+    }
+
+    public CprConfigurationManager getConfigurationManager() {
+        return this.configurationManager;
     }
 
     @Override
@@ -90,8 +95,6 @@ public class CprRegisterManager extends RegisterManager {
     public URI getBaseEndpoint() {
         return null;
     }
-
-
 
     @Override
     protected Communicator getEventFetcher() {

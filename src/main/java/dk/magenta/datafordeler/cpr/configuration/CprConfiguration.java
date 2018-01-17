@@ -68,7 +68,13 @@ public class CprConfiguration implements Configuration {
     private RegisterType personRegisterType = RegisterType.LOCAL_FILE;
 
     @Column
-    private String personRegisterFtpAddress = "ftps://ftp.cpr.dk/ud/";
+    private String personRegisterFtpAddress = "ftps://ftp.cpr.dk";
+
+    @Column
+    private String personRegisterFtpDownloadFolder = "/";
+
+    @Column
+    private String personRegisterFtpUploadFolder = "/";
 
     @Column
     private String personRegisterFtpUsername = "";
@@ -96,6 +102,12 @@ public class CprConfiguration implements Configuration {
     private String roadRegisterFtpAddress = null;
 
     @Column
+    private String roadRegisterFtpDownloadFolder = "/";
+
+    @Column
+    private String roadRegisterFtpUploadFolder = "/";
+
+    @Column
     private String roadRegisterFtpUsername = null;
 
     @Column
@@ -119,6 +131,12 @@ public class CprConfiguration implements Configuration {
 
     @Column
     private String residenceRegisterFtpAddress = null;
+
+    @Column
+    private String residenceRegisterFtpDownloadFolder = "/";
+
+    @Column
+    private String residenceRegisterFtpUploadFolder = "/";
 
     @Column
     private String residenceRegisterFtpUsername = null;
@@ -150,6 +168,14 @@ public class CprConfiguration implements Configuration {
         return this.personRegisterFtpAddress;
     }
 
+    public String getPersonRegisterFtpDownloadFolder() {
+        return this.personRegisterFtpDownloadFolder;
+    }
+
+    public String getPersonRegisterFtpUploadFolder() {
+        return this.personRegisterFtpUploadFolder;
+    }
+
     public String getPersonRegisterFtpUsername() {
         return this.personRegisterFtpUsername;
     }
@@ -167,7 +193,21 @@ public class CprConfiguration implements Configuration {
     }
 
     public URI getPersonRegisterURI() throws ConfigurationException {
-        return this.formatURI(this.personRegisterType, this.personRegisterLocalFile, this.personRegisterFtpAddress);
+        return this.formatURI(
+                this.personRegisterType,
+                this.personRegisterLocalFile,
+                (this.personRegisterFtpAddress != null && this.personRegisterFtpDownloadFolder != null) ?
+                        (this.personRegisterFtpAddress + this.personRegisterFtpDownloadFolder) : null
+        );
+    }
+
+    public URI getPersonRegisterSubscriptionURI() throws ConfigurationException {
+        return this.formatURI(
+                this.personRegisterType,
+                this.personRegisterLocalFile,
+                (this.personRegisterFtpAddress != null && this.personRegisterFtpUploadFolder != null) ?
+                        (this.personRegisterFtpAddress + this.personRegisterFtpUploadFolder) : null
+        );
     }
 
 
@@ -206,7 +246,21 @@ public class CprConfiguration implements Configuration {
     }
 
     public URI getRoadRegisterURI() throws ConfigurationException {
-        return this.formatURI(this.roadRegisterType, this.roadRegisterLocalFile, this.roadRegisterFtpAddress);
+        return this.formatURI(
+                this.roadRegisterType,
+                this.roadRegisterLocalFile,
+                (this.roadRegisterFtpAddress != null && this.roadRegisterFtpDownloadFolder != null) ?
+                        (this.roadRegisterFtpAddress + this.roadRegisterFtpDownloadFolder) : null
+        );
+    }
+
+    public URI getRoadRegisterSubscriptionURI() throws ConfigurationException {
+        return this.formatURI(
+                this.roadRegisterType,
+                this.roadRegisterLocalFile,
+                (this.roadRegisterFtpAddress != null && this.roadRegisterFtpUploadFolder != null) ?
+                        (this.roadRegisterFtpAddress + this.roadRegisterFtpUploadFolder) : null
+        );
     }
 
 
@@ -242,7 +296,21 @@ public class CprConfiguration implements Configuration {
     }
 
     public URI getResidenceRegisterURI() throws ConfigurationException {
-        return this.formatURI(this.residenceRegisterType, this.residenceRegisterLocalFile, this.residenceRegisterFtpAddress);
+        return this.formatURI(
+                this.residenceRegisterType,
+                this.residenceRegisterLocalFile,
+                (this.residenceRegisterFtpAddress != null && this.residenceRegisterFtpDownloadFolder != null) ?
+                        (this.residenceRegisterFtpAddress + this.residenceRegisterFtpDownloadFolder) : null
+        );
+    }
+
+    public URI getResidenceRegisterSubscriptionURI() throws ConfigurationException {
+        return this.formatURI(
+                this.residenceRegisterType,
+                this.residenceRegisterLocalFile,
+                (this.residenceRegisterFtpAddress != null && this.residenceRegisterFtpUploadFolder != null) ?
+                        (this.residenceRegisterFtpAddress + this.residenceRegisterFtpUploadFolder) : null
+        );
     }
 
 
@@ -353,6 +421,19 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
+    public URI getRegisterSubscriptionURI(CprEntityManager entityManager) throws ConfigurationException {
+        if (entityManager instanceof PersonEntityManager) {
+            return this.getPersonRegisterSubscriptionURI();
+        }
+        if (entityManager instanceof RoadEntityManager) {
+            return this.getRoadRegisterSubscriptionURI();
+        }
+        if (entityManager instanceof ResidenceEntityManager) {
+            return this.getResidenceRegisterSubscriptionURI();
+        }
+        return null;
+    }
+
 
 
     private String formatCharset(Charset charset) {
@@ -378,7 +459,7 @@ public class CprConfiguration implements Configuration {
         } else if (registerType == RegisterType.REMOTE_FTP) {
             try {
                 return new URI(ftpAddress);
-            } catch (URISyntaxException e) {
+            } catch (URISyntaxException|NullPointerException e) {
                 throw new ConfigurationException("Invalid FTP address configured: " + ftpAddress);
             }
         }
