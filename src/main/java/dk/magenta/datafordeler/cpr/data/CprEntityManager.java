@@ -520,4 +520,16 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             throw new DataStreamException(e);
         }
     }
+
+    /**
+     * Should return whether the configuration is set so that pulls are enabled for this entitymanager
+     */
+    @Override
+    public boolean pullEnabled() {
+        try {
+            return this.getRegisterManager().getEventInterface(this) != null;
+        } catch (DataFordelerException e) {
+            return false;
+        }
+    }
 }
