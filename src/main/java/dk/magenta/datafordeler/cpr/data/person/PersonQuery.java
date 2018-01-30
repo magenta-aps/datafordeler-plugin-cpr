@@ -49,7 +49,6 @@ public class PersonQuery extends CprQuery<PersonEntity> {
 
     public void setFornavn(String fornavn) {
         this.fornavn = fornavn;
-        System.out.println("SetFornavn "+fornavn);
         if (fornavn != null) {
             this.increaseDataParamCount();
         }
@@ -112,7 +111,6 @@ public class PersonQuery extends CprQuery<PersonEntity> {
                 this.addKommunekode(kommunekode);
             }
         }
-        System.out.println("paramcnt: "+this.getDataParamCount());
     }
 
     @Override
