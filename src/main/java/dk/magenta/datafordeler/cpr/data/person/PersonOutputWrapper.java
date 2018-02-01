@@ -70,10 +70,12 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                 OffsetDateTime timestamp = personBaseData.getLastUpdated();
 
                 if (personCoreData != null) {
-                    addEffectDataToRegistration(
-                            output, PersonCoreData.IO_FIELD_CPR_NUMBER,
-                            createPersonNummerNode(virkning, timestamp, personCoreData)
-                    );
+                    if (personCoreData.getCprNumber() != null && !personCoreData.getCprNumber().isEmpty()) {
+                        addEffectDataToRegistration(
+                                output, PersonCoreData.IO_FIELD_CPR_NUMBER,
+                                createPersonNummerNode(virkning, timestamp, personCoreData)
+                        );
+                    }
                     addEffectDataToRegistration(
                             output,
                             "person",
