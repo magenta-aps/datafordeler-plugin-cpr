@@ -76,11 +76,13 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                                 createPersonNummerNode(virkning, timestamp, personCoreData)
                         );
                     }
-                    addEffectDataToRegistration(
-                            output,
-                            "person",
-                            createKerneDataNode(virkning, timestamp, personCoreData, personStatusData, stilling, foedsel)
-                    );
+                    if (personCoreData.getGender() != null || personStatusData != null || stilling != null || foedsel != null) {
+                        addEffectDataToRegistration(
+                                output,
+                                "person",
+                                createKerneDataNode(virkning, timestamp, personCoreData, personStatusData, stilling, foedsel)
+                        );
+                    }
                 }
                 if (far != null) {
                     addEffectDataToRegistration(
@@ -180,18 +182,24 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                     PersonPositionData stilling, PersonBirthData foedsel
     ) {
         ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
-        output.put(
-                        PersonCoreData.IO_FIELD_GENDER,
-                        personCoreData.getGender() != null ? personCoreData.getGender().toString() : null
-        );
-        output.put(
-                        PersonStatusData.IO_FIELD_STATUS,
-                        personStatusData != null ? personStatusData.getStatus() : null
-        );
-        output.put(
-                        PersonPositionData.IO_FIELD_POSITION,
-                        stilling != null ? stilling.getPosition() : null
-        );
+        if (personCoreData.getGender() != null) {
+            output.put(
+                    PersonCoreData.IO_FIELD_GENDER,
+                    personCoreData.getGender().toString()
+            );
+        }
+        if (personStatusData != null) {
+            output.put(
+                    PersonStatusData.IO_FIELD_STATUS,
+                    personStatusData.getStatus()
+            );
+        }
+        if (stilling != null) {
+            output.put(
+                    PersonPositionData.IO_FIELD_POSITION,
+                    stilling.getPosition()
+            );
+        }
         if (foedsel != null) {
             if (foedsel.getBirthDatetime() != null) {
                 output.put(
