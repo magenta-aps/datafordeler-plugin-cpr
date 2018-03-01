@@ -203,6 +203,19 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
                 }
             }
 
+            for (String cprNumber : addCprNumbers) {
+                content.add(
+                        String.format(
+                                "%02d%06d%10s%15s",
+                                7,
+                                this.getJobId(),
+                                cprNumber,
+                                keyConstant,
+                                ""
+                        )
+                );
+            }
+
             this.addSubscription(content.toString(), charset, this);
 
             session.beginTransaction();
