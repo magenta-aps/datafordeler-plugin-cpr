@@ -172,8 +172,11 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         log.info("Parsing in thread "+Thread.currentThread().getId());
 
         List<File> cacheFiles = null;
+        int lines = 0;
         if (registrationData instanceof ImportInputStream) {
-            cacheFiles = ((ImportInputStream) registrationData).getCacheFiles();
+            ImportInputStream importStream = (ImportInputStream) registrationData;
+            cacheFiles = importStream.getCacheFiles();
+            lines = importStream.getLineCount();
         }
 
         boolean done = false;
@@ -185,10 +188,12 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
                 String line;
                 int i = 0;
+                int size = 0;
                 ArrayList<String> dataChunk = new ArrayList<>();
                 try {
                     for (i = 0; (line = reader.readLine()) != null && i < maxChunkSize; i++) {
                         dataChunk.add(line);
+                        size += line.length();
                     }
                     if (line == null) {
                         done = true;
@@ -199,7 +204,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 }
 
                 if (chunkCount >= startChunk) {
-                    log.info("Handling chunk " + chunkCount);
+                    log.info("Handling chunk " + chunkCount + (lines > 0 ? ("/" + lines) : "") + " (" + size + " chars)");
                     timer.start(TASK_CHUNK_HANDLE);
                     // Parse chunk into a set of records
                     timer.start(TASK_PARSE);
