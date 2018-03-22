@@ -183,7 +183,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
         boolean done = false;
         int maxChunkSize = 1000;
-        long chunkCount = 0;
+        long chunkCount = 1;
         long startChunk = importMetadata.getStartChunk();
         while (!done) {
             try {
