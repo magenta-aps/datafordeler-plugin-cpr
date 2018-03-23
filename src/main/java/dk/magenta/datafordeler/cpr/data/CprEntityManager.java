@@ -171,16 +171,21 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         boolean wrappedInTransaction = importMetadata.isTransactionInProgress();
         log.info("Parsing in thread "+Thread.currentThread().getId());
 
+        int maxChunkSize = 1000;
         List<File> cacheFiles = null;
-        int lines = 0;
+        int totalChunks = 0;
         if (registrationData instanceof ImportInputStream) {
             ImportInputStream importStream = (ImportInputStream) registrationData;
             cacheFiles = importStream.getCacheFiles();
-            lines = importStream.getLineCount();
+            int lines = importStream.getLineCount();
+
+            // Integer division with rounding up
+            //totalChunks = (int) Math.ceil((float) lines / (float) maxChunkSize);
+            totalChunks = (lines + maxChunkSize - 1) / maxChunkSize;
+            //totalChunks = (lines / maxChunkSize) + (lines % maxChunkSize == 0 ? 0 : 1);
         }
 
         boolean done = false;
-        int maxChunkSize = 1000;
         long chunkCount = 1;
         long startChunk = importMetadata.getStartChunk();
         while (!done) {
@@ -204,7 +209,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 }
 
                 if (chunkCount >= startChunk) {
-                    log.info("Handling chunk " + chunkCount + (lines > 0 ? ("/" + lines) : "") + " (" + size + " chars)");
+                    log.info("Handling chunk " + chunkCount + (totalChunks > 0 ? ("/" + totalChunks) : "") + " (" + size + " chars)");
                     timer.start(TASK_CHUNK_HANDLE);
                     // Parse chunk into a set of records
                     timer.start(TASK_PARSE);
