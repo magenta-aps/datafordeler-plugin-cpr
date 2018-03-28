@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
+import dk.magenta.datafordeler.core.fapi.Query;
 import dk.magenta.datafordeler.cpr.data.person.data.*;
 
 import java.time.OffsetDateTime;
@@ -17,7 +18,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     private ObjectMapper objectMapper;
 
     @Override
-    public Object wrapResult(PersonEntity input) {
+    public Object wrapResult(PersonEntity input, Query query) {
         objectMapper = new ObjectMapper();
 
         // Root
