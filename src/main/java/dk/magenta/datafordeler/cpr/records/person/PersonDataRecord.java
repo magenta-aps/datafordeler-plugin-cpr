@@ -15,6 +15,9 @@ import java.util.HashSet;
 public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, PersonBaseData> {
 
     public static final String RECORDTYPE_PERSON = "001";
+    public static final String RECORDTYPE_BIRTH = "005";
+    public static final String RECORDTYPE_CHURCH = "010";
+    public static final String RECORDTYPE_HISTORIC_CHURCH = "011";
     public static final String RECORDTYPE_PROTECTION = "015";
     public static final String RECORDTYPE_CURRENT_NAME = "020";
     public static final String RECORDTYPE_HISTORIC_NAME = "021";
