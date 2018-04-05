@@ -45,49 +45,17 @@ public class BirthRecord extends PersonDataRecord {
         boolean updated = false;
         if (this.birthTemporality.matches(registrationTime, effect)) {
             /*data.setBirth(
-                // int authority,
-                this.getInt("start_mynkod-personbolig"),
-                // String bygningsnummer,
-                this.getString("bnr", true),
-                // String bynavn,
-                null,
-                // String cprKommunekode,
-                this.getInt("komkod", false),
-                // String cprKommunenavn,
-                null,
-                // String cprVejkode,
-                this.getInt("vejkod", false),
-                // String darAdresse,
-                null,
-                // String etage,
-                this.get("etage"),
-                // String husnummer,
-                this.getString("husnr", true),
-                // String postdistrikt,
-                null,
-                // String postnummer,
-                null,
-                // String sideDoer,
-                this.get("sidedoer"),
-                // String adresselinie1,
-                this.get("adr1-supladr"),
-                // String adresselinie2,
-                this.get("adr2-supladr"),
-                // String adresselinie3,
-                this.get("adr3-supladr"),
-                // String adresselinie4,
-                this.get("adr4-supladr"),
-                // String adresselinie5,
-                this.get("adr5-supladr"),
-                // int addressTextType,
-                this.getInt("adrtxttype"),
-                // int startAuthority
-                this.getInt("start_mynkod-adrtxt")
+                this.getInt("start_mynkod-fødested"),
+                this.getString("myntxt_mynkod-fødested", true),
+                this.getString("myntxt-fødested", true),
             );*/
             updated = true;
         }
         if (this.documentTemporality.matches(registrationTime, effect)) {
-            //data.setBirthVerification(this.get("dok_mynkod-fødested"), this.get("dok-fødested"));
+            /*data.setBirthVerification(
+                    this.get("dok_mynkod-fødested"),
+                    this.get("dok-fødested")
+            );*/
             updated = true;
         }
         return updated;
