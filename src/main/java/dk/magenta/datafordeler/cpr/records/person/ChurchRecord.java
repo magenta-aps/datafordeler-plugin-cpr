@@ -7,10 +7,7 @@ import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Record for Person church relation (type 010).
@@ -32,7 +29,11 @@ public class ChurchRecord extends PersonDataRecord {
         this.obtain("dok-folkekirke", 58, 3);
 
         this.churchTemporality = new Bitemporality(this.getOffsetDateTime("fkirk_ts"), null, this.getOffsetDateTime("start_dt-folkekirke"), this.getBoolean("start_dt-umrk-folkekirke"), null, false);
-        this.documentTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-folkekirke"));
+
+        OffsetDateTime docTime = this.getOffsetDateTime("dok_ts-folkekirke");
+        if (docTime != null) {
+            this.documentTemporality = new Bitemporality(docTime);
+        }
     }
 
     @Override
@@ -44,11 +45,11 @@ public class ChurchRecord extends PersonDataRecord {
     public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
         boolean updated = false;
         if (this.churchTemporality.matches(registrationTime, effect)) {
-            //data.setChurch(this.getInt("start_mynkod-folkekirke"), this.getString("fkirk", true));
+            data.setChurch(this.getInt("start_mynkod-folkekirke"), this.getChar("fkirk"));
             updated = true;
         }
-        if (this.documentTemporality.matches(registrationTime, effect)) {
-            //data.setChurchVerification(this.get("dok_mynkod-folkekirke"), this.get("dok-folkekirke"));
+        if (this.documentTemporality != null && this.documentTemporality.matches(registrationTime, effect)) {
+            data.setChurchVerification(this.getInt("dok_mynkod-folkekirke"), this.getBoolean("dok-folkekirke"));
             updated = true;
         }
         return updated;
@@ -64,10 +65,12 @@ public class ChurchRecord extends PersonDataRecord {
 
     @Override
     public List<Bitemporality> getBitemporality() {
-        return Arrays.asList(
-                this.churchTemporality,
-                this.documentTemporality
-        );
+        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+        bitemporalities.add(this.churchTemporality);
+        if (this.documentTemporality != null) {
+            bitemporalities.add(this.documentTemporality);
+        }
+        return bitemporalities;
     }
 
     @Override

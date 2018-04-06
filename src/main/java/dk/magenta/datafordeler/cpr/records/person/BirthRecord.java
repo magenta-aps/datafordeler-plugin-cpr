@@ -44,18 +44,18 @@ public class BirthRecord extends PersonDataRecord {
     public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
         boolean updated = false;
         if (this.birthTemporality.matches(registrationTime, effect)) {
-            /*data.setBirth(
+            data.setBirth(
                 this.getInt("start_mynkod-fødested"),
-                this.getString("myntxt_mynkod-fødested", true),
-                this.getString("myntxt-fødested", true),
-            );*/
+                this.getInt("myntxt_mynkod-fødested", true),
+                this.getString("myntxt-fødested", true)
+            );
             updated = true;
         }
         if (this.documentTemporality.matches(registrationTime, effect)) {
-            /*data.setBirthVerification(
-                    this.get("dok_mynkod-fødested"),
-                    this.get("dok-fødested")
-            );*/
+            data.setBirthVerification(
+                    this.getInt("dok_mynkod-fødested"),
+                    this.getBoolean("dok-fødested")
+            );
             updated = true;
         }
         return updated;

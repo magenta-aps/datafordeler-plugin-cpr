@@ -111,6 +111,12 @@ public class ParseTest {
             PersonEntity entity = entities.get(0);
             Assert.assertEquals(PersonEntity.generateUUID("0101001234"), entity.getUUID());
 
+            System.out.println(
+                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
+                        new PersonOutputWrapper().wrapResult(entity, query)
+                    )
+            );
+
         } finally {
             transaction.rollback();
             session.close();

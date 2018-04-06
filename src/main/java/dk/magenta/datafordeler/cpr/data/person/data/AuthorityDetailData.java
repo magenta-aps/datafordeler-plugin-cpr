@@ -27,7 +27,9 @@ public abstract class AuthorityDetailData extends DetailData {
     }
 
     public void setAuthority(int authority) {
-        this.authority = authority;
+        if (authority != 0 || this.authority == 0) {
+            this.authority = authority;
+        }
     }
 
     @Override

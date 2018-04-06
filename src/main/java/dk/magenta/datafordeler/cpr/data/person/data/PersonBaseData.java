@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
@@ -68,6 +69,24 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_BIRTH + DatabaseEntry.REF)
     private PersonBirthData birth;
+
+    public static final String DB_FIELD_BIRTH_VERIFICATION = "birthVerification";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_BIRTH_VERIFICATION + DatabaseEntry.REF)
+    private PersonBirthVerificationData birthVerification;
+
+    public static final String DB_FIELD_CHURCH = "church";
+    public static final String IO_FIELD_CHURCH = "folkekirke";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_CHURCH + DatabaseEntry.REF)
+    private PersonChurchData church;
+
+    public static final String DB_FIELD_CHURCH_VERIFICATION = "churchVerification";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_CHURCH_VERIFICATION + DatabaseEntry.REF)
+    private PersonChurchVerificationData churchVerification;
+
+
 
     public static final String DB_FIELD_ADDRESS = "address";
     public static final String IO_FIELD_ADDRESS = "cpradresse";
@@ -175,6 +194,18 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
     public PersonBirthData getBirth() {
         return birth;
+    }
+
+    public PersonBirthVerificationData getBirthVerification() {
+        return this.birthVerification;
+    }
+
+    public PersonChurchData getChurch() {
+        return this.church;
+    }
+
+    public PersonChurchVerificationData getChurchVerification() {
+        return this.churchVerification;
     }
 
     public PersonAddressData getAddress() {
@@ -313,18 +344,46 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.position.setPosition(position);
     }
 
-    public void setBirth(LocalDateTime foedselsdato, boolean foedselsdatoUsikkerhedsmarkering,
-                         String cprFoedselsregistreringsstedskode, String cprFoedselsregistreringsstedsnavn,
-                         int foedselsraekkefoelge) {
+    public void setBirth(LocalDateTime foedselsdato, boolean foedselsdatoUsikkerhedsmarkering, int foedselsraekkefoelge) {
         if (this.birth == null) {
             this.birth = new PersonBirthData();
         }
-        this.birth.setBirthPlaceCode(cprFoedselsregistreringsstedskode);
-        this.birth.setBirthPlaceName(cprFoedselsregistreringsstedsnavn);
         this.birth.setBirthDatetime(foedselsdato);
         this.birth.setBirthDatetimeUncertain(foedselsdatoUsikkerhedsmarkering);
-
         this.birth.setFoedselsraekkefoelge(foedselsraekkefoelge);
+    }
+
+    public void setBirth(int authority, int authorityText, String supplementalText) {
+        if (this.birth == null) {
+            this.birth = new PersonBirthData();
+        }
+        this.birth.setBirthPlaceCode(authority);
+        this.birth.setBirthAuthorityText(authorityText);
+        this.birth.setBirthSupplementalText(supplementalText);
+    }
+
+    public void setBirthVerification(int authority, boolean verification) {
+        if (this.birthVerification == null) {
+            this.birthVerification = new PersonBirthVerificationData();
+        }
+        this.birthVerification.setAuthority(authority);
+        this.birthVerification.setVerified(verification);
+    }
+
+    public void setChurch(int authority, Character churchRelation) {
+        if (this.church == null) {
+            this.church = new PersonChurchData();
+        }
+        this.church.setAuthority(authority);
+        this.church.setChurchRelation(churchRelation);
+    }
+
+    public void setChurchVerification(int authority, boolean verified) {
+        if (this.churchVerification == null) {
+            this.churchVerification = new PersonChurchVerificationData();
+        }
+        this.churchVerification.setAuthority(authority);
+        this.churchVerification.setVerified(verified);
     }
 
     public void setAddress(int authority, String bygningsnummer, String bynavn, int cprKommunekode,
@@ -541,6 +600,15 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         }
         if (this.birth != null) {
             map.put("birth", this.birth);
+        }
+        if (this.birthVerification != null) {
+            map.put("birthVerification", this.birthVerification);
+        }
+        if (this.church != null) {
+            map.put("church", this.church);
+        }
+        if (this.churchVerification != null) {
+            map.put("churchVerification", this.churchVerification);
         }
         if (this.address != null) {
             map.put("address", this.address);

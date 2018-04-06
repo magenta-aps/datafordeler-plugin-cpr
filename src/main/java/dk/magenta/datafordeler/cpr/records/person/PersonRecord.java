@@ -170,10 +170,6 @@ public class PersonRecord extends PersonDataRecord {
                 this.getDateTime("foed_dt", "foed_tm"),
                 // boolean foedselsdatoUsikkerhedsmarkering,
                 this.getBoolean("foed_dt_umrk"),
-                // String cprFoedselsregistreringsstedskode,
-                null,
-                // String cprFoedselsregistreringsstedsnavn,
-                null,
                 // int foedselsraekkefoelge
                 this.getInt("foedsekvens")
             );
