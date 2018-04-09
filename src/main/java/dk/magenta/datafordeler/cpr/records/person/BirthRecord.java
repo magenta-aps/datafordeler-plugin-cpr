@@ -7,10 +7,7 @@ import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Record for Person birth (type 025).
@@ -32,7 +29,10 @@ public class BirthRecord extends PersonDataRecord {
         this.obtain("dok-fødested", 82, 3);
 
         this.birthTemporality = new Bitemporality(this.getOffsetDateTime("fødested_ts"));
-        this.documentTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-fødested"));
+        OffsetDateTime docTime = this.getOffsetDateTime("dok_ts-fødested");
+        if (docTime != null) {
+            this.documentTemporality = new Bitemporality(docTime);
+        }
     }
 
     @Override
@@ -51,7 +51,7 @@ public class BirthRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.documentTemporality.matches(registrationTime, effect)) {
+        if (this.documentTemporality != null && this.documentTemporality.matches(registrationTime, effect)) {
             data.setBirthVerification(
                     this.getInt("dok_mynkod-fødested"),
                     this.getBoolean("dok-fødested")
@@ -71,10 +71,12 @@ public class BirthRecord extends PersonDataRecord {
 
     @Override
     public List<Bitemporality> getBitemporality() {
-        return Arrays.asList(
-                this.birthTemporality,
-                this.documentTemporality
-        );
+        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+        bitemporalities.add(this.birthTemporality);
+        if (this.documentTemporality != null) {
+            bitemporalities.add(this.documentTemporality);
+        }
+        return bitemporalities;
     }
 
     @Override
