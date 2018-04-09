@@ -63,19 +63,21 @@ public abstract class CprDataRecord<V extends CprEffect, B extends CprData> exte
                 HashSet<String> acceptedRecordTypes = new HashSet<>(
                         getConfigValueAsText(importConfiguration.get(CprEntityManager.IMPORTCONFIG_RECORDTYPE), "%03d")
                 );
-                System.out.println(this.getRecordType()+(acceptedRecordTypes.contains(this.getRecordType()) ? " contained in ":" NOT contained in ")+acceptedRecordTypes);
                 return acceptedRecordTypes.contains(this.getRecordType());
             }
         }
         return true;
     }
 
-    private static List<String> getConfigValueAsText(JsonNode value, String fmtNumber) {
+    protected static List<String> getConfigValueAsText(JsonNode value, String fmtNumber) {
         ArrayList<String> output = new ArrayList<>();
         if (value != null) {
             if (value.isTextual()) {
                 output.add(value.asText());
             } else if (value.isIntegralNumber()) {
+                if (fmtNumber == null) {
+                    fmtNumber = "%d";
+                }
                 output.add(String.format(fmtNumber, value.asLong()));
             } else if (value.isArray()) {
                 for (JsonNode j : value) {

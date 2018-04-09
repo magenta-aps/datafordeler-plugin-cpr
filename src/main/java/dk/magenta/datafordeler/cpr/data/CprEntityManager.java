@@ -46,6 +46,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     private static boolean SAVE_RECORD_DATA = false;
 
     public static final String IMPORTCONFIG_RECORDTYPE = "recordtype";
+    public static final String IMPORTCONFIG_PNR = "personnummer";
 
     private HttpCommunicator commonFetcher;
 
