@@ -1,11 +1,14 @@
 package dk.magenta.datafordeler.cpr.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.core.database.Identification;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 
+import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +16,21 @@ import java.util.Map;
 @MappedSuperclass
 //@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class DetailData extends DatabaseEntry {
+
+    public static final String DB_FIELD_DAFO_UPDATED = "dafoUpdated";
+    public static final String IO_FIELD_DAFO_UPDATED = "dafoOpdateret";
+
+    @Column(name = DB_FIELD_DAFO_UPDATED)
+    private OffsetDateTime dafoUpdated = null;
+
+    @JsonProperty(value = IO_FIELD_DAFO_UPDATED)
+    public OffsetDateTime getDafoUpdated() {
+        return this.dafoUpdated;
+    }
+
+    public void setDafoUpdated(OffsetDateTime dafoUpdated) {
+        this.dafoUpdated = dafoUpdated;
+    }
 
     public abstract Map<String, Object> asMap();
 

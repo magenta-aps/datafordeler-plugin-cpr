@@ -337,7 +337,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                         boolean updated = false;
                                         for (V effect : effects) {
                                             this.checkInterrupt(importMetadata);
-                                            if (record.populateBaseData(baseData, effect, bitemporality.registrationFrom, session)) {
+                                            if (record.populateBaseData(baseData, effect, bitemporality.registrationFrom, session, importMetadata)) {
                                                 updated = true;
                                             }
                                         }

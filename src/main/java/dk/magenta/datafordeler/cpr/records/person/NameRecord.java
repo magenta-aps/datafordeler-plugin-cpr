@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -54,59 +55,63 @@ public class NameRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (this.nameTemporality.matches(registrationTime, effect)) {
             data.setName(
-                // int authority,
-                this.getInt("start_mynkod-navne"),
-                // String adresseringsnavn,
-                null,
-                // String efternavn,
-                this.get("efternvn"),
-                // String fornavne,
-                this.get("fornvn"),
-                // String mellemnavn,
-                this.get("melnvn"),
-                // boolean efternavnMarkering,
-                this.getMarking("efternvn_mrk"),
-                // boolean fornavneMarkering,
-                this.getMarking("fornvn_mrk"),
-                // boolean mellemnavnMarkering,
-                this.getMarking("melnvn_mrk"),
-                // String egetEfternavn,
-                this.get("slægtsnvn"),
-                // boolean ownLastNameMarking,
-                this.getMarking("slægtsnvn_mrk"),
-                // boolean reportNames
-                this.getBoolean("indrap-navne")
+                    // int authority,
+                    this.getInt("start_mynkod-navne"),
+                    // String adresseringsnavn,
+                    null,
+                    // String efternavn,
+                    this.get("efternvn"),
+                    // String fornavne,
+                    this.get("fornvn"),
+                    // String mellemnavn,
+                    this.get("melnvn"),
+                    // boolean efternavnMarkering,
+                    this.getMarking("efternvn_mrk"),
+                    // boolean fornavneMarkering,
+                    this.getMarking("fornvn_mrk"),
+                    // boolean mellemnavnMarkering,
+                    this.getMarking("melnvn_mrk"),
+                    // String egetEfternavn,
+                    this.get("slægtsnvn"),
+                    // boolean ownLastNameMarking,
+                    this.getMarking("slægtsnvn_mrk"),
+                    // boolean reportNames
+                    this.getBoolean("indrap-navne"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
         if (this.addressNameTemporality.matches(registrationTime, effect)) {
             data.setAddressName(
-                // int authority,
-                this.getInt("adrnvn_mynkod"),
-                // String addressName
-                this.get("adrnvn")
+                    // int authority,
+                    this.getInt("adrnvn_mynkod"),
+                    // String addressName
+                    this.get("adrnvn"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
         if (this.documentNameTemporality.matches(registrationTime, effect)) {
             data.setNameVerification(
-                // int authority,
-                this.getInt("dok_mynkod-navne"),
-                // boolean verification
-                this.getBoolean("dok-navne")
+                    // int authority,
+                    this.getInt("dok_mynkod-navne"),
+                    // boolean verification
+                    this.getBoolean("dok-navne"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
         if (this.officiaryTemporality.matches(registrationTime, effect)) {
             data.setNameAuthorityText(
-                // int authority,
-                this.getInt("myntxt_mynkod-navne"),
-                // String text
-                this.get("myntxt-navne")
+                    // int authority,
+                    this.getInt("myntxt_mynkod-navne"),
+                    // String text
+                    this.get("myntxt-navne"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }

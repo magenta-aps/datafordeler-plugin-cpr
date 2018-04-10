@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.residence;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -42,7 +43,7 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
     }
 
     @Override
-    public boolean populateBaseData(ResidenceBaseData data, ResidenceEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(ResidenceBaseData data, ResidenceEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
         if (this.residenceTemporality.matches(registrationTime, effect)) {
             data.setKommunekode(this.getInt("komkod"));
             data.setVejkode(this.getInt("vejkod"));

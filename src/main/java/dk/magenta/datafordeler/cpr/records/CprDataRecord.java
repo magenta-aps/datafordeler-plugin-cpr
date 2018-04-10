@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.CprEffect;
 import org.hibernate.Session;
@@ -19,7 +20,7 @@ public abstract class CprDataRecord<V extends CprEffect, B extends CprData> exte
         super(line);
     }
 
-    public abstract boolean populateBaseData(B data, V effect, OffsetDateTime registrationTime, Session session);
+    public abstract boolean populateBaseData(B data, V effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata);
 
 
     protected B getBaseDataItem(HashMap<V, B> data) {
