@@ -55,7 +55,8 @@ public class RoadRecord extends RoadDataRecord {
                     this.getInt("frakomkod"),
                     this.getInt("fravejkod"),
                     this.get("vejadrnvn"),
-                    this.get("vejnvn")
+                    this.get("vejnvn"),
+                    importMetadata.getImportTime()
             );
             return true;
         }

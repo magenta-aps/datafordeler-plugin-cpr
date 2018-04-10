@@ -45,7 +45,8 @@ public class RoadPostcodeRecord extends RoadDataRecord {
                     this.getString("husnrfra", false),
                     this.getString("husnrtil", false),
                     this.getEven("ligeulige"),
-                    PostCode.getPostcode(this.getInt("postnr"), this.getString("postdisttxt", true), session)
+                    PostCode.getPostcode(this.getInt("postnr"), this.getString("postdisttxt", true), session),
+                    importMetadata.getImportTime()
             );
             return true;
         }

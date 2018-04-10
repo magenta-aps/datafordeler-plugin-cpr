@@ -12,6 +12,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
 import javax.persistence.*;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +67,7 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     }
 
 
-    public void setCore(int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode, int fromRoadCode, String addressingName, String name) {
+    public void setCore(int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode, int fromRoadCode, String addressingName, String name, OffsetDateTime updateTime) {
         if (this.coreData == null) {
             this.coreData = new RoadCoreData();
         }
@@ -76,9 +77,10 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         this.coreData.setFromRoad(fromRoadCode);
         this.coreData.setAddressingName(addressingName);
         this.coreData.setName(name);
+        this.coreData.setDafoUpdated(updateTime);
     }
 
-    public void addMemo(int memoNumber, String memoText) {
+    public void addMemo(int memoNumber, String memoText, OffsetDateTime updateTime) {
         RoadMemoData memoData = null;
         for (RoadMemoData existing : this.memoData) {
             if (existing.getMemoNumber() == memoNumber) {
@@ -92,9 +94,10 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
             this.memoData.add(memoData);
         }
         memoData.setMemoText(memoText);
+        memoData.setDafoUpdated(updateTime);
     }
 
-    public void addPostcode(String houseNumberFrom, String houseNumberTo, boolean even, PostCode postCode) {
+    public void addPostcode(String houseNumberFrom, String houseNumberTo, boolean even, PostCode postCode, OffsetDateTime updateTime) {
         RoadPostcodeData postcodeData = null;
         for (RoadPostcodeData existing : this.postcodeData) {
             if (Equality.equal(existing.getHouseNumberFrom(), houseNumberFrom) && Equality.equal(existing.getHouseNumberTo(), houseNumberTo) && existing.isEven() == even) {
@@ -110,9 +113,10 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
             this.postcodeData.add(postcodeData);
         }
         postcodeData.setPostCode(postCode);
+        postcodeData.setDafoUpdated(updateTime);
     }
 
-    public void addCity(String houseNumberFrom, String houseNumberTo, boolean even, String cityName) {
+    public void addCity(String houseNumberFrom, String houseNumberTo, boolean even, String cityName, OffsetDateTime updateTime) {
         RoadCityData cityData = null;
         for (RoadCityData existing : this.cityData) {
             if (Equality.equal(existing.getHouseNumberFrom(), houseNumberFrom) && Equality.equal(existing.getHouseNumberTo(), houseNumberTo) && existing.isEven() == even) {
@@ -128,6 +132,7 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
             this.cityData.add(cityData);
         }
         cityData.setCityName(cityName);
+        cityData.setDafoUpdated(updateTime);
     }
 
 

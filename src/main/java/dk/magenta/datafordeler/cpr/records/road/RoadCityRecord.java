@@ -43,7 +43,8 @@ public class RoadCityRecord extends RoadDataRecord {
                     this.get("husnrfra"),
                     this.get("husnrtil"),
                     this.getEven("ligeulige"),
-                    this.get("bynvn")
+                    this.get("bynvn"),
+                    importMetadata.getImportTime()
             );
             return true;
         }
