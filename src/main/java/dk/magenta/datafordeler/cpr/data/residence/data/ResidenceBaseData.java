@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +30,22 @@ import java.util.Map;
 })
 public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseData> {
 
+    public static final String DB_FIELD_DAFO_UPDATED = "dafoUpdated";
+    public static final String IO_FIELD_DAFO_UPDATED = "dafoOpdateret";
+
+    @Column(name = DB_FIELD_DAFO_UPDATED)
+    private OffsetDateTime dafoUpdated = null;
+
+    @JsonProperty(value = IO_FIELD_DAFO_UPDATED)
+    public OffsetDateTime getDafoUpdated() {
+        return this.dafoUpdated;
+    }
+
+    public void setDafoUpdated(OffsetDateTime dafoUpdated) {
+        this.dafoUpdated = dafoUpdated;
+    }
+
+
     public static final String DB_FIELD_MUNICIPALITY_CODE = "municipalityCode";
     public static final String IO_FIELD_MUNICIPALITY_CODE = "kommunekode";
     @Column(name = DB_FIELD_MUNICIPALITY_CODE)
@@ -40,8 +57,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.municipalityCode;
     }
 
-    public void setKommunekode(int kommunekode) {
+    public void setKommunekode(int kommunekode, OffsetDateTime updateTime) {
         this.municipalityCode = kommunekode;
+        this.setDafoUpdated(updateTime);
     }
 
     public static final String DB_FIELD_ROAD_CODE = "roadCode";
@@ -55,8 +73,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.roadCode;
     }
 
-    public void setVejkode(int vejkode) {
+    public void setVejkode(int vejkode, OffsetDateTime updateTime) {
         this.roadCode = vejkode;
+        this.setDafoUpdated(updateTime);
     }
 
     public static final String DB_FIELD_HOUSENUMBER = "houseNumber";
@@ -70,8 +89,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.houseNumber;
     }
 
-    public void setHusnummer(String husnummer) {
+    public void setHusnummer(String husnummer, OffsetDateTime updateTime) {
         this.houseNumber = husnummer;
+        this.setDafoUpdated(updateTime);
     }
 
     public static final String DB_FIELD_FLOOR = "floor";
@@ -85,8 +105,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.floor;
     }
 
-    public void setEtage(String etage) {
+    public void setEtage(String etage, OffsetDateTime updateTime) {
         this.floor = etage;
+        this.setDafoUpdated(updateTime);
     }
 
     public static final String DB_FIELD_DOOR = "door";
@@ -100,8 +121,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.door;
     }
 
-    public void setSideDoer(String sideDoer) {
+    public void setSideDoer(String sideDoer, OffsetDateTime updateTime) {
         this.door = sideDoer;
+        this.setDafoUpdated(updateTime);
     }
 
     public static final String DB_FIELD_LOCALITY = "locality";
@@ -115,8 +137,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.locality;
     }
 
-    public void setLokalitet(String lokalitet) {
+    public void setLokalitet(String lokalitet, OffsetDateTime updateTime) {
         this.locality = lokalitet;
+        this.setDafoUpdated(updateTime);
     }
 
     @Override

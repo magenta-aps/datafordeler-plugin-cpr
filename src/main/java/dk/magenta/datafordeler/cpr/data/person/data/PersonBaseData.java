@@ -239,6 +239,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             this.coreData = new PersonCoreData();
         }
         this.coreData.setCprNumber(personnummer);
+        this.status.setDafoUpdated(updateTime);
     }
 
     public void setKoen(String koen, OffsetDateTime updateTime) {
@@ -246,6 +247,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             this.coreData = new PersonCoreData();
         }
         this.coreData.setKoen(koen);
+        this.status.setDafoUpdated(updateTime);
     }
 
     public void setStartAuthority(int authority, OffsetDateTime updateTime) {
@@ -253,6 +255,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             this.coreData = new PersonCoreData();
         }
         this.coreData.setAuthority(authority);
+        this.status.setDafoUpdated(updateTime);
     }
 
     public void setStatus(int status, OffsetDateTime updateTime) {
@@ -260,6 +263,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             this.status = new PersonStatusData();
         }
         this.status.setStatus(status);
+        this.status.setDafoUpdated(updateTime);
     }
 
     public void setMother(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode, OffsetDateTime updateTime) {

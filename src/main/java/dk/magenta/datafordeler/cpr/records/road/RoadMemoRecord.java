@@ -40,7 +40,8 @@ public class RoadMemoRecord extends RoadDataRecord {
         if (this.memoTemporality.matches(registrationTime, effect)) {
             data.addMemo(
                     this.getInt("notatnr"),
-                    this.get("notatlinie")
+                    this.get("notatlinie"),
+                    importMetadata.getImportTime()
             );
             return true;
         }
