@@ -58,6 +58,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                 PersonParentData mor = personBaseData.getMother();
                 PersonPositionData stilling = personBaseData.getPosition();
                 PersonBirthData foedsel = personBaseData.getBirth();
+                PersonChurchData folkekirkeforhold = personBaseData.getChurch();
                 PersonAddressData adresse = personBaseData.getAddress();
                 PersonAddressConameData conavn = personBaseData.getConame();
                 PersonMoveMunicipalityData flytteKommune = personBaseData.getMoveMunicipality();
@@ -77,13 +78,27 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                                 createPersonNummerNode(virkning, timestamp, personCoreData)
                         );
                     }
-                    if (personCoreData.getGender() != null || personStatusData != null || stilling != null || foedsel != null) {
+                    if (personCoreData.getGender() != null || personStatusData != null || stilling != null) {
                         addEffectDataToRegistration(
                                 output,
                                 "person",
-                                createKerneDataNode(virkning, timestamp, personCoreData, personStatusData, stilling, foedsel)
+                                createKerneDataNode(virkning, timestamp, personCoreData, personStatusData, stilling)
                         );
                     }
+                }
+                if (foedsel != null) {
+                    addEffectDataToRegistration(
+                            output,
+                            "fødselsdata",
+                            createFoedselNode(virkning, timestamp, foedsel)
+                    );
+                }
+                if (folkekirkeforhold != null) {
+                    addEffectDataToRegistration(
+                            output,
+                            "folkekirkeoplysning",
+                            createFolkekirkeoplysningNode(virkning, timestamp, folkekirkeforhold)
+                    );
                 }
                 if (far != null) {
                     addEffectDataToRegistration(
@@ -180,7 +195,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
 
     protected ObjectNode createKerneDataNode(
                     Effect virkning, OffsetDateTime lastUpdated, PersonCoreData personCoreData, PersonStatusData personStatusData,
-                    PersonPositionData stilling, PersonBirthData foedsel
+                    PersonPositionData stilling
     ) {
         ObjectNode output = createVirkningObjectNode(virkning, lastUpdated);
         if (personCoreData.getGender() != null) {
@@ -201,30 +216,56 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                     stilling.getPosition()
             );
         }
-        if (foedsel != null) {
-            if (foedsel.getBirthDatetime() != null) {
-                output.put(
-                        PersonBirthData.IO_FIELD_BIRTH_DATETIME,
-                        foedsel.getBirthDatetime().toLocalDate().toString()
-                );
-            }
+        return output;
+    }
+
+    protected ObjectNode createFoedselNode(
+            Effect virkning, OffsetDateTime lastUpdated, PersonBirthData personBirthData
+    ) {
+        ObjectNode output = createVirkningObjectNode(virkning, true, lastUpdated);
+        if (personBirthData.getBirthDatetime() != null) {
+            output.put(
+                    PersonBirthData.IO_FIELD_BIRTH_DATETIME,
+                    personBirthData.getBirthDatetime().toLocalDate().toString()
+            );
             output.put(
                     PersonBirthData.IO_FIELD_BIRTH_DATETIME_UNCERTAIN,
-                    foedsel.isBirthDatetimeUncertain()
+                    personBirthData.isBirthDatetimeUncertain()
             );
-            if (foedsel.getBirthPlaceCode() != null) {
-                output.put(
-                        PersonBirthData.IO_FIELD_BIRTH_PLACE_CODE,
-                        foedsel.getBirthPlaceCode()
-                );
-            }
-            if (foedsel.getBirthPlaceName() != null) {
-                output.put(
-                        PersonBirthData.IO_FIELD_BIRTH_PLACE_NAME,
-                        foedsel.getBirthPlaceName()
-                );
-            }
         }
+        if (personBirthData.getBirthPlaceCode() != null) {
+            output.put(
+                    PersonBirthData.IO_FIELD_BIRTH_PLACE_CODE,
+                    personBirthData.getBirthPlaceCode()
+            );
+        }
+        if (personBirthData.getBirthAuthorityText() != null) {
+            output.put(
+                    PersonBirthData.IO_FIELD_BIRTH_AUTHORITY_TEXT,
+                    personBirthData.getBirthAuthorityText()
+            );
+        }
+        if (personBirthData.getBirthPlaceName() != null) {
+            output.put(
+                    PersonBirthData.IO_FIELD_BIRTH_PLACE_NAME,
+                    personBirthData.getBirthPlaceName()
+            );
+        }
+        if (personBirthData.getBirthSupplementalText() != null) {
+            output.put(
+                    PersonBirthData.IO_FIELD_BIRTH_SUPPLEMENTAL_TEXT,
+                    personBirthData.getBirthSupplementalText()
+            );
+        }
+        return output;
+    }
+
+    protected ObjectNode createFolkekirkeoplysningNode(
+            Effect virkning, OffsetDateTime lastUpdated, PersonChurchData personChurchData
+    ) {
+        ObjectNode output = createVirkningObjectNode(virkning, true, lastUpdated);
+        Character relation = personChurchData.getChurchRelation();
+        output.put(PersonChurchData.IO_FIELD_CHURCH_RELATION, relation != null ? relation.toString() : null);
         return output;
     }
 

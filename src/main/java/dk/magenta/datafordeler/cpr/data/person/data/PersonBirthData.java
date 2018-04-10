@@ -25,13 +25,13 @@ public class PersonBirthData extends DetailData {
     @Column(name = DB_FIELD_BIRTH_PLACE_CODE)
     @JsonProperty(value = IO_FIELD_BIRTH_PLACE_CODE)
     @XmlElement(name = IO_FIELD_BIRTH_PLACE_CODE)
-    private String birthPlaceCode;
+    private Integer birthPlaceCode;
 
-    public String getBirthPlaceCode() {
+    public Integer getBirthPlaceCode() {
         return this.birthPlaceCode;
     }
 
-    public void setBirthPlaceCode(String birthPlaceCode) {
+    public void setBirthPlaceCode(Integer birthPlaceCode) {
         this.birthPlaceCode = birthPlaceCode;
     }
 
@@ -101,6 +101,41 @@ public class PersonBirthData extends DetailData {
         this.foedselsraekkefoelge = foedselsraekkefoelge;
     }
 
+
+    public static final String DB_FIELD_BIRTH_AUTHORITY_TEXT = "birthAuthorityText";
+    public static final String IO_FIELD_BIRTH_AUTHORITY_TEXT = "fødselsMyndighedTekst";
+    @Column(name = DB_FIELD_BIRTH_AUTHORITY_TEXT)
+    @JsonProperty(value = IO_FIELD_BIRTH_AUTHORITY_TEXT)
+    @XmlElement(name = IO_FIELD_BIRTH_AUTHORITY_TEXT)
+    private Integer birthAuthorityText;
+
+    public Integer getBirthAuthorityText() {
+        return this.birthAuthorityText;
+    }
+
+    public void setBirthAuthorityText(Integer birthAuthorityText) {
+        this.birthAuthorityText = birthAuthorityText;
+    }
+
+
+
+    public static final String DB_FIELD_BIRTH_SUPPLEMENTAL_TEXT = "birthSupplementalText";
+    public static final String IO_FIELD_BIRTH_SUPPLEMENTAL_TEXT = "fødselsSupplerendeTekst";
+    @Column(name = DB_FIELD_BIRTH_SUPPLEMENTAL_TEXT)
+    @JsonProperty(value = IO_FIELD_BIRTH_SUPPLEMENTAL_TEXT)
+    @XmlElement(name = IO_FIELD_BIRTH_SUPPLEMENTAL_TEXT)
+    private String birthSupplementalText;
+
+    public String getBirthSupplementalText() {
+        return this.birthSupplementalText;
+    }
+
+    public void setBirthSupplementalText(String birthSupplementalText) {
+        this.birthSupplementalText = birthSupplementalText;
+    }
+
+
+
     @Override
     public Map<String, Object> databaseFields() {
         HashMap<String, Object> map = new HashMap<>();
@@ -117,6 +152,7 @@ public class PersonBirthData extends DetailData {
         //Person
         map.put("birthPlaceCode", this.birthPlaceCode);
         map.put("birthPlaceName", this.birthPlaceName);
+        map.put("birthAuthorityText", this.birthAuthorityText);
         map.put("birthDatetime", this.birthDatetime);
         map.put("birthDatetimeUncertain", this.birthDatetimeUncertain);
 

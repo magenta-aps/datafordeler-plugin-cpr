@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.database.*;
 import dk.magenta.datafordeler.core.exception.*;
 import dk.magenta.datafordeler.core.io.ImportInputStream;
@@ -45,6 +46,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     Stopwatch timer;
 
     private static boolean SAVE_RECORD_DATA = false;
+
+    public static final String IMPORTCONFIG_RECORDTYPE = "recordtype";
+    public static final String IMPORTCONFIG_PNR = "personnummer";
 
     private HttpCommunicator commonFetcher;
 
@@ -165,6 +169,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
     @Override
     public List<R> parseData(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
+        System.out.println("parseData");
         String charset = this.getConfiguration().getRegisterCharset(this);
         BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
         CprSubParser<T> parser = this.getParser();
@@ -219,7 +224,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     log.debug("Batch parsed into " + chunkRecords.size() + " records");
                     timer.measure(TASK_PARSE);
 
-
                     if (!chunkRecords.isEmpty()) {
 
                         if (!wrappedInTransaction) {
@@ -236,7 +240,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                             for (T record : chunkRecords) {
                                 this.checkInterrupt(importMetadata);
                                 this.handleRecord(record, importMetadata);
-                                if (this.filter(record)) {
+                                if (this.filter(record, importMetadata.getImportConfiguration())) {
                                     UUID uuid = this.generateUUID(record);
                                     uuids.add(uuid);
                                     E entity = entityCache.get(uuid);
@@ -421,8 +425,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         return null;
     }
 
-    protected boolean filter(T record) {
-        return record.filter();
+    protected boolean filter(T record, ObjectNode importConfiguration) {
+        return record.filter(importConfiguration);
     }
 
 
