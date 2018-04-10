@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -63,69 +64,74 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (this.addressTemporality.matches(registrationTime, effect)) {
             data.setAddress(
-                // int authority,
-                this.getInt("start_mynkod-personbolig"),
-                // String bygningsnummer,
-                this.getString("bnr", true),
-                // String bynavn,
-                null,
-                // String cprKommunekode,
-                this.getInt("komkod", false),
-                // String cprKommunenavn,
-                null,
-                // String cprVejkode,
-                this.getInt("vejkod", false),
-                // String darAdresse,
-                null,
-                // String etage,
-                this.get("etage"),
-                // String husnummer,
-                this.getString("husnr", true),
-                // String postdistrikt,
-                null,
-                // String postnummer,
-                null,
-                // String sideDoer,
-                this.get("sidedoer"),
-                // String adresselinie1,
-                this.get("adr1-supladr"),
-                // String adresselinie2,
-                this.get("adr2-supladr"),
-                // String adresselinie3,
-                this.get("adr3-supladr"),
-                // String adresselinie4,
-                this.get("adr4-supladr"),
-                // String adresselinie5,
-                this.get("adr5-supladr"),
-                // int addressTextType,
-                this.getInt("adrtxttype"),
-                // int startAuthority
-                this.getInt("start_mynkod-adrtxt")
+                    // int authority,
+                    this.getInt("start_mynkod-personbolig"),
+                    // String bygningsnummer,
+                    this.getString("bnr", true),
+                    // String bynavn,
+                    null,
+                    // String cprKommunekode,
+                    this.getInt("komkod", false),
+                    // String cprKommunenavn,
+                    null,
+                    // String cprVejkode,
+                    this.getInt("vejkod", false),
+                    // String darAdresse,
+                    null,
+                    // String etage,
+                    this.get("etage"),
+                    // String husnummer,
+                    this.getString("husnr", true),
+                    // String postdistrikt,
+                    null,
+                    // String postnummer,
+                    null,
+                    // String sideDoer,
+                    this.get("sidedoer"),
+                    // String adresselinie1,
+                    this.get("adr1-supladr"),
+                    // String adresselinie2,
+                    this.get("adr2-supladr"),
+                    // String adresselinie3,
+                    this.get("adr3-supladr"),
+                    // String adresselinie4,
+                    this.get("adr4-supladr"),
+                    // String adresselinie5,
+                    this.get("adr5-supladr"),
+                    // int addressTextType,
+                    this.getInt("adrtxttype"),
+                    // int startAuthority
+                    this.getInt("start_mynkod-adrtxt"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
         if (this.conameTemporality.matches(registrationTime, effect)) {
-            data.setCoName(this.get("convn"));
+            data.setCoName(
+                    this.get("convn"),
+                    importMetadata.getImportTime()
+            );
             updated = true;
         }
         if (this.municipalityTemporality.matches(registrationTime, effect)) {
             data.setMoveMunicipality(
-                //int authority,
-                this.getInt("tilfra_mynkod"),
-                // LocalDateTime fraflytningsdatoKommune,
-                this.getDateTime("fraflykomdto"),
-                // boolean fraflytningsdatoKommuneUsikkerhedsmarkering,
-                this.getBoolean("fraflykomdt_umrk"),
-                // int fraflytningskommunekode,
-                this.getInt("fraflykomkod"),
-                // LocalDateTime tilflytningsdatoKommune,
-                this.getDateTime("tilflykomdto"),
-                // boolean tilflytningsdatoKommuneUsikkerhedsmarkering
-                this.getBoolean("tilflykomdt_umrk")
+                    //int authority,
+                    this.getInt("tilfra_mynkod"),
+                    // LocalDateTime fraflytningsdatoKommune,
+                    this.getDateTime("fraflykomdto"),
+                    // boolean fraflytningsdatoKommuneUsikkerhedsmarkering,
+                    this.getBoolean("fraflykomdt_umrk"),
+                    // int fraflytningskommunekode,
+                    this.getInt("fraflykomkod"),
+                    // LocalDateTime tilflytningsdatoKommune,
+                    this.getDateTime("tilflykomdto"),
+                    // boolean tilflytningsdatoKommuneUsikkerhedsmarkering
+                    this.getBoolean("tilflykomdt_umrk"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
