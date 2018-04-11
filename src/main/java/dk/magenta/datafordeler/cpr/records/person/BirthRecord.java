@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -41,20 +42,22 @@ public class BirthRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (this.birthTemporality.matches(registrationTime, effect)) {
             data.setBirth(
-                this.getInt("start_mynkod-fødested"),
-                this.getInt("myntxt_mynkod-fødested", true),
-                this.getString("myntxt-fødested", true)
+                    this.getInt("start_mynkod-fødested"),
+                    this.getInt("myntxt_mynkod-fødested", true),
+                    this.getString("myntxt-fødested", true),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
         if (this.documentTemporality != null && this.documentTemporality.matches(registrationTime, effect)) {
             data.setBirthVerification(
                     this.getInt("dok_mynkod-fødested"),
-                    this.getBoolean("dok-fødested")
+                    this.getBoolean("dok-fødested"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }

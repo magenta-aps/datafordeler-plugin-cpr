@@ -364,37 +364,41 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.birth.setDafoUpdated(updateTime);
     }
 
-    public void setBirth(int authority, int authorityText, String supplementalText) {
+    public void setBirth(int authority, int authorityText, String supplementalText, OffsetDateTime updateTime) {
         if (this.birth == null) {
             this.birth = new PersonBirthData();
         }
         this.birth.setBirthPlaceCode(authority);
         this.birth.setBirthAuthorityText(authorityText);
         this.birth.setBirthSupplementalText(supplementalText);
+        this.birth.setDafoUpdated(updateTime);
     }
 
-    public void setBirthVerification(int authority, boolean verification) {
+    public void setBirthVerification(int authority, boolean verification, OffsetDateTime updateTime) {
         if (this.birthVerification == null) {
             this.birthVerification = new PersonBirthVerificationData();
         }
         this.birthVerification.setAuthority(authority);
         this.birthVerification.setVerified(verification);
+        this.birthVerification.setDafoUpdated(updateTime);
     }
 
-    public void setChurch(int authority, Character churchRelation) {
+    public void setChurch(int authority, Character churchRelation, OffsetDateTime updateTime) {
         if (this.church == null) {
             this.church = new PersonChurchData();
         }
         this.church.setAuthority(authority);
         this.church.setChurchRelation(churchRelation);
+        this.church.setDafoUpdated(updateTime);
     }
 
-    public void setChurchVerification(int authority, boolean verified) {
+    public void setChurchVerification(int authority, boolean verified, OffsetDateTime updateTime) {
         if (this.churchVerification == null) {
             this.churchVerification = new PersonChurchVerificationData();
         }
         this.churchVerification.setAuthority(authority);
         this.churchVerification.setVerified(verified);
+        this.churchVerification.setDafoUpdated(updateTime);
     }
 
     public void setAddress(int authority, String bygningsnummer, String bynavn, int cprKommunekode,

@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -48,14 +49,22 @@ public class HistoricChurchRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (this.churchTemporality.matches(registrationTime, effect)) {
-            data.setChurch(this.getInt("start_mynkod-folkekirke"), this.getChar("fkirk"));
+            data.setChurch(
+                    this.getInt("start_mynkod-folkekirke"),
+                    this.getChar("fkirk"),
+                    importMetadata.getImportTime()
+            );
             updated = true;
         }
         if (this.documentTemporality != null && this.documentTemporality.matches(registrationTime, effect)) {
-            data.setChurchVerification(this.getInt("dok_mynkod-folkekirke"), this.getBoolean("dok-folkekirke"));
+            data.setChurchVerification(
+                    this.getInt("dok_mynkod-folkekirke"),
+                    this.getBoolean("dok-folkekirke"),
+                    importMetadata.getImportTime()
+            );
             updated = true;
         }
         return updated;
