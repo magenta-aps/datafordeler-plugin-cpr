@@ -308,7 +308,7 @@ public class PullTest {
             Assert.assertEquals(1, personEntity.getRegistrations().get(0).getEffects().size());
             PersonBirthData birthData = personEntity.getRegistrations().get(0).getEffects().get(0).getDataItems().get(0).getBirth();
             Assert.assertNotNull(birthData);
-            Assert.assertEquals(9510, birthData.getBirthPlaceCode().intValue());
+            Assert.assertEquals("9510", birthData.getBirthPlaceCode());
             Assert.assertEquals(1234, birthData.getBirthAuthorityText().intValue());
         } finally {
             session.close();
