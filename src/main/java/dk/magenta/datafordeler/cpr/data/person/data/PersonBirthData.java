@@ -25,14 +25,17 @@ public class PersonBirthData extends DetailData {
     @Column(name = DB_FIELD_BIRTH_PLACE_CODE)
     @JsonProperty(value = IO_FIELD_BIRTH_PLACE_CODE)
     @XmlElement(name = IO_FIELD_BIRTH_PLACE_CODE)
-    private Integer birthPlaceCode;
+    private String birthPlaceCode;
 
-    public Integer getBirthPlaceCode() {
+    public String getBirthPlaceCode() {
         return this.birthPlaceCode;
     }
 
-    public void setBirthPlaceCode(Integer birthPlaceCode) {
+    public void setBirthPlaceCode(String birthPlaceCode) {
         this.birthPlaceCode = birthPlaceCode;
+    }
+    public void setBirthPlaceCode(int birthPlaceCode) {
+        this.birthPlaceCode = Integer.toString(birthPlaceCode);
     }
 
 
