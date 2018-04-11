@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -47,37 +48,40 @@ public class CivilStatusRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (this.civilTemporality.matches(registrationTime, effect)) {
             data.setCivilStatus(
-                // int authority,
-                this.getInt("start_mynkod-civilstand"),
-                // String civilStatus,
-                this.getString("civst", true),
-                // String spouseCpr,
-                this.getString("aegtepnr", false),
-                // LocalDate spouseBirthdate,
-                this.getDate("aegtefoed_dt"),
-                // boolean spouseBirthdateUncertain,
-                this.getBoolean("aegtefoeddt_umrk"),
-                // String spouseName,
-                this.getString("aegtenvn", true),
-                // boolean spouseNameMarking
-                this.getMarking("aegtenvn_mrk")
+                    // int authority,
+                    this.getInt("start_mynkod-civilstand"),
+                    // String civilStatus,
+                    this.getString("civst", true),
+                    // String spouseCpr,
+                    this.getString("aegtepnr", false),
+                    // LocalDate spouseBirthdate,
+                    this.getDate("aegtefoed_dt"),
+                    // boolean spouseBirthdateUncertain,
+                    this.getBoolean("aegtefoeddt_umrk"),
+                    // String spouseName,
+                    this.getString("aegtenvn", true),
+                    // boolean spouseNameMarking
+                    this.getMarking("aegtenvn_mrk"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
         if (this.documentTemporality.matches(registrationTime, effect)) {
             data.setCivilStatusVerification(
                     this.getInt("dok_mynkod-civilstand"),
-                    this.getBoolean("dok-civilstand")
+                    this.getBoolean("dok-civilstand"),
+                    importMetadata.getImportTime()
             );
         }
         if (this.officiaryTemporality.matches(registrationTime, effect)) {
             data.setCivilStatusAuthorityText(
                     this.getInt("myntxt_mynkod-civilstand"),
-                    this.getString("myntxt-civilstand", true)
+                    this.getString("myntxt-civilstand", true),
+                    importMetadata.getImportTime()
             );
         }
         return updated;

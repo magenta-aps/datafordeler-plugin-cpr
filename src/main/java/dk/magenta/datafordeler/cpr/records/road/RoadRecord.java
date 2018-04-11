@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.road;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -46,7 +47,7 @@ public class RoadRecord extends RoadDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
         if (registrationTime.equals(this.getOffsetDateTime("timestamp"))) {
             data.setCore(
                     this.getInt("tilkomkod"),
@@ -54,7 +55,8 @@ public class RoadRecord extends RoadDataRecord {
                     this.getInt("frakomkod"),
                     this.getInt("fravejkod"),
                     this.get("vejadrnvn"),
-                    this.get("vejnvn")
+                    this.get("vejnvn"),
+                    importMetadata.getImportTime()
             );
             return true;
         }

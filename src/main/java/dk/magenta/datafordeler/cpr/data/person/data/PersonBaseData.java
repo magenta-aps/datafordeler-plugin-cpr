@@ -12,6 +12,7 @@ import org.hibernate.Session;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 /**
@@ -264,35 +265,39 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         return this.cprNumber;
     }
 
-    public void setPersonnummer(String personnummer) {
+    public void setPersonnummer(String personnummer, OffsetDateTime updateTime) {
         if (this.coreData == null) {
             this.coreData = new PersonCoreData();
         }
         this.coreData.setCprNumber(personnummer);
+        this.coreData.setDafoUpdated(updateTime);
     }
 
-    public void setKoen(String koen) {
+    public void setKoen(String koen, OffsetDateTime updateTime) {
         if (this.coreData == null) {
             this.coreData = new PersonCoreData();
         }
         this.coreData.setKoen(koen);
+        this.coreData.setDafoUpdated(updateTime);
     }
 
-    public void setStartAuthority(int authority) {
+    public void setStartAuthority(int authority, OffsetDateTime updateTime) {
         if (this.coreData == null) {
             this.coreData = new PersonCoreData();
         }
         this.coreData.setAuthority(authority);
+        this.coreData.setDafoUpdated(updateTime);
     }
 
-    public void setStatus(int status) {
+    public void setStatus(int status, OffsetDateTime updateTime) {
         if (this.status == null) {
             this.status = new PersonStatusData();
         }
         this.status.setStatus(status);
+        this.status.setDafoUpdated(updateTime);
     }
 
-    public void setMother(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode) {
+    public void setMother(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode, OffsetDateTime updateTime) {
         if (this.mother == null) {
             this.mother = new PersonParentData();
             this.mother.setMother(true);
@@ -303,9 +308,10 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.mother.setBirthDate(birthDate);
         this.mother.setBirthDateUncertain(birthDateUncertain);
         this.mother.setAuthority(authorityCode);
+        this.mother.setDafoUpdated(updateTime);
     }
 
-    public void setFather(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode) {
+    public void setFather(String name, boolean nameMarking, String cprNumber, LocalDate birthDate, boolean birthDateUncertain, int authorityCode, OffsetDateTime updateTime) {
         if (this.father == null) {
             this.father = new PersonParentData();
             this.father.setMother(false);
@@ -316,81 +322,90 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.father.setBirthDate(birthDate);
         this.father.setBirthDateUncertain(birthDateUncertain);
         this.father.setAuthority(authorityCode);
+        this.father.setDafoUpdated(updateTime);
     }
 
-    public void setMotherVerification(int authorityCode, boolean verified) {
+    public void setMotherVerification(int authorityCode, boolean verified, OffsetDateTime updateTime) {
         if (this.motherVerification == null) {
             this.motherVerification = new PersonParentVerificationData();
             this.motherVerification.setMother(true);
         }
         this.motherVerification.setAuthority(authorityCode);
         this.motherVerification.setVerified(verified);
+        this.motherVerification.setDafoUpdated(updateTime);
     }
 
-    public void setFatherVerification(int authorityCode, boolean verified) {
+    public void setFatherVerification(int authorityCode, boolean verified, OffsetDateTime updateTime) {
         if (this.fatherVerification == null) {
             this.fatherVerification = new PersonParentVerificationData();
             this.fatherVerification.setMother(false);
         }
         this.fatherVerification.setAuthority(authorityCode);
         this.fatherVerification.setVerified(verified);
+        this.fatherVerification.setDafoUpdated(updateTime);
     }
 
-    public void setPosition(int authorityCode, String position) {
+    public void setPosition(int authorityCode, String position, OffsetDateTime updateTime) {
         if (this.position == null) {
             this.position = new PersonPositionData();
         }
         this.position.setAuthority(authorityCode);
         this.position.setPosition(position);
+        this.position.setDafoUpdated(updateTime);
     }
 
-    public void setBirth(LocalDateTime foedselsdato, boolean foedselsdatoUsikkerhedsmarkering, int foedselsraekkefoelge) {
+    public void setBirth(LocalDateTime foedselsdato, boolean foedselsdatoUsikkerhedsmarkering, int foedselsraekkefoelge, OffsetDateTime updateTime) {
         if (this.birth == null) {
             this.birth = new PersonBirthData();
         }
         this.birth.setBirthDatetime(foedselsdato);
         this.birth.setBirthDatetimeUncertain(foedselsdatoUsikkerhedsmarkering);
         this.birth.setFoedselsraekkefoelge(foedselsraekkefoelge);
+        this.birth.setDafoUpdated(updateTime);
     }
 
-    public void setBirth(int authority, int authorityText, String supplementalText) {
+    public void setBirth(int authority, int authorityText, String supplementalText, OffsetDateTime updateTime) {
         if (this.birth == null) {
             this.birth = new PersonBirthData();
         }
         this.birth.setBirthPlaceCode(authority);
         this.birth.setBirthAuthorityText(authorityText);
         this.birth.setBirthSupplementalText(supplementalText);
+        this.birth.setDafoUpdated(updateTime);
     }
 
-    public void setBirthVerification(int authority, boolean verification) {
+    public void setBirthVerification(int authority, boolean verification, OffsetDateTime updateTime) {
         if (this.birthVerification == null) {
             this.birthVerification = new PersonBirthVerificationData();
         }
         this.birthVerification.setAuthority(authority);
         this.birthVerification.setVerified(verification);
+        this.birthVerification.setDafoUpdated(updateTime);
     }
 
-    public void setChurch(int authority, Character churchRelation) {
+    public void setChurch(int authority, Character churchRelation, OffsetDateTime updateTime) {
         if (this.church == null) {
             this.church = new PersonChurchData();
         }
         this.church.setAuthority(authority);
         this.church.setChurchRelation(churchRelation);
+        this.church.setDafoUpdated(updateTime);
     }
 
-    public void setChurchVerification(int authority, boolean verified) {
+    public void setChurchVerification(int authority, boolean verified, OffsetDateTime updateTime) {
         if (this.churchVerification == null) {
             this.churchVerification = new PersonChurchVerificationData();
         }
         this.churchVerification.setAuthority(authority);
         this.churchVerification.setVerified(verified);
+        this.churchVerification.setDafoUpdated(updateTime);
     }
 
     public void setAddress(int authority, String bygningsnummer, String bynavn, int cprKommunekode,
                            String cprKommunenavn, int cprVejkode, String darAdresse, String etage,
                            String husnummer, String postdistrikt, String postnummer, String sideDoer,
                            String adresselinie1, String adresselinie2, String adresselinie3, String adresselinie4,
-                           String adresselinie5, int addressTextType, int startAuthority) {
+                           String adresselinie5, int addressTextType, int startAuthority, OffsetDateTime updateTime) {
         if (this.address == null) {
             this.address = new PersonAddressData();
         }
@@ -415,9 +430,10 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
         this.address.setAdressetekststype(addressTextType);
         this.address.setStartautoritet(startAuthority);
+        this.address.setDafoUpdated(updateTime);
     }
 
-    public void setCoName(String coName) {
+    public void setCoName(String coName, OffsetDateTime updateTime) {
         if (this.coname == null) {
             this.coname = new PersonAddressConameData();
         }
@@ -427,7 +443,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     public void setMoveMunicipality(int authority, LocalDateTime fraflytningsdatoKommune,
                                     boolean fraflytningsdatoKommuneUsikkerhedsmarkering, int fraflytningskommunekode,
                                     LocalDateTime tilflytningsdatoKommune,
-                                    boolean tilflytningsdatoKommuneUsikkerhedsmarkering) {
+                                    boolean tilflytningsdatoKommuneUsikkerhedsmarkering, OffsetDateTime updateTime) {
         if (this.moveMunicipality == null) {
             this.moveMunicipality = new PersonMoveMunicipalityData();
         }
@@ -437,11 +453,12 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.moveMunicipality.setOutMunicipality(fraflytningskommunekode);
         this.moveMunicipality.setInDatetime(tilflytningsdatoKommune);
         this.moveMunicipality.setInDatetimeUncertain(tilflytningsdatoKommuneUsikkerhedsmarkering);
+        this.moveMunicipality.setDafoUpdated(updateTime);
     }
 
     public void setName(int authority, String adresseringsnavn, String efternavn, String fornavne, String mellemnavn,
                         boolean efternavnMarkering, boolean fornavneMarkering, boolean mellemnavnMarkering,
-                        String egetEfternavn, boolean ownLastNameMarking, boolean reportNames) {
+                        String egetEfternavn, boolean ownLastNameMarking, boolean reportNames, OffsetDateTime updateTime) {
         if (this.name == null) {
             this.name = new PersonNameData();
         }
@@ -459,33 +476,37 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.name.setEgetEfternavn(egetEfternavn);
         this.name.setEgetEfternavnMarkering(ownLastNameMarking);
         this.name.setRapportnavne(reportNames);
+        this.name.setDafoUpdated(updateTime);
     }
 
-    public void setAddressName(int authority, String addressName) {
+    public void setAddressName(int authority, String addressName, OffsetDateTime updateTime) {
         if (this.addressingName == null) {
             this.addressingName = new PersonAddressNameData();
         }
         this.addressingName.setAuthority(authority);
         this.addressingName.setAddressName(addressName);
+        this.addressingName.setDafoUpdated(updateTime);
     }
 
-    public void setNameVerification(int authority, boolean verification) {
+    public void setNameVerification(int authority, boolean verification, OffsetDateTime updateTime) {
         if (this.nameVerification == null) {
             this.nameVerification = new PersonNameVerificationData();
         }
         this.nameVerification.setAuthority(authority);
         this.nameVerification.setVerified(verification);
+        this.nameVerification.setDafoUpdated(updateTime);
     }
 
-    public void setNameAuthorityText(int authority, String text) {
+    public void setNameAuthorityText(int authority, String text, OffsetDateTime updateTime) {
         if (this.nameAuthority == null) {
             this.nameAuthority = new PersonNameAuthorityTextData();
         }
         this.nameAuthority.setAuthority(authority);
         this.nameAuthority.setText(text);
+        this.nameAuthority.setDafoUpdated(updateTime);
     }
 
-    public void addProtection(int authority, int beskyttelsestype, boolean reportMarking) {
+    public void addProtection(int authority, int beskyttelsestype, boolean reportMarking, OffsetDateTime updateTime) {
         for (PersonProtectionData existing : this.protection) {
             if (existing.getProtectionType() == beskyttelsestype && existing.getReportMarking() == reportMarking) {
                 return;
@@ -496,18 +517,20 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         protection.setProtectionType(beskyttelsestype);
         protection.setReportMarking(reportMarking);
         protection.setBaseData(this);
+        protection.setDafoUpdated(updateTime);
         this.protection.add(protection);
     }
 
-    public void setEmigration(int authority, int countryCode) {
+    public void setEmigration(int authority, int countryCode, OffsetDateTime updateTime) {
         if (this.migration == null) {
             this.migration = new PersonEmigrationData();
         }
         this.migration.setAuthority(authority);
         this.migration.setCountryCode(countryCode);
+        this.migration.setDafoUpdated(updateTime);
     }
 
-    public void setForeignAddress(int authority, String adresselinie1, String adresselinie2, String adresselinie3, String adresselinie4, String adresselinie5) {
+    public void setForeignAddress(int authority, String adresselinie1, String adresselinie2, String adresselinie3, String adresselinie4, String adresselinie5, OffsetDateTime updateTime) {
         if (this.foreignAddress == null) {
             this.foreignAddress = new PersonForeignAddressData();
         }
@@ -517,13 +540,16 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.foreignAddress.setAddressLine3(adresselinie3);
         this.foreignAddress.setAddressLine4(adresselinie4);
         this.foreignAddress.setAddressLine5(adresselinie5);
+        this.foreignAddress.setDafoUpdated(updateTime);
     }
 
-    public void setCivilStatus(int authority, String civilStatus, String spouseCpr, LocalDate spouseBirthdate, boolean spouseBirthdateUncertain, String spouseName, boolean spouseNameMarking) {
-        this.setCivilStatus(authority, civilStatus, spouseCpr, spouseBirthdate, spouseBirthdateUncertain, spouseName, spouseNameMarking, null);
+    public void setCivilStatus(int authority, String civilStatus, String spouseCpr, LocalDate spouseBirthdate,
+                               boolean spouseBirthdateUncertain, String spouseName, boolean spouseNameMarking, OffsetDateTime updateTime) {
+        this.setCivilStatus(authority, civilStatus, spouseCpr, spouseBirthdate, spouseBirthdateUncertain, spouseName, spouseNameMarking, null, updateTime);
     }
 
-    public void setCivilStatus(int authority, String civilStatus, String spouseCpr, LocalDate spouseBirthdate, boolean spouseBirthdateUncertain, String spouseName, boolean spouseNameMarking, String correctionMarking) {
+    public void setCivilStatus(int authority, String civilStatus, String spouseCpr, LocalDate spouseBirthdate,
+                               boolean spouseBirthdateUncertain, String spouseName, boolean spouseNameMarking, String correctionMarking, OffsetDateTime updateTime) {
         if (this.civilStatus == null) {
             this.civilStatus = new PersonCivilStatusData();
         }
@@ -535,39 +561,43 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.civilStatus.setSpouseBirthdateUncertain(spouseBirthdateUncertain);
         this.civilStatus.setSpouseName(spouseName);
         this.civilStatus.setSpouseNameMarking(spouseNameMarking);
+        this.civilStatus.setDafoUpdated(updateTime);
     }
 
 
-    public void setCivilStatusVerification(int authority, boolean verification) {
-        this.setCivilStatusVerification(authority, verification, null);
+    public void setCivilStatusVerification(int authority, boolean verification, OffsetDateTime updateTime) {
+        this.setCivilStatusVerification(authority, verification, null, updateTime);
     }
-    public void setCivilStatusVerification(int authority, boolean verification, String correctionMarking) {
+    public void setCivilStatusVerification(int authority, boolean verification, String correctionMarking, OffsetDateTime updateTime) {
         if (this.civilStatusVerification == null) {
             this.civilStatusVerification = new PersonCivilStatusVerificationData();
         }
         this.civilStatusVerification.setAuthority(authority);
         this.civilStatusVerification.setVerified(verification);
         this.civilStatusVerification.setCorrectionMarking(correctionMarking);
+        this.civilStatusVerification.setDafoUpdated(updateTime);
     }
 
-    public void setCivilStatusAuthorityText(int authority, String text) {
-        this.setCivilStatusAuthorityText(authority, text, null);
+    public void setCivilStatusAuthorityText(int authority, String text, OffsetDateTime updateTime) {
+        this.setCivilStatusAuthorityText(authority, text, null, updateTime);
     }
-    public void setCivilStatusAuthorityText(int authority, String text, String correctionMarking) {
+    public void setCivilStatusAuthorityText(int authority, String text, String correctionMarking, OffsetDateTime updateTime) {
         if (this.civilStatusAuthority == null) {
             this.civilStatusAuthority = new PersonCivilStatusAuthorityTextData();
         }
         this.civilStatusAuthority.setAuthority(authority);
         this.civilStatusAuthority.setText(text);
         this.civilStatusAuthority.setCorrectionMarking(correctionMarking);
+        this.civilStatusAuthority.setDafoUpdated(updateTime);
     }
 
-    public void setCprNumber(int authority, String cprNumber) {
+    public void setCprNumber(int authority, String cprNumber, OffsetDateTime updateTime) {
         if (this.cprNumber == null) {
             this.cprNumber = new PersonNumberData();
         }
         this.cprNumber.setAuthority(authority);
         this.cprNumber.setCprNumber(cprNumber);
+        this.cprNumber.setDafoUpdated(updateTime);
     }
 
     /**
