@@ -88,6 +88,18 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private PersonChurchVerificationData churchVerification;
 
 
+    public static final String DB_FIELD_CITIZENSHIP = "citizenship";
+    public static final String IO_FIELD_CITIZENSHIP = "statsborgerskab";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_CITIZENSHIP + DatabaseEntry.REF)
+    private PersonCitizenshipData citizenship;
+
+    public static final String DB_FIELD_CITIZENSHIP_VERIFICATION = "citizenshipVerification";
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = DB_FIELD_CITIZENSHIP_VERIFICATION + DatabaseEntry.REF)
+    private PersonCitizenshipVerificationData citizenshipVerification;
+
+
 
     public static final String DB_FIELD_ADDRESS = "address";
     public static final String IO_FIELD_ADDRESS = "cpradresse";
@@ -399,6 +411,24 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.churchVerification.setAuthority(authority);
         this.churchVerification.setVerified(verified);
         this.churchVerification.setDafoUpdated(updateTime);
+    }
+
+    public void setCitizenship(int authority, int countryCode, OffsetDateTime updateTime) {
+        if (this.citizenship == null) {
+            this.citizenship = new PersonCitizenshipData();
+        }
+        this.citizenship.setAuthority(authority);
+        this.citizenship.setCountryCode(countryCode);
+        this.citizenship.setDafoUpdated(updateTime);
+    }
+
+    public void setCitizenshipVerification(int authority, boolean verified, OffsetDateTime updateTime) {
+        if (this.citizenshipVerification == null) {
+            this.citizenshipVerification = new PersonCitizenshipVerificationData();
+        }
+        this.citizenshipVerification.setAuthority(authority);
+        this.citizenshipVerification.setVerified(verified);
+        this.citizenshipVerification.setDafoUpdated(updateTime);
     }
 
     public void setAddress(int authority, String bygningsnummer, String bynavn, int cprKommunekode,
