@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Record for Person church relation (type 010).
+ * Record for Person citizenship (type 040).
  */
 public class CitizenshipRecord extends PersonDataRecord {
 
