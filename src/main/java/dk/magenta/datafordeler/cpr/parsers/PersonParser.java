@@ -52,6 +52,8 @@ public class PersonParser extends CprSubParser<PersonDataRecord> {
                     return new HistoricCivilStatusRecord(line);
                 case PersonDataRecord.RECORDTYPE_CITIZENSHIP:
                     return new CitizenshipRecord(line);
+                case PersonDataRecord.RECORDTYPE_HISTORIC_CITIZENSHIP:
+                    return new HistoricCitizenshipRecord(line);
                 case PersonDataRecord.RECORDTYPE_HISTORIC_CPRNUMBER:
                     return new HistoricCprNumberRecord(line);
                 // TODO: Add one of these for each type...
