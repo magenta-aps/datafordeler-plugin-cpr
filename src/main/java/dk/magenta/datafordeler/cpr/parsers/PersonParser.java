@@ -48,6 +48,8 @@ public class PersonParser extends CprSubParser<PersonDataRecord> {
                     return new HistoricNameRecord(line);
                 case PersonDataRecord.RECORDTYPE_FOREIGN_ADDRESS:
                     return new ForeignAddressRecord(line);
+                case PersonDataRecord.RECORDTYPE_HISTORIC_FOREIGN_ADDRESS:
+                    return new HistoricForeignAddressRecord(line);
                 case PersonDataRecord.RECORDTYPE_CIVILSTATUS:
                     return new CivilStatusRecord(line);
                 case PersonDataRecord.RECORDTYPE_HISTORIC_CIVILSTATUS:
