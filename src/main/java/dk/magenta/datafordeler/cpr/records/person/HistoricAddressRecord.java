@@ -37,7 +37,7 @@ public class HistoricAddressRecord extends PersonDataRecord {
         this.obtain("convn_ts", 87, 12);
         this.obtain("tilflydto", 99, 12);
         this.obtain("tilflydto_umrk", 111, 1);
-        this.obtain("fraflydto", 113, 12);
+        this.obtain("fraflydto", 112, 12);
         this.obtain("fraflydto_umrk", 124, 1);
         this.obtain("tilfra_mynkod", 125, 4);
         this.obtain("tilfra_ts", 129, 12);
@@ -54,7 +54,7 @@ public class HistoricAddressRecord extends PersonDataRecord {
 
     @Override
     public String getRecordType() {
-        return RECORDTYPE_DOMESTIC_ADDRESS;
+        return RECORDTYPE_HISTORIC_DOMESTIC_ADDRESS;
     }
 
     @Override
