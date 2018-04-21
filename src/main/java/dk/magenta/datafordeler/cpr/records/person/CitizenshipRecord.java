@@ -42,7 +42,7 @@ public class CitizenshipRecord extends PersonDataRecord {
 
     @Override
     public String getRecordType() {
-        return RECORDTYPE_CHURCH;
+        return RECORDTYPE_CITIZENSHIP;
     }
 
     @Override
