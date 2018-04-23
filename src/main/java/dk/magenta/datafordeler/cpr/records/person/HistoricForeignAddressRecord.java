@@ -78,7 +78,7 @@ public class HistoricForeignAddressRecord extends PersonDataRecord {
 
     @Override
     public String getRecordType() {
-        return RECORDTYPE_FOREIGN_ADDRESS;
+        return RECORDTYPE_HISTORIC_FOREIGN_ADDRESS;
     }
 
     @Override
