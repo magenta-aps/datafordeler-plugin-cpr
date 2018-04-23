@@ -221,6 +221,14 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         return this.churchVerification;
     }
 
+    public PersonCitizenshipData getCitizenship() {
+        return this.citizenship;
+    }
+
+    public PersonCitizenshipVerificationData getCitizenshipVerification() {
+        return this.citizenshipVerification;
+    }
+
     public PersonAddressData getAddress() {
         return address;
     }
