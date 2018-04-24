@@ -1,10 +1,12 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Collections;
@@ -16,7 +18,9 @@ import java.util.Map;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_status")
+@Table(name = "cpr_person_status", indexes = {
+        @Index(name = "cpr_person_status_status", columnList = PersonStatusData.DB_FIELD_STATUS)
+})
 public class PersonStatusData extends DetailData {
 
     public static final String DB_FIELD_STATUS = "status";

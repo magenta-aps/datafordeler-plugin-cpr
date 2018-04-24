@@ -20,7 +20,8 @@ import java.util.*;
 @Table(name="cpr_person_data", indexes = {
         @Index(name = "cpr_person_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
         @Index(name = "cpr_person_name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF),
-        @Index(name = "cpr_person_address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF)
+        @Index(name = "cpr_person_address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF),
+        @Index(name = "cpr_person_status", columnList = PersonBaseData.DB_FIELD_STATUS + DatabaseEntry.REF)
 })
 public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
