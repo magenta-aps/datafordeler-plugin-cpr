@@ -3,10 +3,7 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -17,7 +14,9 @@ import java.util.Map;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_birth")
+@Table(name = "cpr_person_birth", indexes = {
+        @Index(name = "cpr_person_birth_time", columnList = PersonBirthData.DB_FIELD_BIRTH_DATETIME)
+})
 public class PersonBirthData extends DetailData {
 
     public static final String DB_FIELD_BIRTH_PLACE_CODE = "birthPlaceCode";
