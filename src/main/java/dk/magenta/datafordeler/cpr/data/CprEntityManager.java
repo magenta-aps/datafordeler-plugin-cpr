@@ -202,7 +202,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 ArrayList<String> dataChunk = new ArrayList<>();
                 try {
                     for (i = 0; (line = reader.readLine()) != null && i < maxChunkSize; i++) {
-                        System.out.println("Line: "+line);
                         dataChunk.add(line);
                         size += line.length();
                     }
