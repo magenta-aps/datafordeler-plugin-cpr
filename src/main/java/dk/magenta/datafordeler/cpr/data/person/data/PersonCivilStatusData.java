@@ -165,4 +165,19 @@ public class PersonCivilStatusData extends AuthorityDetailData {
         //OBS: Virkning fra og til mangler i forhold til grunddatamodellen
         return map;
     }
+
+    @Override
+    protected PersonCivilStatusData clone() {
+        PersonCivilStatusData clone = new PersonCivilStatusData();
+        clone.correctionMarking = this.correctionMarking;
+        clone.civilStatus = this.civilStatus;
+        clone.spouseCpr = this.spouseCpr;
+        clone.spouseBirthdate = this.spouseBirthdate;
+        clone.spouseBirthdateUncertain = this.spouseBirthdateUncertain;
+        clone.spouseName = this.spouseName;
+        clone.spouseNameMarking = this.spouseNameMarking;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

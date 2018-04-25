@@ -45,4 +45,13 @@ public class PersonNumberData extends AuthorityDetailData {
         map.put("cprNumber", this.cprNumber);
         return map;
     }
+
+    @Override
+    protected PersonNumberData clone() {
+        PersonNumberData clone = new PersonNumberData();
+        clone.cprNumber = this.cprNumber;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

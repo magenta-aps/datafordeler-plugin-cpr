@@ -115,4 +115,17 @@ public class PersonMoveMunicipalityData extends AuthorityDetailData {
         map.put("inDatetimeUncertain", this.inDatetimeUncertain);
         return map;
     }
+
+    @Override
+    protected PersonMoveMunicipalityData clone() {
+        PersonMoveMunicipalityData clone = new PersonMoveMunicipalityData();
+        clone.outDatetime = this.outDatetime;
+        clone.outDatetimeUncertain = this.outDatetimeUncertain;
+        clone.outMunicipality = this.outMunicipality;
+        clone.inDatetime = this.inDatetime;
+        clone.inDatetimeUncertain = this.inDatetimeUncertain;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

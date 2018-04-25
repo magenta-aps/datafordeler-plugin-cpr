@@ -115,7 +115,6 @@ public class RoadPostcodeData extends DetailData {
         return map;
     }
 
-
     @JsonIgnore
     public Map<String, Object> databaseFields() {
         HashMap<String, Object> map = new HashMap<>();
@@ -124,5 +123,16 @@ public class RoadPostcodeData extends DetailData {
         map.put(DB_FIELD_HOUSENUMBER_FROM, this.houseNumberFrom);
         map.put(DB_FIELD_HOUSENUMBER_TO, this.houseNumberTo);
         return map;
+    }
+
+    @Override
+    protected RoadPostcodeData clone() {
+        RoadPostcodeData clone = new RoadPostcodeData();
+        clone.postCode = this.postCode;
+        clone.houseNumberFrom = this.houseNumberFrom;
+        clone.houseNumberTo = this.houseNumberTo;
+        clone.even = this.even;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

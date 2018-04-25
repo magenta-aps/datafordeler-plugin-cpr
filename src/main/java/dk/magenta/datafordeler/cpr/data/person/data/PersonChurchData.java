@@ -41,4 +41,13 @@ public class PersonChurchData extends AuthorityDetailData {
         return map;
     }
 
+    @Override
+    protected PersonChurchData clone() {
+        PersonChurchData clone = new PersonChurchData();
+        clone.churchRelation = this.churchRelation;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
+
 }

@@ -47,4 +47,13 @@ public class PersonBirthVerificationData extends AuthorityDetailData {
         map.put("verified", this.verified);
         return map;
     }
+
+    @Override
+    protected PersonBirthVerificationData clone() {
+        PersonBirthVerificationData clone = new PersonBirthVerificationData();
+        clone.verified = this.verified;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

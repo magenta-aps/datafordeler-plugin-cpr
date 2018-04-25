@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
+import dk.magenta.datafordeler.core.util.OffsetDateTimeAdapter;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
@@ -300,6 +301,14 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             this.coreData = new PersonCoreData();
         }
         this.coreData.setKoen(koen);
+        this.coreData.setDafoUpdated(updateTime);
+    }
+
+    public void setKoen(PersonCoreData.Koen koen, OffsetDateTime updateTime) {
+        if (this.coreData == null) {
+            this.coreData = new PersonCoreData();
+        }
+        this.coreData.setGender(koen);
         this.coreData.setDafoUpdated(updateTime);
     }
 
@@ -680,6 +689,12 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.churchVerification != null) {
             map.put("churchVerification", this.churchVerification);
         }
+        if (this.citizenship != null) {
+            map.put("citizenship", this.citizenship);
+        }
+        if (this.citizenshipVerification != null) {
+            map.put("citizenshipVerification", this.citizenshipVerification);
+        }
         if (this.address != null) {
             map.put("address", this.address);
         }
@@ -695,7 +710,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.nameAuthority != null) {
             map.put("nameAuthority", this.nameAuthority);
         }
-        if (this.protection != null) {
+        if (this.protection != null && !this.protection.isEmpty()) {
             map.put("protection", this.protection);
         }
         if (this.migration != null) {
@@ -716,7 +731,6 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.cprNumber != null) {
             map.put("cprNumber", this.cprNumber);
         }
-
         return map;
     }
 
@@ -798,5 +812,97 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     @Override
     public void forceLoad(Session session) {
 
+    }
+
+    @Override
+    public PersonBaseData clone() {
+        PersonBaseData clone = new PersonBaseData();
+        if (this.coreData != null) {
+            clone.coreData = this.coreData.clone();
+        }
+        if (this.status != null) {
+            clone.status = this.status.clone();
+        }
+        if (this.mother != null) {
+            clone.mother = this.mother.clone();
+        }
+        if (this.father != null) {
+            clone.father = this.father.clone();
+        }
+        if (this.motherVerification != null) {
+            clone.motherVerification = this.motherVerification.clone();
+        }
+        if (this.fatherVerification != null) {
+            clone.fatherVerification = this.fatherVerification.clone();
+        }
+        if (this.position != null) {
+            clone.position = this.position.clone();
+        }
+        if (this.birth != null) {
+            clone.birth = this.birth.clone();
+        }
+        if (this.birthVerification != null) {
+            clone.birthVerification = this.birthVerification.clone();
+        }
+        if (this.church != null) {
+            clone.church = this.church.clone();
+        }
+        if (this.churchVerification != null) {
+            clone.churchVerification = this.churchVerification.clone();
+        }
+        if (this.citizenship != null) {
+            clone.citizenship = this.citizenship.clone();
+        }
+        if (this.citizenshipVerification != null) {
+            clone.citizenshipVerification = this.citizenshipVerification.clone();
+        }
+        if (this.address != null) {
+            clone.address = this.address.clone();
+        }
+        if (this.coname != null) {
+            clone.coname = this.coname.clone();
+        }
+        if (this.moveMunicipality != null) {
+            clone.moveMunicipality = this.moveMunicipality.clone();
+        }
+        if (this.name != null) {
+            clone.name = this.name.clone();
+        }
+        if (this.addressingName != null) {
+            clone.addressingName = this.addressingName.clone();
+        }
+        if (this.nameVerification != null) {
+            clone.nameVerification = this.nameVerification.clone();
+        }
+        if (this.nameAuthority != null) {
+            clone.nameAuthority = this.nameAuthority.clone();
+        }
+        if (this.protection != null) {
+            clone.protection = new HashSet<>();
+            for (PersonProtectionData protectionData : this.protection) {
+                PersonProtectionData protectionClone = protectionData.clone();
+                protectionClone.setBaseData(clone);
+                clone.protection.add(protectionClone);
+            }
+        }
+        if (this.migration != null) {
+            clone.migration = this.migration.clone();
+        }
+        if (this.foreignAddress != null) {
+            clone.foreignAddress = this.foreignAddress.clone();
+        }
+        if (this.civilStatus != null) {
+            clone.civilStatus = this.civilStatus.clone();
+        }
+        if (this.civilStatusVerification != null) {
+            clone.civilStatusVerification = this.civilStatusVerification.clone();
+        }
+        if (this.civilStatusAuthority != null) {
+            clone.civilStatusAuthority = this.civilStatusAuthority.clone();
+        }
+        if (this.cprNumber != null) {
+            clone.cprNumber = this.cprNumber.clone();
+        }
+        return clone;
     }
 }

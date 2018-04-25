@@ -45,4 +45,13 @@ public class PersonAddressNameData extends AuthorityDetailData {
         map.put("addressName", this.addressName);
         return map;
     }
+
+    @Override
+    protected PersonAddressNameData clone() {
+        PersonAddressNameData clone = new PersonAddressNameData();
+        clone.addressName = this.addressName;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

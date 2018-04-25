@@ -74,9 +74,13 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, D e
     }
 
     public V createClone() {
-        V effect = super.createClone();
-        effect.setEffectFromUncertain(this.effectFromUncertain);
-        effect.setEffectToUncertain(this.effectToUncertain);
-        return effect;
+        V other = (V) this.registration.createEffect(this.getEffectFrom(), this.getEffectTo());
+        other.setEffectFromUncertain(this.effectFromUncertain);
+        other.setEffectToUncertain(this.effectToUncertain);
+        for (D data : this.dataItems) {
+            D dataClone = (D) data.clone();
+            dataClone.addEffect(other);
+        }
+        return other;
     }
 }

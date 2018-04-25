@@ -214,4 +214,22 @@ public class PersonNameData extends AuthorityDetailData {
         //OBS: Virkning fra og til mangler i forhold til grunddatamodellen
         return map;
     }
+
+    @Override
+    protected PersonNameData clone() {
+        PersonNameData clone = new PersonNameData();
+        clone.addressingName = this.addressingName;
+        clone.firstNames = this.firstNames;
+        clone.firstNamesMarking = this.firstNamesMarking;
+        clone.middleName = this.middleName;
+        clone.middleNameMarking = this.middleNameMarking;
+        clone.lastName = this.lastName;
+        clone.lastNameMarking = this.lastNameMarking;
+        clone.egetEfternavn = this.egetEfternavn;
+        clone.egetEfternavnMarkering = this.egetEfternavnMarkering;
+        clone.rapportnavne = this.rapportnavne;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

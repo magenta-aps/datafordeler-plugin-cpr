@@ -186,4 +186,33 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     }
 
 
+    @Override
+    public RoadBaseData clone() {
+        RoadBaseData clone = new RoadBaseData();
+        if (this.coreData != null) {
+            clone.coreData = this.coreData.clone();
+        }
+        if (this.cityData != null && !this.cityData.isEmpty()) {
+            for (RoadCityData cityData : this.cityData) {
+                RoadCityData cityDataClone = cityData.clone();
+                cityDataClone.setRoadBaseData(clone);
+                clone.cityData.add(cityDataClone);
+            }
+        }
+        if (this.memoData != null && !this.memoData.isEmpty()) {
+            for (RoadMemoData memoData : this.memoData) {
+                RoadMemoData memoDataClone = memoData.clone();
+                memoDataClone.setRoadBaseData(clone);
+                clone.memoData.add(memoDataClone);
+            }
+        }
+        if (this.postcodeData != null && !this.postcodeData.isEmpty()) {
+            for (RoadPostcodeData postcodeData : this.postcodeData) {
+                RoadPostcodeData postcodeDataClone = postcodeData.clone();
+                postcodeDataClone.setRoadBaseData(clone);
+                clone.postcodeData.add(postcodeDataClone);
+            }
+        }
+        return clone;
+    }
 }

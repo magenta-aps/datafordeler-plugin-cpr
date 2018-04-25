@@ -79,6 +79,9 @@ public class PersonRecord extends PersonDataRecord {
         this.fatherVerificationTemporality = new Bitemporality(this.getOffsetDateTime("far_dok_ts"));
         this.positionTemporality = new Bitemporality(this.getOffsetDateTime("stilling_ts"));
         this.birthTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-person"), null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
+
+
+        System.out.println("statusTemporality: "+statusTemporality.toString());
     }
 
     /**
@@ -98,7 +101,9 @@ public class PersonRecord extends PersonDataRecord {
                 importMetadata.getImportTime()
         );
 
+
         if (this.statusTemporality.matches(registrationTime, effect)) {
+            System.out.println("statusTemporality "+this.statusTemporality+" matches "+registrationTime+"|"+effect.getEffectFrom()+"|"+effect.getEffectTo() + " for "+this.getInt("status", true));
             data.setStatus(
                     this.getInt("status", true),
                     importMetadata.getImportTime()

@@ -45,4 +45,13 @@ public class PersonNameAuthorityTextData extends AuthorityDetailData {
         map.put("text", this.text);
         return map;
     }
+
+    @Override
+    protected PersonNameAuthorityTextData clone() {
+        PersonNameAuthorityTextData clone = new PersonNameAuthorityTextData();
+        clone.text = this.text;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

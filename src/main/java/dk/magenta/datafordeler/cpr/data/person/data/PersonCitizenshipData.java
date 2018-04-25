@@ -39,4 +39,13 @@ public class PersonCitizenshipData extends AuthorityDetailData {
         return map;
     }
 
+    @Override
+    protected PersonCitizenshipData clone() {
+        PersonCitizenshipData clone = new PersonCitizenshipData();
+        clone.countryCode = this.countryCode;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
+
 }

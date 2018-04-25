@@ -77,4 +77,14 @@ public class PersonProtectionData extends AuthorityDetailData {
         map.put("reportMarking", this.reportMarking);
         return map;
     }
+
+    @Override
+    protected PersonProtectionData clone() {
+        PersonProtectionData clone = new PersonProtectionData();
+        clone.protectionType = this.protectionType;
+        clone.reportMarking = this.reportMarking;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

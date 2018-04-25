@@ -94,4 +94,13 @@ public class RoadMemoData extends DetailData {
         return map;
     }
 
+    @Override
+    protected RoadMemoData clone() {
+        RoadMemoData clone = new RoadMemoData();
+        clone.memoText = this.memoText;
+        clone.memoNumber = this.memoNumber;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
+
 }

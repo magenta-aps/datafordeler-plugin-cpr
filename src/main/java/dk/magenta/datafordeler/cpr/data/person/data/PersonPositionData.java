@@ -47,4 +47,13 @@ public class PersonPositionData extends AuthorityDetailData {
         map.put("position", this.position);
         return map;
     }
+
+    @Override
+    protected PersonPositionData clone() {
+        PersonPositionData clone = new PersonPositionData();
+        clone.position = this.position;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

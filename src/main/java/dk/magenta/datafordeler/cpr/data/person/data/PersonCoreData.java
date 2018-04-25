@@ -84,4 +84,14 @@ public class PersonCoreData extends AuthorityDetailData {
         }
         return map;
     }
+
+    @Override
+    protected PersonCoreData clone() {
+        PersonCoreData clone = new PersonCoreData();
+        clone.cprNumber = this.cprNumber;
+        clone.gender = this.gender;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

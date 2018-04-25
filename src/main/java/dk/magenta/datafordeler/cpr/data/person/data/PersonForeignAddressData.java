@@ -146,4 +146,17 @@ public class PersonForeignAddressData extends AuthorityDetailData {
         }
         return joiner.toString();
     }
+
+    @Override
+    protected PersonForeignAddressData clone() {
+        PersonForeignAddressData clone = new PersonForeignAddressData();
+        clone.addressLine1 = this.addressLine1;
+        clone.addressLine2 = this.addressLine2;
+        clone.addressLine3 = this.addressLine3;
+        clone.addressLine4 = this.addressLine4;
+        clone.addressLine5 = this.addressLine5;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

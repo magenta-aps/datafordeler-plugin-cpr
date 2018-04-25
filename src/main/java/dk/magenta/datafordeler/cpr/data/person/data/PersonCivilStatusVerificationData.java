@@ -67,4 +67,14 @@ public class PersonCivilStatusVerificationData extends AuthorityDetailData {
         map.put("correctionMarking", this.correctionMarking);
         return map;
     }
+
+    @Override
+    protected PersonCivilStatusVerificationData clone() {
+        PersonCivilStatusVerificationData clone = new PersonCivilStatusVerificationData();
+        clone.verified = this.verified;
+        clone.correctionMarking = this.correctionMarking;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

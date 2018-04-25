@@ -172,4 +172,17 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
     public void forceLoad(Session session) {
 
     }
+
+    @Override
+    public ResidenceBaseData clone() {
+        ResidenceBaseData clone = new ResidenceBaseData();
+        clone.municipalityCode = this.municipalityCode;
+        clone.locality = this.locality;
+        clone.roadCode = this.roadCode;
+        clone.houseNumber = this.houseNumber;
+        clone.floor = this.floor;
+        clone.door = this.door;
+        clone.dafoUpdated = this.dafoUpdated;
+        return clone;
+    }
 }

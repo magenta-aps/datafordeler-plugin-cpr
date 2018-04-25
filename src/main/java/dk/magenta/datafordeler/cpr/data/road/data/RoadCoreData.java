@@ -156,4 +156,16 @@ public class RoadCoreData extends DetailData {
         return map;
     }
 
+    @Override
+    protected RoadCoreData clone() {
+        RoadCoreData clone = new RoadCoreData();
+        clone.fromMunicipality = this.fromMunicipality;
+        clone.fromRoad = this.fromRoad;
+        clone.toMunicipality = this.toMunicipality;
+        clone.toRoad = this.toRoad;
+        clone.addressingName = this.addressingName;
+        clone.name = this.name;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

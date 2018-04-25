@@ -133,8 +133,6 @@ public class PersonBirthData extends DetailData {
         this.birthSupplementalText = birthSupplementalText;
     }
 
-
-
     @Override
     public Map<String, Object> databaseFields() {
         HashMap<String, Object> map = new HashMap<>();
@@ -158,5 +156,19 @@ public class PersonBirthData extends DetailData {
         //Ikke i grunddatamodellen
         //map.put("foedselsraekkefoelge", this.foedselsraekkefoelge);
         return map;
+    }
+
+    @Override
+    protected PersonBirthData clone() {
+        PersonBirthData clone = new PersonBirthData();
+        clone.birthPlaceCode = this.birthPlaceCode;
+        clone.birthPlaceName = this.birthPlaceName;
+        clone.birthAuthorityText = this.birthAuthorityText;
+        clone.birthDatetime = this.birthDatetime;
+        clone.birthDatetimeUncertain = this.birthDatetimeUncertain;
+        clone.foedselsraekkefoelge = this.foedselsraekkefoelge;
+        clone.birthSupplementalText = this.birthSupplementalText;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

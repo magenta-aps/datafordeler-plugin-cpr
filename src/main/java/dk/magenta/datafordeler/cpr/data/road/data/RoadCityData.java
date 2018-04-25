@@ -124,4 +124,15 @@ public class RoadCityData extends DetailData {
         return map;
     }
 
+    @Override
+    protected RoadCityData clone() {
+        RoadCityData clone = new RoadCityData();
+        clone.cityName = this.cityName;
+        clone.houseNumberFrom = this.houseNumberFrom;
+        clone.houseNumberTo = this.houseNumberTo;
+        clone.even = this.even;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
+
 }

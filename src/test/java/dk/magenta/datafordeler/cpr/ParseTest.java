@@ -83,7 +83,9 @@ public class ParseTest {
             loadPerson(importMetadata);
             List<PersonEntity> entities = QueryManager.getAllEntities(session, PersonEntity.class);
             JsonNode firstImport = objectMapper.valueToTree(entities);
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(firstImport));
 
+            System.out.println("--------------------------------------------------------");
             loadPerson(importMetadata);
             entities = QueryManager.getAllEntities(session, PersonEntity.class);
             JsonNode secondImport = objectMapper.valueToTree(entities);

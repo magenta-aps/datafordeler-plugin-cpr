@@ -143,4 +143,18 @@ public class PersonParentData extends AuthorityDetailData {
         map.put("nameMarking", this.nameMarking);
         return map;
     }
+
+    @Override
+    protected PersonParentData clone() {
+        PersonParentData clone = new PersonParentData();
+        clone.cprNumber = this.cprNumber;
+        clone.birthDate = this.birthDate;
+        clone.birthDateUncertain = this.birthDateUncertain;
+        clone.isMother = this.isMother;
+        clone.name = this.name;
+        clone.nameMarking = this.nameMarking;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

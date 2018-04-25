@@ -42,4 +42,12 @@ public class PersonAddressConameData extends DetailData {
     public Map<String, Object> asMap() {
         return Collections.singletonMap("coname", this.coname);
     }
+
+    @Override
+    protected PersonAddressConameData clone() {
+        PersonAddressConameData clone = new PersonAddressConameData();
+        clone.coname = this.coname;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

@@ -66,4 +66,14 @@ public class PersonCivilStatusAuthorityTextData extends AuthorityDetailData {
         map.put("correctionMarking", this.correctionMarking);
         return map;
     }
+
+    @Override
+    protected PersonCivilStatusAuthorityTextData clone() {
+        PersonCivilStatusAuthorityTextData clone = new PersonCivilStatusAuthorityTextData();
+        clone.text = this.text;
+        clone.correctionMarking = this.correctionMarking;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

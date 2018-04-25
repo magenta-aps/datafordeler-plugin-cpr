@@ -49,4 +49,12 @@ public class PersonStatusData extends DetailData {
         map.put("status", this.status);
         return map;
     }
+
+    @Override
+    protected PersonStatusData clone() {
+        PersonStatusData clone = new PersonStatusData();
+        clone.status = this.status;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

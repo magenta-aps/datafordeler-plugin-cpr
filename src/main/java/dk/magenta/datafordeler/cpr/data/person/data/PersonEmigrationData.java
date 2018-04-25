@@ -46,4 +46,13 @@ public class PersonEmigrationData extends AuthorityDetailData {
         map.put("countryCode", this.countryCode);
         return map;
     }
+
+    @Override
+    protected PersonEmigrationData clone() {
+        PersonEmigrationData clone = new PersonEmigrationData();
+        clone.countryCode = this.countryCode;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }
