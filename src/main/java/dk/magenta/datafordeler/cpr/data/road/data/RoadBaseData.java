@@ -14,10 +14,7 @@ import org.hibernate.Session;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Base class for Road data, linking to Effects and delegating storage to referred classes
@@ -52,18 +49,18 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     public static final String DB_FIELD_POSTCODE = "postcodeData";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
-    private List<RoadPostcodeData> postcodeData = new ArrayList<>();
+    private Set<RoadPostcodeData> postcodeData = new HashSet<>();
 
-    public List<RoadPostcodeData> getPostcodeData() {
+    public Set<RoadPostcodeData> getPostcodeData() {
         return this.postcodeData;
     }
 
     public static final String DB_FIELD_CITY = "cityData";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
-    private List<RoadCityData> cityData = new ArrayList<>();
+    private Set<RoadCityData> cityData = new HashSet<>();
 
-    public List<RoadCityData> getCityData() {
+    public Set<RoadCityData> getCityData() {
         return this.cityData;
     }
 
@@ -193,21 +190,24 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         if (this.coreData != null) {
             clone.coreData = this.coreData.clone();
         }
-        if (this.cityData != null && !this.cityData.isEmpty()) {
+        if (this.cityData != null) {
+            clone.cityData = new HashSet<>();
             for (RoadCityData cityData : this.cityData) {
                 RoadCityData cityDataClone = cityData.clone();
                 cityDataClone.setRoadBaseData(clone);
                 clone.cityData.add(cityDataClone);
             }
         }
-        if (this.memoData != null && !this.memoData.isEmpty()) {
+        if (this.memoData != null) {
+            clone.memoData = new ArrayList<>();
             for (RoadMemoData memoData : this.memoData) {
                 RoadMemoData memoDataClone = memoData.clone();
                 memoDataClone.setRoadBaseData(clone);
                 clone.memoData.add(memoDataClone);
             }
         }
-        if (this.postcodeData != null && !this.postcodeData.isEmpty()) {
+        if (this.postcodeData != null) {
+            clone.postcodeData = new HashSet<>();
             for (RoadPostcodeData postcodeData : this.postcodeData) {
                 RoadPostcodeData postcodeDataClone = postcodeData.clone();
                 postcodeDataClone.setRoadBaseData(clone);
