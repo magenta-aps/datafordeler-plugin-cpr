@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -31,10 +32,14 @@ public class HistoricCprNumberRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (this.cprTemporality.matches(registrationTime, effect)) {
-            data.setCprNumber(this.getInt("start_mynkod-pnrgaeld"), this.getString("gammelt_pnr", false));
+            data.setCprNumber(
+                    this.getInt("start_mynkod-pnrgaeld"),
+                    this.getString("gammelt_pnr", false),
+                    importMetadata.getImportTime()
+            );
             updated = true;
         }
         return updated;

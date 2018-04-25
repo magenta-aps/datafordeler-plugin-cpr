@@ -16,30 +16,37 @@ import java.util.Set;
 /**
  * Record for Person foreign address (type 028).
  */
-public class ForeignAddressRecord extends PersonDataRecord {
+public class HistoricForeignAddressRecord extends PersonDataRecord {
 
     private Bitemporality emigrationTemporality;
     private Bitemporality foreignAddressTemporality;
 
-    public ForeignAddressRecord(String line) throws ParseException {
+    public HistoricForeignAddressRecord(String line) throws ParseException {
         super(line);
-        this.obtain("start_mynkod-udrindrejse", 14, 4);
-        this.obtain("udr_ts", 18, 12);
-        this.obtain("udr_landekod", 30, 4);
-        this.obtain("udrdto", 34, 12);
-        this.obtain("udrdto_umrk", 46, 1);
-        this.obtain("udlandadr_mynkod", 47, 4);
-        this.obtain("udlandadr_ts", 51, 12);
-        this.obtain("udlandadr1", 63, 34);
-        this.obtain("udlandadr2", 97, 34);
-        this.obtain("udlandadr3", 131, 34);
-        this.obtain("udlandadr4", 165, 34);
-        this.obtain("udlandadr5", 199, 34);
+        this.obtain("annkor", 14,1);
+        this.obtain("start_mynkod-udrindrejse", 16, 4);
+        this.obtain("udr_ts", 19, 12);
+        this.obtain("udr_landekod", 31, 4);
+        this.obtain("udrdto", 35, 12);
+        this.obtain("udrdto_umrk", 47, 1);
+        this.obtain("indr_ts", 48, 12);
+        this.obtain("uindr_landekod", 60, 4);
+        this.obtain("indrdto", 64, 12);
+        this.obtain("indrdto_umrk", 76, 1);
+        this.obtain("udlandadr_mynkod", 77, 4);
+        this.obtain("udlandadr_ts", 81, 12);
+        this.obtain("udlandadr1", 93, 34);
+        this.obtain("udlandadr2", 127, 34);
+        this.obtain("udlandadr3", 161, 34);
+        this.obtain("udlandadr4", 195, 34);
+        this.obtain("udlandadr5", 229, 34);
 
         OffsetDateTime effectFrom = this.getOffsetDateTime("udrdto");
         boolean effectFromUncertain = this.getMarking("udrdto_umrk");
-        this.emigrationTemporality = new Bitemporality(this.getOffsetDateTime("udr_ts"), null, effectFrom, effectFromUncertain, null, false);
-        this.foreignAddressTemporality = new Bitemporality(this.getOffsetDateTime("udlandadr_ts"), null, effectFrom, effectFromUncertain, null, false);
+        OffsetDateTime effectTo = this.getOffsetDateTime("indrdto");
+        boolean effectToUncertain = this.getMarking("indrdto_umrk");
+        this.emigrationTemporality = new Bitemporality(this.getOffsetDateTime("udr_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
+        this.foreignAddressTemporality = new Bitemporality(this.getOffsetDateTime("udlandadr_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
     }
 
     @Override
@@ -71,7 +78,7 @@ public class ForeignAddressRecord extends PersonDataRecord {
 
     @Override
     public String getRecordType() {
-        return RECORDTYPE_FOREIGN_ADDRESS;
+        return RECORDTYPE_HISTORIC_FOREIGN_ADDRESS;
     }
 
     @Override
@@ -93,7 +100,7 @@ public class ForeignAddressRecord extends PersonDataRecord {
     @Override
     public Set<PersonEffect> getEffects() {
         HashSet<PersonEffect> effects = new HashSet<>();
-        effects.add(new PersonEffect(null, this.getOffsetDateTime("udrdto"), this.getMarking("udrdto_umrk"), null, false));
+        effects.add(new PersonEffect(null, this.getOffsetDateTime("udrdto"), this.getMarking("udrdto_umrk"), this.getOffsetDateTime("indrdto"), this.getMarking("indrdto_umrk")));
         return effects;
     }
 }

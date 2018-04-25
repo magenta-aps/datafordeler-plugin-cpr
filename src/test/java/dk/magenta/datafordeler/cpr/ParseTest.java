@@ -2,11 +2,13 @@ package dk.magenta.datafordeler.cpr;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.util.Equality;
+import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.*;
 import dk.magenta.datafordeler.cpr.data.residence.*;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
@@ -100,16 +102,29 @@ public class ParseTest {
         ImportMetadata importMetadata = new ImportMetadata();
         importMetadata.setSession(session);
         importMetadata.setTransactionInProgress(true);
+        PersonQuery query = new PersonQuery();
         try {
+            ObjectNode importConfiguration = (ObjectNode) objectMapper.readTree("{\""+ CprEntityManager.IMPORTCONFIG_PNR+"\":\"0101008888\"}");
+            importMetadata.setImportConfiguration(importConfiguration);
             loadPerson(importMetadata);
 
-            PersonQuery query = new PersonQuery();
             query.setFornavn("Tester");
-
             List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
+            Assert.assertEquals(0, entities.size());
+
+            importConfiguration.remove(CprEntityManager.IMPORTCONFIG_PNR);
+            loadPerson(importMetadata);
+
+            entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
             Assert.assertEquals(1, entities.size());
             PersonEntity entity = entities.get(0);
             Assert.assertEquals(PersonEntity.generateUUID("0101001234"), entity.getUUID());
+
+            System.out.println(
+                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
+                        new PersonOutputWrapper().wrapResult(entity, query)
+                    )
+            );
 
         } finally {
             transaction.rollback();

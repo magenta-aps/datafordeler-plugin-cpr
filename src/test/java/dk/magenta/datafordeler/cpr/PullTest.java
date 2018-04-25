@@ -1,5 +1,7 @@
 package dk.magenta.datafordeler.cpr;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.Application;
 import dk.magenta.datafordeler.core.Engine;
 import dk.magenta.datafordeler.core.Pull;
@@ -7,14 +9,13 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RecordCollection;
 import dk.magenta.datafordeler.core.database.RecordData;
 import dk.magenta.datafordeler.core.database.SessionManager;
+import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.plugin.FtpCommunicator;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
-import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.PersonQuery;
-import dk.magenta.datafordeler.cpr.data.person.PersonSubscription;
+import dk.magenta.datafordeler.cpr.data.person.*;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonBirthData;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
@@ -39,12 +40,15 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -66,6 +70,9 @@ public class PullTest {
 
     @Autowired
     private SessionManager sessionManager;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @SpyBean
     private CprConfigurationManager cprConfigurationManager;
@@ -231,6 +238,81 @@ public class PullTest {
             session.close();
         }
 
+    }
+
+    @Test
+    public void testConfiguredPull() throws Exception {
+        CprConfiguration configuration = ((CprConfigurationManager) plugin.getConfigurationManager()).getConfiguration();
+        when(cprConfigurationManager.getConfiguration()).thenReturn(configuration);
+
+        CprRegisterManager registerManager = (CprRegisterManager) plugin.getRegisterManager();
+        registerManager.setProxyString(null);
+
+        doAnswer(new Answer<FtpCommunicator>() {
+            @Override
+            public FtpCommunicator answer(InvocationOnMock invocation) throws Throwable {
+                FtpCommunicator ftpCommunicator = (FtpCommunicator) invocation.callRealMethod();
+                ftpCommunicator.setSslSocketFactory(PullTest.getTrustAllSSLSocketFactory());
+                return ftpCommunicator;
+            }
+        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprEntityManager.class));
+
+
+        String username = "test";
+        String password = "test";
+
+
+        InputStream personContents = this.getClass().getResourceAsStream("/persondata.txt");
+        File personFile = File.createTempFile("persondata", "txt");
+        personFile.createNewFile();
+        FileUtils.copyInputStreamToFile(personContents, personFile);
+        personContents.close();
+
+        FtpService personFtp = new FtpService();
+        int personPort = 2101;
+        personFtp.startServer(username, password, personPort, Collections.singletonList(personFile));
+
+        configuration.setPersonRegisterType(CprConfiguration.RegisterType.REMOTE_FTP);
+        configuration.setPersonRegisterFtpAddress("ftps://localhost:" + personPort);
+        configuration.setPersonRegisterFtpUsername(username);
+        configuration.setPersonRegisterFtpPassword(password);
+        configuration.setPersonRegisterDataCharset(CprConfiguration.Charset.UTF_8);
+
+
+
+        ObjectNode config = (ObjectNode) objectMapper.readTree("{\""+CprEntityManager.IMPORTCONFIG_RECORDTYPE+"\": [5]}");
+        Pull pull = new Pull(engine, plugin, config);
+        pull.run();
+
+        personFtp.stopServer();
+        personFile.delete();
+
+        Session session = sessionManager.getSessionFactory().openSession();
+        try {
+
+            PersonQuery personQuery = new PersonQuery();
+            personQuery.setPersonnummer("0101001234");
+            List<PersonEntity> personEntities = QueryManager.getAllEntities(session, personQuery, PersonEntity.class);
+            Assert.assertEquals(1, personEntities.size());
+            PersonEntity personEntity = personEntities.get(0);
+            Assert.assertEquals(PersonEntity.generateUUID("0101001234"), personEntity.getUUID());
+
+            System.out.println(
+                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
+                            new PersonOutputWrapper().wrapResult(personEntities.get(0), personQuery)
+                    )
+            );
+            Assert.assertEquals(1, personEntity.getRegistrations().size());
+            Assert.assertTrue(LocalDateTime.parse("1991-09-23T12:00").isEqual(personEntity.getRegistrations().get(0).getRegistrationFrom().toLocalDateTime()));
+            Assert.assertNull(personEntity.getRegistrations().get(0).getRegistrationTo());
+            Assert.assertEquals(1, personEntity.getRegistrations().get(0).getEffects().size());
+            PersonBirthData birthData = personEntity.getRegistrations().get(0).getEffects().get(0).getDataItems().get(0).getBirth();
+            Assert.assertNotNull(birthData);
+            Assert.assertEquals(9510, birthData.getBirthPlaceCode().intValue());
+            Assert.assertEquals(1234, birthData.getBirthAuthorityText().intValue());
+        } finally {
+            session.close();
+        }
     }
 
     @Test
