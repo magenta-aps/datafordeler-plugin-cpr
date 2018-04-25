@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.data.residence.data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
 import org.hibernate.Session;
@@ -20,13 +21,13 @@ import java.util.Map;
  * Base class for Residence data, linking to Effects and delegating storage to referred classes
  */
 @Entity
-@Table(name="cpr_residence_data", indexes = {
-        @Index(name = "cpr_residence_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = "cpr_residence_municipality_code", columnList = ResidenceBaseData.DB_FIELD_MUNICIPALITY_CODE),
-        @Index(name = "cpr_residence_road_code", columnList = ResidenceBaseData.DB_FIELD_ROAD_CODE),
-        @Index(name = "cpr_residence_housenumber", columnList = ResidenceBaseData.DB_FIELD_HOUSENUMBER),
-        @Index(name = "cpr_residence_floor", columnList = ResidenceBaseData.DB_FIELD_FLOOR),
-        @Index(name = "cpr_residence_door", columnList = ResidenceBaseData.DB_FIELD_DOOR),
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_data", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_municipality_code", columnList = ResidenceBaseData.DB_FIELD_MUNICIPALITY_CODE),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_road_code", columnList = ResidenceBaseData.DB_FIELD_ROAD_CODE),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_housenumber", columnList = ResidenceBaseData.DB_FIELD_HOUSENUMBER),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_floor", columnList = ResidenceBaseData.DB_FIELD_FLOOR),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_door", columnList = ResidenceBaseData.DB_FIELD_DOOR),
 })
 public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseData> {
 

@@ -5,6 +5,7 @@ import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.core.util.OffsetDateTimeAdapter;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
@@ -20,12 +21,12 @@ import java.util.*;
  * Base class for Person data, linking to Effects and delegating storage to referred classes
  */
 @Entity
-@Table(name="cpr_person_data", indexes = {
-        @Index(name = "cpr_person_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = "cpr_person_name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF),
-        @Index(name = "cpr_person_address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF),
-        @Index(name = "cpr_person_status", columnList = PersonBaseData.DB_FIELD_STATUS + DatabaseEntry.REF),
-        @Index(name = "cpr_person_birth", columnList = PersonBaseData.DB_FIELD_BIRTH + DatabaseEntry.REF)
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_data", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_status", columnList = PersonBaseData.DB_FIELD_STATUS + DatabaseEntry.REF),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_birth", columnList = PersonBaseData.DB_FIELD_BIRTH + DatabaseEntry.REF)
 })
 public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 

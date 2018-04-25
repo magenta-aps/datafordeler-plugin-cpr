@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.Column;
@@ -15,7 +16,7 @@ import java.util.Map;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_core")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_core")
 public class PersonCoreData extends AuthorityDetailData {
 
     public enum Koen {

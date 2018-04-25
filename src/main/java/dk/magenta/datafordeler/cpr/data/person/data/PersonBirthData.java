@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.*;
@@ -14,8 +15,8 @@ import java.util.Map;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_birth", indexes = {
-        @Index(name = "cpr_person_birth_time", columnList = PersonBirthData.DB_FIELD_BIRTH_DATETIME)
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_birth", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_birth_time", columnList = PersonBirthData.DB_FIELD_BIRTH_DATETIME)
 })
 public class PersonBirthData extends DetailData {
 

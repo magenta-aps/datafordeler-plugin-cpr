@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
@@ -15,9 +16,9 @@ import static dk.magenta.datafordeler.cpr.data.person.data.PersonNameData.DB_FIE
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_name", indexes = {
-        @Index(name = "cpr_person_name_firstname", columnList = DB_FIELD_FIRST_NAMES),
-        @Index(name = "cpr_person_name_lastname", columnList = DB_FIELD_LAST_NAME),
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name_firstname", columnList = DB_FIELD_FIRST_NAMES),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name_lastname", columnList = DB_FIELD_LAST_NAME),
 })
 public class PersonNameData extends AuthorityDetailData {
 

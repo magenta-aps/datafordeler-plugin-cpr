@@ -4,6 +4,7 @@ import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.core.util.Equality;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
@@ -22,9 +23,9 @@ import java.util.Map;
  * Base class for Road data, linking to Effects and delegating storage to referred classes
  */
 @Entity
-@Table(name="cpr_road_data", indexes = {
-        @Index(name = "cpr_road_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = "cpr_road_core", columnList = RoadBaseData.DB_FIELD_CORE + DatabaseEntry.REF)
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_data", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_core", columnList = RoadBaseData.DB_FIELD_CORE + DatabaseEntry.REF)
 })
 public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
 
