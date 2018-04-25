@@ -12,10 +12,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Base class for Road data, linking to Effects and delegating storage to referred classes
@@ -50,18 +47,18 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     public static final String DB_FIELD_POSTCODE = "postcodeData";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
-    private List<RoadPostcodeData> postcodeData = new ArrayList<>();
+    private Set<RoadPostcodeData> postcodeData = new HashSet<>();
 
-    public List<RoadPostcodeData> getPostcodeData() {
+    public Set<RoadPostcodeData> getPostcodeData() {
         return this.postcodeData;
     }
 
     public static final String DB_FIELD_CITY = "cityData";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
-    private List<RoadCityData> cityData = new ArrayList<>();
+    private Set<RoadCityData> cityData = new HashSet<>();
 
-    public List<RoadCityData> getCityData() {
+    public Set<RoadCityData> getCityData() {
         return this.cityData;
     }
 
@@ -179,6 +176,5 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         Hibernate.initialize(postcodeData);
         Hibernate.initialize(cityData);
     }
-
-
+    
 }
