@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Record for Person foreign address (type 028).
  */
-public class HistoricForeignAddressRecord extends PersonDataRecord {
+public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
 
     private Bitemporality emigrationTemporality;
     private Bitemporality foreignAddressTemporality;
@@ -75,6 +75,19 @@ public class HistoricForeignAddressRecord extends PersonDataRecord {
         return updated;
     }
 
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.emigrationTemporality) && outdatedTemporality.equals(this.emigrationTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearEmigration(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.foreignAddressTemporality) && outdatedTemporality.equals(this.foreignAddressTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearForeignAddress(session);
+            updated = true;
+        }
+        return updated;
+    }
 
     @Override
     public String getRecordType() {

@@ -16,9 +16,14 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.CprRegisterManager;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
+import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.AddressRecord;
+import dk.magenta.datafordeler.cpr.records.person.HistoricAddressRecord;
+import dk.magenta.datafordeler.cpr.records.person.HistoricPersonDataRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -312,12 +317,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                         for (D baseData : e.getDataItems()) {
                                             for (T record : groupRecords) {
                                                 boolean updated = false;
-//                                                for (V effect : effects) {
-//                                                    this.checkInterrupt(importMetadata);
-//                                                    if (record.populateBaseData(baseData, effect, effect.getRegistration().getRegistrationFrom()/*bitemporality.registrationFrom*/, session, importMetadata)) {
-//                                                        updated = true;
-//                                                   }
-////                                                }
+
                                                 if (record.populateBaseData(baseData, bitemporality, session, importMetadata)) {
                                                        updated = true;
                                                 }
@@ -335,6 +335,37 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                     }
                                     timer.measure(TASK_POPULATE_DATA);
 
+                                    for (R registration : registrations) {
+                                        V effect = registration.getEffect(bitemporality.effectFrom, bitemporality.effectFromUncertain, null, false);
+                                        if (effect != null) {
+                                            Bitemporality outdatedTemporality = bitemporality.withEffect(effect);
+                                            for (T record : groupRecords) {
+                                                if (record instanceof HistoricPersonDataRecord) {
+                                                    HistoricPersonDataRecord historicRecord = (HistoricPersonDataRecord) record;
+                                                    for (D baseData : effect.getDataItems()) {
+                                                        PersonBaseData personBaseData = (PersonBaseData) baseData;
+                                                        if (historicRecord.cleanBaseData((PersonBaseData) baseData, bitemporality, outdatedTemporality, session)) {
+                                                            if (personBaseData.isEmpty()) {
+                                                                HashSet<PersonEffect> personEffects = new HashSet<>(personBaseData.getEffects());
+                                                                for (PersonEffect personEffect : personEffects) {
+                                                                    personBaseData.removeEffect(personEffect);
+                                                                }
+                                                                session.delete(personBaseData);
+                                                                for (PersonEffect personEffect : personEffects) {
+                                                                    if (personEffect.getDataItems().isEmpty()) {
+                                                                        personEffect.getRegistration().removeEffect(personEffect);
+                                                                        session.delete(personEffect);
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                baseData.setUpdated(importMetadata.getImportTime());
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
 
 
 /*
@@ -418,7 +449,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 */
                                 }
 
-
+System.out.println("Imported:");
                                 try {
                                     System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity));
                                 } catch (JsonProcessingException e) {

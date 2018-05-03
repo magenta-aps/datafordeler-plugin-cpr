@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Record for Person historic name (type 021).
  */
-public class HistoricNameRecord extends PersonDataRecord {
+public class HistoricNameRecord extends HistoricPersonDataRecord {
 
     private Bitemporality nameTemporality;
     private Bitemporality addressNameTemporality;
@@ -116,6 +116,28 @@ public class HistoricNameRecord extends PersonDataRecord {
                     this.get("myntxt-navne"),
                     importMetadata.getImportTime()
             );
+            updated = true;
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.nameTemporality) && outdatedTemporality.equals(this.nameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearName(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.addressNameTemporality) && outdatedTemporality.equals(this.addressNameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearAddressName(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.documentNameTemporality) && outdatedTemporality.equals(this.documentNameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearNameVerification(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.officiaryTemporality) && outdatedTemporality.equals(this.officiaryTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearNameAuthorityText(session);
             updated = true;
         }
         return updated;

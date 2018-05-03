@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Record for Person historic cpr number (type 065).
  */
-public class HistoricCprNumberRecord extends PersonDataRecord {
+public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
 
     private Bitemporality cprTemporality;
 
@@ -40,6 +40,16 @@ public class HistoricCprNumberRecord extends PersonDataRecord {
                     this.getString("gammelt_pnr", false),
                     importMetadata.getImportTime()
             );
+            updated = true;
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.cprTemporality) && outdatedTemporality.equals(this.cprTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCprNumber(session);
             updated = true;
         }
         return updated;

@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Record for Person historic address (type 026).
  */
-public class HistoricAddressRecord extends PersonDataRecord {
+public class HistoricAddressRecord extends HistoricPersonDataRecord {
 
     private Bitemporality addressTemporality;
     private Bitemporality conameTemporality;
@@ -60,6 +60,7 @@ public class HistoricAddressRecord extends PersonDataRecord {
     @Override
     public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
+
         if (bitemporality.equals(this.addressTemporality)) {
             data.setAddress(
                     // int authority,
@@ -104,6 +105,7 @@ public class HistoricAddressRecord extends PersonDataRecord {
             );
             updated = true;
         }
+
         if (bitemporality.equals(this.conameTemporality)) {
             data.setCoName(
                     this.get("convn"),
@@ -127,6 +129,24 @@ public class HistoricAddressRecord extends PersonDataRecord {
                     this.getBoolean("tilflykomdt_umrk"),
                     importMetadata.getImportTime()
             );
+            updated = true;
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.addressTemporality) && outdatedTemporality.equals(this.addressTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearAddress(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.conameTemporality) && outdatedTemporality.equals(this.conameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCoName(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.municipalityTemporality) && outdatedTemporality.equals(this.municipalityTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearMoveMunicipality(session);
             updated = true;
         }
         return updated;

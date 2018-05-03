@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Record for Person historic civil status (type 036).
  */
-public class HistoricCivilStatusRecord extends PersonDataRecord {
+public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
 
     private Bitemporality civilTemporality;
     private Bitemporality documentTemporality;
@@ -90,6 +90,24 @@ public class HistoricCivilStatusRecord extends PersonDataRecord {
                     this.getString("annkor", true),
                     importMetadata.getImportTime()
             );
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.civilTemporality) && outdatedTemporality.equals(this.civilTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCivilStatus(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.documentTemporality) && outdatedTemporality.equals(this.documentTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCitizenshipVerification(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.officiaryTemporality) && outdatedTemporality.equals(this.officiaryTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCivilStatusAuthorityText(session);
+            updated = true;
         }
         return updated;
     }
