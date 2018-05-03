@@ -273,8 +273,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                 sortedBitemporalities.sort(Bitemporality::compareTo);
 
                                 for (Bitemporality bitemporality :sortedBitemporalities) {
-                                    System.out.println("---------------------------------------");
-                                    System.out.println("Bitemporality "+bitemporality.toString());
+                                    //System.out.println("Bitemporality "+bitemporality.toString());
 
                                     timer.start(TASK_FIND_REGISTRATIONS);
                                     List<T> groupRecords = groups.get(bitemporality);
@@ -283,7 +282,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                     for (T rec : groupRecords) {
                                         recordtypes.add(rec.getRecordType());
                                     }
-                                    System.out.println("RecordTypes: "+recordtypes);
 
                                     List<R> registrations = entity.findRegistrations(bitemporality.registrationFrom, bitemporality.registrationTo);
 
@@ -447,13 +445,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                     }
                                     timer.measure(TASK_POPULATE_DATA);
 */
-                                }
-
-System.out.println("Imported:");
-                                try {
-                                    System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity));
-                                } catch (JsonProcessingException e) {
-                                    e.printStackTrace();
                                 }
 
                                 timer.start(TASK_SAVE);

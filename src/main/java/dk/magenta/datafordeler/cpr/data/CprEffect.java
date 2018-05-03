@@ -80,12 +80,6 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, D e
         other.setEffectToUncertain(this.effectToUncertain);
         for (D data : this.dataItems) {
             D dataClone = (D) data.clone();
-            if (dataClone instanceof PersonBaseData) {
-                PersonBaseData p = (PersonBaseData) dataClone;
-                if (p.getStatus() != null) {
-                    System.out.println("Attaching clone with status "+p.getStatus().getStatus()+" to effect "+other.toString());
-                }
-            }
             dataClone.addEffect(other);
         }
         return other;
