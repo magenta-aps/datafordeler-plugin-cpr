@@ -39,8 +39,8 @@ public class RoadPostcodeRecord extends RoadDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
-        if (this.postcodeTemporality.matches(registrationTime, effect)) {
+    public boolean populateBaseData(RoadBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+        if (bitemporality.equals(this.postcodeTemporality)) {
             data.addPostcode(
                     this.getString("husnrfra", false),
                     this.getString("husnrtil", false),

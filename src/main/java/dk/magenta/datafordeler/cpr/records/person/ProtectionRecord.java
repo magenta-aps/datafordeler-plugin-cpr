@@ -38,8 +38,8 @@ public class ProtectionRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
-        if (this.protectionTemporality.matches(registrationTime, effect)) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+        if (bitemporality.equals(this.protectionTemporality)) {
             data.addProtection(
                     // int authority,
                     this.getInt("start_mynkod-beskyttelse"),

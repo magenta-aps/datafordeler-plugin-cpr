@@ -36,8 +36,8 @@ public class RoadMemoRecord extends RoadDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
-        if (this.memoTemporality.matches(registrationTime, effect)) {
+    public boolean populateBaseData(RoadBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+        if (bitemporality.equals(this.memoTemporality)) {
             data.addMemo(
                     this.getInt("notatnr"),
                     this.get("notatlinie"),

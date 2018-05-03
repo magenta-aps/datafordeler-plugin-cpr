@@ -46,9 +46,9 @@ public class CitizenshipRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.citizenshipTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.citizenshipTemporality)) {
             data.setCitizenship(
                     this.getInt("start_mynkod-statsborgerskab"),
                     this.getInt("landekod"),
@@ -56,7 +56,7 @@ public class CitizenshipRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.documentTemporality != null && this.documentTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.documentTemporality)) {
             data.setCitizenshipVerification(
                     this.getInt("dok_mynkod-statsborgerskab"),
                     this.getBoolean("dok-statsborgerskab"),

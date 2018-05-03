@@ -5,7 +5,7 @@ import dk.magenta.datafordeler.cpr.data.CprEffect;
 
 import java.time.OffsetDateTime;
 
-public class Bitemporality {
+public class Bitemporality implements Comparable<Bitemporality> {
     public OffsetDateTime registrationFrom;
     public OffsetDateTime registrationTo;
     public OffsetDateTime effectFrom;
@@ -66,5 +66,20 @@ public class Bitemporality {
 
     public String toString() {
         return this.registrationFrom + "|" + this.registrationTo + "|" + this.effectFrom + "|" + this.effectTo;
+    }
+
+    @Override
+    public int compareTo(Bitemporality o) {
+        int c = Equality.compare(this.registrationFrom, o.registrationFrom, OffsetDateTime.class, false);
+        if (c == 0) {
+            c = Equality.compare(this.registrationTo, o.registrationTo, OffsetDateTime.class, true);
+        }
+        if (c == 0) {
+            c = Equality.compare(this.effectFrom, o.effectFrom, OffsetDateTime.class, false);
+        }
+        if (c == 0) {
+            c = Equality.compare(this.effectTo, o.effectTo, OffsetDateTime.class, true);
+        }
+        return c;
     }
 }

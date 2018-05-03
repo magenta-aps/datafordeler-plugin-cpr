@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.database.*;
@@ -15,13 +16,11 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.CprRegisterManager;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -265,11 +264,22 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                 ListHashMap<Bitemporality, T> groups = this.sortIntoGroups(records);
                                 HashSet<R> entityRegistrations = new HashSet<>();
 
-                                for (Bitemporality bitemporality : groups.keySet()) {
-                                    //System.out.println("Bitemporality "+bitemporality.toString());
+                                ArrayList<Bitemporality> sortedBitemporalities = new ArrayList<>(groups.keySet());
+                                sortedBitemporalities.sort(Bitemporality::compareTo);
+
+                                for (Bitemporality bitemporality :sortedBitemporalities) {
+                                    System.out.println("---------------------------------------");
+                                    System.out.println("Bitemporality "+bitemporality.toString());
 
                                     timer.start(TASK_FIND_REGISTRATIONS);
                                     List<T> groupRecords = groups.get(bitemporality);
+
+                                    ArrayList<String> recordtypes = new ArrayList<>();
+                                    for (T rec : groupRecords) {
+                                        recordtypes.add(rec.getRecordType());
+                                    }
+                                    System.out.println("RecordTypes: "+recordtypes);
+
                                     List<R> registrations = entity.findRegistrations(bitemporality.registrationFrom, bitemporality.registrationTo);
 
                                     ArrayList<V> effects = new ArrayList<>();
@@ -278,9 +288,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                         V effect = registration.getEffect(bitemporality);
                                         if (effect == null) {
                                             effect = registration.createEffect(bitemporality);
-                                            //System.out.println("Create new effect "+System.identityHashCode(effect));
+                                            //System.out.println("Create new effect "+effect.getRegistration().getRegistrationFrom()+"|"+effect.getRegistration().getRegistrationTo()+"|"+effect.getEffectFrom()+"|"+effect.getEffectTo());
                                         } else {
-                                            //System.out.println("Use existing effect "+System.identityHashCode(effect));
+                                            //System.out.println("Use existing effect "+effect.getRegistration().getRegistrationFrom()+"|"+effect.getRegistration().getRegistrationTo()+"|"+effect.getEffectFrom()+"|"+effect.getEffectTo());
                                         }
                                         //System.out.println("effect: "+effect.getRegistration().getRegistrationFrom()+"|"+effect.getRegistration().getRegistrationTo()+"|"+effect.getEffectFrom()+"|"+effect.getEffectTo());
                                         effects.add(effect);
@@ -302,11 +312,14 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                         for (D baseData : e.getDataItems()) {
                                             for (T record : groupRecords) {
                                                 boolean updated = false;
-                                                for (V effect : effects) {
-                                                    this.checkInterrupt(importMetadata);
-                                                    if (record.populateBaseData(baseData, effect, bitemporality.registrationFrom, session, importMetadata)) {
-                                                        updated = true;
-                                                    }
+//                                                for (V effect : effects) {
+//                                                    this.checkInterrupt(importMetadata);
+//                                                    if (record.populateBaseData(baseData, effect, effect.getRegistration().getRegistrationFrom()/*bitemporality.registrationFrom*/, session, importMetadata)) {
+//                                                        updated = true;
+//                                                   }
+////                                                }
+                                                if (record.populateBaseData(baseData, bitemporality, session, importMetadata)) {
+                                                       updated = true;
                                                 }
                                                 this.checkInterrupt(importMetadata);
                                                 if (updated) {
@@ -321,6 +334,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                         }
                                     }
                                     timer.measure(TASK_POPULATE_DATA);
+
 
 
 /*
@@ -402,6 +416,13 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                     }
                                     timer.measure(TASK_POPULATE_DATA);
 */
+                                }
+
+
+                                try {
+                                    System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity));
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
                                 }
 
                                 timer.start(TASK_SAVE);

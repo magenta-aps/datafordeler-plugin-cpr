@@ -55,9 +55,9 @@ public class NameRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.nameTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.nameTemporality)) {
             data.setName(
                     // int authority,
                     this.getInt("start_mynkod-navne"),
@@ -85,7 +85,7 @@ public class NameRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.addressNameTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.addressNameTemporality)) {
             data.setAddressName(
                     // int authority,
                     this.getInt("adrnvn_mynkod"),
@@ -95,7 +95,7 @@ public class NameRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.documentNameTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.documentNameTemporality)) {
             data.setNameVerification(
                     // int authority,
                     this.getInt("dok_mynkod-navne"),
@@ -105,7 +105,7 @@ public class NameRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.officiaryTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.officiaryTemporality)) {
             data.setNameAuthorityText(
                     // int authority,
                     this.getInt("myntxt_mynkod-navne"),

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.database.Registration;
 import dk.magenta.datafordeler.core.util.Equality;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -79,8 +80,18 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, D e
         other.setEffectToUncertain(this.effectToUncertain);
         for (D data : this.dataItems) {
             D dataClone = (D) data.clone();
+            if (dataClone instanceof PersonBaseData) {
+                PersonBaseData p = (PersonBaseData) dataClone;
+                if (p.getStatus() != null) {
+                    System.out.println("Attaching clone with status "+p.getStatus().getStatus()+" to effect "+other.toString());
+                }
+            }
             dataClone.addEffect(other);
         }
         return other;
+    }
+
+    public String toString() {
+        return this.registration.getRegistrationFrom()+"|"+this.registration.getRegistrationTo()+"|"+this.getEffectFrom()+"|"+this.getEffectTo();
     }
 }

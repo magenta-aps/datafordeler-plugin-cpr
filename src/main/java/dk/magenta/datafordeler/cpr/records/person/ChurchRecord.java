@@ -43,9 +43,9 @@ public class ChurchRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.churchTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.churchTemporality)) {
             data.setChurch(
                     this.getInt("start_mynkod-folkekirke"),
                     this.getChar("fkirk"),
@@ -53,7 +53,7 @@ public class ChurchRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.documentTemporality != null && this.documentTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.documentTemporality)) {
             data.setChurchVerification(
                     this.getInt("dok_mynkod-folkekirke"),
                     this.getBoolean("dok-folkekirke"),

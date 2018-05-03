@@ -822,6 +822,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
             clone.coreData = this.coreData.clone();
         }
         if (this.status != null) {
+            System.out.println("Cloning basedata with status "+this.status.getStatus());
             clone.status = this.status.clone();
         }
         if (this.mother != null) {

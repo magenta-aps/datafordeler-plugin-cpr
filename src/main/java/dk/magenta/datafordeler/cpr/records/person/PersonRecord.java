@@ -84,13 +84,12 @@ public class PersonRecord extends PersonDataRecord {
     /**
      * Create a set of populated PersonBaseData objects, each with its own unique effect period
      *
-     * @param effect
-     * @param registrationTime
+     * @param bitemporality
      * @param importMetadata
      * @return
      */
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = true;
 
         data.setPersonnummer(
@@ -99,7 +98,7 @@ public class PersonRecord extends PersonDataRecord {
         );
 
 
-        if (this.statusTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.statusTemporality)) {
             data.setStatus(
                     this.getInt("status", true),
                     importMetadata.getImportTime()
@@ -107,8 +106,8 @@ public class PersonRecord extends PersonDataRecord {
             updated = true;
         }
 
-        if (this.motherTemporality.matches(registrationTime, effect)) {
-            data.setMother(
+        if (bitemporality.equals(this.motherTemporality)) {
+                data.setMother(
                     // String name,
                     this.get("mornvn"),
                     // boolean nameMarking,
@@ -126,7 +125,7 @@ public class PersonRecord extends PersonDataRecord {
             updated = true;
         }
 
-        if (this.fatherTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.fatherTemporality)) {
             data.setFather(
                     // String name,
                     this.get("farnvn"),
@@ -145,7 +144,7 @@ public class PersonRecord extends PersonDataRecord {
             updated = true;
         }
 
-        if (this.motherVerificationTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.motherVerificationTemporality)) {
             data.setMotherVerification(
                     // int authorityCode,
                     this.getInt("mor_dok_mynkod"),
@@ -156,7 +155,7 @@ public class PersonRecord extends PersonDataRecord {
             updated = true;
         }
 
-        if (this.fatherVerificationTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.fatherVerificationTemporality)) {
             data.setFatherVerification(
                     // int authorityCode,
                     this.getInt("far_dok_mynkod"),
@@ -167,7 +166,7 @@ public class PersonRecord extends PersonDataRecord {
             updated = true;
         }
 
-        if (this.positionTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.positionTemporality)) {
             data.setPosition(
                     // int authorityCode,
                     this.getInt("stilling_mynkod"),
@@ -178,7 +177,7 @@ public class PersonRecord extends PersonDataRecord {
             updated = true;
         }
 
-        if (this.birthTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.birthTemporality)) {
             data.setBirth(
                     // LocalDateTime foedselsdato,
                     this.getDateTime("foed_dt", "foed_tm"),
