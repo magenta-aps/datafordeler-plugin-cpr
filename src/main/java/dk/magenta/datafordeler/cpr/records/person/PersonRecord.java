@@ -26,6 +26,8 @@ public class PersonRecord extends PersonDataRecord {
     private Bitemporality positionTemporality;
     private Bitemporality birthTemporality;
 
+    private boolean hasPnrGaeld = false;
+
     public PersonRecord(String line) throws ParseException {
         super(line);
         this.obtain("pnrgaeld", 14, 10);
@@ -79,6 +81,8 @@ public class PersonRecord extends PersonDataRecord {
         this.fatherVerificationTemporality = new Bitemporality(this.getOffsetDateTime("far_dok_ts"));
         this.positionTemporality = new Bitemporality(this.getOffsetDateTime("stilling_ts"));
         this.birthTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-person"), null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
+
+        this.hasPnrGaeld = !this.getString("pnrgaeld", false).trim().isEmpty();
     }
 
     /**
@@ -92,10 +96,13 @@ public class PersonRecord extends PersonDataRecord {
     public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = true;
 
-        data.setPersonnummer(
-                this.getString("pnrgaeld", false),
-                importMetadata.getImportTime()
-        );
+
+        if (this.hasPnrGaeld) {
+            data.setPersonnummer(
+                    this.getString("pnrgaeld", false),
+                    importMetadata.getImportTime()
+            );
+        }
 
 
         if (bitemporality.equals(this.statusTemporality)) {
