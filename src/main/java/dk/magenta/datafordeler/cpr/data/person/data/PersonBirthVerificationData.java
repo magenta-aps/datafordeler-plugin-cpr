@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +17,7 @@ import java.util.Map;
  * referenced by {@link PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_birth_verification")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_birth_verification")
 public class PersonBirthVerificationData extends AuthorityDetailData {
 
     public static final String DB_FIELD_VERIFIED = "verified";
@@ -46,5 +47,14 @@ public class PersonBirthVerificationData extends AuthorityDetailData {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("verified", this.verified);
         return map;
+    }
+
+    @Override
+    protected PersonBirthVerificationData clone() {
+        PersonBirthVerificationData clone = new PersonBirthVerificationData();
+        clone.verified = this.verified;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

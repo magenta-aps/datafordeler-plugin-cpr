@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +17,7 @@ import java.util.Map;
  * referenced by {@link PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_church")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_church")
 public class PersonChurchData extends AuthorityDetailData {
 
     public static final String DB_FIELD_CHURCH_RELATION = "churchRelation";
@@ -39,6 +40,15 @@ public class PersonChurchData extends AuthorityDetailData {
         HashMap<String, Object> map = new HashMap<>();
         map.put(DB_FIELD_CHURCH_RELATION, this.churchRelation);
         return map;
+    }
+
+    @Override
+    protected PersonChurchData clone() {
+        PersonChurchData clone = new PersonChurchData();
+        clone.churchRelation = this.churchRelation;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 
 }

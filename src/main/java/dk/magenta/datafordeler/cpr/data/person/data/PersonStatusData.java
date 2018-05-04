@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
@@ -18,8 +19,8 @@ import java.util.Map;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_status", indexes = {
-        @Index(name = "cpr_person_status_status", columnList = PersonStatusData.DB_FIELD_STATUS)
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_status", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_status_status", columnList = PersonStatusData.DB_FIELD_STATUS)
 })
 public class PersonStatusData extends DetailData {
 
@@ -48,5 +49,13 @@ public class PersonStatusData extends DetailData {
         HashMap<String, Object> map = new HashMap<>();
         map.put("status", this.status);
         return map;
+    }
+
+    @Override
+    protected PersonStatusData clone() {
+        PersonStatusData clone = new PersonStatusData();
+        clone.status = this.status;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

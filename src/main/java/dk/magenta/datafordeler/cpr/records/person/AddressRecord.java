@@ -64,9 +64,9 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.addressTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.addressTemporality)) {
             data.setAddress(
                     // int authority,
                     this.getInt("start_mynkod-personbolig"),
@@ -110,14 +110,14 @@ public class AddressRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.conameTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.conameTemporality)) {
             data.setCoName(
                     this.get("convn"),
                     importMetadata.getImportTime()
             );
             updated = true;
         }
-        if (this.municipalityTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.municipalityTemporality)) {
             data.setMoveMunicipality(
                     //int authority,
                     this.getInt("tilfra_mynkod"),

@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.*;
@@ -14,8 +15,8 @@ import java.util.Map;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_birth", indexes = {
-        @Index(name = "cpr_person_birth_time", columnList = PersonBirthData.DB_FIELD_BIRTH_DATETIME)
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_birth", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_birth_time", columnList = PersonBirthData.DB_FIELD_BIRTH_DATETIME)
 })
 public class PersonBirthData extends DetailData {
 
@@ -133,8 +134,6 @@ public class PersonBirthData extends DetailData {
         this.birthSupplementalText = birthSupplementalText;
     }
 
-
-
     @Override
     public Map<String, Object> databaseFields() {
         HashMap<String, Object> map = new HashMap<>();
@@ -158,5 +157,19 @@ public class PersonBirthData extends DetailData {
         //Ikke i grunddatamodellen
         //map.put("foedselsraekkefoelge", this.foedselsraekkefoelge);
         return map;
+    }
+
+    @Override
+    protected PersonBirthData clone() {
+        PersonBirthData clone = new PersonBirthData();
+        clone.birthPlaceCode = this.birthPlaceCode;
+        clone.birthPlaceName = this.birthPlaceName;
+        clone.birthAuthorityText = this.birthAuthorityText;
+        clone.birthDatetime = this.birthDatetime;
+        clone.birthDatetimeUncertain = this.birthDatetimeUncertain;
+        clone.foedselsraekkefoelge = this.foedselsraekkefoelge;
+        clone.birthSupplementalText = this.birthSupplementalText;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

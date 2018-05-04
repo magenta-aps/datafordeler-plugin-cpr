@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.database.Identification;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Index;
@@ -20,9 +21,9 @@ import static dk.magenta.datafordeler.cpr.data.person.PersonEntity.DB_FIELD_CPR_
  * described in {@link dk.magenta.datafordeler.core.database.Entity}
  */
 @javax.persistence.Entity
-@Table(name="cpr_person_entity", indexes = {
-        @Index(name = "cpr_person_identification", columnList = "identification_id"),
-        @Index(name = "cpr_person_personnummer", columnList = DB_FIELD_CPR_NUMBER)
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_entity", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_identification", columnList = "identification_id"),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_personnummer", columnList = DB_FIELD_CPR_NUMBER)
 })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {

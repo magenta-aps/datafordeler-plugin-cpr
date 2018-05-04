@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Record for Person historic civil status (type 036).
  */
-public class HistoricCivilStatusRecord extends PersonDataRecord {
+public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
 
     private Bitemporality civilTemporality;
     private Bitemporality documentTemporality;
@@ -51,9 +51,9 @@ public class HistoricCivilStatusRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.civilTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.civilTemporality)) {
             data.setCivilStatus(
                     // int authority,
                     this.getInt("start_mynkod-civilstand"),
@@ -75,7 +75,7 @@ public class HistoricCivilStatusRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.documentTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.documentTemporality)) {
             data.setCivilStatusVerification(
                     this.getInt("dok_mynkod-civilstand"),
                     this.getBoolean("dok-civilstand"),
@@ -83,13 +83,31 @@ public class HistoricCivilStatusRecord extends PersonDataRecord {
                     importMetadata.getImportTime()
             );
         }
-        if (this.officiaryTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.officiaryTemporality)) {
             data.setCivilStatusAuthorityText(
                     this.getInt("myntxt_mynkod-civilstand"),
                     this.getString("myntxt-civilstand", true),
                     this.getString("annkor", true),
                     importMetadata.getImportTime()
             );
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.civilTemporality) && outdatedTemporality.equals(this.civilTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCivilStatus(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.documentTemporality) && outdatedTemporality.equals(this.documentTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCitizenshipVerification(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.officiaryTemporality) && outdatedTemporality.equals(this.officiaryTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCivilStatusAuthorityText(session);
+            updated = true;
         }
         return updated;
     }

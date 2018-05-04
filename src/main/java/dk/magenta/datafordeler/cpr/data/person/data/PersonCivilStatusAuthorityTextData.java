@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +15,7 @@ import java.util.Map;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_civil_status_authority_text")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_civil_status_authority_text")
 public class PersonCivilStatusAuthorityTextData extends AuthorityDetailData {
 
 
@@ -65,5 +66,15 @@ public class PersonCivilStatusAuthorityTextData extends AuthorityDetailData {
         map.put("text", this.text);
         map.put("correctionMarking", this.correctionMarking);
         return map;
+    }
+
+    @Override
+    protected PersonCivilStatusAuthorityTextData clone() {
+        PersonCivilStatusAuthorityTextData clone = new PersonCivilStatusAuthorityTextData();
+        clone.text = this.text;
+        clone.correctionMarking = this.correctionMarking;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

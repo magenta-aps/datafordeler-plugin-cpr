@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +15,7 @@ import java.util.Map;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_emigration")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_emigration")
 public class PersonEmigrationData extends AuthorityDetailData {
 
 
@@ -45,5 +46,14 @@ public class PersonEmigrationData extends AuthorityDetailData {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("countryCode", this.countryCode);
         return map;
+    }
+
+    @Override
+    protected PersonEmigrationData clone() {
+        PersonEmigrationData clone = new PersonEmigrationData();
+        clone.countryCode = this.countryCode;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.road;
 
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 
@@ -13,10 +14,10 @@ import java.time.temporal.TemporalAccessor;
  * @see dk.magenta.datafordeler.core.database.Entity
  */
 @javax.persistence.Entity
-@Table(name="cpr_road_effect", indexes = {
-        @Index(name = "cpr_road_effect_registration", columnList = "registration_id"),
-        @Index(name = "cpr_road_effect_from", columnList = "effectFrom"),
-        @Index(name = "cpr_road_effect_to", columnList = "effectTo")
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_effect", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_effect_registration", columnList = "registration_id"),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_effect_from", columnList = "effectFrom"),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_effect_to", columnList = "effectTo")
 })
 public class RoadEffect extends CprEffect<RoadRegistration, RoadEffect, RoadBaseData> {
 

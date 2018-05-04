@@ -43,8 +43,8 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
     }
 
     @Override
-    public boolean populateBaseData(ResidenceBaseData data, ResidenceEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
-        if (this.residenceTemporality.matches(registrationTime, effect)) {
+    public boolean populateBaseData(ResidenceBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+        if (bitemporality.equals(this.residenceTemporality)) {
             OffsetDateTime updateTime = importMetadata.getImportTime();
             data.setKommunekode(this.getInt("komkod"), updateTime);
             data.setVejkode(this.getInt("vejkod"), updateTime);

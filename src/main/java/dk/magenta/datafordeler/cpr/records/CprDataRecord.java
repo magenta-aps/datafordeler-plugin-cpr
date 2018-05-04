@@ -22,7 +22,7 @@ public abstract class CprDataRecord<V extends CprEffect, B extends CprData> exte
         super(line);
     }
 
-    public abstract boolean populateBaseData(B data, V effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata);
+    public abstract boolean populateBaseData(B data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata);
 
 
     protected B getBaseDataItem(HashMap<V, B> data) {

@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Record for Person historic cpr number (type 065).
  */
-public class HistoricCprNumberRecord extends PersonDataRecord {
+public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
 
     private Bitemporality cprTemporality;
 
@@ -32,14 +32,24 @@ public class HistoricCprNumberRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.cprTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.cprTemporality)) {
             data.setCprNumber(
                     this.getInt("start_mynkod-pnrgaeld"),
                     this.getString("gammelt_pnr", false),
                     importMetadata.getImportTime()
             );
+            updated = true;
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.cprTemporality) && outdatedTemporality.equals(this.cprTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCprNumber(session);
             updated = true;
         }
         return updated;

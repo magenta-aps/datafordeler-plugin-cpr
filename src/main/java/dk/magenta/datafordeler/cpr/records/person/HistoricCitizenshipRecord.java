@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Record for Person historic citizenship (type 041).
  */
-public class HistoricCitizenshipRecord extends PersonDataRecord {
+public class HistoricCitizenshipRecord extends HistoricPersonDataRecord {
 
     private Bitemporality citizenshipTemporality;
     private Bitemporality documentTemporality;
@@ -49,9 +49,9 @@ public class HistoricCitizenshipRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.citizenshipTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.citizenshipTemporality)) {
             data.setCitizenship(
                     this.getInt("start_mynkod-statsborgerskab"),
                     this.getInt("landekod"),
@@ -59,12 +59,26 @@ public class HistoricCitizenshipRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.documentTemporality != null && this.documentTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.documentTemporality)) {
             data.setCitizenshipVerification(
                     this.getInt("dok_mynkod-statsborgerskab"),
                     this.getBoolean("dok-statsborgerskab"),
                     importMetadata.getImportTime()
             );
+            updated = true;
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.citizenshipTemporality) && outdatedTemporality.equals(this.citizenshipTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCitizenship(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.documentTemporality) && outdatedTemporality.equals(this.documentTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCitizenshipVerification(session);
             updated = true;
         }
         return updated;

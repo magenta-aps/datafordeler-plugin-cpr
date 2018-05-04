@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * Record for Person historic church relation (type 011).
  */
-public class HistoricChurchRecord extends PersonDataRecord {
+public class HistoricChurchRecord extends HistoricPersonDataRecord {
 
     private Bitemporality churchTemporality;
     private Bitemporality documentTemporality;
@@ -49,9 +49,9 @@ public class HistoricChurchRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.churchTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.churchTemporality)) {
             data.setChurch(
                     this.getInt("start_mynkod-folkekirke"),
                     this.getChar("fkirk"),
@@ -59,12 +59,26 @@ public class HistoricChurchRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.documentTemporality != null && this.documentTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.documentTemporality)) {
             data.setChurchVerification(
                     this.getInt("dok_mynkod-folkekirke"),
                     this.getBoolean("dok-folkekirke"),
                     importMetadata.getImportTime()
             );
+            updated = true;
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.churchTemporality) && outdatedTemporality.equals(this.churchTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearChurch(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.documentTemporality) && outdatedTemporality.equals(this.documentTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearChurchVerification(session);
             updated = true;
         }
         return updated;

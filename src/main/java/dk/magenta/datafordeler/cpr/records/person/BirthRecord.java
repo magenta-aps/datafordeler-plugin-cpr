@@ -42,9 +42,9 @@ public class BirthRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.birthTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.birthTemporality)) {
             data.setBirth(
                     this.getInt("start_mynkod-fødested"),
                     this.getInt("myntxt_mynkod-fødested", true),
@@ -53,7 +53,7 @@ public class BirthRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.documentTemporality != null && this.documentTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.documentTemporality)) {
             data.setBirthVerification(
                     this.getInt("dok_mynkod-fødested"),
                     this.getBoolean("dok-fødested"),

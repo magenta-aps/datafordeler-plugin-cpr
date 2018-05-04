@@ -4,6 +4,7 @@ import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.core.util.Equality;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
@@ -20,9 +21,9 @@ import java.util.*;
  * Base class for Road data, linking to Effects and delegating storage to referred classes
  */
 @Entity
-@Table(name="cpr_road_data", indexes = {
-        @Index(name = "cpr_road_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = "cpr_road_core", columnList = RoadBaseData.DB_FIELD_CORE + DatabaseEntry.REF)
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_data", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_core", columnList = RoadBaseData.DB_FIELD_CORE + DatabaseEntry.REF)
 })
 public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
 
@@ -182,5 +183,38 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
         Hibernate.initialize(postcodeData);
         Hibernate.initialize(cityData);
     }
-    
+
+
+    @Override
+    public RoadBaseData clone() {
+        RoadBaseData clone = new RoadBaseData();
+        if (this.coreData != null) {
+            clone.coreData = this.coreData.clone();
+        }
+        if (this.cityData != null) {
+            clone.cityData = new HashSet<>();
+            for (RoadCityData cityData : this.cityData) {
+                RoadCityData cityDataClone = cityData.clone();
+                cityDataClone.setRoadBaseData(clone);
+                clone.cityData.add(cityDataClone);
+            }
+        }
+        if (this.memoData != null) {
+            clone.memoData = new ArrayList<>();
+            for (RoadMemoData memoData : this.memoData) {
+                RoadMemoData memoDataClone = memoData.clone();
+                memoDataClone.setRoadBaseData(clone);
+                clone.memoData.add(memoDataClone);
+            }
+        }
+        if (this.postcodeData != null) {
+            clone.postcodeData = new HashSet<>();
+            for (RoadPostcodeData postcodeData : this.postcodeData) {
+                RoadPostcodeData postcodeDataClone = postcodeData.clone();
+                postcodeDataClone.setRoadBaseData(clone);
+                clone.postcodeData.add(postcodeDataClone);
+            }
+        }
+        return clone;
+    }
 }

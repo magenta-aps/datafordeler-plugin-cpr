@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Record for Person historic address (type 026).
  */
-public class HistoricAddressRecord extends PersonDataRecord {
+public class HistoricAddressRecord extends HistoricPersonDataRecord {
 
     private Bitemporality addressTemporality;
     private Bitemporality conameTemporality;
@@ -58,9 +58,10 @@ public class HistoricAddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.addressTemporality.matches(registrationTime, effect)) {
+
+        if (bitemporality.equals(this.addressTemporality)) {
             data.setAddress(
                     // int authority,
                     this.getInt("start_mynkod-personbolig"),
@@ -104,14 +105,15 @@ public class HistoricAddressRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.conameTemporality.matches(registrationTime, effect)) {
+
+        if (bitemporality.equals(this.conameTemporality)) {
             data.setCoName(
                     this.get("convn"),
                     importMetadata.getImportTime()
             );
             updated = true;
         }
-        if (this.municipalityTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.municipalityTemporality)) {
             data.setMoveMunicipality(
                     //int authority,
                     this.getInt("tilfra_mynkod"),
@@ -127,6 +129,24 @@ public class HistoricAddressRecord extends PersonDataRecord {
                     this.getBoolean("tilflykomdt_umrk"),
                     importMetadata.getImportTime()
             );
+            updated = true;
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.addressTemporality) && outdatedTemporality.equals(this.addressTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearAddress(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.conameTemporality) && outdatedTemporality.equals(this.conameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCoName(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.municipalityTemporality) && outdatedTemporality.equals(this.municipalityTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearMoveMunicipality(session);
             updated = true;
         }
         return updated;

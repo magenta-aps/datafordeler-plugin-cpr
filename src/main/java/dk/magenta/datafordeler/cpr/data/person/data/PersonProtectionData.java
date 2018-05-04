@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
@@ -14,8 +15,8 @@ import java.util.Map;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_protection", indexes = {
-        @Index(name = "cpr_person_protection_base", columnList = PersonProtectionData.DB_FIELD_BASEDATA + DatabaseEntry.REF)
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_protection", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_protection_base", columnList = PersonProtectionData.DB_FIELD_BASEDATA + DatabaseEntry.REF)
 })
 public class PersonProtectionData extends AuthorityDetailData {
 
@@ -76,5 +77,15 @@ public class PersonProtectionData extends AuthorityDetailData {
         map.put("protectionType", this.protectionType);
         map.put("reportMarking", this.reportMarking);
         return map;
+    }
+
+    @Override
+    protected PersonProtectionData clone() {
+        PersonProtectionData clone = new PersonProtectionData();
+        clone.protectionType = this.protectionType;
+        clone.reportMarking = this.reportMarking;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

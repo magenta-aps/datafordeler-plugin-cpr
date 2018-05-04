@@ -48,9 +48,9 @@ public class CivilStatusRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.civilTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.civilTemporality)) {
             data.setCivilStatus(
                     // int authority,
                     this.getInt("start_mynkod-civilstand"),
@@ -70,14 +70,14 @@ public class CivilStatusRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.documentTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.documentTemporality)) {
             data.setCivilStatusVerification(
                     this.getInt("dok_mynkod-civilstand"),
                     this.getBoolean("dok-civilstand"),
                     importMetadata.getImportTime()
             );
         }
-        if (this.officiaryTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.officiaryTemporality)) {
             data.setCivilStatusAuthorityText(
                     this.getInt("myntxt_mynkod-civilstand"),
                     this.getString("myntxt-civilstand", true),

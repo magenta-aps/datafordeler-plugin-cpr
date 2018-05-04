@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Record for Person historic name (type 021).
  */
-public class HistoricNameRecord extends PersonDataRecord {
+public class HistoricNameRecord extends HistoricPersonDataRecord {
 
     private Bitemporality nameTemporality;
     private Bitemporality addressNameTemporality;
@@ -58,9 +58,9 @@ public class HistoricNameRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.nameTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.nameTemporality)) {
             data.setName(
                     // int authority,
                     this.getInt("start_mynkod-navne"),
@@ -88,7 +88,7 @@ public class HistoricNameRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.addressNameTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.addressNameTemporality)) {
             data.setAddressName(
                     // int authority,
                     this.getInt("adrnvn_mynkod"),
@@ -98,7 +98,7 @@ public class HistoricNameRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.documentNameTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.documentNameTemporality)) {
             data.setNameVerification(
                     // int authority,
                     this.getInt("dok_mynkod-navne"),
@@ -108,7 +108,7 @@ public class HistoricNameRecord extends PersonDataRecord {
             );
             updated = true;
         }
-        if (this.officiaryTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.officiaryTemporality)) {
             data.setNameAuthorityText(
                     // int authority,
                     this.getInt("myntxt_mynkod-navne"),
@@ -116,6 +116,28 @@ public class HistoricNameRecord extends PersonDataRecord {
                     this.get("myntxt-navne"),
                     importMetadata.getImportTime()
             );
+            updated = true;
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.nameTemporality) && outdatedTemporality.equals(this.nameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearName(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.addressNameTemporality) && outdatedTemporality.equals(this.addressNameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearAddressName(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.documentNameTemporality) && outdatedTemporality.equals(this.documentNameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearNameVerification(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.officiaryTemporality) && outdatedTemporality.equals(this.officiaryTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearNameAuthorityText(session);
             updated = true;
         }
         return updated;

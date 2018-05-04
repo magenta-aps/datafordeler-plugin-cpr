@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
+import dk.magenta.datafordeler.core.util.OffsetDateTimeAdapter;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
@@ -19,12 +21,12 @@ import java.util.*;
  * Base class for Person data, linking to Effects and delegating storage to referred classes
  */
 @Entity
-@Table(name="cpr_person_data", indexes = {
-        @Index(name = "cpr_person_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = "cpr_person_name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF),
-        @Index(name = "cpr_person_address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF),
-        @Index(name = "cpr_person_status", columnList = PersonBaseData.DB_FIELD_STATUS + DatabaseEntry.REF),
-        @Index(name = "cpr_person_birth", columnList = PersonBaseData.DB_FIELD_BIRTH + DatabaseEntry.REF)
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_data", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_status", columnList = PersonBaseData.DB_FIELD_STATUS + DatabaseEntry.REF),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_birth", columnList = PersonBaseData.DB_FIELD_BIRTH + DatabaseEntry.REF)
 })
 public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
@@ -303,6 +305,14 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.coreData.setDafoUpdated(updateTime);
     }
 
+    public void setKoen(PersonCoreData.Koen koen, OffsetDateTime updateTime) {
+        if (this.coreData == null) {
+            this.coreData = new PersonCoreData();
+        }
+        this.coreData.setGender(koen);
+        this.coreData.setDafoUpdated(updateTime);
+    }
+
     public void setStartAuthority(int authority, OffsetDateTime updateTime) {
         if (this.coreData == null) {
             this.coreData = new PersonCoreData();
@@ -414,6 +424,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.church.setDafoUpdated(updateTime);
     }
 
+    public void clearChurch(Session session) {
+        if (this.church != null) {
+            session.delete(this.church);
+            this.church = null;
+        }
+    }
+
     public void setChurchVerification(int authority, boolean verified, OffsetDateTime updateTime) {
         if (this.churchVerification == null) {
             this.churchVerification = new PersonChurchVerificationData();
@@ -421,6 +438,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.churchVerification.setAuthority(authority);
         this.churchVerification.setVerified(verified);
         this.churchVerification.setDafoUpdated(updateTime);
+    }
+
+    public void clearChurchVerification(Session session) {
+        if (this.churchVerification != null) {
+            session.delete(this.churchVerification);
+            this.churchVerification = null;
+        }
     }
 
     public void setCitizenship(int authority, int countryCode, OffsetDateTime updateTime) {
@@ -432,6 +456,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.citizenship.setDafoUpdated(updateTime);
     }
 
+    public void clearCitizenship(Session session) {
+        if (this.citizenship != null) {
+            session.delete(this.citizenship);
+            this.citizenship = null;
+        }
+    }
+
     public void setCitizenshipVerification(int authority, boolean verified, OffsetDateTime updateTime) {
         if (this.citizenshipVerification == null) {
             this.citizenshipVerification = new PersonCitizenshipVerificationData();
@@ -439,6 +470,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.citizenshipVerification.setAuthority(authority);
         this.citizenshipVerification.setVerified(verified);
         this.citizenshipVerification.setDafoUpdated(updateTime);
+    }
+
+    public void clearCitizenshipVerification(Session session) {
+        if (this.citizenshipVerification != null) {
+            session.delete(this.citizenshipVerification);
+            this.citizenshipVerification = null;
+        }
     }
 
     public void setAddress(int authority, String bygningsnummer, String bynavn, int cprKommunekode,
@@ -473,11 +511,25 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.address.setDafoUpdated(updateTime);
     }
 
+    public void clearAddress(Session session) {
+        if (this.address != null) {
+            session.delete(this.address);
+            this.address = null;
+        }
+    }
+
     public void setCoName(String coName, OffsetDateTime updateTime) {
         if (this.coname == null) {
             this.coname = new PersonAddressConameData();
         }
         this.coname.setConame(coName);
+    }
+
+    public void clearCoName(Session session) {
+        if (this.coname != null) {
+            session.delete(this.coname);
+            this.coname = null;
+        }
     }
 
     public void setMoveMunicipality(int authority, LocalDateTime fraflytningsdatoKommune,
@@ -494,6 +546,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.moveMunicipality.setInDatetime(tilflytningsdatoKommune);
         this.moveMunicipality.setInDatetimeUncertain(tilflytningsdatoKommuneUsikkerhedsmarkering);
         this.moveMunicipality.setDafoUpdated(updateTime);
+    }
+
+    public void clearMoveMunicipality(Session session) {
+        if (this.moveMunicipality != null) {
+            session.delete(this.moveMunicipality);
+            this.moveMunicipality = null;
+        }
     }
 
     public void setName(int authority, String adresseringsnavn, String efternavn, String fornavne, String mellemnavn,
@@ -519,6 +578,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.name.setDafoUpdated(updateTime);
     }
 
+    public void clearName(Session session) {
+        if (this.name != null) {
+            session.delete(this.name);
+            this.name = null;
+        }
+    }
+
     public void setAddressName(int authority, String addressName, OffsetDateTime updateTime) {
         if (this.addressingName == null) {
             this.addressingName = new PersonAddressNameData();
@@ -526,6 +592,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.addressingName.setAuthority(authority);
         this.addressingName.setAddressName(addressName);
         this.addressingName.setDafoUpdated(updateTime);
+    }
+
+    public void clearAddressName(Session session) {
+        if (this.addressingName != null) {
+            session.delete(this.addressingName);
+            this.addressingName = null;
+        }
     }
 
     public void setNameVerification(int authority, boolean verification, OffsetDateTime updateTime) {
@@ -537,6 +610,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.nameVerification.setDafoUpdated(updateTime);
     }
 
+    public void clearNameVerification(Session session) {
+        if (this.nameVerification != null) {
+            session.delete(this.nameVerification);
+            this.nameVerification = null;
+        }
+    }
+
     public void setNameAuthorityText(int authority, String text, OffsetDateTime updateTime) {
         if (this.nameAuthority == null) {
             this.nameAuthority = new PersonNameAuthorityTextData();
@@ -544,6 +624,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.nameAuthority.setAuthority(authority);
         this.nameAuthority.setText(text);
         this.nameAuthority.setDafoUpdated(updateTime);
+    }
+
+    public void clearNameAuthorityText(Session session) {
+        if (this.nameAuthority != null) {
+            session.delete(this.nameAuthority);
+            this.nameAuthority = null;
+        }
     }
 
     public void addProtection(int authority, int beskyttelsestype, boolean reportMarking, OffsetDateTime updateTime) {
@@ -570,6 +657,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.migration.setDafoUpdated(updateTime);
     }
 
+    public void clearEmigration(Session session) {
+        if (this.migration != null) {
+            session.delete(this.migration);
+            this.migration = null;
+        }
+    }
+
     public void setForeignAddress(int authority, String adresselinie1, String adresselinie2, String adresselinie3, String adresselinie4, String adresselinie5, OffsetDateTime updateTime) {
         if (this.foreignAddress == null) {
             this.foreignAddress = new PersonForeignAddressData();
@@ -581,6 +675,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.foreignAddress.setAddressLine4(adresselinie4);
         this.foreignAddress.setAddressLine5(adresselinie5);
         this.foreignAddress.setDafoUpdated(updateTime);
+    }
+
+    public void clearForeignAddress(Session session) {
+        if (this.foreignAddress != null) {
+            session.delete(this.foreignAddress);
+            this.foreignAddress = null;
+        }
     }
 
     public void setCivilStatus(int authority, String civilStatus, String spouseCpr, LocalDate spouseBirthdate,
@@ -604,6 +705,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.civilStatus.setDafoUpdated(updateTime);
     }
 
+    public void clearCivilStatus(Session session) {
+        if (this.civilStatus != null) {
+            session.delete(this.civilStatus);
+            this.civilStatus = null;
+        }
+    }
+
 
     public void setCivilStatusVerification(int authority, boolean verification, OffsetDateTime updateTime) {
         this.setCivilStatusVerification(authority, verification, null, updateTime);
@@ -616,6 +724,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.civilStatusVerification.setVerified(verification);
         this.civilStatusVerification.setCorrectionMarking(correctionMarking);
         this.civilStatusVerification.setDafoUpdated(updateTime);
+    }
+
+    public void clearCivilStatusVerification(Session session) {
+        if (this.civilStatusVerification != null) {
+            session.delete(this.civilStatusVerification);
+            this.civilStatusVerification = null;
+        }
     }
 
     public void setCivilStatusAuthorityText(int authority, String text, OffsetDateTime updateTime) {
@@ -631,6 +746,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.civilStatusAuthority.setDafoUpdated(updateTime);
     }
 
+    public void clearCivilStatusAuthorityText(Session session) {
+        if (this.civilStatusAuthority != null) {
+            session.delete(this.civilStatusAuthority);
+            this.civilStatusAuthority = null;
+        }
+    }
+
     public void setCprNumber(int authority, String cprNumber, OffsetDateTime updateTime) {
         if (this.cprNumber == null) {
             this.cprNumber = new PersonNumberData();
@@ -638,6 +760,13 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         this.cprNumber.setAuthority(authority);
         this.cprNumber.setCprNumber(cprNumber);
         this.cprNumber.setDafoUpdated(updateTime);
+    }
+
+    public void clearCprNumber(Session session) {
+        if (this.cprNumber != null) {
+            session.delete(this.cprNumber);
+            this.cprNumber = null;
+        }
     }
 
     /**
@@ -680,6 +809,12 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.churchVerification != null) {
             map.put("churchVerification", this.churchVerification);
         }
+        if (this.citizenship != null) {
+            map.put("citizenship", this.citizenship);
+        }
+        if (this.citizenshipVerification != null) {
+            map.put("citizenshipVerification", this.citizenshipVerification);
+        }
         if (this.address != null) {
             map.put("address", this.address);
         }
@@ -695,7 +830,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.nameAuthority != null) {
             map.put("nameAuthority", this.nameAuthority);
         }
-        if (this.protection != null) {
+        if (this.protection != null && !this.protection.isEmpty()) {
             map.put("protection", this.protection);
         }
         if (this.migration != null) {
@@ -716,7 +851,6 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
         if (this.cprNumber != null) {
             map.put("cprNumber", this.cprNumber);
         }
-
         return map;
     }
 
@@ -798,5 +932,182 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     @Override
     public void forceLoad(Session session) {
 
+    }
+
+    @Override
+    public PersonBaseData clone() {
+        PersonBaseData clone = new PersonBaseData();
+        if (this.coreData != null) {
+            clone.coreData = this.coreData.clone();
+        }
+        if (this.status != null) {
+            clone.status = this.status.clone();
+        }
+        if (this.mother != null) {
+            clone.mother = this.mother.clone();
+        }
+        if (this.father != null) {
+            clone.father = this.father.clone();
+        }
+        if (this.motherVerification != null) {
+            clone.motherVerification = this.motherVerification.clone();
+        }
+        if (this.fatherVerification != null) {
+            clone.fatherVerification = this.fatherVerification.clone();
+        }
+        if (this.position != null) {
+            clone.position = this.position.clone();
+        }
+        if (this.birth != null) {
+            clone.birth = this.birth.clone();
+        }
+        if (this.birthVerification != null) {
+            clone.birthVerification = this.birthVerification.clone();
+        }
+        if (this.church != null) {
+            clone.church = this.church.clone();
+        }
+        if (this.churchVerification != null) {
+            clone.churchVerification = this.churchVerification.clone();
+        }
+        if (this.citizenship != null) {
+            clone.citizenship = this.citizenship.clone();
+        }
+        if (this.citizenshipVerification != null) {
+            clone.citizenshipVerification = this.citizenshipVerification.clone();
+        }
+        if (this.address != null) {
+            clone.address = this.address.clone();
+        }
+        if (this.coname != null) {
+            clone.coname = this.coname.clone();
+        }
+        if (this.moveMunicipality != null) {
+            clone.moveMunicipality = this.moveMunicipality.clone();
+        }
+        if (this.name != null) {
+            clone.name = this.name.clone();
+        }
+        if (this.addressingName != null) {
+            clone.addressingName = this.addressingName.clone();
+        }
+        if (this.nameVerification != null) {
+            clone.nameVerification = this.nameVerification.clone();
+        }
+        if (this.nameAuthority != null) {
+            clone.nameAuthority = this.nameAuthority.clone();
+        }
+        if (this.protection != null) {
+            clone.protection = new HashSet<>();
+            for (PersonProtectionData protectionData : this.protection) {
+                PersonProtectionData protectionClone = protectionData.clone();
+                protectionClone.setBaseData(clone);
+                clone.protection.add(protectionClone);
+            }
+        }
+        if (this.migration != null) {
+            clone.migration = this.migration.clone();
+        }
+        if (this.foreignAddress != null) {
+            clone.foreignAddress = this.foreignAddress.clone();
+        }
+        if (this.civilStatus != null) {
+            clone.civilStatus = this.civilStatus.clone();
+        }
+        if (this.civilStatusVerification != null) {
+            clone.civilStatusVerification = this.civilStatusVerification.clone();
+        }
+        if (this.civilStatusAuthority != null) {
+            clone.civilStatusAuthority = this.civilStatusAuthority.clone();
+        }
+        if (this.cprNumber != null) {
+            clone.cprNumber = this.cprNumber.clone();
+        }
+        return clone;
+    }
+
+    public boolean isEmpty() {
+        if (this.coreData != null) {
+            return false;
+        }
+        if (this.status != null) {
+            return false;
+        }
+        if (this.mother != null) {
+            return false;
+        }
+        if (this.father != null) {
+            return false;
+        }
+        if (this.motherVerification != null) {
+            return false;
+        }
+        if (this.fatherVerification != null) {
+            return false;
+        }
+        if (this.position != null) {
+            return false;
+        }
+        if (this.birth != null) {
+            return false;
+        }
+        if (this.birthVerification != null) {
+            return false;
+        }
+        if (this.church != null) {
+            return false;
+        }
+        if (this.churchVerification != null) {
+            return false;
+        }
+        if (this.citizenship != null) {
+            return false;
+        }
+        if (this.citizenshipVerification != null) {
+            return false;
+        }
+        if (this.address != null) {
+            return false;
+        }
+        if (this.coname != null) {
+            return false;
+        }
+        if (this.moveMunicipality != null) {
+            return false;
+        }
+        if (this.name != null) {
+            return false;
+        }
+        if (this.addressingName != null) {
+            return false;
+        }
+        if (this.nameVerification != null) {
+            return false;
+        }
+        if (this.nameAuthority != null) {
+            return false;
+        }
+        if (this.protection != null && !this.protection.isEmpty()) {
+            return false;
+        }
+        if (this.migration != null) {
+            return false;
+        }
+        if (this.foreignAddress != null) {
+            return false;
+        }
+        if (this.civilStatus != null) {
+            return false;
+        }
+        if (this.civilStatusVerification != null) {
+            return false;
+        }
+        if (this.civilStatusAuthority != null) {
+            return false;
+        }
+        if (this.cprNumber != null) {
+            return false;
+        }
+        return true;
     }
 }
