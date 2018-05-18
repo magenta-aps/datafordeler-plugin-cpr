@@ -1,6 +1,5 @@
 package dk.magenta.datafordeler.cpr.data;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.database.*;
@@ -22,10 +21,6 @@ import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
-import dk.magenta.datafordeler.cpr.records.Record;
-import dk.magenta.datafordeler.cpr.records.person.NameRecord;
-import dk.magenta.datafordeler.cpr.records.person.AddressRecord;
-import dk.magenta.datafordeler.cpr.records.person.HistoricAddressRecord;
 import dk.magenta.datafordeler.cpr.records.person.HistoricPersonDataRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -353,8 +348,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                     e.g. an address that was loaded as "current" is later found to be present as "historic",
                                     we should remove the old entry that has effectTo=null; the historic data is already loaded in with effectTo!=null
                                      */
-
-
                                     for (R registration : registrations) {
                                         V effect = registration.getEffect(bitemporality.effectFrom, bitemporality.effectFromUncertain, null, false);
                                         if (effect != null) {
@@ -386,9 +379,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                             }
                                         }
                                     }
-
-
-
                                 }
 
                                 timer.start(TASK_SAVE);
