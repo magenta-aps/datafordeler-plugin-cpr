@@ -23,10 +23,10 @@ import java.util.*;
 @Entity
 @Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_data", indexes = {
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_status", columnList = PersonBaseData.DB_FIELD_STATUS + DatabaseEntry.REF),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_birth", columnList = PersonBaseData.DB_FIELD_BIRTH + DatabaseEntry.REF)
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF, unique = true),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF, unique = true),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_status", columnList = PersonBaseData.DB_FIELD_STATUS + DatabaseEntry.REF, unique = true),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_birth", columnList = PersonBaseData.DB_FIELD_BIRTH + DatabaseEntry.REF, unique = true)
 })
 public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
@@ -150,6 +150,7 @@ public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
     private Set<PersonProtectionData> protection = new HashSet<>();
 
     public static final String DB_FIELD_MIGRATION = "migration";
+    @JsonProperty(value = DB_FIELD_MIGRATION)
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_MIGRATION + DatabaseEntry.REF)
     private PersonEmigrationData migration;

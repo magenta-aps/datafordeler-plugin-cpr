@@ -8,10 +8,7 @@ import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Record for Person foreign address (type 028).
@@ -19,6 +16,7 @@ import java.util.Set;
 public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
 
     private Bitemporality emigrationTemporality;
+    private Bitemporality immigrationTemporality;
     private Bitemporality foreignAddressTemporality;
 
     public HistoricForeignAddressRecord(String line) throws ParseException {
@@ -30,7 +28,7 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
         this.obtain("udrdto", 35, 12);
         this.obtain("udrdto_umrk", 47, 1);
         this.obtain("indr_ts", 48, 12);
-        this.obtain("uindr_landekod", 60, 4);
+        this.obtain("indr_landekod", 60, 4);
         this.obtain("indrdto", 64, 12);
         this.obtain("indrdto_umrk", 76, 1);
         this.obtain("udlandadr_mynkod", 77, 4);
@@ -46,16 +44,25 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
         OffsetDateTime effectTo = this.getOffsetDateTime("indrdto");
         boolean effectToUncertain = this.getMarking("indrdto_umrk");
         this.emigrationTemporality = new Bitemporality(this.getOffsetDateTime("udr_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
+        this.immigrationTemporality = new Bitemporality(this.getOffsetDateTime("indr_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
         this.foreignAddressTemporality = new Bitemporality(this.getOffsetDateTime("udlandadr_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
     }
 
     @Override
     public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (bitemporality.equals(this.emigrationTemporality)) {
+        if (this.emigrationTemporality.registrationFrom != null && bitemporality.equals(this.emigrationTemporality)) {
             data.setEmigration(
-                    this.getInt("start_mynkod-udrindrejs"),
+                    this.getInt("start_mynkod-udrindrejse"),
                     this.getInt("udr_landekod"),
+                    importMetadata.getImportTime()
+            );
+            updated = true;
+        }
+        if (this.immigrationTemporality.registrationFrom != null && bitemporality.equals(this.immigrationTemporality)) {
+            data.setEmigration(
+                    this.getInt("start_mynkod-udrindrejse"),
+                    this.getInt("indr_landekod"),
                     importMetadata.getImportTime()
             );
             updated = true;
@@ -75,10 +82,23 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
         return updated;
     }
 
+    /**
+     * Delete obsolete data that has been replaced
+     * The obsolete data must not match the new bitemporality, but must match it without effectTo
+     * @param data
+     * @param bitemporality
+     * @param outdatedTemporality
+     * @param session
+     * @return
+     */
     @Override
     public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
         boolean updated = false;
         if (bitemporality.equals(this.emigrationTemporality) && outdatedTemporality.equals(this.emigrationTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearEmigration(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.immigrationTemporality) && outdatedTemporality.equals(this.immigrationTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearEmigration(session);
             updated = true;
         }
@@ -97,17 +117,27 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.emigrationTemporality.registrationFrom);
+        if (this.emigrationTemporality.registrationFrom != null) {
+            timestamps.add(this.emigrationTemporality.registrationFrom);
+        }
+        if (this.immigrationTemporality.registrationFrom != null) {
+            timestamps.add(this.immigrationTemporality.registrationFrom);
+        }
         timestamps.add(this.foreignAddressTemporality.registrationFrom);
         return timestamps;
     }
 
     @Override
     public List<Bitemporality> getBitemporality() {
-        return Arrays.asList(
-                this.emigrationTemporality,
-                this.foreignAddressTemporality
-        );
+        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+        if (this.emigrationTemporality.registrationFrom != null) {
+            bitemporalities.add(this.emigrationTemporality);
+        }
+        if (this.immigrationTemporality.registrationFrom != null) {
+            bitemporalities.add(this.immigrationTemporality);
+        }
+        bitemporalities.add(this.foreignAddressTemporality);
+        return bitemporalities;
     }
 
     @Override

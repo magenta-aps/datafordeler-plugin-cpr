@@ -28,7 +28,7 @@ public class PersonParser extends CprSubParser<PersonDataRecord> {
         this.logType(recordType);
         try {
             switch (recordType) {
-                case PersonDataRecord.RECORDTYPE_PERSON:
+                /*case PersonDataRecord.RECORDTYPE_PERSON:
                     return new PersonRecord(line);
                 case PersonDataRecord.RECORDTYPE_BIRTH:
                     return new BirthRecord(line);
@@ -45,12 +45,12 @@ public class PersonParser extends CprSubParser<PersonDataRecord> {
                 case PersonDataRecord.RECORDTYPE_HISTORIC_DOMESTIC_ADDRESS:
                     return new HistoricAddressRecord(line);
                 case PersonDataRecord.RECORDTYPE_HISTORIC_NAME:
-                    return new HistoricNameRecord(line);
+                    return new HistoricNameRecord(line);*/
                 case PersonDataRecord.RECORDTYPE_FOREIGN_ADDRESS:
                     return new ForeignAddressRecord(line);
                 case PersonDataRecord.RECORDTYPE_HISTORIC_FOREIGN_ADDRESS:
                     return new HistoricForeignAddressRecord(line);
-                case PersonDataRecord.RECORDTYPE_CIVILSTATUS:
+                /*case PersonDataRecord.RECORDTYPE_CIVILSTATUS:
                     return new CivilStatusRecord(line);
                 case PersonDataRecord.RECORDTYPE_HISTORIC_CIVILSTATUS:
                     return new HistoricCivilStatusRecord(line);
@@ -59,7 +59,7 @@ public class PersonParser extends CprSubParser<PersonDataRecord> {
                 case PersonDataRecord.RECORDTYPE_HISTORIC_CITIZENSHIP:
                     return new HistoricCitizenshipRecord(line);
                 case PersonDataRecord.RECORDTYPE_HISTORIC_CPRNUMBER:
-                    return new HistoricCprNumberRecord(line);
+                    return new HistoricCprNumberRecord(line);*/
                 // TODO: Add one of these for each type...
             }
         } catch (ParseException e) {

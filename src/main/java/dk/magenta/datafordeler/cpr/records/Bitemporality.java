@@ -4,6 +4,7 @@ import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.CprEffect;
 
 import java.time.OffsetDateTime;
+import java.util.Objects;
 
 public class Bitemporality implements Comparable<Bitemporality> {
     public OffsetDateTime registrationFrom;
@@ -75,6 +76,14 @@ public class Bitemporality implements Comparable<Bitemporality> {
         return true;
     }
 
+    public boolean equalRegistration(Bitemporality o) {
+        return o != null && Objects.equals(this.registrationFrom, o.registrationFrom) && Objects.equals(this.registrationTo, o.registrationTo);
+    }
+
+    public boolean equalEffect(Bitemporality o) {
+        return o != null && Objects.equals(this.effectFrom, o.effectFrom) && Objects.equals(this.effectTo, o.effectTo);
+    }
+
     @Override
     public int hashCode() {
         int result = registrationFrom != null ? registrationFrom.hashCode() : 0;
@@ -87,6 +96,30 @@ public class Bitemporality implements Comparable<Bitemporality> {
 
     public boolean matches(OffsetDateTime registrationTime, CprEffect effect) {
         return Equality.equal(this.registrationFrom, registrationTime) && effect.compareRange(this);
+    }
+
+    public boolean overlapsRegistration(OffsetDateTime rangeStart, OffsetDateTime rangeEnd) {
+        return (this.registrationFrom == null || rangeEnd == null || !rangeEnd.isBefore(this.registrationFrom)) && (this.registrationTo == null || rangeStart == null || !rangeStart.isAfter(this.registrationTo));
+    }
+
+    public boolean overlapsEffect(OffsetDateTime rangeStart, OffsetDateTime rangeEnd) {
+        return (this.effectFrom == null || rangeEnd == null || !rangeEnd.isBefore(this.effectFrom)) && (this.effectTo == null || rangeStart == null || !rangeStart.isAfter(this.effectTo));
+    }
+
+    public boolean overlaps(Bitemporality other) {
+        return this.overlapsRegistration(other.registrationFrom, other.registrationTo) && this.overlapsEffect(other.effectFrom, other.effectTo);
+    }
+
+    public boolean containsRegistration(OffsetDateTime rangeStart, OffsetDateTime rangeEnd) {
+        return (this.registrationFrom == null || (rangeStart != null && !rangeStart.isBefore(this.registrationFrom))) && (this.registrationTo == null || (rangeEnd != null && !rangeEnd.isAfter(this.registrationTo)));
+    }
+
+    public boolean containsEffect(OffsetDateTime rangeStart, OffsetDateTime rangeEnd) {
+        return (this.effectFrom == null || (rangeStart != null && !rangeStart.isBefore(this.effectFrom))) && (this.effectTo == null || (rangeEnd != null && !rangeEnd.isAfter(this.effectTo)));
+    }
+
+    public boolean contains(Bitemporality other) {
+        return this.containsRegistration(other.registrationFrom, other.registrationTo) && this.containsEffect(other.effectFrom, other.effectTo);
     }
 
     public String toString() {
