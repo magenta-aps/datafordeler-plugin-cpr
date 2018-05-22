@@ -8,6 +8,7 @@ import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.core.fapi.Query;
 import dk.magenta.datafordeler.core.util.ListHashMap;
+import dk.magenta.datafordeler.core.util.OffsetDateTimeAdapter;
 import dk.magenta.datafordeler.cpr.data.person.data.*;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import dk.magenta.datafordeler.cpr.records.BitemporalityComparator;
@@ -24,24 +25,16 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     @Override
     public Object wrapResult(PersonEntity input, Query query) {
         objectMapper = new ObjectMapper();
-
-        // Root
         ObjectNode root = objectMapper.createObjectNode();
-
-/*
         root.put(PersonEntity.IO_FIELD_UUID, input.getUUID().toString());
         root.put(PersonEntity.IO_FIELD_CPR_NUMBER, input.getPersonnummer());
         root.putPOJO("id", input.getIdentification());
-*/
-        //ArrayNode registreringer = this.getRegistrations(input, null);
-        //root.set(PersonEntity.IO_FIELD_REGISTRATIONS, registreringer);
-        root = objectMapper.valueToTree(input);
+        ArrayNode registreringer = this.getRegistrations(input, null);
+        root.set(PersonEntity.IO_FIELD_REGISTRATIONS, registreringer);
         return root;
     }
 
-
     public ArrayNode getRegistrations(PersonEntity entity, Bitemporality mustOverlap) {
-
 
         ArrayNode registrationsNode = objectMapper.createArrayNode();
         //HashMap<Bitemporality, ObjectNode> data = new HashMap<>();
@@ -82,7 +75,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         for (int i = 0; i < terminators.size(); i++) {
             OffsetDateTime t = terminators.get(i);
             List<Bitemporality> startingHere = startTerminators.get(t);
-            List<Bitemporality> endingHere = endTerminators.get(t);
+            List<Bitemporality> endingHere = (t != null) ? endTerminators.get(t) : null;
             if (startingHere != null) {
                 presentBitemporalities.addAll(startingHere);
             }
@@ -97,41 +90,120 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                         registrationsNode.add(registrationNode);
                         registrationNode.put("registreringFra", formatTime(t));
                         registrationNode.put("registreringTil", formatTime(next));
-                        ArrayNode effectsNode = objectMapper.createArrayNode();
-                        registrationNode.set("virkninger", effectsNode);
-                        ArrayList<Bitemporality> sortedEffects = new ArrayList<>(presentBitemporalities);
-                        sortedEffects.sort(effectComparator);
-                        Bitemporality lastEffect = null;
-                        ObjectNode effectNode = null;
 
-                        System.out.println("----------------------");
-                        System.out.println(t+" => "+next);
+                        ArrayList<Bitemporality> sortedBitemporalities = new ArrayList<>(presentBitemporalities);
+                        sortedBitemporalities.sort(effectComparator);
 
-                        for (Bitemporality bitemporality : sortedEffects) {
-                            // Implemented in Hibernate filters instead. Each stored effect can be tested against the query filter
-                            // on the database level, but registrations are split here and thus cannot be tested in the database
-                            // Also, they lack the range end due to the way the incoming data is formatted
-                            //if (mustOverlap == null || mustOverlap.overlapsEffect(bitemporality.effectFrom, bitemporality.effectTo)) {
-                            if (lastEffect == null || effectNode == null || !lastEffect.equalEffect(bitemporality)) {
-                                effectNode = objectMapper.createObjectNode();
-                                effectsNode.add(effectNode);
-                            }
-                            effectNode.put("virkningFra", formatTime(bitemporality.effectFrom, true));
-                            effectNode.put("virkningTil", formatTime(bitemporality.effectTo, true));
+                        for (Bitemporality bitemporality : sortedBitemporalities) {
 
                             ArrayList<PersonBaseData> dataItems = data.get(bitemporality);
-                            System.out.println(dataItems);
 
-                            /*HashMap<String, ArrayList<JsonNode>> records = this.bitemporalData.get(bitemporality);
-                            for (String key : records.keySet()) {
-                                this.setValue(objectMapper, effectNode, key, records.get(key));
-                            }*/
+                            for (PersonBaseData dataItem : dataItems) {
+                                OffsetDateTime timestamp = dataItem.getLastUpdated();
 
+                                PersonCoreData personCoreData = dataItem.getCoreData();
+                                PersonStatusData personStatusData = dataItem.getStatus();
+                                PersonPositionData personPositionData = dataItem.getPosition();
+                                if (personCoreData != null) {
+                                    if (personCoreData.getCprNumber() != null && !personCoreData.getCprNumber().isEmpty()) {
+                                        addEffectDataToRegistration(
+                                                registrationNode, PersonCoreData.IO_FIELD_CPR_NUMBER,
+                                                createPersonNummerNode(bitemporality, timestamp, personCoreData)
+                                        );
+                                    }
+                                    if (personCoreData.getGender() != null || personStatusData != null || personPositionData != null) {
+                                        addEffectDataToRegistration(
+                                                registrationNode,
+                                                "person",
+                                                createKerneDataNode(bitemporality, timestamp, personCoreData, personStatusData, personPositionData)
+                                        );
+                                    }
+                                }
 
+                                PersonBirthData personBirthData = dataItem.getBirth();
+                                if (personBirthData != null) {
+                                    addEffectDataToRegistration(
+                                            registrationNode,
+                                            "fødselsdata",
+                                            createFoedselNode(bitemporality, timestamp, personBirthData)
+                                    );
+                                }
 
+                                PersonChurchData personChurchData = dataItem.getChurch();
+                                if (personChurchData != null) {
+                                    addEffectDataToRegistration(
+                                            registrationNode,
+                                            "folkekirkeoplysning",
+                                            createFolkekirkeoplysningNode(bitemporality, timestamp, personChurchData)
+                                    );
+                                }
 
-                            lastEffect = bitemporality;
-                            //}
+                                PersonParentData personFatherData = dataItem.getFather();
+                                if (personFatherData != null) {
+                                    addEffectDataToRegistration(
+                                            registrationNode,
+                                            "foraeldreoplysning",
+                                            createForaeldreoplysningNode(bitemporality, timestamp, "FAR_MEDMOR", personFatherData)
+                                    );
+                                }
+                                PersonParentData personMotherData = dataItem.getMother();
+                                if (personMotherData != null) {
+                                    addEffectDataToRegistration(
+                                            registrationNode,
+                                            "foraeldreoplysning",
+                                            createForaeldreoplysningNode(bitemporality, timestamp, "MOR", personMotherData)
+                                    );
+                                }
+                                PersonAddressData personAddressData = dataItem.getAddress();
+                                PersonAddressConameData personAddressConameData = dataItem.getConame();
+                                PersonMoveMunicipalityData personMoveMunicipalityData = dataItem.getMoveMunicipality();
+                                if (personAddressData != null || personAddressConameData != null || personMoveMunicipalityData != null) {
+                                    addEffectDataToRegistration(
+                                            registrationNode,
+                                            "adresseoplysninger",
+                                            createAdresseOplysningNode(bitemporality, timestamp, personAddressData, personAddressConameData, personMoveMunicipalityData)
+                                    );
+                                }
+
+                                PersonNameData personNameData = dataItem.getName();
+                                PersonAddressNameData personAddressNameData = dataItem.getAddressingName();
+                                if (personNameData != null || personAddressNameData != null) {
+                                    addEffectDataToRegistration(
+                                            registrationNode,
+                                            PersonBaseData.IO_FIELD_NAME,
+                                            createNavnNode(bitemporality, timestamp, personNameData, personAddressNameData)
+                                    );
+                                }
+
+                                Collection<PersonProtectionData> personProtectionData = dataItem.getProtection();
+                                if (personProtectionData != null && !personProtectionData.isEmpty()) {
+                                    addEffectDataToRegistration(
+                                            registrationNode,
+                                            PersonBaseData.IO_FIELD_PROTECTION,
+                                            createBeskyttelseNode(bitemporality, timestamp, personProtectionData)
+                                    );
+                                }
+
+                                PersonEmigrationData personEmigrationData = dataItem.getMigration();
+                                PersonForeignAddressData personForeignAddressData = dataItem.getForeignAddress();
+                                if (personEmigrationData != null) {
+                                    addEffectDataToRegistration(
+                                            registrationNode,
+                                            "udrejseindrejse",
+                                            createUdrejseIndrejseNode(bitemporality, timestamp, personEmigrationData, personForeignAddressData)
+                                    );
+                                }
+
+                                PersonNameAuthorityTextData personNameAuthorityTextData = dataItem.getNameAuthority();
+                                if (personNameAuthorityTextData != null) {
+                                    addEffectDataToRegistration(
+                                            registrationNode,
+                                            PersonBaseData.IO_FIELD_NAME_AUTHORITY,
+                                            createNavneMyndighedNode(bitemporality, timestamp, personNameAuthorityTextData)
+                                    );
+                                }
+
+                            }
                         }
                     }
                 }
@@ -159,219 +231,6 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return time.format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
-
-                    /*OffsetDateTime timestamp = personBaseData.getLastUpdated();
-
-                    PersonCoreData personCoreData = personBaseData.getCoreData();
-                    PersonStatusData personStatusData = personBaseData.getStatus();
-                    PersonPositionData stilling = personBaseData.getPosition();
-                    if (personCoreData != null) {
-                        if (personCoreData.getCprNumber() != null && !personCoreData.getCprNumber().isEmpty()) {
-                            dataPiece.set(PersonCoreData.IO_FIELD_CPR_NUMBER,
-                                    createPersonNummerNode(null, timestamp, personCoreData)
-                            );
-                        }
-                        if (personCoreData.getGender() != null || personStatusData != null || stilling != null) {
-                            dataPiece.set("person",
-                                    createKerneDataNode(null, timestamp, personCoreData, personStatusData, stilling)
-                            );
-                        }
-                    }
-
-                    PersonBirthData foedsel = personBaseData.getBirth();
-                    if (foedsel != null) {
-                        dataPiece.set("fødselsdata",
-                                createFoedselNode(null, timestamp, foedsel)
-                        );
-                    }
-
-                    PersonChurchData folkekirkeforhold = personBaseData.getChurch();
-                    if (folkekirkeforhold != null) {
-                        dataPiece.set("folkekirkeoplysning",
-                                createFolkekirkeoplysningNode(null, timestamp, folkekirkeforhold)
-                        );
-                    }
-
-                    PersonParentData far = personBaseData.getFather();
-                    if (far != null) {
-                        dataPiece.set("foraeldreoplysning",
-                                createForaeldreoplysningNode(null, timestamp, "FAR_MEDMOR", far)
-                        );
-                    }
-
-                    PersonParentData mor = personBaseData.getMother();
-                    if (mor != null) {
-                        dataPiece.set("foraeldreoplysning",
-                                createForaeldreoplysningNode(null, timestamp, "MOR", mor)
-                        );
-                    }
-
-                    PersonAddressData adresse = personBaseData.getAddress();
-                    PersonAddressConameData conavn = personBaseData.getConame();
-                    PersonMoveMunicipalityData flytteKommune = personBaseData.getMoveMunicipality();
-                    if (adresse != null || conavn != null || flytteKommune != null) {
-                        dataPiece.set("adresseoplysninger",
-                                createAdresseOplysningNode(null, timestamp, adresse, conavn, flytteKommune)
-                        );
-                    }
-
-                    PersonNameData navn = personBaseData.getName();
-                    PersonAddressNameData adressenavn = personBaseData.getAddressingName();
-                    if (navn != null || adressenavn != null) {
-                        dataPiece.set(PersonBaseData.IO_FIELD_NAME,
-                                createNavnNode(null, timestamp, navn, adressenavn)
-                        );
-                    }
-
-                    Collection<PersonProtectionData> beskyttelse = personBaseData.getProtection();
-                    if (beskyttelse != null && !beskyttelse.isEmpty()) {
-                        dataPiece.set(PersonBaseData.IO_FIELD_PROTECTION,
-                                createBeskyttelseNode(null, timestamp, beskyttelse)
-                        );
-                    }
-
-                    PersonForeignAddressData udenlandsadresse = personBaseData.getForeignAddress();
-                    PersonEmigrationData udrejseIndrejse = personBaseData.getMigration();
-                    if (udrejseIndrejse != null) {
-                        dataPiece.set("udrejseindrejse",
-                                createUdrejseIndrejseNode(null, timestamp, udrejseIndrejse, udenlandsadresse)
-                        );
-                    }
-
-                    PersonNameAuthorityTextData navnemyndighed = personBaseData.getNameAuthority();
-                    if (navnemyndighed != null) {
-                        dataPiece.set(PersonBaseData.IO_FIELD_NAME_AUTHORITY,
-                                createNavneMyndighedNode(null, timestamp, navnemyndighed)
-                        );
-                    }
-                }
-                if (dataPiece.size() > 0) {
-                    System.out.println(bitemporality + " => " + dataPiece.toString());
-                    data.put(bitemporality, dataPiece);
-                }*/
-
-
-
-
-/*
-            ObjectNode output = objectMapper.createObjectNode();
-            output.put(
-                    PersonRegistration.IO_FIELD_REGISTRATION_FROM,
-                    registration.getRegistrationFrom() != null ? registration.getRegistrationFrom().toString() : null
-            );
-            output.put(
-                    PersonRegistration.IO_FIELD_REGISTRATION_TO,
-                    registration.getRegistrationTo() != null ? registration.getRegistrationTo().toString() : null
-            );
-
-            for (PersonEffect virkning : registration.getEffects()) {
-                for (PersonBaseData personBaseData : virkning.getDataItems()) {
-                    PersonCoreData personCoreData = personBaseData.getCoreData();
-                    PersonStatusData personStatusData = personBaseData.getStatus();
-                    PersonParentData far = personBaseData.getFather();
-                    PersonParentData mor = personBaseData.getMother();
-                    PersonPositionData stilling = personBaseData.getPosition();
-                    PersonBirthData foedsel = personBaseData.getBirth();
-                    PersonChurchData folkekirkeforhold = personBaseData.getChurch();
-                    PersonAddressData adresse = personBaseData.getAddress();
-                    PersonAddressConameData conavn = personBaseData.getConame();
-                    PersonMoveMunicipalityData flytteKommune = personBaseData.getMoveMunicipality();
-                    PersonNameData navn = personBaseData.getName();
-                    PersonAddressNameData adressenavn = personBaseData.getAddressingName();
-                    Collection<PersonProtectionData> beskyttelse = personBaseData.getProtection();
-                    PersonEmigrationData udrejseIndrejse = personBaseData.getMigration();
-                    PersonForeignAddressData udenlandsadresse = personBaseData.getForeignAddress();
-                    PersonNameAuthorityTextData navnemyndighed = personBaseData.getNameAuthority();
-
-                    OffsetDateTime timestamp = personBaseData.getLastUpdated();
-
-                    if (personCoreData != null) {
-                        if (personCoreData.getCprNumber() != null && !personCoreData.getCprNumber().isEmpty()) {
-                            addEffectDataToRegistration(
-                                    output, PersonCoreData.IO_FIELD_CPR_NUMBER,
-                                    createPersonNummerNode(virkning, timestamp, personCoreData)
-                            );
-                        }
-                        if (personCoreData.getGender() != null || personStatusData != null || stilling != null) {
-                            addEffectDataToRegistration(
-                                    output,
-                                    "person",
-                                    createKerneDataNode(virkning, timestamp, personCoreData, personStatusData, stilling)
-                            );
-                        }
-                    }
-                    if (foedsel != null) {
-                        addEffectDataToRegistration(
-                                output,
-                                "fødselsdata",
-                                createFoedselNode(virkning, timestamp, foedsel)
-                        );
-                    }
-                    if (folkekirkeforhold != null) {
-                        addEffectDataToRegistration(
-                                output,
-                                "folkekirkeoplysning",
-                                createFolkekirkeoplysningNode(virkning, timestamp, folkekirkeforhold)
-                        );
-                    }
-                    if (far != null) {
-                        addEffectDataToRegistration(
-                                output,
-                                "foraeldreoplysning",
-                                createForaeldreoplysningNode(virkning, timestamp, "FAR_MEDMOR", far)
-                        );
-                    }
-                    if (mor != null) {
-                        addEffectDataToRegistration(
-                                output,
-                                "foraeldreoplysning",
-                                createForaeldreoplysningNode(virkning, timestamp, "MOR", mor)
-                        );
-                    }
-                    if (adresse != null || conavn != null || flytteKommune != null) {
-                        addEffectDataToRegistration(
-                                output,
-                                "adresseoplysninger",
-                                createAdresseOplysningNode(virkning, timestamp, adresse, conavn, flytteKommune)
-                        );
-                    }
-                    if (navn != null || adressenavn != null) {
-                        addEffectDataToRegistration(
-                                output,
-                                PersonBaseData.IO_FIELD_NAME,
-                                createNavnNode(virkning, timestamp, navn, adressenavn)
-                        );
-                    }
-                    if (beskyttelse != null && !beskyttelse.isEmpty()) {
-                        addEffectDataToRegistration(
-                                output,
-                                PersonBaseData.IO_FIELD_PROTECTION,
-                                createBeskyttelseNode(virkning, timestamp, beskyttelse)
-                        );
-                    }
-                    if (udrejseIndrejse != null) {
-                        addEffectDataToRegistration(
-                                output,
-                                "udrejseindrejse",
-                                createUdrejseIndrejseNode(virkning, timestamp, udrejseIndrejse, udenlandsadresse)
-                        );
-                    }
-                    if (navnemyndighed != null) {
-                        addEffectDataToRegistration(
-                                output,
-                                PersonBaseData.IO_FIELD_NAME_AUTHORITY,
-                                createNavneMyndighedNode(virkning, timestamp, navnemyndighed)
-                        );
-                    }
-                }
-            }
-            registreringer.add(output);
-        }
-        
-        return root;
-    }*/
-
-
     protected void addEffectDataToRegistration(ObjectNode output, String key, JsonNode value) {
         if (!output.has(key) || output.get(key).isNull()) {
             output.set(key, objectMapper.createArrayNode());
@@ -379,21 +238,21 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         ((ArrayNode) output.get(key)).add(value);
     }
 
-    protected ObjectNode createDataNode(Effect virkning, OffsetDateTime lastUpdated) {
-        return createDataNode(virkning, true, lastUpdated);
+    protected ObjectNode createDataNode(Bitemporality bitemporality, OffsetDateTime lastUpdated) {
+        return createDataNode(bitemporality, true, lastUpdated);
     }
 
-    protected ObjectNode createDataNode(Effect virkning, boolean includeVirkningTil, OffsetDateTime lastUpdated) {
+    protected ObjectNode createDataNode(Bitemporality bitemporality, boolean includeVirkningTil, OffsetDateTime lastUpdated) {
         ObjectNode output = objectMapper.createObjectNode();
-        if (virkning != null) {
+        if (bitemporality != null) {
             output.put(
                     PersonEffect.IO_FIELD_EFFECT_FROM,
-                    virkning.getEffectFrom() != null ? virkning.getEffectFrom().toString() : null
+                    OffsetDateTimeAdapter.toString(bitemporality.effectFrom)
             );
             if (includeVirkningTil) {
                 output.put(
                         PersonEffect.IO_FIELD_EFFECT_TO,
-                        virkning.getEffectTo() != null ? virkning.getEffectTo().toString() : null
+                        OffsetDateTimeAdapter.toString(bitemporality.effectTo)
                 );
             }
         }
@@ -404,18 +263,18 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return output;
     }
 
-    protected ObjectNode createPersonNummerNode(Effect virkning, OffsetDateTime lastUpdated, PersonCoreData personCoreData) {
-        ObjectNode personnummer = createDataNode(virkning, lastUpdated);
+    protected ObjectNode createPersonNummerNode(Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonCoreData personCoreData) {
+        ObjectNode personnummer = createDataNode(bitemporality, lastUpdated);
         personnummer.put(PersonCoreData.IO_FIELD_CPR_NUMBER, personCoreData.getCprNumber());
         // TODO: Personnummer status enum?
         return personnummer;
     }
 
     protected ObjectNode createKerneDataNode(
-                    Effect virkning, OffsetDateTime lastUpdated, PersonCoreData personCoreData, PersonStatusData personStatusData,
+            Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonCoreData personCoreData, PersonStatusData personStatusData,
                     PersonPositionData stilling
     ) {
-        ObjectNode output = createDataNode(virkning, lastUpdated);
+        ObjectNode output = createDataNode(bitemporality, lastUpdated);
         if (personCoreData.getGender() != null) {
             output.put(
                     PersonCoreData.IO_FIELD_GENDER,
@@ -438,9 +297,9 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createFoedselNode(
-            Effect virkning, OffsetDateTime lastUpdated, PersonBirthData personBirthData
+            Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonBirthData personBirthData
     ) {
-        ObjectNode output = createDataNode(virkning, true, lastUpdated);
+        ObjectNode output = createDataNode(bitemporality, true, lastUpdated);
         if (personBirthData.getBirthDatetime() != null) {
             output.put(
                     PersonBirthData.IO_FIELD_BIRTH_DATETIME,
@@ -479,28 +338,28 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createFolkekirkeoplysningNode(
-            Effect virkning, OffsetDateTime lastUpdated, PersonChurchData personChurchData
+            Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonChurchData personChurchData
     ) {
-        ObjectNode output = createDataNode(virkning, true, lastUpdated);
+        ObjectNode output = createDataNode(bitemporality, true, lastUpdated);
         Character relation = personChurchData.getChurchRelation();
         output.put(PersonChurchData.IO_FIELD_CHURCH_RELATION, relation != null ? relation.toString() : null);
         return output;
     }
 
     protected ObjectNode createForaeldreoplysningNode(
-                    Effect virkning, OffsetDateTime lastUpdated, String foraelderrolle, PersonParentData personParentData
+                    Bitemporality bitemporality, OffsetDateTime lastUpdated, String foraelderrolle, PersonParentData personParentData
     ) {
-        ObjectNode output = createDataNode(virkning, false, lastUpdated);
+        ObjectNode output = createDataNode(bitemporality, false, lastUpdated);
         output.put(PersonParentData.IO_FIELD_CPR_NUMBER, personParentData.getCprNumber());
         output.put("foraelderrolle", foraelderrolle);
         return output;
     }
 
     protected ObjectNode createAdresseOplysningNode(
-                    Effect virkning, OffsetDateTime lastUpdated, PersonAddressData adresse, PersonAddressConameData conavn,
+                    Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonAddressData adresse, PersonAddressConameData conavn,
                     PersonMoveMunicipalityData flytteKommune
     ) {
-        ObjectNode output = createDataNode(virkning, lastUpdated);
+        ObjectNode output = createDataNode(bitemporality, lastUpdated);
         output.put(
                 PersonAddressConameData.IO_FIELD_CONAME,
                 conavn != null ? conavn.getConame() : null
@@ -547,9 +406,9 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createNavnNode(
-                    Effect virkning, OffsetDateTime lastUpdated, PersonNameData navn, PersonAddressNameData addresseringsnavn
+                    Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonNameData navn, PersonAddressNameData addresseringsnavn
     ) {
-        ObjectNode output = createDataNode(virkning, lastUpdated);
+        ObjectNode output = createDataNode(bitemporality, lastUpdated);
         output.put(
                 PersonBaseData.IO_FIELD_ADDRESSING_NAME,
                 addresseringsnavn != null ? addresseringsnavn.getAddressName() : null
@@ -576,10 +435,10 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return output;
     }
 
-    protected ArrayNode createBeskyttelseNode(Effect virkning, OffsetDateTime lastUpdated, Collection<PersonProtectionData> beskyttelse) {
+    protected ArrayNode createBeskyttelseNode(Bitemporality bitemporality, OffsetDateTime lastUpdated, Collection<PersonProtectionData> beskyttelse) {
         ArrayNode output = objectMapper.createArrayNode();
         for (PersonProtectionData personProtectionData : beskyttelse) {
-            ObjectNode item = createDataNode(virkning, lastUpdated);
+            ObjectNode item = createDataNode(bitemporality, lastUpdated);
             item.put(PersonProtectionData.IO_FIELD_TYPE, personProtectionData.getProtectionType());
             output.add(item);
         }
@@ -587,14 +446,11 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createUdrejseIndrejseNode(
-                    Effect virkning, OffsetDateTime lastUpdated, PersonEmigrationData udrejseIndrejse,
+                    Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonEmigrationData udrejseIndrejse,
                     PersonForeignAddressData udenlandsadresse
     ) {
-        ObjectNode output = createDataNode(virkning, lastUpdated);
+        ObjectNode output = createDataNode(bitemporality, lastUpdated);
         output.put(PersonEmigrationData.IO_FIELD_COUNTRY_CODE, udrejseIndrejse.getCountryCode());
-        if (udenlandsadresse != null) {
-            output.set("simpeladresse", createUdrejseAdresseNode(udenlandsadresse));
-        }
         return output;
     }
 
@@ -608,8 +464,8 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return output;
     }
 
-    protected ObjectNode createNavneMyndighedNode(Effect virkning, OffsetDateTime lastUpdated, PersonNameAuthorityTextData navnemyndighed) {
-        ObjectNode output = createDataNode(virkning, lastUpdated);
+    protected ObjectNode createNavneMyndighedNode(Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonNameAuthorityTextData navnemyndighed) {
+        ObjectNode output = createDataNode(bitemporality, lastUpdated);
         output.put(PersonNameAuthorityTextData.IO_FIELD_AUTHORITY, navnemyndighed.getText());
         return output;
     }

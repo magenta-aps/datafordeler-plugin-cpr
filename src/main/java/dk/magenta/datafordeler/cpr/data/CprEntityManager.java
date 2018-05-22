@@ -399,8 +399,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                     }
                                 }
                                 timer.measure(TASK_SAVE);
-                                //session.flush();
-                                //session.clear();
                             }
 
                             this.checkInterrupt(importMetadata);
