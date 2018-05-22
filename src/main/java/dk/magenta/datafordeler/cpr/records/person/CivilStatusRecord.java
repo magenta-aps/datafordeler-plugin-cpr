@@ -76,6 +76,7 @@ public class CivilStatusRecord extends PersonDataRecord {
                     this.getBoolean("dok-civilstand"),
                     importMetadata.getImportTime()
             );
+            updated = true;
         }
         if (bitemporality.equals(this.officiaryTemporality)) {
             data.setCivilStatusAuthorityText(
@@ -83,6 +84,7 @@ public class CivilStatusRecord extends PersonDataRecord {
                     this.getString("myntxt-civilstand", true),
                     importMetadata.getImportTime()
             );
+            updated = true;
         }
         return updated;
     }
