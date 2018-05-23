@@ -221,4 +221,9 @@ public abstract class Record extends HashMap<String, String> {
         return null;
     }
 
+    public boolean has(String key) {
+        String value = this.getString(key, true);
+        return value != null && !value.isEmpty();
+    }
+
 }

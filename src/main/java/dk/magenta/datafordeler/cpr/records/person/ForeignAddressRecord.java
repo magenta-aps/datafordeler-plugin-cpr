@@ -7,11 +7,9 @@ import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
+import java.lang.reflect.Array;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Record for Person foreign address (type 028).
@@ -84,10 +82,14 @@ public class ForeignAddressRecord extends PersonDataRecord {
 
     @Override
     public List<Bitemporality> getBitemporality() {
-        return Arrays.asList(
-                this.emigrationTemporality,
-                this.foreignAddressTemporality
-        );
+        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+        if (this.has("start_mynkod-udrindrejs") || this.has("udr_landekod")) {
+            bitemporalities.add(this.emigrationTemporality);
+        }
+        if (this.has("udlandadr_mynkod") || this.has("udlandadr1")) {
+            bitemporalities.add(this.foreignAddressTemporality);
+        }
+        return bitemporalities;
     }
 
     @Override
