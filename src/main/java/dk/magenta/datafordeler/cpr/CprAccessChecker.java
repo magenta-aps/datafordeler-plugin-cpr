@@ -5,7 +5,7 @@ import dk.magenta.datafordeler.core.exception.AccessRequiredException;
 import dk.magenta.datafordeler.core.user.DafoUserDetails;
 
 /**
- * Checkx access for all entity services related to PERSONNUMMER.
+ * Checks access for all entity services related to PERSONNUMMER.
  */
 public abstract class CprAccessChecker {
 
