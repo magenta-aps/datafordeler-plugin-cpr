@@ -2,7 +2,6 @@ package dk.magenta.datafordeler.cpr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.SessionManager;
-import dk.magenta.datafordeler.core.exception.ConfigurationException;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.WrongSubclassException;
@@ -25,10 +24,9 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.time.*;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.StringJoiner;
 
 @Component

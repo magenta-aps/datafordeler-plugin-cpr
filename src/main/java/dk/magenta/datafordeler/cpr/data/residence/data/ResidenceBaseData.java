@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.data.residence.data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.LookupDefinition;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
 import org.hibernate.Session;
@@ -12,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,15 +21,31 @@ import java.util.Map;
  * Base class for Residence data, linking to Effects and delegating storage to referred classes
  */
 @Entity
-@Table(name="cpr_residence_data", indexes = {
-        @Index(name = "cpr_residence_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = "cpr_residence_municipality_code", columnList = ResidenceBaseData.DB_FIELD_MUNICIPALITY_CODE),
-        @Index(name = "cpr_residence_road_code", columnList = ResidenceBaseData.DB_FIELD_ROAD_CODE),
-        @Index(name = "cpr_residence_housenumber", columnList = ResidenceBaseData.DB_FIELD_HOUSENUMBER),
-        @Index(name = "cpr_residence_floor", columnList = ResidenceBaseData.DB_FIELD_FLOOR),
-        @Index(name = "cpr_residence_door", columnList = ResidenceBaseData.DB_FIELD_DOOR),
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_data", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_municipality_code", columnList = ResidenceBaseData.DB_FIELD_MUNICIPALITY_CODE),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_road_code", columnList = ResidenceBaseData.DB_FIELD_ROAD_CODE),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_housenumber", columnList = ResidenceBaseData.DB_FIELD_HOUSENUMBER),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_floor", columnList = ResidenceBaseData.DB_FIELD_FLOOR),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_door", columnList = ResidenceBaseData.DB_FIELD_DOOR),
 })
 public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseData> {
+
+    public static final String DB_FIELD_DAFO_UPDATED = "dafoUpdated";
+    public static final String IO_FIELD_DAFO_UPDATED = "dafoOpdateret";
+
+    @Column(name = DB_FIELD_DAFO_UPDATED)
+    private OffsetDateTime dafoUpdated = null;
+
+    @JsonProperty(value = IO_FIELD_DAFO_UPDATED)
+    public OffsetDateTime getDafoUpdated() {
+        return this.dafoUpdated;
+    }
+
+    public void setDafoUpdated(OffsetDateTime dafoUpdated) {
+        this.dafoUpdated = dafoUpdated;
+    }
+
 
     public static final String DB_FIELD_MUNICIPALITY_CODE = "municipalityCode";
     public static final String IO_FIELD_MUNICIPALITY_CODE = "kommunekode";
@@ -40,8 +58,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.municipalityCode;
     }
 
-    public void setKommunekode(int kommunekode) {
+    public void setKommunekode(int kommunekode, OffsetDateTime updateTime) {
         this.municipalityCode = kommunekode;
+        this.setDafoUpdated(updateTime);
     }
 
     public static final String DB_FIELD_ROAD_CODE = "roadCode";
@@ -55,8 +74,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.roadCode;
     }
 
-    public void setVejkode(int vejkode) {
+    public void setVejkode(int vejkode, OffsetDateTime updateTime) {
         this.roadCode = vejkode;
+        this.setDafoUpdated(updateTime);
     }
 
     public static final String DB_FIELD_HOUSENUMBER = "houseNumber";
@@ -70,8 +90,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.houseNumber;
     }
 
-    public void setHusnummer(String husnummer) {
+    public void setHusnummer(String husnummer, OffsetDateTime updateTime) {
         this.houseNumber = husnummer;
+        this.setDafoUpdated(updateTime);
     }
 
     public static final String DB_FIELD_FLOOR = "floor";
@@ -85,8 +106,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.floor;
     }
 
-    public void setEtage(String etage) {
+    public void setEtage(String etage, OffsetDateTime updateTime) {
         this.floor = etage;
+        this.setDafoUpdated(updateTime);
     }
 
     public static final String DB_FIELD_DOOR = "door";
@@ -100,8 +122,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.door;
     }
 
-    public void setSideDoer(String sideDoer) {
+    public void setSideDoer(String sideDoer, OffsetDateTime updateTime) {
         this.door = sideDoer;
+        this.setDafoUpdated(updateTime);
     }
 
     public static final String DB_FIELD_LOCALITY = "locality";
@@ -115,8 +138,9 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
         return this.locality;
     }
 
-    public void setLokalitet(String lokalitet) {
+    public void setLokalitet(String lokalitet, OffsetDateTime updateTime) {
         this.locality = lokalitet;
+        this.setDafoUpdated(updateTime);
     }
 
     @Override
@@ -148,5 +172,18 @@ public class ResidenceBaseData extends CprData<ResidenceEffect, ResidenceBaseDat
     @Override
     public void forceLoad(Session session) {
 
+    }
+
+    @Override
+    public ResidenceBaseData clone() {
+        ResidenceBaseData clone = new ResidenceBaseData();
+        clone.municipalityCode = this.municipalityCode;
+        clone.locality = this.locality;
+        clone.roadCode = this.roadCode;
+        clone.houseNumber = this.houseNumber;
+        clone.floor = this.floor;
+        clone.door = this.door;
+        clone.dafoUpdated = this.dafoUpdated;
+        return clone;
     }
 }

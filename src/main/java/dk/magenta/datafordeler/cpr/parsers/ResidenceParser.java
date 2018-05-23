@@ -24,7 +24,7 @@ public class ResidenceParser extends CprSubParser<ResidenceRecord> {
     }
 
     @Override
-    protected ResidenceRecord parseLine(String recordType, String line) {
+    public ResidenceRecord parseLine(String recordType, String line) {
         this.logType(recordType);
         try {
             switch (recordType) {

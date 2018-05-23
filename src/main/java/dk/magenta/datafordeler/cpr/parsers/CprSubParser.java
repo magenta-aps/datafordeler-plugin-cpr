@@ -29,7 +29,8 @@ public abstract class CprSubParser<T extends Record> {
         this.getLog().debug("Parsing record of type "+recordType);
     }
 
-    protected abstract T parseLine(String recordType, String line);
+    public abstract T parseLine(String recordType, String line);
+
 
     // Maybe override in subclass?
     protected String getEncoding() {

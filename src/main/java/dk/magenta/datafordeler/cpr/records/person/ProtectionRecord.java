@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -37,15 +38,16 @@ public class ProtectionRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
-        if (this.protectionTemporality.matches(registrationTime, effect)) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+        if (bitemporality.equals(this.protectionTemporality)) {
             data.addProtection(
-                // int authority,
-                this.getInt("start_mynkod-beskyttelse"),
-                // int beskyttelsestype,
-                this.getInt("beskyttype"),
-                // boolean reportMarking
-                this.getBoolean("indrap-beskyttelse")
+                    // int authority,
+                    this.getInt("start_mynkod-beskyttelse"),
+                    // int beskyttelsestype,
+                    this.getInt("beskyttype"),
+                    // boolean reportMarking
+                    this.getBoolean("indrap-beskyttelse"),
+                    importMetadata.getImportTime()
             );
             return true;
         }

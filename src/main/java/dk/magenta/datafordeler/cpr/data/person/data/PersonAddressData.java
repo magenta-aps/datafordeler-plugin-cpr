@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
@@ -15,8 +16,8 @@ import static dk.magenta.datafordeler.cpr.data.person.data.PersonAddressData.DB_
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_address", indexes = {
-        @Index(name = "cpr_person_address_municipality", columnList = DB_FIELD_MUNICIPALITY_CODE)
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_address", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_address_municipality", columnList = DB_FIELD_MUNICIPALITY_CODE)
 })
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PersonAddressData extends AuthorityDetailData {
@@ -235,7 +236,9 @@ public class PersonAddressData extends AuthorityDetailData {
     }
 
     public void setRoadAddressLine1(String roadAddressLine1) {
-        this.roadAddressLine1 = roadAddressLine1;
+        if (roadAddressLine1 != null) {
+            this.roadAddressLine1 = roadAddressLine1;
+        }
     }
 
 
@@ -252,7 +255,9 @@ public class PersonAddressData extends AuthorityDetailData {
     }
 
     public void setRoadAddressLine2(String roadAddressLine2) {
-        this.roadAddressLine2 = roadAddressLine2;
+        if (roadAddressLine2 != null) {
+            this.roadAddressLine2 = roadAddressLine2;
+        }
     }
 
 
@@ -269,7 +274,9 @@ public class PersonAddressData extends AuthorityDetailData {
     }
 
     public void setRoadAddressLine3(String roadAddressLine3) {
-        this.roadAddressLine3 = roadAddressLine3;
+        if (roadAddressLine3 != null) {
+            this.roadAddressLine3 = roadAddressLine3;
+        }
     }
 
 
@@ -286,7 +293,9 @@ public class PersonAddressData extends AuthorityDetailData {
     }
 
     public void setRoadAddressLine4(String roadAddressLine4) {
-        this.roadAddressLine4 = roadAddressLine4;
+        if (roadAddressLine4 != null) {
+            this.roadAddressLine4 = roadAddressLine4;
+        }
     }
 
 
@@ -303,7 +312,9 @@ public class PersonAddressData extends AuthorityDetailData {
     }
 
     public void setRoadAddressLine5(String roadAddressLine5) {
-        this.roadAddressLine5 = roadAddressLine5;
+        if (roadAddressLine5 != null) {
+            this.roadAddressLine5 = roadAddressLine5;
+        }
     }
 
 
@@ -312,26 +323,30 @@ public class PersonAddressData extends AuthorityDetailData {
     //Ikke i grunddatamodellen
 
     @Transient
-    private int adressetekststype;
+    private int adressetekststype = 0;
 
     public int getAdressetekststype() {
         return this.adressetekststype;
     }
 
     public void setAdressetekststype(int adressetekststype) {
-        this.adressetekststype = adressetekststype;
+        if (adressetekststype != 0) {
+            this.adressetekststype = adressetekststype;
+        }
     }
 
 
     @Transient
-    private int startautoritet;
+    private int startautoritet = 0;
 
     public int getStartautoritet() {
         return this.startautoritet;
     }
 
     public void setStartautoritet(int startautoritet) {
-        this.startautoritet = startautoritet;
+        if (startautoritet != 0) {
+            this.startautoritet = startautoritet;
+        }
     }
 
 
@@ -365,4 +380,28 @@ public class PersonAddressData extends AuthorityDetailData {
         return map;
     }
 
+    @Override
+    protected PersonAddressData clone() {
+        PersonAddressData clone = new PersonAddressData();
+        clone.buildingNumber = this.buildingNumber;
+        clone.cityName = this.cityName;
+        clone.municipalityCode = this.municipalityCode;
+        clone.municipalityName = this.municipalityName;
+        clone.roadCode = this.roadCode;
+        clone.darAddress = this.darAddress;
+        clone.floor = this.floor;
+        clone.houseNumber = this.houseNumber;
+        clone.postalDistrict = this.postalDistrict;
+        clone.postalCode = this.postalCode;
+        clone.door = this.door;
+        clone.roadAddressName = this.roadAddressName;
+        clone.roadAddressLine1 = this.roadAddressLine1;
+        clone.roadAddressLine2 = this.roadAddressLine2;
+        clone.roadAddressLine3 = this.roadAddressLine3;
+        clone.roadAddressLine4 = this.roadAddressLine4;
+        clone.roadAddressLine5 = this.roadAddressLine5;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

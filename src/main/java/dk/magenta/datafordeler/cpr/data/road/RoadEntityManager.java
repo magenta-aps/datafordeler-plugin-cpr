@@ -25,35 +25,6 @@ public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEnti
     @Autowired
     private SessionManager sessionManager;
 
-
-    private static class RoadIdentifier {
-        public int kommunekode;
-        public int vejkode;
-
-        public RoadIdentifier(int kommunekode, int vejkode) {
-            this.kommunekode = kommunekode;
-            this.vejkode = vejkode;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            RoadIdentifier that = (RoadIdentifier) o;
-
-            if (kommunekode != that.kommunekode) return false;
-            return vejkode == that.vejkode;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = kommunekode;
-            result = 31 * result + vejkode;
-            return result;
-        }
-    }
-
     public RoadEntityManager() {
         this.managedEntityClass = RoadEntity.class;
         this.managedEntityReferenceClass = RoadEntityReference.class;

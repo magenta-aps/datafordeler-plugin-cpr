@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -42,14 +43,26 @@ public class ForeignAddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.emigrationTemporality.matches(registrationTime, effect)) {
-            data.setEmigration(this.getInt("start_mynkod-udrindrejs"), this.getInt("udr_landekod"));
+        if (bitemporality.equals(this.emigrationTemporality)) {
+            data.setEmigration(
+                    this.getInt("start_mynkod-udrindrejs"),
+                    this.getInt("udr_landekod"),
+                    importMetadata.getImportTime()
+            );
             updated = true;
         }
-        if (this.foreignAddressTemporality.matches(registrationTime, effect)) {
-            data.setForeignAddress(this.getInt("udlandadr_mynkod"), this.get("udlandadr1"), this.get("udlandadr2"), this.get("udlandadr3"), this.get("udlandadr4"), this.get("udlandadr5"));
+        if (bitemporality.equals(this.foreignAddressTemporality)) {
+            data.setForeignAddress(
+                    this.getInt("udlandadr_mynkod"),
+                    this.get("udlandadr1"),
+                    this.get("udlandadr2"),
+                    this.get("udlandadr3"),
+                    this.get("udlandadr4"),
+                    this.get("udlandadr5"),
+                    importMetadata.getImportTime()
+            );
             updated = true;
         }
         return updated;

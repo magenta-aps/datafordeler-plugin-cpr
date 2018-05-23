@@ -129,7 +129,7 @@ public abstract class Record extends HashMap<String, String> {
 
     public boolean getBoolean(String key) {
         String value = this.get(key).toLowerCase();
-        return value.equals("1") || value.equals("yes") || value.equals("true") || value.equals("ja") || value.equals("y");
+        return value.equals("1") || value.equals("yes") || value.equals("true") || value.equals("ja") || value.equals("y") || value.equals("*");
     }
 
     public Character getChar(String key) {
@@ -181,6 +181,9 @@ public abstract class Record extends HashMap<String, String> {
     public LocalDateTime getDateTime(String key) {
         String value = this.get(key);
         if (value != null && !value.isEmpty()) {
+            if (value.length() == 12 && value.endsWith("99")) {
+                value = value.substring(0, 10) + "00";
+            }
             for (DateTimeFormatter parser : datetimeParsers) {
                 try {
                     return LocalDateTime.parse(value, parser);

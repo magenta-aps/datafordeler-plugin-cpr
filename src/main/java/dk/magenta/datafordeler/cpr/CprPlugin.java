@@ -27,6 +27,10 @@ import javax.annotation.PostConstruct;
 @Component
 public class CprPlugin extends Plugin {
 
+
+    public static final String DEBUG_TABLE_PREFIX = "debug3_";
+
+
     @Autowired
     private CprConfigurationManager configurationManager;
 

@@ -14,58 +14,53 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Record for Person address (type 025).
+ * Record for Person historic address (type 026).
  */
-public class AddressRecord extends PersonDataRecord {
+public class HistoricAddressRecord extends HistoricPersonDataRecord {
 
     private Bitemporality addressTemporality;
     private Bitemporality conameTemporality;
     private Bitemporality municipalityTemporality;
 
-    public AddressRecord(String line) throws ParseException {
+    public HistoricAddressRecord(String line) throws ParseException {
         super(line);
-        this.obtain("start_mynkod-personbolig", 14, 4);
-        this.obtain("adr_ts", 18, 12);
-        this.obtain("komkod", 30, 4);
-        this.obtain("vejkod", 34, 4);
-        this.obtain("husnr", 38, 4);
-        this.obtain("etage", 42, 2);
-        this.obtain("sidedoer", 44, 4);
-        this.obtain("bnr", 48, 4);
-        this.obtain("convn", 52, 34);
-        this.obtain("convn_ts", 86, 12);
-        this.obtain("tilflydto", 98, 12);
-        this.obtain("tilflydto_umrk", 110, 1);
-        this.obtain("tilfra_mynkod", 111, 4);
-        this.obtain("tilfra_ts", 115, 12);
-        this.obtain("tilflykomdto", 127, 12);
-        this.obtain("tilflykomdt_umrk", 139, 1);
-        this.obtain("fraflykomkod", 140, 4);
-        this.obtain("fraflykomdto", 144, 12);
-        this.obtain("fraflykomdt_umrk", 156, 1);
-        this.obtain("adrtxttype", 157, 4);
-        this.obtain("start_mynkod-adrtxt", 161, 4);
-        this.obtain("adr1-supladr", 165, 34);
-        this.obtain("adr2-supladr", 199, 34);
-        this.obtain("adr3-supladr", 233, 34);
-        this.obtain("adr4-supladr", 267, 34);
-        this.obtain("adr5-supladr", 301, 34);
-        this.obtain("start_dt-adrtxt", 335, 10);
-        this.obtain("slet_dt-adrtxt", 345, 10);
+        this.obtain("annkor", 14, 1);
+        this.obtain("start_mynkod-personbolig", 15, 4);
+        this.obtain("adr_ts", 19, 12);
+        this.obtain("komkod", 31, 4);
+        this.obtain("vejkod", 35, 4);
+        this.obtain("husnr", 39, 4);
+        this.obtain("etage", 43, 2);
+        this.obtain("sidedoer", 45, 4);
+        this.obtain("bnr", 49, 4);
+        this.obtain("convn", 53, 34);
+        this.obtain("convn_ts", 87, 12);
+        this.obtain("tilflydto", 99, 12);
+        this.obtain("tilflydto_umrk", 111, 1);
+        this.obtain("fraflydto", 112, 12);
+        this.obtain("fraflydto_umrk", 124, 1);
+        this.obtain("tilfra_mynkod", 125, 4);
+        this.obtain("tilfra_ts", 129, 12);
+        this.obtain("tilflykomdto", 141, 12);
+        this.obtain("tilflykomdt_umrk", 153, 1);
+        this.obtain("fraflykomkod", 154, 4);
+        this.obtain("fraflykomdto", 158, 12);
+        this.obtain("fraflykomdt_umrk", 170, 1);
 
-        this.addressTemporality = new Bitemporality(this.getOffsetDateTime("adr_ts"), null, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), null, false);
+        this.addressTemporality = new Bitemporality(this.getOffsetDateTime("adr_ts"), null, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), this.getOffsetDateTime("fraflydto"), this.getBoolean("fraflydto_umrk"));
         this.conameTemporality = new Bitemporality(this.getOffsetDateTime("convn_ts"));
         this.municipalityTemporality = new Bitemporality(this.getOffsetDateTime("tilfra_ts"));
     }
 
     @Override
     public String getRecordType() {
-        return RECORDTYPE_DOMESTIC_ADDRESS;
+        return RECORDTYPE_HISTORIC_DOMESTIC_ADDRESS;
     }
 
     @Override
     public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
+
         if (bitemporality.equals(this.addressTemporality)) {
             data.setAddress(
                     // int authority,
@@ -93,23 +88,24 @@ public class AddressRecord extends PersonDataRecord {
                     // String sideDoer,
                     this.get("sidedoer"),
                     // String adresselinie1,
-                    this.get("adr1-supladr"),
+                    null,
                     // String adresselinie2,
-                    this.get("adr2-supladr"),
+                    null,
                     // String adresselinie3,
-                    this.get("adr3-supladr"),
+                    null,
                     // String adresselinie4,
-                    this.get("adr4-supladr"),
+                    null,
                     // String adresselinie5,
-                    this.get("adr5-supladr"),
+                    null,
                     // int addressTextType,
-                    this.getInt("adrtxttype"),
+                    0,
                     // int startAuthority
-                    this.getInt("start_mynkod-adrtxt"),
+                    0,
                     importMetadata.getImportTime()
             );
             updated = true;
         }
+
         if (bitemporality.equals(this.conameTemporality)) {
             data.setCoName(
                     this.get("convn"),
@@ -139,6 +135,24 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.addressTemporality) && outdatedTemporality.equals(this.addressTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearAddress(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.conameTemporality) && outdatedTemporality.equals(this.conameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCoName(session);
+            updated = true;
+        }
+        if (bitemporality.equals(this.municipalityTemporality) && outdatedTemporality.equals(this.municipalityTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearMoveMunicipality(session);
+            updated = true;
+        }
+        return updated;
+    }
+
+    @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
         timestamps.add(this.getOffsetDateTime("adr_ts"));
@@ -159,7 +173,7 @@ public class AddressRecord extends PersonDataRecord {
     @Override
     public Set<PersonEffect> getEffects() {
         HashSet<PersonEffect> effects = new HashSet<>();
-        effects.add(new PersonEffect(null, this.getOffsetDateTime("tilflydto"), this.getMarking("tilflydto_umrk"), null, false));
+        effects.add(new PersonEffect(null, this.getOffsetDateTime("tilflydto"), this.getMarking("tilflydto_umrk"), this.getOffsetDateTime("fraflydto"), this.getMarking("fraflydto_umrk")));
         effects.add(new PersonEffect(null, null, false, null, false));
         return effects;
     }

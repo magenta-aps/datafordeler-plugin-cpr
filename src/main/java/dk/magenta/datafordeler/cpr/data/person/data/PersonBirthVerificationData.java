@@ -13,30 +13,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Storage for data on a Person's parentage verification,
- * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
+ * Storage for data on a Person's birth verification,
+ * referenced by {@link PersonBaseData}
  */
 @Entity
-@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_parent_verification")
-public class PersonParentVerificationData extends AuthorityDetailData {
-
-    public static final String DB_FIELD_IS_MOTHER = "isMother";
-    @Column(name = DB_FIELD_IS_MOTHER)
-    @JsonIgnore
-    @XmlTransient
-    private boolean isMother;
-
-    @JsonIgnore
-    @XmlTransient
-    public boolean isMother() {
-        return this.isMother;
-    }
-
-    public void setMother(boolean mother) {
-        isMother = mother;
-    }
-
-
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_birth_verification")
+public class PersonBirthVerificationData extends AuthorityDetailData {
 
     public static final String DB_FIELD_VERIFIED = "verified";
     public static final String IO_FIELD_VERIFIED = "verificeret";
@@ -56,7 +38,6 @@ public class PersonParentVerificationData extends AuthorityDetailData {
     @Override
     public Map<String, Object> databaseFields() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put(DB_FIELD_IS_MOTHER, this.isMother);
         map.put(DB_FIELD_VERIFIED, this.verified);
         return map;
     }
@@ -69,10 +50,9 @@ public class PersonParentVerificationData extends AuthorityDetailData {
     }
 
     @Override
-    protected PersonParentVerificationData clone() {
-        PersonParentVerificationData clone = new PersonParentVerificationData();
+    protected PersonBirthVerificationData clone() {
+        PersonBirthVerificationData clone = new PersonBirthVerificationData();
         clone.verified = this.verified;
-        clone.isMother = this.isMother;
         clone.setAuthority(this.getAuthority());
         clone.setDafoUpdated(this.getDafoUpdated());
         return clone;

@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
@@ -15,7 +16,7 @@ import java.util.Map;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_address_coname")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_address_coname")
 public class PersonAddressConameData extends DetailData {
 
     public static final String DB_FIELD_CONAME = "coname";
@@ -41,5 +42,13 @@ public class PersonAddressConameData extends DetailData {
     @Override
     public Map<String, Object> asMap() {
         return Collections.singletonMap("coname", this.coname);
+    }
+
+    @Override
+    protected PersonAddressConameData clone() {
+        PersonAddressConameData clone = new PersonAddressConameData();
+        clone.coname = this.coname;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

@@ -11,13 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Storage for data on a Person's country code,
- * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
+ * Storage for data on a Person's church relation,
+ * referenced by {@link PersonBaseData}
  */
 @Entity
-@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_emigration")
-public class PersonEmigrationData extends AuthorityDetailData {
-
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_citizenship")
+public class PersonCitizenshipData extends AuthorityDetailData {
 
     public static final String DB_FIELD_COUNTRY_CODE = "countryCode";
     public static final String IO_FIELD_COUNTRY_CODE = "landekode";
@@ -27,7 +26,7 @@ public class PersonEmigrationData extends AuthorityDetailData {
     private int countryCode;
 
     public int getCountryCode() {
-        return countryCode;
+        return this.countryCode;
     }
 
     public void setCountryCode(int countryCode) {
@@ -36,24 +35,18 @@ public class PersonEmigrationData extends AuthorityDetailData {
 
     @Override
     public Map<String, Object> databaseFields() {
-        HashMap<String, Object> map = new HashMap<>(super.databaseFields());
+        HashMap<String, Object> map = new HashMap<>();
         map.put(DB_FIELD_COUNTRY_CODE, this.countryCode);
         return map;
     }
 
     @Override
-    public Map<String, Object> asMap() {
-        HashMap<String, Object> map = new HashMap<>(super.asMap());
-        map.put("countryCode", this.countryCode);
-        return map;
-    }
-
-    @Override
-    protected PersonEmigrationData clone() {
-        PersonEmigrationData clone = new PersonEmigrationData();
+    protected PersonCitizenshipData clone() {
+        PersonCitizenshipData clone = new PersonCitizenshipData();
         clone.countryCode = this.countryCode;
         clone.setAuthority(this.getAuthority());
         clone.setDafoUpdated(this.getDafoUpdated());
         return clone;
     }
+
 }

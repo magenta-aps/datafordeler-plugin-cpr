@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +17,7 @@ import java.util.StringJoiner;
  * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_foreign_address")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_foreign_address")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PersonForeignAddressData extends AuthorityDetailData {
 
@@ -145,5 +146,18 @@ public class PersonForeignAddressData extends AuthorityDetailData {
             joiner.add(this.addressLine5);
         }
         return joiner.toString();
+    }
+
+    @Override
+    protected PersonForeignAddressData clone() {
+        PersonForeignAddressData clone = new PersonForeignAddressData();
+        clone.addressLine1 = this.addressLine1;
+        clone.addressLine2 = this.addressLine2;
+        clone.addressLine3 = this.addressLine3;
+        clone.addressLine4 = this.addressLine4;
+        clone.addressLine5 = this.addressLine5;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

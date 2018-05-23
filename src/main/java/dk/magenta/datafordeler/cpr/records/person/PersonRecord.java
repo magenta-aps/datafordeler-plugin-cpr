@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -24,6 +25,8 @@ public class PersonRecord extends PersonDataRecord {
     private Bitemporality fatherVerificationTemporality;
     private Bitemporality positionTemporality;
     private Bitemporality birthTemporality;
+
+    private boolean hasPnrGaeld = false;
 
     public PersonRecord(String line) throws ParseException {
         super(line);
@@ -78,107 +81,127 @@ public class PersonRecord extends PersonDataRecord {
         this.fatherVerificationTemporality = new Bitemporality(this.getOffsetDateTime("far_dok_ts"));
         this.positionTemporality = new Bitemporality(this.getOffsetDateTime("stilling_ts"));
         this.birthTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-person"), null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
+
+        this.hasPnrGaeld = !this.getString("pnrgaeld", false).trim().isEmpty();
     }
 
     /**
      * Create a set of populated PersonBaseData objects, each with its own unique effect period
      *
-     * @param effect
-     * @param registrationTime
+     * @param bitemporality
+     * @param importMetadata
      * @return
      */
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = true;
 
-        data.setPersonnummer(this.getString("pnrgaeld", false));
 
-        if (this.statusTemporality.matches(registrationTime, effect)) {
-            data.setStatus(this.getInt("status", true));
-            updated = true;
+        if (this.hasPnrGaeld) {
+            data.setPersonnummer(
+                    this.getString("pnrgaeld", false),
+                    importMetadata.getImportTime()
+            );
         }
 
-        if (this.motherTemporality.matches(registrationTime, effect)) {
-            data.setMother(
-                // String name,
-                this.get("mornvn"),
-                // boolean nameMarking,
-                this.getBoolean("mornvn_mrk"),
-                // String cprNumber,
-                this.getString("pnrmor", false),
-                // LocalDate birthDate,
-                this.getDate("mor_foed_dt"),
-                // boolean birthDateUncertain,
-                this.getBoolean("mor_foed_dt_umrk"),
-                // int authorityCode
-                this.getInt("mor_mynkod")
+
+        if (bitemporality.equals(this.statusTemporality)) {
+            data.setStatus(
+                    this.getInt("status", true),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
 
-        if (this.fatherTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.motherTemporality)) {
+                data.setMother(
+                    // String name,
+                    this.get("mornvn"),
+                    // boolean nameMarking,
+                    this.getBoolean("mornvn_mrk"),
+                    // String cprNumber,
+                    this.getString("pnrmor", false),
+                    // LocalDate birthDate,
+                    this.getDate("mor_foed_dt"),
+                    // boolean birthDateUncertain,
+                    this.getBoolean("mor_foed_dt_umrk"),
+                    // int authorityCode
+                    this.getInt("mor_mynkod"),
+                    importMetadata.getImportTime()
+            );
+            updated = true;
+        }
+
+        if (bitemporality.equals(this.fatherTemporality)) {
             data.setFather(
-                // String name,
-                this.get("farnvn"),
-                // boolean nameMarking,
-                this.getBoolean("farnvn_mrk"),
-                // String cprNumber,
-                this.getString("pnrfar", false),
-                // LocalDate birthDate,
-                this.getDate("far_foed_dt"),
-                // boolean birthDateUncertain,
-                this.getBoolean("far_foed_dt_umrk"),
-                // int authorityCode
-                this.getInt("far_mynkod")
+                    // String name,
+                    this.get("farnvn"),
+                    // boolean nameMarking,
+                    this.getBoolean("farnvn_mrk"),
+                    // String cprNumber,
+                    this.getString("pnrfar", false),
+                    // LocalDate birthDate,
+                    this.getDate("far_foed_dt"),
+                    // boolean birthDateUncertain,
+                    this.getBoolean("far_foed_dt_umrk"),
+                    // int authorityCode
+                    this.getInt("far_mynkod"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
 
-        if (this.motherVerificationTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.motherVerificationTemporality)) {
             data.setMotherVerification(
-                // int authorityCode,
-                this.getInt("mor_dok_mynkod"),
-                // boolean verified
-                this.getBoolean("mor_dok")
+                    // int authorityCode,
+                    this.getInt("mor_dok_mynkod"),
+                    // boolean verified
+                    this.getBoolean("mor_dok"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
 
-        if (this.fatherVerificationTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.fatherVerificationTemporality)) {
             data.setFatherVerification(
-                // int authorityCode,
-                this.getInt("far_dok_mynkod"),
-                // boolean verified
-                this.getBoolean("far_dok")
+                    // int authorityCode,
+                    this.getInt("far_dok_mynkod"),
+                    // boolean verified
+                    this.getBoolean("far_dok"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
 
-        if (this.positionTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.positionTemporality)) {
             data.setPosition(
-                // int authorityCode,
-                this.getInt("stilling_mynkod"),
-                // String position
-                this.get("stilling")
+                    // int authorityCode,
+                    this.getInt("stilling_mynkod"),
+                    // String position
+                    this.get("stilling"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
 
-        if (this.birthTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.birthTemporality)) {
             data.setBirth(
-                // LocalDateTime foedselsdato,
-                this.getDateTime("foed_dt", "foed_tm"),
-                // boolean foedselsdatoUsikkerhedsmarkering,
-                this.getBoolean("foed_dt_umrk"),
-                // String cprFoedselsregistreringsstedskode,
-                null,
-                // String cprFoedselsregistreringsstedsnavn,
-                null,
-                // int foedselsraekkefoelge
-                this.getInt("foedsekvens")
+                    // LocalDateTime foedselsdato,
+                    this.getDateTime("foed_dt", "foed_tm"),
+                    // boolean foedselsdatoUsikkerhedsmarkering,
+                    this.getBoolean("foed_dt_umrk"),
+                    // int foedselsraekkefoelge
+                    this.getInt("foedsekvens"),
+                    importMetadata.getImportTime()
             );
-            data.setKoen(this.get("koen"));
-            data.setStartAuthority(this.getInt("start_mynkod-person"));
+            data.setKoen(
+                    this.get("koen"),
+                    importMetadata.getImportTime()
+            );
+            data.setStartAuthority(
+                    this.getInt("start_mynkod-person"),
+                    importMetadata.getImportTime()
+            );
             updated = true;
         }
         return updated;

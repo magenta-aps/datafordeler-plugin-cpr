@@ -148,6 +148,12 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
         return personEntity;
     }
 
+    private PersonEntity createBasicEntity(String cprNumber) {
+        PersonEntity personEntity = new PersonEntity();
+        personEntity.setPersonnummer(cprNumber);
+        return personEntity;
+    }
+
     @Override
     protected PersonBaseData createDataItem() {
         return new PersonBaseData();
