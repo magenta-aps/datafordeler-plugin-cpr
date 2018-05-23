@@ -8,10 +8,7 @@ import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Record for Person historic civil status (type 036).
@@ -121,12 +118,24 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
         timestamps.add(this.civilTemporality.registrationFrom);
+        timestamps.add(this.documentTemporality.registrationFrom);
+        timestamps.add(this.officiaryTemporality.registrationFrom);
         return timestamps;
     }
 
     @Override
     public List<Bitemporality> getBitemporality() {
-        return Collections.singletonList(this.civilTemporality);
+        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+        if (this.has("civst") || this.has("aegtepnr")) {
+            bitemporalities.add(this.civilTemporality);
+        }
+        if (this.has("dok_mynkod-civilstand")) {
+            bitemporalities.add(this.documentTemporality);
+        }
+        if (this.has("myntxt_mynkod-civilstand")) {
+            bitemporalities.add(this.officiaryTemporality);
+        }
+        return bitemporalities;
     }
 
     @Override

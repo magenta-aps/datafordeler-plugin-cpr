@@ -98,12 +98,24 @@ public class CivilStatusRecord extends PersonDataRecord {
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
         timestamps.add(this.civilTemporality.registrationFrom);
+        timestamps.add(this.documentTemporality.registrationFrom);
+        timestamps.add(this.officiaryTemporality.registrationFrom);
         return timestamps;
     }
 
     @Override
     public List<Bitemporality> getBitemporality() {
-        return Collections.singletonList(this.civilTemporality);
+        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+        if (this.has("civst") || this.has("aegtepnr")) {
+            bitemporalities.add(this.civilTemporality);
+        }
+        if (this.has("dok_mynkod-civilstand")) {
+            bitemporalities.add(this.documentTemporality);
+        }
+        if (this.has("myntxt_mynkod-civilstand")) {
+            bitemporalities.add(this.officiaryTemporality);
+        }
+        return bitemporalities;
     }
 
     @Override

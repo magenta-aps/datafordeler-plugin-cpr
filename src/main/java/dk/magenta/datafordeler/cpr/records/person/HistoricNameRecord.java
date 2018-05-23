@@ -8,10 +8,7 @@ import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Record for Person historic name (type 021).
@@ -160,12 +157,20 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
 
     @Override
     public List<Bitemporality> getBitemporality() {
-        return Arrays.asList(
-                this.nameTemporality,
-                this.addressNameTemporality,
-                this.documentNameTemporality,
-                this.officiaryTemporality
-        );
+        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+        if (this.has("fornvn") || this.has("melnvn") || this.has("efternvn") || this.has("slægtsnvn")) {
+            bitemporalities.add(this.nameTemporality);
+        }
+        if (this.has("adrnvn") || this.has("adrnvn_mynkod")) {
+            bitemporalities.add(this.addressNameTemporality);
+        }
+        if (this.has("dok-navne") || this.has("dok_mynkod-navne")) {
+            bitemporalities.add(this.documentNameTemporality);
+        }
+        if (this.has("myntxt-navne") || this.has("myntxt_mynkod-navne")) {
+            bitemporalities.add(this.officiaryTemporality);
+        }
+        return bitemporalities;
     }
 
     @Override

@@ -8,10 +8,7 @@ import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Record for Person base data (type 001).
@@ -95,7 +92,6 @@ public class PersonRecord extends PersonDataRecord {
     @Override
     public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = true;
-
 
         if (this.hasPnrGaeld) {
             data.setPersonnummer(
@@ -232,15 +228,29 @@ public class PersonRecord extends PersonDataRecord {
 
     @Override
     public List<Bitemporality> getBitemporality() {
-        return Arrays.asList(
-                this.statusTemporality,
-                this.motherTemporality,
-                this.fatherTemporality,
-                this.motherVerificationTemporality,
-                this.fatherVerificationTemporality,
-                this.positionTemporality,
-                this.birthTemporality
-        );
+        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+        if (this.has("status")) {
+            bitemporalities.add(this.statusTemporality);
+        }
+        if (this.has("mornvn") || this.has("pnrmor") || this.has("mor_foed_dt")) {
+            bitemporalities.add(this.motherTemporality);
+        }
+        if (this.has("farnvn") || this.has("pnrfar") || this.has("far_foed_dt")) {
+            bitemporalities.add(this.fatherTemporality);
+        }
+        if (this.has("mor_dok_mynkod") || this.has("mor_dok")) {
+            bitemporalities.add(this.motherVerificationTemporality);
+        }
+        if (this.has("far_dok_mynkod") || this.has("far_dok")) {
+            bitemporalities.add(this.fatherVerificationTemporality);
+        }
+        if (this.has("stilling") || this.has("stilling_mynkod")) {
+            bitemporalities.add(this.positionTemporality);
+        }
+        if (this.has("foed_dt") || this.has("foedsekvens")) {
+            bitemporalities.add(this.birthTemporality);
+        }
+        return bitemporalities;
     }
 
 
