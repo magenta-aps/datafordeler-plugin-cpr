@@ -36,11 +36,7 @@ public class HistoricChurchRecord extends HistoricPersonDataRecord {
                 this.getOffsetDateTime("start_dt-folkekirke"), this.getBoolean("start_dt-umrk-folkekirke"),
                 this.getOffsetDateTime("slut_dt-folkekirke"), this.getBoolean("slut_dt-umrk-folkekirke")
         );
-
-        OffsetDateTime docTime = this.getOffsetDateTime("dok_ts-folkekirke");
-        if (docTime != null) {
-            this.documentTemporality = new Bitemporality(docTime);
-        }
+        this.documentTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-folkekirke"));
     }
 
     @Override
@@ -87,8 +83,8 @@ public class HistoricChurchRecord extends HistoricPersonDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.getOffsetDateTime("fkirk_ts"));
-        timestamps.add(this.getOffsetDateTime("dok_ts-folkekirke"));
+        timestamps.add(this.churchTemporality.registrationFrom);
+        timestamps.add(this.documentTemporality.registrationFrom);
         return timestamps;
     }
 
@@ -96,9 +92,7 @@ public class HistoricChurchRecord extends HistoricPersonDataRecord {
     public List<Bitemporality> getBitemporality() {
         ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
         bitemporalities.add(this.churchTemporality);
-        if (this.documentTemporality != null) {
-            bitemporalities.add(this.documentTemporality);
-        }
+        bitemporalities.add(this.documentTemporality);
         return bitemporalities;
     }
 
