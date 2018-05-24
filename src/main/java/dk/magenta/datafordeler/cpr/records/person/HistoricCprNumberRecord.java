@@ -28,7 +28,11 @@ public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
         this.obtain("start_dt_umrk-person", 38, 1);
         this.obtain("slut_dt-person", 38, 10);
         this.obtain("slut_dt_umrk-person", 49, 1);
-        this.cprTemporality = new Bitemporality(null, null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
+        this.cprTemporality = new Bitemporality(
+                null, null,
+                this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"),
+                this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person")
+        );
     }
 
     @Override
