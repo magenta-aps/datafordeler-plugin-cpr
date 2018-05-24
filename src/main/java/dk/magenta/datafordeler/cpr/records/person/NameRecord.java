@@ -121,16 +121,6 @@ public class NameRecord extends PersonDataRecord {
     }
 
     @Override
-    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
-        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.nameTemporality.registrationFrom);
-        timestamps.add(this.addressNameTemporality.registrationFrom);
-        timestamps.add(this.documentNameTemporality.registrationFrom);
-        timestamps.add(this.officiaryTemporality.registrationFrom);
-        return timestamps;
-    }
-
-    @Override
     public List<Bitemporality> getBitemporality() {
         ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
         if (this.has("fornvn") || this.has("melnvn") || this.has("efternvn") || this.has("slægtsnvn")) {

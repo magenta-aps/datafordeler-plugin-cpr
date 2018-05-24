@@ -214,19 +214,6 @@ public class PersonRecord extends PersonDataRecord {
     }
 
     @Override
-    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
-        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.statusTemporality.registrationFrom);
-        timestamps.add(this.motherTemporality.registrationFrom);
-        timestamps.add(this.fatherTemporality.registrationFrom);
-        timestamps.add(this.motherVerificationTemporality.registrationFrom);
-        timestamps.add(this.fatherVerificationTemporality.registrationFrom);
-        timestamps.add(this.positionTemporality.registrationFrom);
-        timestamps.add(this.birthTemporality.registrationFrom);
-        return timestamps;
-    }
-
-    @Override
     public List<Bitemporality> getBitemporality() {
         ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
         if (this.has("status")) {

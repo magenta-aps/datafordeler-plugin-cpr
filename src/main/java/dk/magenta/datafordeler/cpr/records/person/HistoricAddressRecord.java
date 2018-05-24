@@ -153,15 +153,6 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
-        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.addressTemporality.registrationFrom);
-        timestamps.add(this.conameTemporality.registrationFrom);
-        timestamps.add(this.municipalityTemporality.registrationFrom);
-        return timestamps;
-    }
-
-    @Override
     public List<Bitemporality> getBitemporality() {
         return Arrays.asList(
                 this.addressTemporality,

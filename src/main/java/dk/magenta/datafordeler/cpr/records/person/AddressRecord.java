@@ -136,15 +136,6 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
-        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.addressTemporality.registrationFrom);
-        timestamps.add(this.conameTemporality.registrationFrom);
-        timestamps.add(this.municipalityTemporality.registrationFrom);
-        return timestamps;
-    }
-
-    @Override
     public List<Bitemporality> getBitemporality() {
         ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
         if (this.has("komkod") || this.has("vejkod") || this.has("bnr")) {
