@@ -64,16 +64,6 @@ public class CitizenshipRecord extends PersonDataRecord {
     }
 
     @Override
-    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
-        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.citizenshipTemporality.registrationFrom);
-        if (this.documentTemporality != null) {
-            timestamps.add(this.documentTemporality.registrationFrom);
-        }
-        return timestamps;
-    }
-
-    @Override
     public List<Bitemporality> getBitemporality() {
         ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
         bitemporalities.add(this.citizenshipTemporality);

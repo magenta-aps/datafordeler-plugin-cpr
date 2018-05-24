@@ -73,17 +73,9 @@ public class ForeignAddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
-        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.emigrationTemporality.registrationFrom);
-        timestamps.add(this.foreignAddressTemporality.registrationFrom);
-        return timestamps;
-    }
-
-    @Override
     public List<Bitemporality> getBitemporality() {
         ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
-        if (this.has("start_mynkod-udrindrejs") || this.has("udr_landekod")) {
+        if (this.has("udr_ts") || this.has("udr_landekod")) {
             bitemporalities.add(this.emigrationTemporality);
         }
         if (this.has("udlandadr_mynkod") || this.has("udlandadr1")) {

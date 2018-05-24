@@ -115,28 +115,17 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
-        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        if (this.emigrationTemporality.registrationFrom != null) {
-            timestamps.add(this.emigrationTemporality.registrationFrom);
-        }
-        if (this.immigrationTemporality.registrationFrom != null) {
-            timestamps.add(this.immigrationTemporality.registrationFrom);
-        }
-        timestamps.add(this.foreignAddressTemporality.registrationFrom);
-        return timestamps;
-    }
-
-    @Override
     public List<Bitemporality> getBitemporality() {
         ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
-        if (this.emigrationTemporality.registrationFrom != null) {
+        if (this.has("udr_ts") || this.has("udr_landekod")) {
             bitemporalities.add(this.emigrationTemporality);
         }
-        if (this.immigrationTemporality.registrationFrom != null) {
+        if (this.has("indr_ts") || this.has("indr_landekod")) {
             bitemporalities.add(this.immigrationTemporality);
         }
-        bitemporalities.add(this.foreignAddressTemporality);
+        if (this.has("udlandadr_mynkod") || this.has("udlandadr1")) {
+            bitemporalities.add(this.foreignAddressTemporality);
+        }
         return bitemporalities;
     }
 

@@ -80,13 +80,6 @@ public class HistoricChurchRecord extends HistoricPersonDataRecord {
         return updated;
     }
 
-    @Override
-    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
-        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.churchTemporality.registrationFrom);
-        timestamps.add(this.documentTemporality.registrationFrom);
-        return timestamps;
-    }
 
     @Override
     public List<Bitemporality> getBitemporality() {
