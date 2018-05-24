@@ -57,7 +57,7 @@ public class ProtectionRecord extends PersonDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.getOffsetDateTime("start_ts-beskyttelse"));
+        timestamps.add(this.protectionTemporality.registrationFrom);
         return timestamps;
     }
 

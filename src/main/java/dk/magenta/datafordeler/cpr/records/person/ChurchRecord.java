@@ -28,13 +28,8 @@ public class ChurchRecord extends PersonDataRecord {
         this.obtain("dok_mynkod-folkekirke", 42, 4);
         this.obtain("dok_ts-folkekirke", 46, 12);
         this.obtain("dok-folkekirke", 58, 3);
-
         this.churchTemporality = new Bitemporality(this.getOffsetDateTime("fkirk_ts"), null, this.getOffsetDateTime("start_dt-folkekirke"), this.getBoolean("start_dt-umrk-folkekirke"), null, false);
-
-        OffsetDateTime docTime = this.getOffsetDateTime("dok_ts-folkekirke");
-        if (docTime != null) {
-            this.documentTemporality = new Bitemporality(docTime);
-        }
+        this.documentTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-folkekirke"));
     }
 
     @Override
@@ -67,8 +62,10 @@ public class ChurchRecord extends PersonDataRecord {
     @Override
     public HashSet<OffsetDateTime> getRegistrationTimestamps() {
         HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.getOffsetDateTime("fkirk_ts"));
-        timestamps.add(this.getOffsetDateTime("dok_ts-folkekirke"));
+        timestamps.add(this.churchTemporality.registrationFrom);
+        if (this.documentTemporality != null) {
+            timestamps.add(this.documentTemporality.registrationFrom);
+        }
         return timestamps;
     }
 
