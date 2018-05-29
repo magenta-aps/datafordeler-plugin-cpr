@@ -98,6 +98,13 @@ public class QueryTest {
         return this.restTemplate.exchange("/cpr/"+type+"/1/rest/search?" + parameters.asUrlParams(), HttpMethod.GET, httpEntity, String.class);
     }
 
+    private ResponseEntity<String> uuidSearch(String id, String type) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/json");
+        HttpEntity<String> httpEntity = new HttpEntity<String>("", headers);
+        return this.restTemplate.exchange("/cpr/"+type+"/1/rest/" + id, HttpMethod.GET, httpEntity, String.class);
+    }
+
 
     @Test
     public void testPersonAccess() throws Exception {
@@ -145,6 +152,13 @@ public class QueryTest {
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(0, results.size());
 
+        response = uuidSearch("4ccc3b64-1779-38f2-a96c-458e541a010d", "person");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
+
         searchParameters.add("kommunekode", "95*");
         response = restSearch(searchParameters, "person");
         Assert.assertEquals(200, response.getStatusCode().value());
@@ -163,6 +177,14 @@ public class QueryTest {
         this.applyAccess(testUserDetails);
 
         response = restSearch(searchParameters, "person");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = objectMapper.readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("UUID").asText());
+
+        response = uuidSearch("4ccc3b64-1779-38f2-a96c-458e541a010d", "person");
         Assert.assertEquals(200, response.getStatusCode().value());
         jsonBody = objectMapper.readTree(response.getBody());
         results = jsonBody.get("results");
