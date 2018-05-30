@@ -8,15 +8,20 @@ import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
 
+@MappedSuperclass
 @JsonPropertyOrder({"effectFrom", "effectFromUncertain", "effectTo", "effectToUncertain", "dataItems"})
 public abstract class CprEffect<R extends Registration, V extends CprEffect, D extends CprData> extends Effect<R, V, D> {
 
+    @Column
     private boolean effectFromUncertain;
 
+    @Column
     private boolean effectToUncertain;
 
     public CprEffect() {
@@ -86,6 +91,6 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, D e
     }
 
     public String toString() {
-        return this.registration.getRegistrationFrom()+"|"+this.registration.getRegistrationTo()+"|"+this.getEffectFrom()+"|"+this.getEffectTo();
+        return this.registration.getRegistrationFrom()+"|"+this.registration.getRegistrationTo()+"|"+this.getEffectFrom()+"|"+this.getEffectFromUncertain()+"|"+this.getEffectTo()+"|"+this.getEffectToUncertain();
     }
 }
