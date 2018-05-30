@@ -34,7 +34,6 @@ public class PersonEntityService extends FapiService<PersonEntity, PersonQuery> 
     private MonitorService monitorService;
 
     public PersonEntityService() {
-        super();
         this.setOutputWrapper(new PersonOutputWrapper());
     }
 

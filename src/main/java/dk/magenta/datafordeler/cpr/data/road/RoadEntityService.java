@@ -28,6 +28,10 @@ public class RoadEntityService extends FapiService<RoadEntity, RoadQuery> {
     @Autowired
     private CprPlugin cprPlugin;
 
+    public RoadEntityService() {
+        this.setOutputWrapper(new RoadOutputWrapper());
+    }
+
     @Override
     public int getVersion() {
         return 1;

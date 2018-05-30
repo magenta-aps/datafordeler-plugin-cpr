@@ -22,9 +22,12 @@ import java.util.UUID;
 })
 public class PostCode extends UnversionedEntity {
 
-    @Column
-    @JsonProperty(value = "postnummer")
-    @XmlElement(name = "postnummer")
+    public static final String DB_FIELD_POSTNUMBER = "postnummer";
+    public static final String IO_FIELD_POSTNUMBER = "postnummer";
+
+    @Column(name = DB_FIELD_POSTNUMBER)
+    @JsonProperty(value = IO_FIELD_POSTNUMBER)
+    @XmlElement(name = IO_FIELD_POSTNUMBER)
     private int postnummer;
 
     public int getPostnummer() {
@@ -35,9 +38,13 @@ public class PostCode extends UnversionedEntity {
         this.postnummer = postnummer;
     }
 
-    @Column
-    @JsonProperty(value = "postdistrikt")
-    @XmlElement(name = "postdistrikt")
+
+    public static final String DB_FIELD_POSTDISTRICT = "postdistrikt";
+    public static final String IO_FIELD_POSTDISTRICT = "postdistrikt";
+
+    @Column(name = DB_FIELD_POSTDISTRICT)
+    @JsonProperty(value = IO_FIELD_POSTDISTRICT)
+    @XmlElement(name = IO_FIELD_POSTDISTRICT)
     private String postdistrikt;
 
     public String getPostdistrikt() {
