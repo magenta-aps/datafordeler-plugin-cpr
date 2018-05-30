@@ -139,7 +139,7 @@ public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
         return time.format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
-    protected void addEffectDataToRegistration(ObjectNode output, String key, JsonNode value) {
+    protected void addEffectDataToRegistration(ObjectNode output, String key, ObjectNode value) {
         if (!output.has(key) || output.get(key).isNull()) {
             output.set(key, objectMapper.createArrayNode());
         }
