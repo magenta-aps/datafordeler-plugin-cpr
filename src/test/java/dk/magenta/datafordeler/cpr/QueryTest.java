@@ -133,7 +133,7 @@ public class QueryTest {
         JsonNode results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(1, results.size());
-        Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("UUID").asText());
+        Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("uuid").asText());
 
 
         testUserDetails.giveAccess(
@@ -182,7 +182,7 @@ public class QueryTest {
         results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(1, results.size());
-        Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("UUID").asText());
+        Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("uuid").asText());
 
         response = uuidSearch("4ccc3b64-1779-38f2-a96c-458e541a010d", "person");
         Assert.assertEquals(200, response.getStatusCode().value());
@@ -190,7 +190,7 @@ public class QueryTest {
         results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(1, results.size());
-        Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("UUID").asText());
+        Assert.assertEquals("4ccc3b64-1779-38f2-a96c-458e541a010d", results.get(0).get("uuid").asText());
     }
 
     @Test
@@ -261,7 +261,7 @@ public class QueryTest {
         JsonNode results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(1, results.size());
-        Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("UUID").asText());
+        Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("uuid").asText());
 
         testUserDetails.giveAccess(
                 plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
@@ -294,7 +294,7 @@ public class QueryTest {
         results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(1, results.size());
-        Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("UUID").asText());
+        Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("uuid").asText());
     }
 
 
@@ -365,7 +365,7 @@ public class QueryTest {
         JsonNode results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(1, results.size());
-        Assert.assertEquals("d318815f-1959-3b37-b173-b99b88935c82", results.get(0).get("UUID").asText());
+        Assert.assertEquals("d318815f-1959-3b37-b173-b99b88935c82", results.get(0).get("uuid").asText());
 
         testUserDetails.giveAccess(
                 plugin.getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
@@ -398,7 +398,7 @@ public class QueryTest {
         results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(1, results.size());
-        Assert.assertEquals("d318815f-1959-3b37-b173-b99b88935c82", results.get(0).get("UUID").asText());
+        Assert.assertEquals("d318815f-1959-3b37-b173-b99b88935c82", results.get(0).get("uuid").asText());
 
     }
 

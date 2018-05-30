@@ -44,6 +44,11 @@ public class ResidenceEntityManager extends CprEntityManager<ResidenceRecord, Re
     }
 
     @Override
+    public String getDomain() {
+        return "https://data.gl/cpr/residence/1/rest/";
+    }
+
+    @Override
     public String getSchema() {
         return ResidenceEntity.schema;
     }

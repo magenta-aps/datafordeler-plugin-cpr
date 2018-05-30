@@ -71,6 +71,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         //this.handledURISubstrings.add(expandBaseURI(this.getBaseEndpoint(), "/get/" + this.getBaseName(), null, null).toString());
     }
 
+    public abstract String getDomain();
+
     @Override
     public Collection<String> getHandledURISubstrings() {
         return this.handledURISubstrings;
@@ -244,7 +246,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                     uuids.add(uuid);
                                     E entity = entityCache.get(uuid);
                                     if (entity == null) {
-                                        Identification identification = QueryManager.getOrCreateIdentification(session, uuid, CprPlugin.getDomain());
+                                        Identification identification = QueryManager.getOrCreateIdentification(session, uuid, this.getDomain());
                                         entity = QueryManager.getEntity(session, identification, this.getEntityClass());
                                         if (entity == null) {
                                             entity = this.createBasicEntity(record);

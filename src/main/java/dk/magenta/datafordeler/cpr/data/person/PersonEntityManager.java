@@ -81,6 +81,11 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     }
 
     @Override
+    public String getDomain() {
+        return "https://data.gl/cpr/person/1/rest/";
+    }
+
+    @Override
     public String getSchema() {
         return PersonEntity.schema;
     }

@@ -182,7 +182,7 @@ public class ParseTest {
             Assert.assertEquals(1, entities.size());
             RoadEntity entity = entities.get(0);
             Assert.assertEquals(RoadEntity.generateUUID(730, 4), entity.getUUID());
-            Assert.assertEquals(CprPlugin.getDomain(), entity.getDomain());
+            Assert.assertEquals(roadEntityManager.getDomain(), entity.getDomain());
             Assert.assertEquals(730, entity.getKommunekode());
             Assert.assertEquals(4, entity.getVejkode());
             Assert.assertEquals(2, entity.getRegistrations().size());
