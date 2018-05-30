@@ -181,6 +181,9 @@ public class ParseTest {
             List<RoadEntity> entities = QueryManager.getAllEntities(session, query, RoadEntity.class);
             Assert.assertEquals(1, entities.size());
             RoadEntity entity = entities.get(0);
+
+            System.out.println(new RoadOutputWrapper().wrapResult(entity, query));
+
             Assert.assertEquals(RoadEntity.generateUUID(730, 4), entity.getUUID());
             Assert.assertEquals(roadEntityManager.getDomain(), entity.getDomain());
             Assert.assertEquals(730, entity.getKommunekode());
@@ -285,6 +288,9 @@ public class ParseTest {
             Assert.assertEquals(1, entities.size());
             ResidenceEntity entity = entities.get(0);
             Assert.assertEquals(ResidenceEntity.generateUUID(360, 206, "44E", "", ""), entity.getUUID());
+
+            System.out.println(new ResidenceOutputWrapper().wrapResult(entities.get(0), query));
+
 
             List<ResidenceRegistration> registrations = entities.get(0).getRegistrations();
             Assert.assertEquals(1, registrations.size());

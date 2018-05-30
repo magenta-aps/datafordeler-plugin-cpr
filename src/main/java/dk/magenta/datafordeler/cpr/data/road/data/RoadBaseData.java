@@ -28,6 +28,7 @@ import java.util.*;
 public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
 
     public static final String DB_FIELD_CORE = "coreData";
+    public static final String IO_FIELD_CORE = "kernedata";
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = DB_FIELD_CORE + DatabaseEntry.REF)
@@ -38,6 +39,7 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     }
 
     public static final String DB_FIELD_MEMO = "memoData";
+    public static final String IO_FIELD_MEMO = "noter";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
     @OrderBy("memoNumber")
@@ -48,6 +50,7 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     }
 
     public static final String DB_FIELD_POSTCODE = "postcodeData";
+    public static final String IO_FIELD_POSTCODE = "post";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
     private Set<RoadPostcodeData> postcodeData = new HashSet<>();
@@ -57,6 +60,7 @@ public class RoadBaseData extends CprData<RoadEffect, RoadBaseData> {
     }
 
     public static final String DB_FIELD_CITY = "cityData";
+    public static final String IO_FIELD_CITY = "by";
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "roadBaseData")
     private Set<RoadCityData> cityData = new HashSet<>();
