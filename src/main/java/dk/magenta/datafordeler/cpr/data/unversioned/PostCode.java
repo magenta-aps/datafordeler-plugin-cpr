@@ -48,6 +48,10 @@ public class PostCode extends UnversionedEntity {
         this.postdistrikt = postdistrikt;
     }
 
+    public static String getDomain() {
+        return "https://data.gl/cpr/postcode/1/rest/";
+    }
+
     public static PostCode getPostcode(int code, String text, Session session) {
         PostCode postcode = QueryManager.getItem(session, PostCode.class, Collections.singletonMap("postnummer", code));
         if (postcode == null) {
@@ -55,7 +59,7 @@ public class PostCode extends UnversionedEntity {
             postcode.setPostnummer(code);
             postcode.setPostdistrikt(text);
             postcode.setIdentification(
-                    QueryManager.getOrCreateIdentification(session, generateUUID(code), CprPlugin.getDomain())
+                    QueryManager.getOrCreateIdentification(session, generateUUID(code), PostCode.getDomain())
             );
             session.save(postcode);
         }

@@ -43,6 +43,11 @@ public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEnti
     }
 
     @Override
+    public String getDomain() {
+        return "https://data.gl/cpr/road/1/rest/";
+    }
+
+    @Override
     public String getSchema() {
         return RoadEntity.schema;
     }

@@ -78,13 +78,6 @@ public class CprPlugin extends Plugin {
     }
 
     /**
-     * Return the domain for the plugin, used in Identification objects under CPR
-     */
-    public static String getDomain() {
-        return "cpr";
-    }
-
-    /**
      * Return the plugin’s register manager
      */
     @Override
