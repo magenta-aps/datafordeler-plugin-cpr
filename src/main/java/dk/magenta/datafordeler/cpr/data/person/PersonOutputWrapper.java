@@ -27,8 +27,8 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         objectMapper = new ObjectMapper();
         ObjectNode root = objectMapper.createObjectNode();
         root.put(PersonEntity.IO_FIELD_UUID, input.getUUID().toString());
+        root.put(PersonEntity.IO_FIELD_DOMAIN, input.getDomain());
         root.put(PersonEntity.IO_FIELD_CPR_NUMBER, input.getPersonnummer());
-        root.putPOJO("id", input.getIdentification());
         ArrayNode registreringer = this.getRegistrations(input, null);
         root.set(PersonEntity.IO_FIELD_REGISTRATIONS, registreringer);
         return root;
