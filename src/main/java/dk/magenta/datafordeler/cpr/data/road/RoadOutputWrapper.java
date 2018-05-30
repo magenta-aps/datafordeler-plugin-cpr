@@ -166,11 +166,18 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
         return time.format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
-    protected void addEffectDataToRegistration(ObjectNode output, String key, JsonNode value) {
+    protected void addEffectDataToRegistration(ObjectNode output, String key, ObjectNode value) {
         if (!output.has(key) || output.get(key).isNull()) {
             output.set(key, objectMapper.createArrayNode());
         }
         ((ArrayNode) output.get(key)).add(value);
+    }
+
+    protected void addEffectDataToRegistration(ObjectNode output, String key, Collection<ObjectNode> value) {
+        if (!output.has(key) || output.get(key).isNull()) {
+            output.set(key, objectMapper.createArrayNode());
+        }
+        ((ArrayNode) output.get(key)).addAll(value);
     }
 
     protected ObjectNode createDataNode(Bitemporality bitemporality, OffsetDateTime lastUpdated) {
@@ -211,10 +218,10 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
         return output;
     }
 
-    protected ArrayNode createByNode(
+    protected Set<ObjectNode> createByNode(
             Bitemporality bitemporality, OffsetDateTime lastUpdated, Collection<RoadCityData> roadCityDataSet
     ) {
-        ArrayNode output = objectMapper.createArrayNode();
+        HashSet<ObjectNode> output = new HashSet<>();
         for (RoadCityData roadCityData : roadCityDataSet) {
             ObjectNode item = createDataNode(bitemporality, lastUpdated);
             item.put(RoadCityData.IO_FIELD_CITYNAME, roadCityData.getCityName());
@@ -226,10 +233,10 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
         return output;
     }
 
-    protected ArrayNode createMemoNode(
+    protected Set<ObjectNode> createMemoNode(
             Bitemporality bitemporality, OffsetDateTime lastUpdated, Collection<RoadMemoData> roadMemoDataSet
     ) {
-        ArrayNode output = objectMapper.createArrayNode();
+        HashSet<ObjectNode> output = new HashSet<>();
         for (RoadMemoData roadMemoData : roadMemoDataSet) {
             ObjectNode item = createDataNode(bitemporality, lastUpdated);
             item.put(RoadMemoData.IO_FIELD_MEMONUMBER, roadMemoData.getMemoNumber());
@@ -239,10 +246,10 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
         return output;
     }
 
-    protected ArrayNode createPostNode(
+    protected Set<ObjectNode> createPostNode(
             Bitemporality bitemporality, OffsetDateTime lastUpdated, Collection<RoadPostcodeData> roadPostcodeDataSet
     ) {
-        ArrayNode output = objectMapper.createArrayNode();
+        HashSet<ObjectNode> output = new HashSet<>();
         for (RoadPostcodeData roadPostcodeData : roadPostcodeDataSet) {
             ObjectNode item = createDataNode(bitemporality, lastUpdated);
             item.putPOJO(RoadPostcodeData.IO_FIELD_POSTCODE, roadPostcodeData.getPostCode());
