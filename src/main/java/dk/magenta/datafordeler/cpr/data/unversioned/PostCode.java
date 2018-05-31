@@ -17,8 +17,8 @@ import java.util.UUID;
  * Nontemporal storage of postcodes, to be referenced by bitemporal data items.
  */
 @Entity
-@Table(name="cpr_postcode", indexes = {
-        @Index(name = "cpr_postcode", columnList = "postnummer")
+@Table(name=CprPlugin.DEBUG_TABLE_PREFIX + "cpr_postcode", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_postcode", columnList = "postnummer")
 })
 public class PostCode extends UnversionedEntity {
 
