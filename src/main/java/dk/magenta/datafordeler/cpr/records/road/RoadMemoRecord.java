@@ -1,7 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.road;
 
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 28-06-17.
+ * Record for Road memos (type 005).
  */
 public class RoadMemoRecord extends RoadDataRecord {
 
@@ -36,11 +36,12 @@ public class RoadMemoRecord extends RoadDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, Session session) {
-        if (this.memoTemporality.matches(registrationTime, effect)) {
+    public boolean populateBaseData(RoadBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+        if (bitemporality.equals(this.memoTemporality)) {
             data.addMemo(
                     this.getInt("notatnr"),
-                    this.get("notatlinie")
+                    this.get("notatlinie"),
+                    importMetadata.getImportTime()
             );
             return true;
         }

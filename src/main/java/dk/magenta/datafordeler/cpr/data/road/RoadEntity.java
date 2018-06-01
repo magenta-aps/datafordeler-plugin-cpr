@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.database.Identification;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Index;
@@ -17,15 +18,16 @@ import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_MUNICIPA
 import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_ROADCODE;
 
 /**
- * Created by lars on 16-05-17.
+ * An Entity representing a road. Bitemporal data is structured as described
+ * in {@link dk.magenta.datafordeler.core.database.Entity}
  */
 @javax.persistence.Entity
 @Table(
-    name="cpr_road_entity",
+    name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_entity",
     indexes = {
-            @Index(name = "cpr_road_identification", columnList = "identification_id"),
-            @Index(name = "cpr_road_municipality_code", columnList = DB_FIELD_MUNICIPALITYCODE),
-            @Index(name = "cpr_road_code", columnList = DB_FIELD_ROADCODE)
+            @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_identification", columnList = "identification_id"),
+            @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_municipality_code", columnList = DB_FIELD_MUNICIPALITYCODE),
+            @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_code", columnList = DB_FIELD_ROADCODE)
     }
 )
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -53,7 +55,7 @@ public class RoadEntity extends Entity<RoadEntity, RoadRegistration> {
 
 
     public static final String DB_FIELD_MUNICIPALITYCODE = "municipalityCode";
-    public static final String IO_FIELD_MUNICIPALITYCODE = "municipalityCode";
+    public static final String IO_FIELD_MUNICIPALITYCODE = "kommunekode";
 
     @Column(name = DB_FIELD_MUNICIPALITYCODE)
     @JsonProperty(value = IO_FIELD_MUNICIPALITYCODE)

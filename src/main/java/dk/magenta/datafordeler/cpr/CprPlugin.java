@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 /**
- * Created by lars on 16-05-17.
  * Datafordeler Plugin to fetch, parse and serve CPR data (data on people, roads and
  * administrative regions).
  * As with all plugins, it follows the model laid out in the Datafordeler Core
@@ -27,6 +26,10 @@ import javax.annotation.PostConstruct;
  */
 @Component
 public class CprPlugin extends Plugin {
+
+
+    public static final String DEBUG_TABLE_PREFIX = "";
+
 
     @Autowired
     private CprConfigurationManager configurationManager;
@@ -71,13 +74,6 @@ public class CprPlugin extends Plugin {
 
     @Override
     public String getName() {
-        return "cpr";
-    }
-
-    /**
-     * Return the domain for the plugin, used in Identification objects under CPR
-     */
-    public static String getDomain() {
         return "cpr";
     }
 

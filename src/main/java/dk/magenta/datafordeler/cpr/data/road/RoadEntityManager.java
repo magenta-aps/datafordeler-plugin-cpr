@@ -1,7 +1,5 @@
 package dk.magenta.datafordeler.cpr.data.road;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
@@ -15,9 +13,6 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.util.UUID;
 
-/**
- * Created by lars on 16-05-17.
- */
 @Component("cprRoadEntityMananger")
 public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEntity, RoadRegistration, RoadEffect, RoadBaseData> {
 
@@ -29,35 +24,6 @@ public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEnti
 
     @Autowired
     private SessionManager sessionManager;
-
-
-    private static class RoadIdentifier {
-        public int kommunekode;
-        public int vejkode;
-
-        public RoadIdentifier(int kommunekode, int vejkode) {
-            this.kommunekode = kommunekode;
-            this.vejkode = vejkode;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            RoadIdentifier that = (RoadIdentifier) o;
-
-            if (kommunekode != that.kommunekode) return false;
-            return vejkode == that.vejkode;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = kommunekode;
-            result = 31 * result + vejkode;
-            return result;
-        }
-    }
 
     public RoadEntityManager() {
         this.managedEntityClass = RoadEntity.class;
@@ -74,6 +40,11 @@ public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEnti
     @Override
     public RoadEntityService getEntityService() {
         return this.roadEntityService;
+    }
+
+    @Override
+    public String getDomain() {
+        return "https://data.gl/cpr/road/1/rest/";
     }
 
     @Override

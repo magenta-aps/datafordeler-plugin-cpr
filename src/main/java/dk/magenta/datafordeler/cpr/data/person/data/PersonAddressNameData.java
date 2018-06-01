@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,10 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lars on 22-06-17.
+ * Storage for data on a Person's addressing name,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_addressname")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_addressname")
 public class PersonAddressNameData extends AuthorityDetailData {
 
     public static final String DB_FIELD_ADDRESS_NAME = "addressName";
@@ -43,5 +45,14 @@ public class PersonAddressNameData extends AuthorityDetailData {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("addressName", this.addressName);
         return map;
+    }
+
+    @Override
+    protected PersonAddressNameData clone() {
+        PersonAddressNameData clone = new PersonAddressNameData();
+        clone.addressName = this.addressName;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

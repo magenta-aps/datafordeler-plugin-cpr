@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * Created by lars on 29-06-17.
+ * Superclass for storing data with an authority field
  */
 @MappedSuperclass
 public abstract class AuthorityDetailData extends DetailData {
@@ -27,7 +27,9 @@ public abstract class AuthorityDetailData extends DetailData {
     }
 
     public void setAuthority(int authority) {
-        this.authority = authority;
+        if (authority != 0 || this.authority == 0) {
+            this.authority = authority;
+        }
     }
 
     @Override

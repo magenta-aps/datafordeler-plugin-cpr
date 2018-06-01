@@ -1,20 +1,17 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
- * Created by lars on 22-06-17.
+ * Record for Person address (type 025).
  */
 public class AddressRecord extends PersonDataRecord {
 
@@ -64,9 +61,9 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.addressTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.addressTemporality)) {
             data.setAddress(
                 // int authority,
                 this.getInt("start_mynkod-personbolig"),
@@ -91,7 +88,7 @@ public class AddressRecord extends PersonDataRecord {
                 // String postnummer,
                 null,
                 // String sideDoer,
-                this.get("sidedoer"),
+                this.getString("sidedoer", true),
                 // String adresselinie1,
                 this.get("adr1-supladr"),
                 // String adresselinie2,
@@ -105,28 +102,33 @@ public class AddressRecord extends PersonDataRecord {
                 // int addressTextType,
                 this.getInt("adrtxttype"),
                 // int startAuthority
-                this.getInt("start_mynkod-adrtxt")
+                this.getInt("start_mynkod-adrtxt"),
+                importMetadata.getImportTime()
             );
             updated = true;
         }
-        if (this.conameTemporality.matches(registrationTime, effect)) {
-            data.setCoName(this.get("convn"));
+        if (bitemporality.equals(this.conameTemporality)) {
+            data.setCoName(
+                    this.get("convn"),
+                    importMetadata.getImportTime()
+            );
             updated = true;
         }
-        if (this.municipalityTemporality.matches(registrationTime, effect)) {
+        if (bitemporality.equals(this.municipalityTemporality)) {
             data.setMoveMunicipality(
-                //int authority,
-                this.getInt("tilfra_mynkod"),
-                // LocalDateTime fraflytningsdatoKommune,
-                this.getDateTime("fraflykomdto"),
-                // boolean fraflytningsdatoKommuneUsikkerhedsmarkering,
-                this.getBoolean("fraflykomdt_umrk"),
-                // int fraflytningskommunekode,
-                this.getInt("fraflykomkod"),
-                // LocalDateTime tilflytningsdatoKommune,
-                this.getDateTime("tilflykomdto"),
-                // boolean tilflytningsdatoKommuneUsikkerhedsmarkering
-                this.getBoolean("tilflykomdt_umrk")
+                    //int authority,
+                    this.getInt("tilfra_mynkod"),
+                    // LocalDateTime fraflytningsdatoKommune,
+                    this.getDateTime("fraflykomdto"),
+                    // boolean fraflytningsdatoKommuneUsikkerhedsmarkering,
+                    this.getBoolean("fraflykomdt_umrk"),
+                    // int fraflytningskommunekode,
+                    this.getInt("fraflykomkod"),
+                    // LocalDateTime tilflytningsdatoKommune,
+                    this.getDateTime("tilflykomdto"),
+                    // boolean tilflytningsdatoKommuneUsikkerhedsmarkering
+                    this.getBoolean("tilflykomdt_umrk"),
+                    importMetadata.getImportTime()
             );
             updated = true;
         }
@@ -134,21 +136,18 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
-        HashSet<OffsetDateTime> timestamps = super.getRegistrationTimestamps();
-        timestamps.add(this.getOffsetDateTime("adr_ts"));
-        timestamps.add(this.getOffsetDateTime("convn_ts"));
-        timestamps.add(this.getOffsetDateTime("tilfra_ts"));
-        return timestamps;
-    }
-
-    @Override
     public List<Bitemporality> getBitemporality() {
-        return Arrays.asList(
-                this.addressTemporality,
-                this.conameTemporality,
-                this.municipalityTemporality
-        );
+        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+        if (this.has("komkod") || this.has("vejkod") || this.has("bnr")) {
+            bitemporalities.add(this.addressTemporality);
+        }
+        if (this.has("convn")) {
+            bitemporalities.add(this.conameTemporality);
+        }
+        if (this.has("tilfra_mynkod") || this.has("fraflykomdto") || this.has("fraflykomkod") || this.has("tilflykomdto")) {
+            bitemporalities.add(this.municipalityTemporality);
+        }
+        return bitemporalities;
     }
 
     @Override
@@ -157,5 +156,9 @@ public class AddressRecord extends PersonDataRecord {
         effects.add(new PersonEffect(null, this.getOffsetDateTime("tilflydto"), this.getMarking("tilflydto_umrk"), null, false));
         effects.add(new PersonEffect(null, null, false, null, false));
         return effects;
+    }
+
+    public int getMunicipalityCode() {
+        return this.getInt("komkod");
     }
 }

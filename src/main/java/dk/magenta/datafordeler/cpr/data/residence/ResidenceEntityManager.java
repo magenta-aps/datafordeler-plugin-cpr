@@ -1,11 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.residence;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
-import dk.magenta.datafordeler.core.exception.DataFordelerException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonRegistrationReference;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
@@ -15,15 +11,9 @@ import dk.magenta.datafordeler.cpr.records.residence.ResidenceRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by lars on 16-05-17.
- */
 @Component
 public class ResidenceEntityManager extends CprEntityManager<ResidenceRecord, ResidenceEntity, ResidenceRegistration, ResidenceEffect, ResidenceBaseData> {
 
@@ -54,15 +44,14 @@ public class ResidenceEntityManager extends CprEntityManager<ResidenceRecord, Re
     }
 
     @Override
+    public String getDomain() {
+        return "https://data.gl/cpr/residence/1/rest/";
+    }
+
+    @Override
     public String getSchema() {
         return ResidenceEntity.schema;
     }
-/*
-    @Override
-    public List<ResidenceRegistration> parseRegistration(String registrationData, ImportMetadata importMetadata) throws DataFordelerException {
-        return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)), importMetadata);
-    }
-    */
 
     @Override
     protected RegistrationReference createRegistrationReference(URI uri) {

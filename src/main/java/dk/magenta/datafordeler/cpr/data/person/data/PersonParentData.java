@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,10 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lars on 21-06-17.
+ * Storage for data on a Person's parentage,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_parent")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_parent")
 public class PersonParentData extends AuthorityDetailData {
 
     public static final String DB_FIELD_IS_MOTHER = "isMother";
@@ -141,5 +143,19 @@ public class PersonParentData extends AuthorityDetailData {
         map.put("name", this.name);
         map.put("nameMarking", this.nameMarking);
         return map;
+    }
+
+    @Override
+    protected PersonParentData clone() {
+        PersonParentData clone = new PersonParentData();
+        clone.cprNumber = this.cprNumber;
+        clone.birthDate = this.birthDate;
+        clone.birthDateUncertain = this.birthDateUncertain;
+        clone.isMother = this.isMother;
+        clone.name = this.name;
+        clone.nameMarking = this.nameMarking;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

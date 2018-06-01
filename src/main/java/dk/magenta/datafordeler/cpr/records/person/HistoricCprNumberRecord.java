@@ -1,7 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 22-06-17.
+ * Record for Person historic cpr number (type 065).
  */
-public class HistoricCprNumberRecord extends PersonDataRecord {
+public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
 
     private Bitemporality cprTemporality;
 
@@ -28,14 +28,32 @@ public class HistoricCprNumberRecord extends PersonDataRecord {
         this.obtain("start_dt_umrk-person", 38, 1);
         this.obtain("slut_dt-person", 38, 10);
         this.obtain("slut_dt_umrk-person", 49, 1);
-        this.cprTemporality = new Bitemporality(null, null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
+        this.cprTemporality = new Bitemporality(
+                null, null,
+                this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"),
+                this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person")
+        );
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, PersonEffect effect, OffsetDateTime registrationTime, Session session) {
+    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
-        if (this.cprTemporality.matches(registrationTime, effect)) {
-            data.setCprNumber(this.getInt("start_mynkod-pnrgaeld"), this.getString("gammelt_pnr", false));
+        if (bitemporality.equals(this.cprTemporality)) {
+            data.setCprNumber(
+                    this.getInt("start_mynkod-pnrgaeld"),
+                    this.getString("gammelt_pnr", false),
+                    importMetadata.getImportTime()
+            );
+            updated = true;
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        boolean updated = false;
+        if (bitemporality.equals(this.cprTemporality) && outdatedTemporality.equals(this.cprTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+            data.clearCprNumber(session);
             updated = true;
         }
         return updated;

@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,10 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lars on 22-06-17.
+ * Storage for data on a Person's moving between municipalities,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_move_municipality")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_move_municipality")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PersonMoveMunicipalityData extends AuthorityDetailData {
 
@@ -113,5 +115,18 @@ public class PersonMoveMunicipalityData extends AuthorityDetailData {
         map.put("inDatetime", this.inDatetime);
         map.put("inDatetimeUncertain", this.inDatetimeUncertain);
         return map;
+    }
+
+    @Override
+    protected PersonMoveMunicipalityData clone() {
+        PersonMoveMunicipalityData clone = new PersonMoveMunicipalityData();
+        clone.outDatetime = this.outDatetime;
+        clone.outDatetimeUncertain = this.outDatetimeUncertain;
+        clone.outMunicipality = this.outMunicipality;
+        clone.inDatetime = this.inDatetime;
+        clone.inDatetimeUncertain = this.inDatetimeUncertain;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

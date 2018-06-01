@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
@@ -11,12 +12,13 @@ import static dk.magenta.datafordeler.cpr.data.person.data.PersonNameData.DB_FIE
 import static dk.magenta.datafordeler.cpr.data.person.data.PersonNameData.DB_FIELD_LAST_NAME;
 
 /**
- * Created by lars on 22-06-17.
+ * Storage for data on a Person's name,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_name", indexes = {
-        @Index(name = "cpr_person_name_firstname", columnList = DB_FIELD_FIRST_NAMES),
-        @Index(name = "cpr_person_name_lastname", columnList = DB_FIELD_LAST_NAME),
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name_firstname", columnList = DB_FIELD_FIRST_NAMES),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name_lastname", columnList = DB_FIELD_LAST_NAME),
 })
 public class PersonNameData extends AuthorityDetailData {
 
@@ -39,7 +41,7 @@ public class PersonNameData extends AuthorityDetailData {
 
 
     public static final String DB_FIELD_FIRST_NAMES = "firstNames";
-    public static final String IO_FIELD_FIRST_NAMES = "fornavne";
+    public static final String IO_FIELD_FIRST_NAMES = "fornavn";
     @Column(name = DB_FIELD_FIRST_NAMES)
     @JsonProperty(value = IO_FIELD_FIRST_NAMES)
     @XmlElement(name = IO_FIELD_FIRST_NAMES)
@@ -212,5 +214,23 @@ public class PersonNameData extends AuthorityDetailData {
 
         //OBS: Virkning fra og til mangler i forhold til grunddatamodellen
         return map;
+    }
+
+    @Override
+    protected PersonNameData clone() {
+        PersonNameData clone = new PersonNameData();
+        clone.addressingName = this.addressingName;
+        clone.firstNames = this.firstNames;
+        clone.firstNamesMarking = this.firstNamesMarking;
+        clone.middleName = this.middleName;
+        clone.middleNameMarking = this.middleNameMarking;
+        clone.lastName = this.lastName;
+        clone.lastNameMarking = this.lastNameMarking;
+        clone.egetEfternavn = this.egetEfternavn;
+        clone.egetEfternavnMarkering = this.egetEfternavnMarkering;
+        clone.rapportnavne = this.rapportnavne;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

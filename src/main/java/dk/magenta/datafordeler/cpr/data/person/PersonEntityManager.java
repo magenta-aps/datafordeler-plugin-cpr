@@ -1,31 +1,42 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
+import dk.magenta.datafordeler.cpr.CprRegisterManager;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
+import dk.magenta.datafordeler.cpr.records.person.AddressRecord;
+import dk.magenta.datafordeler.cpr.records.person.ForeignAddressRecord;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-/**
- * Created by lars on 16-05-17.
- */
 @Component
 public class PersonEntityManager extends CprEntityManager<PersonDataRecord, PersonEntity, PersonRegistration, PersonEffect, PersonBaseData> {
+
+    @Value("${dafo.cpr.person.subscription-enabled:false}")
+    private boolean setupSubscriptionEnabled;
+
+    @Value("${dafo.cpr.person.local-subscription-folder:cache}")
+    private String localSubscriptionFolder;
+
+    @Value("${dafo.cpr.person.jobid:0}")
+    private int jobId;
+
+    @Value("${dafo.cpr.person.customer-id:0}")
+    private int customerId;
+
 
     @Autowired
     private PersonEntityService personEntityService;
@@ -43,6 +54,22 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
         this.managedRegistrationReferenceClass = PersonRegistrationReference.class;
     }
 
+    public int getJobId() {
+        return this.jobId;
+    }
+
+    public int getCustomerId() {
+        return this.customerId;
+    }
+
+    public String getLocalSubscriptionFolder() {
+        return this.localSubscriptionFolder;
+    }
+
+    public boolean isSetupSubscriptionEnabled() {
+        return this.setupSubscriptionEnabled;
+    }
+
     @Override
     protected String getBaseName() {
         return "person";
@@ -54,14 +81,45 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     }
 
     @Override
+    public String getDomain() {
+        return "https://data.gl/cpr/person/1/rest/";
+    }
+
+    @Override
     public String getSchema() {
         return PersonEntity.schema;
     }
-/*
+
+    private HashSet<String> nonGreenlandicCprNumbers = new HashSet<>();
+
     @Override
-    public List<PersonRegistration> parseRegistration(String registrationData, ImportMetadata importMetadata) throws DataFordelerException {
-        return this.parseRegistration(new ByteArrayInputStream(registrationData.getBytes(StandardCharsets.UTF_8)), importMetadata);
-    }*/
+    public List<PersonRegistration> parseData(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
+        try {
+            List<PersonRegistration> result = super.parseData(registrationData, importMetadata);
+            if (this.isSetupSubscriptionEnabled() && !this.nonGreenlandicCprNumbers.isEmpty()) {
+                this.createSubscription(this.nonGreenlandicCprNumbers);
+            }
+            return result;
+        } finally {
+            this.nonGreenlandicCprNumbers.clear();
+        }
+    }
+
+    @Override
+    protected void handleRecord(PersonDataRecord record, ImportMetadata importMetadata) {
+        super.handleRecord(record, importMetadata);
+        if (record != null) {
+            if (record instanceof AddressRecord) {
+                AddressRecord addressRecord = (AddressRecord) record;
+                if (addressRecord.getMunicipalityCode() < 900) {
+                    this.nonGreenlandicCprNumbers.add(addressRecord.getCprNumber());
+                }
+            } else if (record instanceof ForeignAddressRecord) {
+                ForeignAddressRecord foreignAddressRecord = (ForeignAddressRecord) record;
+                this.nonGreenlandicCprNumbers.add(foreignAddressRecord.getCprNumber());
+            }
+        }
+    }
 
     @Override
     protected RegistrationReference createRegistrationReference(URI uri) {
@@ -95,9 +153,96 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
         return personEntity;
     }
 
+    private PersonEntity createBasicEntity(String cprNumber) {
+        PersonEntity personEntity = new PersonEntity();
+        personEntity.setPersonnummer(cprNumber);
+        return personEntity;
+    }
+
     @Override
     protected PersonBaseData createDataItem() {
         return new PersonBaseData();
+    }
+
+    private void createSubscription(HashSet<String> addCprNumbers) throws DataFordelerException {
+        this.createSubscription(addCprNumbers, new HashSet<>());
+    }
+
+    private void createSubscription(HashSet<String> addCprNumbers, HashSet<String> removeCprNumbers) throws DataFordelerException {
+        this.log.info("Collected these numbers for subscription: "+addCprNumbers);
+        String charset = this.getConfiguration().getRegisterCharset(this);
+        String keyConstant = "";
+        StringJoiner content = new StringJoiner("\r\n");
+
+        Session session = sessionManager.getSessionFactory().openSession();
+        try {
+            List<PersonSubscription> existingSubscriptions = QueryManager.getAllItems(session, PersonSubscription.class);
+            HashMap<String, PersonSubscription> map = new HashMap<>();
+            for (PersonSubscription subscription : existingSubscriptions) {
+                map.put(subscription.getPersonNumber(), subscription);
+            }
+
+            addCprNumbers.removeAll(removeCprNumbers);
+            addCprNumbers.removeAll(map.keySet());
+
+
+            HashMap<String, HashSet<String>> loop = new HashMap<>();
+            loop.put("OP", addCprNumbers);
+            loop.put("SL", removeCprNumbers);
+
+            for (String operation : loop.keySet()) {
+                HashSet<String> cprNumbers = loop.get(operation);
+                for (String cprNumber : cprNumbers) {
+                    content.add(
+                            String.format(
+                                    "%02d%04d%02d%2s%10s%15s%45s",
+                                    6,
+                                    this.getCustomerId(),
+                                    0,
+                                    operation,
+                                    cprNumber,
+                                    keyConstant,
+                                    ""
+                            )
+                    );
+                }
+            }
+
+            for (String cprNumber : addCprNumbers) {
+                content.add(
+                        String.format(
+                                "%02d%06d%10s%15s",
+                                7,
+                                this.getJobId(),
+                                cprNumber,
+                                keyConstant,
+                                ""
+                        )
+                );
+            }
+
+            this.addSubscription(content.toString(), charset, this);
+
+            session.beginTransaction();
+            try {
+                for (String add : addCprNumbers) {
+                    PersonSubscription newSubscription = new PersonSubscription();
+                    newSubscription.setPersonNumber(add);
+                    session.save(newSubscription);
+                }
+                for (String remove : removeCprNumbers) {
+                    PersonSubscription removeSubscription = map.get(remove);
+                    if (removeSubscription != null) {
+                        session.delete(removeSubscription);
+                    }
+                }
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.getTransaction().rollback();
+            }
+        } finally {
+            session.close();
+        }
     }
 
 }

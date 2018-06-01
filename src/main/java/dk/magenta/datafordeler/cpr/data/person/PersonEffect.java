@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 
@@ -9,12 +10,14 @@ import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
 
 /**
- * Created by lars on 16-05-17.
+ * Representation of effects in the bitemporal model for persons.
+ * @see dk.magenta.datafordeler.core.database.Entity
  */
 @javax.persistence.Entity
-@Table(name="cpr_person_effect", indexes = {
-        @Index(name = "cpr_person_effect_from", columnList = "effectFrom"),
-        @Index(name = "cpr_person_effect_to", columnList = "effectTo")
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_effect", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_effect_registration", columnList = "registration_id"),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_effect_from", columnList = "effectFrom"),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_effect_to", columnList = "effectTo")
 })
 public class PersonEffect extends CprEffect<PersonRegistration, PersonEffect, PersonBaseData> {
 
@@ -39,6 +42,5 @@ public class PersonEffect extends CprEffect<PersonRegistration, PersonEffect, Pe
         this.setEffectFromUncertain(effectFromUncertain);
         this.setEffectToUncertain(effectToUncertain);
     }
-
 
 }

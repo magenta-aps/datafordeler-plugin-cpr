@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.database.Identification;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Index;
@@ -16,12 +17,13 @@ import java.util.UUID;
 import static dk.magenta.datafordeler.cpr.data.person.PersonEntity.DB_FIELD_CPR_NUMBER;
 
 /**
- * Created by lars on 16-05-17.
+ * An Entity representing a person. Bitemporal data is structured as
+ * described in {@link dk.magenta.datafordeler.core.database.Entity}
  */
 @javax.persistence.Entity
-@Table(name="cpr_person_entity", indexes = {
-        @Index(name = "cpr_person_identification", columnList = "identification_id"),
-        @Index(name = "cpr_person_personnummer", columnList = DB_FIELD_CPR_NUMBER)
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_entity", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_identification", columnList = "identification_id"),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_personnummer", columnList = DB_FIELD_CPR_NUMBER)
 })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {
@@ -60,8 +62,6 @@ public class PersonEntity extends Entity<PersonEntity, PersonRegistration> {
     public void setPersonnummer(String personnummer) {
         this.personnummer = personnummer;
     }
-
-
 
     public static UUID generateUUID(String cprNumber) {
         String uuidInput = "person:"+cprNumber;

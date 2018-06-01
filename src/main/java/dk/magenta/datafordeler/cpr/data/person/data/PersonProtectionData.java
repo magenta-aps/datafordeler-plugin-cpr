@@ -2,26 +2,29 @@ package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.DatabaseEntry;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lars on 27-06-17.
+ * Storage for data on a Person's protections,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_protection")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_protection", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_protection_base", columnList = PersonProtectionData.DB_FIELD_BASEDATA + DatabaseEntry.REF)
+})
 public class PersonProtectionData extends AuthorityDetailData {
 
 
-    public static final String DB_FIELD_BASEDATA = "baseData";
-    @ManyToOne(targetEntity = PersonBaseData.class)
+    public static final String DB_FIELD_BASEDATA = "personBaseData";
     @JsonIgnore
+    @ManyToOne(targetEntity = PersonBaseData.class)
+    @JoinColumn(name = DB_FIELD_BASEDATA + DatabaseEntry.REF)
     private PersonBaseData personBaseData;
 
     public void setBaseData(PersonBaseData personBaseData) {
@@ -74,5 +77,15 @@ public class PersonProtectionData extends AuthorityDetailData {
         map.put("protectionType", this.protectionType);
         map.put("reportMarking", this.reportMarking);
         return map;
+    }
+
+    @Override
+    protected PersonProtectionData clone() {
+        PersonProtectionData clone = new PersonProtectionData();
+        clone.protectionType = this.protectionType;
+        clone.reportMarking = this.reportMarking;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

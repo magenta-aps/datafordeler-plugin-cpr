@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
+import dk.magenta.datafordeler.core.MonitorService;
 import dk.magenta.datafordeler.core.arearestriction.AreaRestriction;
 import dk.magenta.datafordeler.core.arearestriction.AreaRestrictionType;
 import dk.magenta.datafordeler.core.database.DataItem;
@@ -19,12 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import java.util.Collection;
 
-
-/**
- * Created by lars on 19-05-17.
- */
 @RestController
 @RequestMapping("/cpr/person/1/rest")
 public class PersonEntityService extends FapiService<PersonEntity, PersonQuery> {
@@ -32,9 +30,17 @@ public class PersonEntityService extends FapiService<PersonEntity, PersonQuery> 
     @Autowired
     private CprPlugin cprPlugin;
 
+    @Autowired
+    private MonitorService monitorService;
+
     public PersonEntityService() {
-        super();
         this.setOutputWrapper(new PersonOutputWrapper());
+    }
+
+    @PostConstruct
+    public void init() {
+        this.monitorService.addAccessCheckPoint("/cpr/person/1/rest/1234");
+        this.monitorService.addAccessCheckPoint("/cpr/person/1/rest/search?personnummer=1234");
     }
 
     @Override

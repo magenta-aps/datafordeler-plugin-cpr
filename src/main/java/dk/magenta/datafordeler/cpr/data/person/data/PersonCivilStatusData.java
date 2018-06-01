@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,10 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lars on 22-06-17.
+ * Storage for data on a Person's civil status,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_civil_status")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_civil_status")
 public class PersonCivilStatusData extends AuthorityDetailData {
 
 
@@ -163,5 +165,20 @@ public class PersonCivilStatusData extends AuthorityDetailData {
 
         //OBS: Virkning fra og til mangler i forhold til grunddatamodellen
         return map;
+    }
+
+    @Override
+    protected PersonCivilStatusData clone() {
+        PersonCivilStatusData clone = new PersonCivilStatusData();
+        clone.correctionMarking = this.correctionMarking;
+        clone.civilStatus = this.civilStatus;
+        clone.spouseCpr = this.spouseCpr;
+        clone.spouseBirthdate = this.spouseBirthdate;
+        clone.spouseBirthdateUncertain = this.spouseBirthdateUncertain;
+        clone.spouseName = this.spouseName;
+        clone.spouseNameMarking = this.spouseNameMarking;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

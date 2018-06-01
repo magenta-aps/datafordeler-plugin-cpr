@@ -4,20 +4,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.database.Registration;
+import dk.magenta.datafordeler.core.util.Equality;
+import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
 
-/**
- * Created by lars on 29-06-17.
- */
+@MappedSuperclass
 @JsonPropertyOrder({"effectFrom", "effectFromUncertain", "effectTo", "effectToUncertain", "dataItems"})
 public abstract class CprEffect<R extends Registration, V extends CprEffect, D extends CprData> extends Effect<R, V, D> {
 
+    @Column
     private boolean effectFromUncertain;
 
+    @Column
     private boolean effectToUncertain;
 
     public CprEffect() {
@@ -64,8 +68,8 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, D e
 
     public boolean compareRange(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         return (
-                (this.getEffectFrom() != null ? this.getEffectFrom().equals(effectFrom) : effectFrom == null) &&
-                        (this.getEffectTo() != null ? this.getEffectTo().equals(effectTo) : effectTo == null) &&
+                Equality.equal(this.getEffectFrom(), effectFrom) &&
+                Equality.equal(this.getEffectTo(), effectTo) &&
                         (this.getEffectFromUncertain() == effectFromUncertain) &&
                         (this.getEffectToUncertain() == effectToUncertain)
         );
@@ -76,9 +80,17 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, D e
     }
 
     public V createClone() {
-        V effect = super.createClone();
-        effect.setEffectFromUncertain(this.effectFromUncertain);
-        effect.setEffectToUncertain(this.effectToUncertain);
-        return effect;
+        V other = (V) this.registration.createEffect(this.getEffectFrom(), this.getEffectTo());
+        other.setEffectFromUncertain(this.effectFromUncertain);
+        other.setEffectToUncertain(this.effectToUncertain);
+        for (D data : this.dataItems) {
+            D dataClone = (D) data.clone();
+            dataClone.addEffect(other);
+        }
+        return other;
+    }
+
+    public String toString() {
+        return this.registration.getRegistrationFrom()+"|"+this.registration.getRegistrationTo()+"|"+this.getEffectFrom()+"|"+this.getEffectFromUncertain()+"|"+this.getEffectTo()+"|"+this.getEffectToUncertain();
     }
 }

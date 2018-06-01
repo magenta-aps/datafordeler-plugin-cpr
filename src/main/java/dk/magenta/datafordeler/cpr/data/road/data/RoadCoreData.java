@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.data.road.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
 import javax.persistence.Column;
@@ -14,13 +15,13 @@ import java.util.Map;
 
 import static dk.magenta.datafordeler.cpr.data.road.data.RoadCoreData.DB_FIELD_ROAD_NAME;
 
-
 /**
- * Created by lars on 16-05-17.
+ * Storage for data on a Road's core data (name, connections),
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData}
  */
 @Entity
-@Table(name="cpr_road_core", indexes = {
-        @Index(name = "cpr_road_name", columnList = DB_FIELD_ROAD_NAME),
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_core", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_name", columnList = DB_FIELD_ROAD_NAME),
 })
 public class RoadCoreData extends DetailData {
 
@@ -156,4 +157,16 @@ public class RoadCoreData extends DetailData {
         return map;
     }
 
+    @Override
+    protected RoadCoreData clone() {
+        RoadCoreData clone = new RoadCoreData();
+        clone.fromMunicipality = this.fromMunicipality;
+        clone.fromRoad = this.fromRoad;
+        clone.toMunicipality = this.toMunicipality;
+        clone.toRoad = this.toRoad;
+        clone.addressingName = this.addressingName;
+        clone.name = this.name;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
+    }
 }

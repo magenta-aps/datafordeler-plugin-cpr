@@ -1,7 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.road;
 
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.data.unversioned.PostCode;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 29-06-17.
+ * Record for Road postcodes (type 004).
  */
 public class RoadPostcodeRecord extends RoadDataRecord {
 
@@ -39,13 +39,14 @@ public class RoadPostcodeRecord extends RoadDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(RoadBaseData data, RoadEffect effect, OffsetDateTime registrationTime, Session session) {
-        if (this.postcodeTemporality.matches(registrationTime, effect)) {
+    public boolean populateBaseData(RoadBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+        if (bitemporality.equals(this.postcodeTemporality)) {
             data.addPostcode(
                     this.getString("husnrfra", false),
                     this.getString("husnrtil", false),
                     this.getEven("ligeulige"),
-                    PostCode.getPostcode(this.getInt("postnr"), this.getString("postdisttxt", true), session)
+                    PostCode.getPostcode(this.getInt("postnr"), this.getString("postdisttxt", true), session),
+                    importMetadata.getImportTime()
             );
             return true;
         }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * Created by lars on 04-11-14.
+ * Parser for the Road line format.
  */
 @Component
 public class RoadParser extends CprSubParser<RoadDataRecord> {
@@ -24,7 +24,7 @@ public class RoadParser extends CprSubParser<RoadDataRecord> {
     }
 
     @Override
-    protected RoadDataRecord parseLine(String recordType, String line) {
+    public RoadDataRecord parseLine(String recordType, String line) {
         this.logType(recordType);
         try {
             switch (recordType) {

@@ -1,7 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.cpr.data.DetailData;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,10 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lars on 21-06-17.
+ * Storage for data on a Person's historic cpr number,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_cprnumber")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_cprnumber")
 public class PersonNumberData extends AuthorityDetailData {
 
     public static final String DB_FIELD_CPR_NUMBER = "cprNumber";
@@ -44,5 +45,14 @@ public class PersonNumberData extends AuthorityDetailData {
         HashMap<String, Object> map = new HashMap<>();
         map.put("cprNumber", this.cprNumber);
         return map;
+    }
+
+    @Override
+    protected PersonNumberData clone() {
+        PersonNumberData clone = new PersonNumberData();
+        clone.cprNumber = this.cprNumber;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

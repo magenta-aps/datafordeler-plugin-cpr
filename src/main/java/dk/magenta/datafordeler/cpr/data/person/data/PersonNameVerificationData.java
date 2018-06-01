@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.data.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,10 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lars on 21-06-17.
+ * Storage for data on a Person's name verification,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData}
  */
 @Entity
-@Table(name = "cpr_person_name_verification")
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name_verification")
 public class PersonNameVerificationData extends AuthorityDetailData {
 
 
@@ -45,5 +47,14 @@ public class PersonNameVerificationData extends AuthorityDetailData {
         HashMap<String, Object> map = new HashMap<>(super.asMap());
         map.put("verified", this.verified);
         return map;
+    }
+
+    @Override
+    protected PersonNameVerificationData clone() {
+        PersonNameVerificationData clone = new PersonNameVerificationData();
+        clone.verified = this.verified;
+        clone.setAuthority(this.getAuthority());
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 }

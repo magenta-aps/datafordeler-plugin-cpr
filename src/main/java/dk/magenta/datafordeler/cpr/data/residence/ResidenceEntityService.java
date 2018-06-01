@@ -14,6 +14,7 @@ import dk.magenta.datafordeler.cpr.CprAccessChecker;
 import dk.magenta.datafordeler.cpr.CprAreaRestrictionDefinition;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.CprRolesDefinition;
+import dk.magenta.datafordeler.cpr.data.person.PersonOutputWrapper;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,15 +22,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 
-/**
- * Created by lars on 19-05-17.
- */
 @RestController
 @RequestMapping("/cpr/residence/1/rest")
 public class ResidenceEntityService extends FapiService<ResidenceEntity, ResidenceQuery> {
 
     @Autowired
     private CprPlugin cprPlugin;
+
+    public ResidenceEntityService() {
+        this.setOutputWrapper(new ResidenceOutputWrapper());
+    }
 
     @Override
     public int getVersion() {

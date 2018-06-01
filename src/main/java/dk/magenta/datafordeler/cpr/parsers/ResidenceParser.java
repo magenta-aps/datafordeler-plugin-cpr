@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * Created by lars on 04-11-14.
+ * Parser for the Residence line format (same as road data, but obtains only the RECORDTYPE_RESIDENCE recordtype).
  */
 @Component
 public class ResidenceParser extends CprSubParser<ResidenceRecord> {
@@ -24,7 +24,7 @@ public class ResidenceParser extends CprSubParser<ResidenceRecord> {
     }
 
     @Override
-    protected ResidenceRecord parseLine(String recordType, String line) {
+    public ResidenceRecord parseLine(String recordType, String line) {
         this.logType(recordType);
         try {
             switch (recordType) {

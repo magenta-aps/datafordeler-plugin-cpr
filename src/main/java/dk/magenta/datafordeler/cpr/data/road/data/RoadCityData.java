@@ -2,25 +2,32 @@ package dk.magenta.datafordeler.cpr.data.road.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.DatabaseEntry;
+import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.DetailData;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.Map;
 
+import static dk.magenta.datafordeler.cpr.data.road.data.RoadCityData.DB_FIELD_BASEDATA;
+
 /**
- * Created by lars on 29-06-17.
+ * Storage for data on a Road's city,
+ * referenced by {@link dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData}
  */
 @Entity
-@Table(name="cpr_road_city")
+@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_city", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_city_base", columnList = DB_FIELD_BASEDATA + DatabaseEntry.REF)
+})
 public class RoadCityData extends DetailData {
 
-    @ManyToOne(targetEntity = RoadBaseData.class)
+    public static final String DB_FIELD_BASEDATA = "roadBaseData";
+
     @JsonIgnore
+    @ManyToOne(targetEntity = RoadBaseData.class)
+    @JoinColumn(name = DB_FIELD_BASEDATA + DatabaseEntry.REF)
     private RoadBaseData roadBaseData;
 
     public RoadBaseData getRoadBaseData() {
@@ -116,6 +123,17 @@ public class RoadCityData extends DetailData {
         map.put(DB_FIELD_HOUSENUMBER_FROM, this.houseNumberFrom);
         map.put(DB_FIELD_HOUSENUMBER_TO, this.houseNumberTo);
         return map;
+    }
+
+    @Override
+    protected RoadCityData clone() {
+        RoadCityData clone = new RoadCityData();
+        clone.cityName = this.cityName;
+        clone.houseNumberFrom = this.houseNumberFrom;
+        clone.houseNumberTo = this.houseNumberTo;
+        clone.even = this.even;
+        clone.setDafoUpdated(this.getDafoUpdated());
+        return clone;
     }
 
 }

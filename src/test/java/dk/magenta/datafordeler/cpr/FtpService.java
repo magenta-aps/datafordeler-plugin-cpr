@@ -20,9 +20,6 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by lars on 23-06-17.
- */
 public class FtpService {
 
     private FtpServer server = null;

@@ -13,13 +13,13 @@ import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_MUNICIPA
 import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_ROADCODE;
 
 /**
- * Created by lars on 19-05-17.
+ * Container for a query for Roads, defining fields and database lookup
  */
 public class RoadQuery extends CprQuery<RoadEntity> {
 
-    public static final String VEJKODE = "vejkode";
-    public static final String VEJNAVN = "vejnavn";
-    public static final String KOMMUNEKODE = "kommunekode";
+    public static final String VEJKODE = RoadEntity.IO_FIELD_ROADCODE;
+    public static final String VEJNAVN = RoadCoreData.IO_FIELD_ROAD_NAME;
+    public static final String KOMMUNEKODE = RoadEntity.IO_FIELD_MUNICIPALITYCODE;
 
     @QueryField(type = QueryField.FieldType.INT, queryName = VEJKODE)
     private String vejkode;
@@ -30,6 +30,9 @@ public class RoadQuery extends CprQuery<RoadEntity> {
 
     public void setVejkode(String vejkode) {
         this.vejkode = vejkode;
+        if (vejkode != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     public void setVejkode(int vejkode) {
@@ -45,6 +48,9 @@ public class RoadQuery extends CprQuery<RoadEntity> {
 
     public void setNavn(String navn) {
         this.navn = navn;
+        if (navn != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = KOMMUNEKODE)
@@ -56,6 +62,9 @@ public class RoadQuery extends CprQuery<RoadEntity> {
 
     public void addKommunekode(String kommunekode) {
         this.kommunekoder.add(kommunekode);
+        if (kommunekode != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     public void addKommunekode(int kommunekode) {

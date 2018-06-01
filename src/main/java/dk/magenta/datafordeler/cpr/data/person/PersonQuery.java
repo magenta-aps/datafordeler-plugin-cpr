@@ -6,21 +6,19 @@ import dk.magenta.datafordeler.core.fapi.QueryField;
 import dk.magenta.datafordeler.cpr.data.CprQuery;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonAddressData;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonCoreData;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonNameData;
-import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 
 import java.util.*;
 
 /**
- * Created by lars on 19-05-17.
+ * Container for a query for Persons, defining fields and database lookup
  */
 public class PersonQuery extends CprQuery<PersonEntity> {
 
-    public static final String PERSONNUMMER = "personnummer";
-    public static final String FORNAVNE = "fornavne";
-    public static final String EFTERNAVN = "efternavn";
-    public static final String KOMMUNEKODE = "kommunekode";
+    public static final String PERSONNUMMER = PersonEntity.IO_FIELD_CPR_NUMBER;
+    public static final String FORNAVNE = PersonNameData.IO_FIELD_FIRST_NAMES;
+    public static final String EFTERNAVN = PersonNameData.IO_FIELD_LAST_NAME;
+    public static final String KOMMUNEKODE = PersonAddressData.IO_FIELD_MUNICIPALITY_CODE;
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = PERSONNUMMER)
     private List<String> personnumre = new ArrayList<>();
@@ -31,6 +29,9 @@ public class PersonQuery extends CprQuery<PersonEntity> {
 
     public void addPersonnummer(String personnummer) {
         this.personnumre.add(personnummer);
+        if (personnummer != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     public void setPersonnummer(String personnummer) {
@@ -48,6 +49,9 @@ public class PersonQuery extends CprQuery<PersonEntity> {
 
     public void setFornavn(String fornavn) {
         this.fornavn = fornavn;
+        if (fornavn != null) {
+            this.increaseDataParamCount();
+        }
     }
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = EFTERNAVN)
@@ -59,6 +63,9 @@ public class PersonQuery extends CprQuery<PersonEntity> {
 
     public void setEfternavn(String efternavn) {
         this.efternavn = efternavn;
+        if (efternavn != null) {
+            this.increaseDataParamCount();
+        }
     }
 
 

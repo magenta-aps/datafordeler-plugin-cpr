@@ -1,7 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.residence;
 
-import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by lars on 29-06-17.
+ * Record for Residence (type 002).
  */
 public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBaseData> {
 
@@ -43,14 +43,15 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
     }
 
     @Override
-    public boolean populateBaseData(ResidenceBaseData data, ResidenceEffect effect, OffsetDateTime registrationTime, Session session) {
-        if (this.residenceTemporality.matches(registrationTime, effect)) {
-            data.setKommunekode(this.getInt("komkod"));
-            data.setVejkode(this.getInt("vejkod"));
-            data.setHusnummer(this.getString("husnr", true));
-            data.setEtage(this.getString("etage", true));
-            data.setSideDoer(this.getString("sidedoer", true));
-            data.setLokalitet(this.getString("lokalitet", true));
+    public boolean populateBaseData(ResidenceBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+        if (bitemporality.equals(this.residenceTemporality)) {
+            OffsetDateTime updateTime = importMetadata.getImportTime();
+            data.setKommunekode(this.getInt("komkod"), updateTime);
+            data.setVejkode(this.getInt("vejkod"), updateTime);
+            data.setHusnummer(this.getString("husnr", true), updateTime);
+            data.setEtage(this.getString("etage", true), updateTime);
+            data.setSideDoer(this.getString("sidedoer", true), updateTime);
+            data.setLokalitet(this.getString("lokalitet", true), updateTime);
             return true;
         }
         return false;

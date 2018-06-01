@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by jubk on 01-07-2017.
- */
 public class CprRolesDefinition extends RolesDefinition {
 
     public static ReadServiceRole READ_CPR_ROLE = new ReadServiceRole(
