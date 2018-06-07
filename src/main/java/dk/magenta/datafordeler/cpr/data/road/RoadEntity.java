@@ -25,7 +25,7 @@ import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_ROADCODE
 @Table(
     name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_entity",
     indexes = {
-            @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_identification", columnList = "identification_id"),
+            @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_identification", columnList = "identification_id", unique = true),
             @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_municipality_code", columnList = DB_FIELD_MUNICIPALITYCODE),
             @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_code", columnList = DB_FIELD_ROADCODE)
     }
