@@ -29,7 +29,8 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         root.put(PersonEntity.IO_FIELD_UUID, input.getUUID().toString());
         root.put(PersonEntity.IO_FIELD_DOMAIN, input.getDomain());
         root.put(PersonEntity.IO_FIELD_CPR_NUMBER, input.getPersonnummer());
-        ArrayNode registreringer = this.getRegistrations(input, null);
+        Bitemporality overlap = new Bitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
+        ArrayNode registreringer = this.getRegistrations(input, overlap);
         root.set(PersonEntity.IO_FIELD_REGISTRATIONS, registreringer);
         return root;
     }
