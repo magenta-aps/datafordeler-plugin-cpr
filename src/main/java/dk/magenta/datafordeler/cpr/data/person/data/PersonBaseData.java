@@ -21,14 +21,16 @@ import java.util.*;
  * Base class for Person data, linking to Effects and delegating storage to referred classes
  */
 @Entity
-@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_data", indexes = {
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF, unique = true),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF, unique = true),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_status", columnList = PersonBaseData.DB_FIELD_STATUS + DatabaseEntry.REF, unique = true),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_birth", columnList = PersonBaseData.DB_FIELD_BIRTH + DatabaseEntry.REF, unique = true)
+@Table(name = PersonBaseData.TABLE_NAME, indexes = {
+        @Index(name = PersonBaseData.TABLE_NAME + "__lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
+        @Index(name = PersonBaseData.TABLE_NAME + "__name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF, unique = true),
+        @Index(name = PersonBaseData.TABLE_NAME + "__address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF, unique = true),
+        @Index(name = PersonBaseData.TABLE_NAME + "__status", columnList = PersonBaseData.DB_FIELD_STATUS + DatabaseEntry.REF, unique = true),
+        @Index(name = PersonBaseData.TABLE_NAME + "__birth", columnList = PersonBaseData.DB_FIELD_BIRTH + DatabaseEntry.REF, unique = true)
 })
 public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
+
+    public static final String TABLE_NAME = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_data";
 
     public static final String DB_FIELD_CORE = "coreData";
     @OneToOne(optional = true, cascade = CascadeType.ALL)
