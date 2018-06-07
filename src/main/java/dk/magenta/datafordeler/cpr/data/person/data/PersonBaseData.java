@@ -23,10 +23,10 @@ import java.util.*;
 @Entity
 @Table(name = PersonBaseData.TABLE_NAME, indexes = {
         @Index(name = PersonBaseData.TABLE_NAME + "__lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
-        @Index(name = PersonBaseData.TABLE_NAME + "__name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF, unique = true),
-        @Index(name = PersonBaseData.TABLE_NAME + "__address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF, unique = true),
-        @Index(name = PersonBaseData.TABLE_NAME + "__status", columnList = PersonBaseData.DB_FIELD_STATUS + DatabaseEntry.REF, unique = true),
-        @Index(name = PersonBaseData.TABLE_NAME + "__birth", columnList = PersonBaseData.DB_FIELD_BIRTH + DatabaseEntry.REF, unique = true)
+        @Index(name = PersonBaseData.TABLE_NAME + "__name", columnList = PersonBaseData.DB_FIELD_NAME + DatabaseEntry.REF),
+        @Index(name = PersonBaseData.TABLE_NAME + "__address", columnList = PersonBaseData.DB_FIELD_ADDRESS + DatabaseEntry.REF),
+        @Index(name = PersonBaseData.TABLE_NAME + "__status", columnList = PersonBaseData.DB_FIELD_STATUS + DatabaseEntry.REF),
+        @Index(name = PersonBaseData.TABLE_NAME + "__birth", columnList = PersonBaseData.DB_FIELD_BIRTH + DatabaseEntry.REF)
 })
 public class PersonBaseData extends CprData<PersonEffect, PersonBaseData> {
 
