@@ -17,7 +17,7 @@ import java.util.UUID;
  */
 @javax.persistence.Entity
 @Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_entity",  indexes = {
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_identification", columnList = "identification_id")
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_identification", columnList = "identification_id", unique = true)
 })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ResidenceEntity extends CprEntity<ResidenceEntity, ResidenceRegistration> {
