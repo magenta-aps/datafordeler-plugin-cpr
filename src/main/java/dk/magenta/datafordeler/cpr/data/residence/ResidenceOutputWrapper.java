@@ -30,7 +30,8 @@ public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
         ObjectNode root = objectMapper.createObjectNode();
         root.put(ResidenceEntity.IO_FIELD_UUID, input.getUUID().toString());
         root.put(ResidenceEntity.IO_FIELD_DOMAIN, input.getDomain());
-        ArrayNode registreringer = this.getRegistrations(input, null);
+        Bitemporality overlap = new Bitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
+        ArrayNode registreringer = this.getRegistrations(input, overlap);
         root.set(ResidenceEntity.IO_FIELD_REGISTRATIONS, registreringer);
         return root;
     }

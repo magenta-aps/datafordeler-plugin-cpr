@@ -29,7 +29,8 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
         root.put(RoadEntity.IO_FIELD_DOMAIN, input.getDomain());
         root.put(RoadEntity.IO_FIELD_MUNICIPALITYCODE, input.getKommunekode());
         root.put(RoadEntity.IO_FIELD_ROADCODE, input.getVejkode());
-        ArrayNode registreringer = this.getRegistrations(input, null);
+        Bitemporality overlap = new Bitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
+        ArrayNode registreringer = this.getRegistrations(input, overlap);
         root.set(RoadEntity.IO_FIELD_REGISTRATIONS, registreringer);
         return root;
     }
