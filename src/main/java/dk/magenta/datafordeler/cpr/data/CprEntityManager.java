@@ -154,6 +154,9 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         return (CprRegisterManager) super.getRegisterManager();
     }
 
+    protected void parseAlternate(E entity, Collection<T> records, ImportMetadata importMetadata) {
+    }
+
 
     protected abstract SessionManager getSessionManager();
     protected abstract CprSubParser<T> getParser();
@@ -265,6 +268,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                             for (UUID uuid : uuids) {
                                 E entity = entityCache.get(uuid);
                                 List<T> records = recordMap.get(entity);
+
+
+                                this.parseAlternate(entity, records, importMetadata);
+
 
                                 ListHashMap<Bitemporality, T> groups = this.sortIntoGroups(records);
                                 HashSet<R> entityRegistrations = new HashSet<>();

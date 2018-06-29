@@ -1,16 +1,18 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
-import dk.magenta.datafordeler.cpr.CprRegisterManager;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.AddressRecord;
+import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import dk.magenta.datafordeler.cpr.records.person.ForeignAddressRecord;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
 import org.hibernate.Session;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 @Component
@@ -242,6 +245,23 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
             }
         } finally {
             session.close();
+        }
+    }
+
+    @Override
+    protected void parseAlternate(PersonEntity entity, Collection<PersonDataRecord> records, ImportMetadata importMetadata) {
+        OffsetDateTime updateTime = importMetadata.getImportTime();
+        for (PersonDataRecord record : records) {
+            for (CprBitemporalRecord bitemporalRecord : record.getBitemporalRecords()) {
+                bitemporalRecord.setDafoUpdated(updateTime);
+                entity.addBitemporalRecord((CprBitemporalPersonRecord) bitemporalRecord);
+            }
+        }
+        System.out.println(entity.getPersonnummer());
+        try {
+            System.out.println(getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(entity.getBitemporalRecords()));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
     }
 

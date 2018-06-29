@@ -5,13 +5,10 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import org.hibernate.Session;
 
-import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Record for Person historic address (type 026).
@@ -150,6 +147,63 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
             updated = true;
         }
         return updated;
+    }
+
+    @Override
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
+
+        records.add(new AddressDataRecord(
+                this.getInt("komkod", false),
+                this.getInt("vejkod", false),
+                this.getString("bnr", true),
+                this.getString("husnr", true),
+                this.get("etage"),
+                this.getString("sidedoer", true),
+                this.get("adr1-supladr"),
+                this.get("adr2-supladr"),
+                this.get("adr3-supladr"),
+                this.get("adr4-supladr"),
+                this.get("adr5-supladr"),
+                this.getInt("adrtxttype"),
+                this.getInt("start_mynkod-adrtxt")
+        ).setAuthority(
+                this.getInt("start_mynkod-personbolig")
+        ).setBitemporality(
+                this.addressTemporality
+        ));
+
+        records.add(new AddressConameDataRecord(
+                this.get("convn")
+        ).setAuthority(
+                this.getInt("start_mynkod-personbolig")
+        ).setBitemporality(
+                this.getOffsetDateTime("convn_ts"),
+                null,
+                this.getOffsetDateTime("tilflydto"),
+                this.getBoolean("tilflydto_umrk"),
+                this.getOffsetDateTime("fraflydto"),
+                this.getBoolean("fraflydto_umrk")
+        ));
+
+        records.add(new MoveMunicipalityDataRecord(
+                this.getDateTime("fraflykomdto"),
+                this.getBoolean("fraflykomdt_umrk"),
+                this.getInt("fraflykomkod"),
+                this.getDateTime("tilflykomdto"),
+                this.getBoolean("tilflykomdt_umrk")
+        ).setAuthority(
+                this.getInt("tilfra_mynkod")
+        ).setBitemporality(
+                this.getOffsetDateTime("tilfra_ts"),
+                null,
+                this.getOffsetDateTime("tilflydto"),
+                this.getBoolean("tilflydto_umrk"),
+                this.getOffsetDateTime("fraflydto"),
+                this.getBoolean("fraflydto_umrk")
+        ));
+
+        return records;
     }
 
     @Override

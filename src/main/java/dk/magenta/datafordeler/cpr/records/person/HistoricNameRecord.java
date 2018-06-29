@@ -5,10 +5,14 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Record for Person historic name (type 021).
@@ -143,6 +147,49 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
     @Override
     public String getRecordType() {
         return RECORDTYPE_HISTORIC_NAME;
+    }
+
+
+    @Override
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
+
+        records.add(new NameDataRecord(
+                null,
+                this.get("fornvn"),
+                this.getMarking("fornvn_mrk"),
+                this.get("melnvn"),
+                this.getMarking("melnvn_mrk"),
+                this.get("efternvn"),
+                this.getMarking("efternvn_mrk"),
+                this.get("slægtsnvn"),
+                this.getMarking("slægtsnvn_mrk")
+        ).setAuthority(
+                this.getInt("start_mynkod-navne")
+        ).setBitemporality(
+                this.nameTemporality
+        ));
+
+        records.add(new NameVerificationDataRecord(
+                this.getBoolean("dok-navne"),
+                null
+        ).setAuthority(
+                this.getInt("dok_mynkod-navne")
+        ).setBitemporality(
+                this.documentNameTemporality
+        ));
+
+        records.add(new NameAuthorityTextDataRecord(
+                this.getString("myntxt-navne", true),
+                null
+        ).setAuthority(
+                this.getInt("myntxt_mynkod-navne")
+        ).setBitemporality(
+                this.officiaryTemporality
+        ));
+
+        return records;
     }
 
     @Override

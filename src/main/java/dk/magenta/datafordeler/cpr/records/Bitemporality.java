@@ -3,7 +3,11 @@ package dk.magenta.datafordeler.cpr.records;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.CprEffect;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.TemporalAccessor;
 import java.util.Objects;
 
 public class Bitemporality implements Comparable<Bitemporality> {
@@ -33,6 +37,14 @@ public class Bitemporality implements Comparable<Bitemporality> {
 
     public Bitemporality(OffsetDateTime registrationFrom, OffsetDateTime registrationTo, OffsetDateTime effectFrom, OffsetDateTime effectTo) {
         this(registrationFrom, registrationTo, effectFrom, false, effectTo, false);
+    }
+
+    public Bitemporality(OffsetDateTime registrationFrom, OffsetDateTime registrationTo, TemporalAccessor effectFrom, TemporalAccessor effectTo) {
+        this(registrationFrom, registrationTo, convertTime(effectFrom), false, convertTime(effectTo), false);
+    }
+
+    public Bitemporality(OffsetDateTime registrationFrom, OffsetDateTime registrationTo, TemporalAccessor effectFrom, boolean effectFromUncertain, TemporalAccessor effectTo, boolean effectToUncertain) {
+        this(registrationFrom, registrationTo, convertTime(effectFrom), effectFromUncertain, convertTime(effectTo), effectToUncertain);
     }
 
     public Bitemporality withEffect(CprEffect effect) {
@@ -139,5 +151,14 @@ public class Bitemporality implements Comparable<Bitemporality> {
             c = Equality.compare(this.effectTo, o.effectTo, OffsetDateTime.class, true);
         }
         return c;
+    }
+
+
+    public static OffsetDateTime convertTime(TemporalAccessor time) {
+        return time != null ? OffsetDateTime.from(time) : null;
+    }
+
+    public static OffsetDateTime convertTime(LocalDate time) {
+        return time != null ? OffsetDateTime.of(time, LocalTime.MIDNIGHT, ZoneOffset.UTC) : null;
     }
 }

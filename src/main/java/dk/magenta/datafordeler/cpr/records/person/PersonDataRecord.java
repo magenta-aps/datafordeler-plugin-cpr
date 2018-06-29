@@ -2,14 +2,17 @@ package dk.magenta.datafordeler.cpr.records.person;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Superclass for Person records
@@ -21,6 +24,9 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
     public static final String RECORDTYPE_CHURCH = "010";
     public static final String RECORDTYPE_HISTORIC_CHURCH = "011";
     public static final String RECORDTYPE_PROTECTION = "015";
+
+
+
     public static final String RECORDTYPE_CURRENT_NAME = "020";
     public static final String RECORDTYPE_HISTORIC_NAME = "021";
     public static final String RECORDTYPE_DOMESTIC_ADDRESS = "025";
@@ -102,4 +108,6 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
         }
         return super.filter(importConfiguration);
     }
+
+    public abstract List<CprBitemporalRecord> getBitemporalRecords();
 }

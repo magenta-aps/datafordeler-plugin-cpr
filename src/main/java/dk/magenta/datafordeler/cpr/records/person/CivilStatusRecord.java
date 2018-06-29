@@ -5,10 +5,13 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import org.hibernate.Session;
 
-import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Record for Person civil status (type 035).
@@ -89,6 +92,46 @@ public class CivilStatusRecord extends PersonDataRecord {
     @Override
     public String getRecordType() {
         return RECORDTYPE_CIVILSTATUS;
+    }
+
+    @Override
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
+
+        records.add(new CivilStatusDataRecord(
+                null,
+                this.getString("civst", true),
+                this.getString("aegtepnr", false),
+                this.getDate("aegtefoed_dt"),
+                this.getBoolean("aegtefoeddt_umrk"),
+                this.getString("aegtenvn", true),
+                this.getMarking("aegtenvn_mrk")
+        ).setAuthority(
+                this.getInt("start_mynkod-civilstand")
+        ).setBitemporality(
+                this.civilTemporality
+        ));
+
+        records.add(new CivilStatusVerificationDataRecord(
+                this.getBoolean("dok-civilstand"),
+                null
+        ).setAuthority(
+                this.getInt("dok_mynkod-civilstand")
+        ).setBitemporality(
+                this.documentTemporality
+        ));
+
+        records.add(new CivilStatusAuthorityTextDataRecord(
+                this.getString("myntxt-civilstand", true),
+                null
+        ).setAuthority(
+                this.getInt("myntxt_mynkod-civilstand")
+        ).setBitemporality(
+                this.officiaryTemporality
+        ));
+
+        return records;
     }
 
     @Override

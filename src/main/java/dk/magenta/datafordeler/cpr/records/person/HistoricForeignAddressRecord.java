@@ -5,10 +5,14 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Record for Person foreign address (type 028).
@@ -112,6 +116,34 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
     @Override
     public String getRecordType() {
         return RECORDTYPE_HISTORIC_FOREIGN_ADDRESS;
+    }
+
+    @Override
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
+
+        records.add(new ForeignAddressDataRecord(
+                this.get("udlandadr1"),
+                this.get("udlandadr2"),
+                this.get("udlandadr3"),
+                this.get("udlandadr4"),
+                this.get("udlandadr5")
+        ).setAuthority(
+                this.getInt("udlandadr_mynkod")
+        ).setBitemporality(
+                this.foreignAddressTemporality
+        ));
+
+        records.add(new ForeignAddressEmigrationDataRecord(
+                this.getInt("udr_landekod")
+        ).setAuthority(
+                this.getInt("start_mynkod-udrindrejs")
+        ).setBitemporality(
+                this.emigrationTemporality
+        ));
+
+        return records;
     }
 
     @Override

@@ -13,20 +13,30 @@ import java.util.*;
 /**
  * Record for Person protection (type 015).
  */
-public class ProtectionRecord extends PersonDataRecord {
+public class HistoricProtectionRecord extends HistoricPersonDataRecord {
 
     private Bitemporality protectionTemporality;
 
-    public ProtectionRecord(String line) throws ParseException {
+    public HistoricProtectionRecord(String line) throws ParseException {
         super(line);
         this.obtain("beskyttype",14,4);
         this.obtain("start_mynkod-beskyttelse",18,4);
-        this.obtain("start_ts-beskyttelse",22,12	);
-        this.obtain("start_dt-beskyttelse",34,10	);
+        this.obtain("start_ts-beskyttelse",22,12);
+        this.obtain("start_dt-beskyttelse",34,10);
         this.obtain("indrap-beskyttelse",44	,3);
         this.obtain("slet_dt-beskyttelse",47,10);
 
-        this.protectionTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-beskyttelse"), null, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slet_dt-beskyttelse"), false);
+        this.obtain("slut_mynkod-beskyttelse",57,4);
+        this.obtain("slut_ts-beskyttelse",61,12);
+        this.obtain("slut_dt-beskyttelse",73,10);
+
+        //this.protectionTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-beskyttelse"), this.getOffsetDateTime("slut_ts-beskyttelse"), this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slut_dt-beskyttelse"), false);
+        this.protectionTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-beskyttelse"), this.getOffsetDateTime("slut_ts-beskyttelse"), this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slut_dt-beskyttelse"), false);
+    }
+
+    @Override
+    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+        return false;
     }
 
     @Override
@@ -36,6 +46,8 @@ public class ProtectionRecord extends PersonDataRecord {
 
     @Override
     public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+        /*
+        Keep this off for now
         if (bitemporality.equals(this.protectionTemporality)) {
             data.addProtection(
                     // int authority,
@@ -47,7 +59,7 @@ public class ProtectionRecord extends PersonDataRecord {
                     importMetadata.getImportTime()
             );
             return true;
-        }
+        }*/
         return false;
     }
 
@@ -69,13 +81,14 @@ public class ProtectionRecord extends PersonDataRecord {
 
     @Override
     public List<Bitemporality> getBitemporality() {
-        return Collections.singletonList(this.protectionTemporality);
+        //return Collections.singletonList(this.protectionTemporality);
+        return Collections.emptyList();
     }
 
     @Override
     public Set<PersonEffect> getEffects() {
         HashSet<PersonEffect> effects = new HashSet<>();
-        effects.add(new PersonEffect(null, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slet_dt-beskyttelse"), false));
+        //effects.add(new PersonEffect(null, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slut_dt-beskyttelse"), false));
         return effects;
     }
 }

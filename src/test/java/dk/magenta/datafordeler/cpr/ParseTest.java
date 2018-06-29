@@ -132,7 +132,8 @@ public class ParseTest {
 
             System.out.println(
                     objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
-                        new PersonOutputWrapper().wrapResult(entity, query)
+                        //new PersonOutputWrapper().wrapResult(entity, query)
+                            entity
                     )
             );
 
