@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's country code,
@@ -46,6 +47,20 @@ public class ForeignAddressEmigrationDataRecord extends CprBitemporalPersonRecor
 
     public void setCountryCode(int countryCode) {
         this.countryCode = countryCode;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ForeignAddressEmigrationDataRecord that = (ForeignAddressEmigrationDataRecord) o;
+        return countryCode == that.countryCode;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), countryCode);
     }
 
     @Override

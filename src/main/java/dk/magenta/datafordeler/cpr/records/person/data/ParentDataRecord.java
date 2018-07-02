@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's parentage,
@@ -139,6 +140,25 @@ public class ParentDataRecord extends CprBitemporalPersonRecord {
 
     public void setNameMarking(boolean nameMarking) {
         this.nameMarking = nameMarking;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ParentDataRecord that = (ParentDataRecord) o;
+        return isMother == that.isMother &&
+                birthDateUncertain == that.birthDateUncertain &&
+                nameMarking == that.nameMarking &&
+                Objects.equals(cprNumber, that.cprNumber) &&
+                Objects.equals(birthDate, that.birthDate) &&
+                Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), isMother, cprNumber, birthDate, birthDateUncertain, name, nameMarking);
     }
 
     @Override

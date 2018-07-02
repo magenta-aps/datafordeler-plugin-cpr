@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 /**
@@ -140,6 +141,24 @@ public class ForeignAddressDataRecord extends CprBitemporalPersonRecord {
             joiner.add(this.addressLine5);
         }
         return joiner.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ForeignAddressDataRecord that = (ForeignAddressDataRecord) o;
+        return Objects.equals(addressLine1, that.addressLine1) &&
+                Objects.equals(addressLine2, that.addressLine2) &&
+                Objects.equals(addressLine3, that.addressLine3) &&
+                Objects.equals(addressLine4, that.addressLine4) &&
+                Objects.equals(addressLine5, that.addressLine5);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), addressLine1, addressLine2, addressLine3, addressLine4, addressLine5);
     }
 
     @Override

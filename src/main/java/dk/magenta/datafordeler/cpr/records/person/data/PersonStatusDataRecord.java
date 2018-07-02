@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's status code,
@@ -47,6 +48,20 @@ public class PersonStatusDataRecord extends CprBitemporalPersonRecord {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        PersonStatusDataRecord that = (PersonStatusDataRecord) o;
+        return status == that.status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), status);
     }
 
     @Override

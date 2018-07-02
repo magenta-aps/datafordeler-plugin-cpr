@@ -11,6 +11,7 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's moving between municipalities,
@@ -120,6 +121,23 @@ public class MoveMunicipalityDataRecord extends CprBitemporalPersonRecord {
         this.inDatetimeUncertain = inDatetimeUncertain;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        MoveMunicipalityDataRecord that = (MoveMunicipalityDataRecord) o;
+        return outDatetimeUncertain == that.outDatetimeUncertain &&
+                outMunicipality == that.outMunicipality &&
+                inDatetimeUncertain == that.inDatetimeUncertain &&
+                Objects.equals(outDatetime, that.outDatetime) &&
+                Objects.equals(inDatetime, that.inDatetime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), outDatetime, outDatetimeUncertain, outMunicipality, inDatetime, inDatetimeUncertain);
+    }
 
     @Override
     protected MoveMunicipalityDataRecord clone() {

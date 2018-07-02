@@ -297,6 +297,14 @@ public class PersonRecord extends PersonDataRecord {
                 this.birthTemporality
         ));
 
+        records.add(new PersonCoreDataRecord(
+                this.get("koen")
+        ).setAuthority(
+                this.getInt("start_mynkod-person")
+        ).setBitemporality(
+                this.birthTemporality
+        ));
+
         return records;
     }
 

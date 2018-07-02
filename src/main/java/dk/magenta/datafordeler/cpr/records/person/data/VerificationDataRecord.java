@@ -8,6 +8,7 @@ import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's church verification,
@@ -36,6 +37,20 @@ public abstract class VerificationDataRecord extends CprBitemporalPersonRecord {
 
     public void setVerified(boolean verified) {
         this.verified = verified;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        VerificationDataRecord that = (VerificationDataRecord) o;
+        return verified == that.verified;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), verified);
     }
 
     protected static void copy(VerificationDataRecord from, VerificationDataRecord to) {

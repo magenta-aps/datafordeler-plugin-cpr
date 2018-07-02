@@ -8,6 +8,7 @@ import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's birth,
@@ -80,6 +81,21 @@ public class BirthTimeDataRecord extends CprBitemporalPersonRecord {
         this.foedselsraekkefoelge = foedselsraekkefoelge;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        BirthTimeDataRecord that = (BirthTimeDataRecord) o;
+        return birthDatetimeUncertain == that.birthDatetimeUncertain &&
+                foedselsraekkefoelge == that.foedselsraekkefoelge &&
+                Objects.equals(birthDatetime, that.birthDatetime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), birthDatetime, birthDatetimeUncertain, foedselsraekkefoelge);
+    }
 
     @Override
     protected BirthTimeDataRecord clone() {

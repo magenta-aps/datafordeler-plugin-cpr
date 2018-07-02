@@ -1,12 +1,13 @@
-package dk.magenta.datafordeler.cpr.records.person;
+package dk.magenta.datafordeler.cpr.records.person.data;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's name,
@@ -183,7 +184,27 @@ public class NameDataRecord extends CprBitemporalPersonRecord {
         this.egetEfternavnMarkering = egetEfternavnMarkering;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        NameDataRecord that = (NameDataRecord) o;
+        return firstNamesMarking == that.firstNamesMarking &&
+                middleNameMarking == that.middleNameMarking &&
+                lastNameMarking == that.lastNameMarking &&
+                egetEfternavnMarkering == that.egetEfternavnMarkering &&
+                Objects.equals(addressingName, that.addressingName) &&
+                Objects.equals(firstNames, that.firstNames) &&
+                Objects.equals(middleName, that.middleName) &&
+                Objects.equals(lastName, that.lastName) &&
+                Objects.equals(egetEfternavn, that.egetEfternavn);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), addressingName, firstNames, firstNamesMarking, middleName, middleNameMarking, lastName, lastNameMarking, egetEfternavn, egetEfternavnMarkering);
+    }
 
     @Override
     protected NameDataRecord clone() {

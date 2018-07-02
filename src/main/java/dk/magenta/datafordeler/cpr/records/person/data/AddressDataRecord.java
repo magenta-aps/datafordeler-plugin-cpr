@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 @Entity
 @Table(name = CprPlugin.DEBUG_TABLE_PREFIX + AddressDataRecord.TABLE_NAME, indexes = {
@@ -276,7 +277,31 @@ public class AddressDataRecord extends CprBitemporalPersonRecord {
         this.startAuthority = startAuthority;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        AddressDataRecord that = (AddressDataRecord) o;
+        return municipalityCode == that.municipalityCode &&
+                roadCode == that.roadCode &&
+                addressTextType == that.addressTextType &&
+                startAuthority == that.startAuthority &&
+                Objects.equals(buildingNumber, that.buildingNumber) &&
+                Objects.equals(houseNumber, that.houseNumber) &&
+                Objects.equals(floor, that.floor) &&
+                Objects.equals(door, that.door) &&
+                Objects.equals(roadAddressLine1, that.roadAddressLine1) &&
+                Objects.equals(roadAddressLine2, that.roadAddressLine2) &&
+                Objects.equals(roadAddressLine3, that.roadAddressLine3) &&
+                Objects.equals(roadAddressLine4, that.roadAddressLine4) &&
+                Objects.equals(roadAddressLine5, that.roadAddressLine5);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), municipalityCode, roadCode, buildingNumber, houseNumber, floor, door, roadAddressLine1, roadAddressLine2, roadAddressLine3, roadAddressLine4, roadAddressLine5, addressTextType, startAuthority);
+    }
 
     @Override
     protected AddressDataRecord clone() {

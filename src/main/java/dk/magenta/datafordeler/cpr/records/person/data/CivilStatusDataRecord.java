@@ -11,6 +11,7 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's civil status,
@@ -154,6 +155,25 @@ public class CivilStatusDataRecord extends CprBitemporalPersonRecord {
         this.spouseNameMarking = spouseNameMarking;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CivilStatusDataRecord that = (CivilStatusDataRecord) o;
+        return spouseBirthdateUncertain == that.spouseBirthdateUncertain &&
+                spouseNameMarking == that.spouseNameMarking &&
+                Objects.equals(correctionMarking, that.correctionMarking) &&
+                Objects.equals(civilStatus, that.civilStatus) &&
+                Objects.equals(spouseCpr, that.spouseCpr) &&
+                Objects.equals(spouseBirthdate, that.spouseBirthdate) &&
+                Objects.equals(spouseName, that.spouseName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), correctionMarking, civilStatus, spouseCpr, spouseBirthdate, spouseBirthdateUncertain, spouseName, spouseNameMarking);
+    }
 
     @Override
     protected CivilStatusDataRecord clone() {

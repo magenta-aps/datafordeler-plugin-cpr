@@ -31,8 +31,16 @@ public class PersonCoreDataRecord extends CprBitemporalPersonRecord {
         KVINDE
     }
 
+    public PersonCoreDataRecord() {
+    }
 
+    public PersonCoreDataRecord(Koen gender) {
+        this.gender = gender;
+    }
 
+    public PersonCoreDataRecord(String gender) {
+        this.setGender(gender);
+    }
 
     public static final String DB_FIELD_GENDER = "gender";
     public static final String IO_FIELD_GENDER = "køn";
@@ -49,11 +57,11 @@ public class PersonCoreDataRecord extends CprBitemporalPersonRecord {
         this.gender = gender;
     }
 
-    public void setKoen(String koen) {
-        if (koen != null) {
-            if (koen.equalsIgnoreCase("M")) {
+    public void setGender(String gender) {
+        if (gender != null) {
+            if (gender.equalsIgnoreCase("M")) {
                 this.setGender(Koen.MAND);
-            } else if (koen.equalsIgnoreCase("K")) {
+            } else if (gender.equalsIgnoreCase("K")) {
                 this.setGender(Koen.KVINDE);
             }
         }

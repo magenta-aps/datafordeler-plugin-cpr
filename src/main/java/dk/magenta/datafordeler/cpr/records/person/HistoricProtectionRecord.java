@@ -73,6 +73,10 @@ public class HistoricProtectionRecord extends HistoricPersonDataRecord {
                 this.getInt("beskyttype"),
                 this.getBoolean("indrap-beskyttelse"),
                 this.getDate("slet_dt-beskyttelse")
+        ).setAuthority(
+                this.getInt("start_mynkod-beskyttelse")
+        ).setEndAuthority(
+                this.getInt("slut_mynkod-beskyttelse")
         ).setBitemporality(
                 this.protectionTemporality
         ));

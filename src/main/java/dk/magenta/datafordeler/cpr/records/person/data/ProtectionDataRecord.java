@@ -3,12 +3,14 @@ package dk.magenta.datafordeler.cpr.records.person.data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.cpr.records.CprAuthorityRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's protections,
@@ -84,6 +86,45 @@ public class ProtectionDataRecord extends CprBitemporalPersonRecord {
     }
 
 
+    public static final String DB_FIELD_END_AUTHORITY = "endAuthority";
+    public static final String IO_FIELD_END_AUTHORITY = "slutmyndighed";
+    @Column(name = DB_FIELD_END_AUTHORITY)
+    @JsonProperty(value = IO_FIELD_END_AUTHORITY)
+    @XmlElement(name = IO_FIELD_END_AUTHORITY)
+    private int endAuthority;
+
+    public int getEndAuthority() {
+        return this.endAuthority;
+    }
+
+    public ProtectionDataRecord setEndAuthority(int endAuthority) {
+        if (endAuthority != 0 || this.endAuthority == 0) {
+            this.endAuthority = endAuthority;
+        }
+        return this;
+    }
+
+    public ProtectionDataRecord setAuthority(int authority) {
+        super.setAuthority(authority);
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ProtectionDataRecord that = (ProtectionDataRecord) o;
+        return protectionType == that.protectionType &&
+                reportMarking == that.reportMarking &&
+                endAuthority == that.endAuthority &&
+                Objects.equals(deletionDate, that.deletionDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), protectionType, reportMarking, deletionDate, endAuthority);
+    }
 
     @Override
     protected ProtectionDataRecord clone() {

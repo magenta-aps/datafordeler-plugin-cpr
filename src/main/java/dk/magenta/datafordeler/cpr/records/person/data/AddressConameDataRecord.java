@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 @Entity
 @Table(name = CprPlugin.DEBUG_TABLE_PREFIX + AddressConameDataRecord.TABLE_NAME, indexes = {
@@ -42,6 +43,20 @@ public class AddressConameDataRecord extends CprBitemporalPersonRecord {
 
     public void setConame(String coname) {
         this.coname = coname;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        AddressConameDataRecord that = (AddressConameDataRecord) o;
+        return Objects.equals(coname, that.coname);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), coname);
     }
 
     @Override

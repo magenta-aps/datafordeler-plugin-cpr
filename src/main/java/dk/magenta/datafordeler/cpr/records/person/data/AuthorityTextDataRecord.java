@@ -7,6 +7,7 @@ import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 
 @MappedSuperclass
@@ -50,6 +51,21 @@ public abstract class AuthorityTextDataRecord extends CprBitemporalPersonRecord 
 
     public void setCorrectionMarking(String correctionMarking) {
         this.correctionMarking = correctionMarking;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        AuthorityTextDataRecord that = (AuthorityTextDataRecord) o;
+        return Objects.equals(text, that.text) &&
+                Objects.equals(correctionMarking, that.correctionMarking);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), text, correctionMarking);
     }
 
     protected static void copy(AuthorityTextDataRecord from, AuthorityTextDataRecord to) {

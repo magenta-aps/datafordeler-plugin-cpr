@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's civil status verification,
@@ -48,6 +49,19 @@ public class NameVerificationDataRecord extends VerificationDataRecord {
         this.correctionMarking = correctionMarking;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        NameVerificationDataRecord that = (NameVerificationDataRecord) o;
+        return Objects.equals(correctionMarking, that.correctionMarking);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), correctionMarking);
+    }
 
     @Override
     protected NameVerificationDataRecord clone() {

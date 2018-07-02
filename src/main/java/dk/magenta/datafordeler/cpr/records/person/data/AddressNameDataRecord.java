@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's addressing name,
@@ -60,6 +61,21 @@ public class AddressNameDataRecord extends CprBitemporalPersonRecord {
 
     public void setRapportnavne(boolean rapportnavne) {
         this.rapportnavne = rapportnavne;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        AddressNameDataRecord that = (AddressNameDataRecord) o;
+        return rapportnavne == that.rapportnavne &&
+                Objects.equals(addressName, that.addressName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), addressName, rapportnavne);
     }
 
     @Override

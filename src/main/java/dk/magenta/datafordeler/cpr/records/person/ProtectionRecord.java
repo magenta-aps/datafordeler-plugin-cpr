@@ -61,6 +61,8 @@ public class ProtectionRecord extends PersonDataRecord {
                 this.getInt("beskyttype"),
                 this.getBoolean("indrap-beskyttelse"),
                 this.getDate("slet_dt-beskyttelse")
+        ).setAuthority(
+                this.getInt("start_mynkod-beskyttelse")
         ).setBitemporality(
                 this.protectionTemporality
         ));

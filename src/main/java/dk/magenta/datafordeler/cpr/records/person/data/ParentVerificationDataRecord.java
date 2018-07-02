@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's parentage verification,
@@ -47,6 +48,20 @@ public class ParentVerificationDataRecord extends VerificationDataRecord {
 
     public void setMother(boolean mother) {
         isMother = mother;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ParentVerificationDataRecord that = (ParentVerificationDataRecord) o;
+        return isMother == that.isMother;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), isMother);
     }
 
     @Override
