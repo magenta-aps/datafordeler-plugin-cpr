@@ -21,7 +21,6 @@ import javax.xml.bind.annotation.XmlElement;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class NameDataRecord extends CprBitemporalPersonRecord {
 
     public static final String TABLE_NAME = "cpr_person_name_record";

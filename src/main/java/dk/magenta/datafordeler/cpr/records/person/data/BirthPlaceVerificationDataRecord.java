@@ -1,6 +1,5 @@
-package dk.magenta.datafordeler.cpr.records.person;
+package dk.magenta.datafordeler.cpr.records.person.data;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 
@@ -18,7 +17,6 @@ import javax.persistence.Table;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthPlaceDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthPlaceDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class BirthPlaceVerificationDataRecord extends VerificationDataRecord {
 
     public static final String TABLE_NAME = "cpr_person_birthplace_verification_record";

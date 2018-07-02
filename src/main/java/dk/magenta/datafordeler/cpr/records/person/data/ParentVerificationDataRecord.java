@@ -1,7 +1,6 @@
-package dk.magenta.datafordeler.cpr.records.person;
+package dk.magenta.datafordeler.cpr.records.person.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 
@@ -22,7 +21,6 @@ import javax.xml.bind.annotation.XmlTransient;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ParentVerificationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ParentVerificationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ParentVerificationDataRecord extends VerificationDataRecord {
 
     public static final String TABLE_NAME = "cpr_person_parent_verification_record";

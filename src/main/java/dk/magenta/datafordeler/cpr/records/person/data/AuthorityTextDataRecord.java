@@ -1,7 +1,8 @@
-package dk.magenta.datafordeler.cpr.records.person;
+package dk.magenta.datafordeler.cpr.records.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;

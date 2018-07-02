@@ -6,6 +6,8 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.NameAuthorityTextDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.NameVerificationDataRecord;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;

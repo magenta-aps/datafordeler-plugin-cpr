@@ -1,10 +1,10 @@
-package dk.magenta.datafordeler.cpr.records.person;
+package dk.magenta.datafordeler.cpr.records.person.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,7 +25,6 @@ import java.time.LocalDate;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ParentDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ParentDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ParentDataRecord extends CprBitemporalPersonRecord {
 
     public static final String TABLE_NAME = "cpr_person_parent_record";

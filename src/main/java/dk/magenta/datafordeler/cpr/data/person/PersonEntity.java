@@ -7,6 +7,7 @@ import dk.magenta.datafordeler.core.database.Identification;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
 import dk.magenta.datafordeler.cpr.records.person.*;
+import dk.magenta.datafordeler.cpr.records.person.data.*;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
