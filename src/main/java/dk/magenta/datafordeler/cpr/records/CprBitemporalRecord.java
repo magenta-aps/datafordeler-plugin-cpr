@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.time.*;
 import java.time.temporal.TemporalAccessor;
 import java.util.Objects;
@@ -78,6 +80,24 @@ public class CprBitemporalRecord extends CprMonotemporalRecord implements Compar
     }
 
 
+
+
+    // Whether this record should replace any equal records? (equal except effectTo)
+    @Transient
+    @JsonIgnore
+    @XmlTransient
+    private boolean historic = false;
+
+    public CprBitemporalRecord setHistoric() {
+        this.historic = true;
+        return this;
+    }
+
+    public boolean isHistoric() {
+        return this.historic;
+    }
+
+
     public CprBitemporalRecord setBitemporality(OffsetDateTime registrationFrom, OffsetDateTime registrationTo, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
         super.setBitemporality(registrationFrom, registrationTo);
         this.effectFrom = effectFrom;
@@ -137,11 +157,17 @@ public class CprBitemporalRecord extends CprMonotemporalRecord implements Compar
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
         CprBitemporalRecord that = (CprBitemporalRecord) o;
-        return effectFromUncertain == that.effectFromUncertain &&
-                effectToUncertain == that.effectToUncertain &&
-                Objects.equals(effectFrom, that.effectFrom) &&
+        if (this.getAuthority() != that.getAuthority()) return false;
+        if (effectFromUncertain != that.effectFromUncertain || !Objects.equals(effectFrom, that.effectFrom)) return false;
+
+        // Historic items should replace non-historic items when the following is true
+        if (this.historic && !that.historic && that.effectTo == null) return true;
+        if (!this.historic && that.historic && this.effectTo == null) return true;
+
+        if (!super.equals(o)) return false;
+
+        return effectToUncertain == that.effectToUncertain &&
                 Objects.equals(effectTo, that.effectTo);
     }
 

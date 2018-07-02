@@ -96,7 +96,7 @@ public class HistoricChurchRecord extends HistoricPersonDataRecord {
                 this.getInt("start_mynkod-folkekirke", true)
         ).setBitemporality( // TODO: Monotemporal?
                 this.churchTemporality // TODO: mangler registrationTo
-        ));
+        ).setHistoric());
 
         records.add(new ChurchVerificationDataRecord(
                 this.getBoolean("dok-folkekirke")
@@ -104,7 +104,7 @@ public class HistoricChurchRecord extends HistoricPersonDataRecord {
                 this.getInt("dok_mynkod-folkekirke")
         ).setBitemporality(
                 this.documentTemporality
-        ));
+        ).setHistoric());
 
         return records;
     }

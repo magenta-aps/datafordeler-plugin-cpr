@@ -12,7 +12,7 @@ import org.hibernate.Session;
 import java.util.*;
 
 /**
- * Record for Person protection (type 015).
+ * Record for Historic Person protection (type 016).
  */
 public class HistoricProtectionRecord extends HistoricPersonDataRecord {
 
@@ -42,7 +42,7 @@ public class HistoricProtectionRecord extends HistoricPersonDataRecord {
 
     @Override
     public String getRecordType() {
-        return RECORDTYPE_PROTECTION;
+        return RECORDTYPE_HISTORIC_PROTECTION;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class HistoricProtectionRecord extends HistoricPersonDataRecord {
                 this.getInt("slut_mynkod-beskyttelse")
         ).setBitemporality(
                 this.protectionTemporality
-        ));
+        ).setHistoric());
 
         return records;
     }

@@ -132,7 +132,7 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
                 this.getInt("start_mynkod-civilstand")
         ).setBitemporality(
                 this.civilTemporality
-        ));
+        ).setHistoric());
 
         records.add(new CivilStatusVerificationDataRecord(
                 this.getBoolean("dok-civilstand"),
@@ -141,7 +141,7 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
                 this.getInt("dok_mynkod-civilstand")
         ).setBitemporality(
                 this.documentTemporality
-        ));
+        ).setHistoric());
 
         records.add(new CivilStatusAuthorityTextDataRecord(
                 this.getString("myntxt-civilstand", true),
@@ -150,7 +150,7 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
                 this.getInt("myntxt_mynkod-civilstand")
         ).setBitemporality(
                 this.officiaryTemporality
-        ));
+        ).setHistoric());
 
         return records;
     }

@@ -172,7 +172,7 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
                 this.getInt("start_mynkod-navne")
         ).setBitemporality(
                 this.nameTemporality
-        ));
+        ).setHistoric());
 
         records.add(new NameVerificationDataRecord(
                 this.getBoolean("dok-navne"),
@@ -181,7 +181,7 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
                 this.getInt("dok_mynkod-navne")
         ).setBitemporality(
                 this.documentNameTemporality
-        ));
+        ).setHistoric());
 
         records.add(new NameAuthorityTextDataRecord(
                 this.getString("myntxt-navne", true),
@@ -190,7 +190,7 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
                 this.getInt("myntxt_mynkod-navne")
         ).setBitemporality(
                 this.officiaryTemporality
-        ));
+        ).setHistoric());
 
         return records;
     }

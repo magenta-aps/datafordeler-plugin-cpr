@@ -174,7 +174,7 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
                 this.getInt("start_mynkod-personbolig")
         ).setBitemporality(
                 this.addressTemporality
-        ));
+        ).setHistoric());
 
         records.add(new AddressConameDataRecord(
                 this.get("convn")
@@ -187,7 +187,7 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
                 this.getBoolean("tilflydto_umrk"),
                 this.getOffsetDateTime("fraflydto"),
                 this.getBoolean("fraflydto_umrk")
-        ));
+        ).setHistoric());
 
         records.add(new MoveMunicipalityDataRecord(
                 this.getDateTime("fraflykomdto"),
@@ -204,7 +204,7 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
                 this.getBoolean("tilflydto_umrk"),
                 this.getOffsetDateTime("fraflydto"),
                 this.getBoolean("fraflydto_umrk")
-        ));
+        ).setHistoric());
 
         return records;
     }

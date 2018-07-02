@@ -135,7 +135,7 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
                 this.getInt("udlandadr_mynkod")
         ).setBitemporality(
                 this.foreignAddressTemporality
-        ));
+        ).setHistoric());
 
         records.add(new ForeignAddressEmigrationDataRecord(
                 this.getInt("udr_landekod")
@@ -143,7 +143,7 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
                 this.getInt("start_mynkod-udrindrejs")
         ).setBitemporality(
                 this.emigrationTemporality
-        ));
+        ).setHistoric());
 
         return records;
     }

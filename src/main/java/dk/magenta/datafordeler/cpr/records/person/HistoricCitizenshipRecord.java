@@ -93,7 +93,7 @@ public class HistoricCitizenshipRecord extends HistoricPersonDataRecord {
                 this.getInt("start_mynkod-statsborgerskab")
         ).setBitemporality( // TODO: Monotemporal?
                 this.citizenshipTemporality // TODO: mangler registrationTo
-        ));
+        ).setHistoric());
 
         records.add(new CitizenshipVerificationDataRecord(
                 this.getBoolean("dok-statsborgerskab")
@@ -101,7 +101,7 @@ public class HistoricCitizenshipRecord extends HistoricPersonDataRecord {
                 this.getInt("dok_mynkod-statsborgerskab")
         ).setBitemporality(
                 this.documentTemporality
-        ));
+        ).setHistoric());
 
         return records;
     }

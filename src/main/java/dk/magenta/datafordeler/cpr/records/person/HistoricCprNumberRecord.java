@@ -75,7 +75,7 @@ public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
                 this.getInt("start_mynkod-pnrgaeld")
         ).setBitemporality(
                 this.cprTemporality
-        ));
+        ).setHistoric());
 
         return records;
     }

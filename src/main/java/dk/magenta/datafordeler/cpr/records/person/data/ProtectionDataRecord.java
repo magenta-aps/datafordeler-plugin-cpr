@@ -117,13 +117,12 @@ public class ProtectionDataRecord extends CprBitemporalPersonRecord {
         ProtectionDataRecord that = (ProtectionDataRecord) o;
         return protectionType == that.protectionType &&
                 reportMarking == that.reportMarking &&
-                endAuthority == that.endAuthority &&
                 Objects.equals(deletionDate, that.deletionDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), protectionType, reportMarking, deletionDate, endAuthority);
+        return Objects.hash(super.hashCode(), protectionType, reportMarking, deletionDate);
     }
 
     @Override

@@ -64,7 +64,12 @@ public class ProtectionRecord extends PersonDataRecord {
         ).setAuthority(
                 this.getInt("start_mynkod-beskyttelse")
         ).setBitemporality(
-                this.protectionTemporality
+                new Bitemporality(
+                        this.getOffsetDateTime("start_ts-beskyttelse"),
+                        null,
+                        this.getOffsetDateTime("start_dt-beskyttelse"), false,
+                        this.getOffsetDateTime("slut_dt-beskyttelse"), false
+                )
         ));
 
         return records;

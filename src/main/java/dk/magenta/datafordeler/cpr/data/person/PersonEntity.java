@@ -9,6 +9,7 @@ import dk.magenta.datafordeler.cpr.data.CprEntity;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonCoreData;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonNumberData;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonPositionData;
+import dk.magenta.datafordeler.cpr.records.RecordSet;
 import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
 import org.hibernate.annotations.Where;
@@ -81,146 +82,146 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_ADDRESS_CONAME = "conavn";
     @JsonProperty(IO_FIELD_ADDRESS_CONAME)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<AddressConameDataRecord> personAddressConameDataSet = new HashSet<>();
+    Set<AddressConameDataRecord> personAddressConameDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_ADDRESS = "addresse";
     @JsonProperty(IO_FIELD_ADDRESS)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<AddressDataRecord> personAddressDataSet = new HashSet<>();
+    Set<AddressDataRecord> personAddressDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_ADDRESS_NAME = "addresseringsnavn";
     @JsonProperty(IO_FIELD_ADDRESS_NAME)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<AddressNameDataRecord> personAddressNameDataSet = new HashSet<>();
+    Set<AddressNameDataRecord> personAddressNameDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_BIRTHPLACE = "fødselsted";
     @JsonProperty(IO_FIELD_BIRTHPLACE)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<BirthPlaceDataRecord> personBirthPlaceDataSet = new HashSet<>();
+    Set<BirthPlaceDataRecord> personBirthPlaceDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_BIRTHPLACE_VERIFICATION = "fødselssted_verifikation";
     @JsonProperty(IO_FIELD_BIRTHPLACE_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<BirthPlaceVerificationDataRecord> personBirthPlaceVerificationDataSet = new HashSet<>();
+    Set<BirthPlaceVerificationDataRecord> personBirthPlaceVerificationDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_BIRTHTIME = "fødselstidspunkt";
     @JsonProperty(IO_FIELD_BIRTHTIME)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<BirthTimeDataRecord> personBirthTimeDataSet = new HashSet<>();
+    Set<BirthTimeDataRecord> personBirthTimeDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_CHURCH = "folkekirkerelation";
     @JsonProperty(IO_FIELD_CHURCH)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ChurchDataRecord> personChurchDataSet = new HashSet<>();
+    Set<ChurchDataRecord> personChurchDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_CHURCH_VERIFICATION = "folkekirkerelation_verifikation";
     @JsonProperty(IO_FIELD_CHURCH_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ChurchVerificationDataRecord> personChurchVerificationDataSet = new HashSet<>();
+    Set<ChurchVerificationDataRecord> personChurchVerificationDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_CITIZENSHIP = "statsborgerskab";
     @JsonProperty(IO_FIELD_CITIZENSHIP)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CitizenshipDataRecord> personCitizenshipDataSet = new HashSet<>();
+    Set<CitizenshipDataRecord> personCitizenshipDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_CITIZENSHIP_VERIFICATION = "statsborgerskab_verifikation";
     @JsonProperty(IO_FIELD_CITIZENSHIP_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CitizenshipVerificationDataRecord> personCitizenshipVerificationDataSet = new HashSet<>();
+    Set<CitizenshipVerificationDataRecord> personCitizenshipVerificationDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_CIVILSTATUS = "civilstatus";
     @JsonProperty(IO_FIELD_CIVILSTATUS)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CivilStatusDataRecord> personCivilstatusDataSet = new HashSet<>();
+    Set<CivilStatusDataRecord> personCivilstatusDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_CIVILSTATUS_AUTHORITYTEXT = "civilstatus_autoritetstekst";
     @JsonProperty(IO_FIELD_CIVILSTATUS_AUTHORITYTEXT)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CivilStatusAuthorityTextDataRecord> personCivilstatusAuthorityTextDataSet = new HashSet<>();
+    Set<CivilStatusAuthorityTextDataRecord> personCivilstatusAuthorityTextDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_CIVILSTATUS_VERIFICATION = "civilstatus_verifikation";
     @JsonProperty(IO_FIELD_CIVILSTATUS_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CivilStatusVerificationDataRecord> personCivilstatusVerificationDataSet = new HashSet<>();
+    Set<CivilStatusVerificationDataRecord> personCivilstatusVerificationDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_FOREIGN_ADDRESS = "udlandsadresse";
     @JsonProperty(IO_FIELD_FOREIGN_ADDRESS)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ForeignAddressDataRecord> personForeignAddressDataSet = new HashSet<>();
+    Set<ForeignAddressDataRecord> personForeignAddressDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_FOREIGN_ADDRESS_EMIGRATION = "udrejse";
     @JsonProperty(IO_FIELD_FOREIGN_ADDRESS_EMIGRATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ForeignAddressEmigrationDataRecord> personForeignAddressEmigrationDataSet = new HashSet<>();
+    Set<ForeignAddressEmigrationDataRecord> personForeignAddressEmigrationDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_MOVE_MUNICIPALITY = "kommuneflytning";
     @JsonProperty(IO_FIELD_MOVE_MUNICIPALITY)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<MoveMunicipalityDataRecord> personMoveMunicipalityDataSet = new HashSet<>();
+    Set<MoveMunicipalityDataRecord> personMoveMunicipalityDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_NAME = "navn";
     @JsonProperty(IO_FIELD_NAME)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<NameDataRecord> personNameDataSet = new HashSet<>();
+    Set<NameDataRecord> personNameDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_NAME_AUTHORITY_TEXT = "navn_autoritetstekst";
     @JsonProperty(IO_FIELD_NAME_AUTHORITY_TEXT)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<NameAuthorityTextDataRecord> personNameAuthorityTextDataSet = new HashSet<>();
+    Set<NameAuthorityTextDataRecord> personNameAuthorityTextDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_NAME_VERIFICATION = "navn_verifikation";
     @JsonProperty(IO_FIELD_NAME_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<NameVerificationDataRecord> personNameVerificationDataSet = new HashSet<>();
+    Set<NameVerificationDataRecord> personNameVerificationDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_MOTHER = "mor";
     @JsonProperty(IO_FIELD_MOTHER)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=1")
-    Set<ParentDataRecord> personMotherDataSet = new HashSet<>();
+    Set<ParentDataRecord> personMotherDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_MOTHER_VERIFICATION = "mor_verifikation";
     @JsonProperty(IO_FIELD_MOTHER_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=1")
-    Set<ParentVerificationDataRecord> personMotherVerificationDataSet = new HashSet<>();
+    Set<ParentVerificationDataRecord> personMotherVerificationDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_FATHER = "far";
     @JsonProperty(IO_FIELD_FATHER)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=0")
-    Set<ParentDataRecord> personFatherDataSet = new HashSet<>();
+    Set<ParentDataRecord> personFatherDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_FATHER_VERIFICATION = "far_verifikation";
     @JsonProperty(IO_FIELD_FATHER_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=0")
-    Set<ParentVerificationDataRecord> personFatherVerificationDataSet = new HashSet<>();
+    Set<ParentVerificationDataRecord> personFatherVerificationDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_CORE = "kernedata";
     @JsonProperty(IO_FIELD_CORE)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonCoreDataRecord> personCoreDataSet = new HashSet<>();
+    Set<PersonCoreDataRecord> personCoreDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_PNR = "personnummer";
     @JsonProperty(IO_FIELD_PNR)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonNumberDataRecord> personNumberDataSet = new HashSet<>();
+    Set<PersonNumberDataRecord> personNumberDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_POSITION = "stilling";
     @JsonProperty(IO_FIELD_POSITION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonPositionDataRecord> personPositionDataSet = new HashSet<>();
+    Set<PersonPositionDataRecord> personPositionDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_STATUS = "status";
     @JsonProperty(IO_FIELD_STATUS)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonStatusDataRecord> personStatusDataSet = new HashSet<>();
+    Set<PersonStatusDataRecord> personStatusDataSet = new RecordSet<>();
 
     public static final String IO_FIELD_PROTECTION = "beskyttelse";
     @JsonProperty(IO_FIELD_PROTECTION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ProtectionDataRecord> personProtectionDataSet = new HashSet<>();
+    Set<ProtectionDataRecord> personProtectionDataSet = new RecordSet<>();
 
 
     public void addBitemporalRecord(CprBitemporalPersonRecord record) {
@@ -313,9 +314,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
             this.personStatusDataSet.add((PersonStatusDataRecord) record);
         }
         if (record instanceof ProtectionDataRecord) {
-            System.out.println("Add one");
             this.personProtectionDataSet.add((ProtectionDataRecord) record);
-            System.out.println(this.personProtectionDataSet.size());
         }
         record.setEntity(this);
     }

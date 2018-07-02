@@ -24,9 +24,7 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
     public static final String RECORDTYPE_CHURCH = "010";
     public static final String RECORDTYPE_HISTORIC_CHURCH = "011";
     public static final String RECORDTYPE_PROTECTION = "015";
-
-
-
+    public static final String RECORDTYPE_HISTORIC_PROTECTION = "016";
     public static final String RECORDTYPE_CURRENT_NAME = "020";
     public static final String RECORDTYPE_HISTORIC_NAME = "021";
     public static final String RECORDTYPE_DOMESTIC_ADDRESS = "025";
