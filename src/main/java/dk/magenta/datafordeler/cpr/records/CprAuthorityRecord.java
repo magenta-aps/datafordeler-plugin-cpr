@@ -2,7 +2,6 @@ package dk.magenta.datafordeler.cpr.records;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
-import dk.magenta.datafordeler.cpr.records.person.data.ChurchDataRecord;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;

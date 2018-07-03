@@ -2,7 +2,6 @@ package dk.magenta.datafordeler.cpr.records.person;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;

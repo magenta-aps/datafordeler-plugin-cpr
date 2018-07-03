@@ -8,7 +8,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.time.*;
+import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.util.Objects;
 
