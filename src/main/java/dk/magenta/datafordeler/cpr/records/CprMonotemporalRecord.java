@@ -78,6 +78,7 @@ public class CprMonotemporalRecord extends CprAuthorityRecord {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CprMonotemporalRecord that = (CprMonotemporalRecord) o;
+        if (!this.equalData(that)) return false;
         return Objects.equals(registrationFrom, that.registrationFrom) &&
                 Objects.equals(registrationTo, that.registrationTo);
     }

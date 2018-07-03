@@ -157,17 +157,13 @@ public class CprBitemporalRecord extends CprMonotemporalRecord implements Compar
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CprBitemporalRecord that = (CprBitemporalRecord) o;
-        if (this.getAuthority() != that.getAuthority()) return false;
-        if (effectFromUncertain != that.effectFromUncertain || !Objects.equals(effectFrom, that.effectFrom)) return false;
-
-        // Historic items should replace non-historic items when the following is true
-        if (this.historic && !that.historic && that.effectTo == null) return true;
-        if (!this.historic && that.historic && this.effectTo == null) return true;
-
         if (!super.equals(o)) return false;
-
-        return effectToUncertain == that.effectToUncertain &&
+        if (!this.equalData(o)) return false;
+        CprBitemporalRecord that = (CprBitemporalRecord) o;
+        return effectFromUncertain == that.effectFromUncertain &&
+                effectToUncertain == that.effectToUncertain &&
+                historic == that.historic &&
+                Objects.equals(effectFrom, that.effectFrom) &&
                 Objects.equals(effectTo, that.effectTo);
     }
 

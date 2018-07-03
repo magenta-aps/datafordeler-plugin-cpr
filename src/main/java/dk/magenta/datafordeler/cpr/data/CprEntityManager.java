@@ -352,11 +352,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                     }
                                     timer.measure(TASK_POPULATE_DATA);
 
-                                    /*
-                                    When a historic piece of data should be used instead of an earlier loaded piece,
-                                    e.g. an address that was loaded as "current" is later found to be present as "historic",
-                                    we should remove the old entry that has effectTo=null; the historic data is already loaded in with effectTo!=null
-                                     */
+
+                                    // When a historic piece of data should be used instead of an earlier loaded piece,
+                                    // e.g. an address that was loaded as "current" is later found to be present as "historic",
+                                    // we should remove the old entry that has effectTo=null; the historic data is already loaded in with effectTo!=null
                                     for (R registration : registrations) {
                                         V effect = registration.getEffect(bitemporality.effectFrom, bitemporality.effectFromUncertain, null, false);
                                         if (effect != null) {

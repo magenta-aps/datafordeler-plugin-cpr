@@ -2,11 +2,13 @@ package dk.magenta.datafordeler.cpr.records;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
+import dk.magenta.datafordeler.cpr.records.person.data.ChurchDataRecord;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.OffsetDateTime;
+import java.util.Objects;
 
 @MappedSuperclass
 public class CprAuthorityRecord extends DatabaseEntry {
@@ -50,5 +52,11 @@ public class CprAuthorityRecord extends DatabaseEntry {
     protected static void copy(CprAuthorityRecord from, CprAuthorityRecord to) {
         to.authority = from.authority;
         to.dafoUpdated = from.dafoUpdated;
+    }
+
+    public boolean equalData(Object o) {
+        if (o==null || (getClass() != o.getClass())) return false;
+        CprAuthorityRecord that = (CprAuthorityRecord) o;
+        return Objects.equals(this.authority, that.authority);
     }
 }

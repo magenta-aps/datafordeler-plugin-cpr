@@ -122,10 +122,10 @@ public class MoveMunicipalityDataRecord extends CprBitemporalPersonRecord {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equalData(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (!super.equalData(o)) return false;
         MoveMunicipalityDataRecord that = (MoveMunicipalityDataRecord) o;
         return outDatetimeUncertain == that.outDatetimeUncertain &&
                 outMunicipality == that.outMunicipality &&

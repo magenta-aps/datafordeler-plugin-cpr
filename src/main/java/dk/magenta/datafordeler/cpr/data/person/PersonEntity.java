@@ -6,12 +6,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import dk.magenta.datafordeler.core.database.Identification;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonCoreData;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonNumberData;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonPositionData;
-import dk.magenta.datafordeler.cpr.records.RecordSet;
 import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
+import org.hibernate.Session;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -82,241 +79,262 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_ADDRESS_CONAME = "conavn";
     @JsonProperty(IO_FIELD_ADDRESS_CONAME)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<AddressConameDataRecord> personAddressConameDataSet = new RecordSet<>();
+    Set<AddressConameDataRecord> personAddressConameDataSet = new HashSet<>();
 
     public static final String IO_FIELD_ADDRESS = "addresse";
     @JsonProperty(IO_FIELD_ADDRESS)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<AddressDataRecord> personAddressDataSet = new RecordSet<>();
+    Set<AddressDataRecord> personAddressDataSet = new HashSet<>();
 
     public static final String IO_FIELD_ADDRESS_NAME = "addresseringsnavn";
     @JsonProperty(IO_FIELD_ADDRESS_NAME)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<AddressNameDataRecord> personAddressNameDataSet = new RecordSet<>();
+    Set<AddressNameDataRecord> personAddressNameDataSet = new HashSet<>();
 
     public static final String IO_FIELD_BIRTHPLACE = "fødselsted";
     @JsonProperty(IO_FIELD_BIRTHPLACE)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<BirthPlaceDataRecord> personBirthPlaceDataSet = new RecordSet<>();
+    Set<BirthPlaceDataRecord> personBirthPlaceDataSet = new HashSet<>();
 
     public static final String IO_FIELD_BIRTHPLACE_VERIFICATION = "fødselssted_verifikation";
     @JsonProperty(IO_FIELD_BIRTHPLACE_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<BirthPlaceVerificationDataRecord> personBirthPlaceVerificationDataSet = new RecordSet<>();
+    Set<BirthPlaceVerificationDataRecord> personBirthPlaceVerificationDataSet = new HashSet<>();
 
     public static final String IO_FIELD_BIRTHTIME = "fødselstidspunkt";
     @JsonProperty(IO_FIELD_BIRTHTIME)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<BirthTimeDataRecord> personBirthTimeDataSet = new RecordSet<>();
+    Set<BirthTimeDataRecord> personBirthTimeDataSet = new HashSet<>();
 
     public static final String IO_FIELD_CHURCH = "folkekirkerelation";
     @JsonProperty(IO_FIELD_CHURCH)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ChurchDataRecord> personChurchDataSet = new RecordSet<>();
+    Set<ChurchDataRecord> personChurchDataSet = new HashSet<>();
 
     public static final String IO_FIELD_CHURCH_VERIFICATION = "folkekirkerelation_verifikation";
     @JsonProperty(IO_FIELD_CHURCH_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ChurchVerificationDataRecord> personChurchVerificationDataSet = new RecordSet<>();
+    Set<ChurchVerificationDataRecord> personChurchVerificationDataSet = new HashSet<>();
 
     public static final String IO_FIELD_CITIZENSHIP = "statsborgerskab";
     @JsonProperty(IO_FIELD_CITIZENSHIP)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CitizenshipDataRecord> personCitizenshipDataSet = new RecordSet<>();
+    Set<CitizenshipDataRecord> personCitizenshipDataSet = new HashSet<>();
 
     public static final String IO_FIELD_CITIZENSHIP_VERIFICATION = "statsborgerskab_verifikation";
     @JsonProperty(IO_FIELD_CITIZENSHIP_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CitizenshipVerificationDataRecord> personCitizenshipVerificationDataSet = new RecordSet<>();
+    Set<CitizenshipVerificationDataRecord> personCitizenshipVerificationDataSet = new HashSet<>();
 
     public static final String IO_FIELD_CIVILSTATUS = "civilstatus";
     @JsonProperty(IO_FIELD_CIVILSTATUS)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CivilStatusDataRecord> personCivilstatusDataSet = new RecordSet<>();
+    Set<CivilStatusDataRecord> personCivilstatusDataSet = new HashSet<>();
 
     public static final String IO_FIELD_CIVILSTATUS_AUTHORITYTEXT = "civilstatus_autoritetstekst";
     @JsonProperty(IO_FIELD_CIVILSTATUS_AUTHORITYTEXT)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CivilStatusAuthorityTextDataRecord> personCivilstatusAuthorityTextDataSet = new RecordSet<>();
+    Set<CivilStatusAuthorityTextDataRecord> personCivilstatusAuthorityTextDataSet = new HashSet<>();
 
     public static final String IO_FIELD_CIVILSTATUS_VERIFICATION = "civilstatus_verifikation";
     @JsonProperty(IO_FIELD_CIVILSTATUS_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CivilStatusVerificationDataRecord> personCivilstatusVerificationDataSet = new RecordSet<>();
+    Set<CivilStatusVerificationDataRecord> personCivilstatusVerificationDataSet = new HashSet<>();
 
     public static final String IO_FIELD_FOREIGN_ADDRESS = "udlandsadresse";
     @JsonProperty(IO_FIELD_FOREIGN_ADDRESS)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ForeignAddressDataRecord> personForeignAddressDataSet = new RecordSet<>();
+    Set<ForeignAddressDataRecord> personForeignAddressDataSet = new HashSet<>();
 
     public static final String IO_FIELD_FOREIGN_ADDRESS_EMIGRATION = "udrejse";
     @JsonProperty(IO_FIELD_FOREIGN_ADDRESS_EMIGRATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ForeignAddressEmigrationDataRecord> personForeignAddressEmigrationDataSet = new RecordSet<>();
+    Set<ForeignAddressEmigrationDataRecord> personForeignAddressEmigrationDataSet = new HashSet<>();
 
     public static final String IO_FIELD_MOVE_MUNICIPALITY = "kommuneflytning";
     @JsonProperty(IO_FIELD_MOVE_MUNICIPALITY)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<MoveMunicipalityDataRecord> personMoveMunicipalityDataSet = new RecordSet<>();
+    Set<MoveMunicipalityDataRecord> personMoveMunicipalityDataSet = new HashSet<>();
 
     public static final String IO_FIELD_NAME = "navn";
     @JsonProperty(IO_FIELD_NAME)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<NameDataRecord> personNameDataSet = new RecordSet<>();
+    Set<NameDataRecord> personNameDataSet = new HashSet<>();
 
     public static final String IO_FIELD_NAME_AUTHORITY_TEXT = "navn_autoritetstekst";
     @JsonProperty(IO_FIELD_NAME_AUTHORITY_TEXT)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<NameAuthorityTextDataRecord> personNameAuthorityTextDataSet = new RecordSet<>();
+    Set<NameAuthorityTextDataRecord> personNameAuthorityTextDataSet = new HashSet<>();
 
     public static final String IO_FIELD_NAME_VERIFICATION = "navn_verifikation";
     @JsonProperty(IO_FIELD_NAME_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<NameVerificationDataRecord> personNameVerificationDataSet = new RecordSet<>();
+    Set<NameVerificationDataRecord> personNameVerificationDataSet = new HashSet<>();
 
     public static final String IO_FIELD_MOTHER = "mor";
     @JsonProperty(IO_FIELD_MOTHER)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=1")
-    Set<ParentDataRecord> personMotherDataSet = new RecordSet<>();
+    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=true")
+    Set<ParentDataRecord> personMotherDataSet = new HashSet<>();
 
     public static final String IO_FIELD_MOTHER_VERIFICATION = "mor_verifikation";
     @JsonProperty(IO_FIELD_MOTHER_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=1")
-    Set<ParentVerificationDataRecord> personMotherVerificationDataSet = new RecordSet<>();
+    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=true")
+    Set<ParentVerificationDataRecord> personMotherVerificationDataSet = new HashSet<>();
 
     public static final String IO_FIELD_FATHER = "far";
     @JsonProperty(IO_FIELD_FATHER)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=0")
-    Set<ParentDataRecord> personFatherDataSet = new RecordSet<>();
+    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=false")
+    Set<ParentDataRecord> personFatherDataSet = new HashSet<>();
 
     public static final String IO_FIELD_FATHER_VERIFICATION = "far_verifikation";
     @JsonProperty(IO_FIELD_FATHER_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=0")
-    Set<ParentVerificationDataRecord> personFatherVerificationDataSet = new RecordSet<>();
+    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=false")
+    Set<ParentVerificationDataRecord> personFatherVerificationDataSet = new HashSet<>();
 
     public static final String IO_FIELD_CORE = "kernedata";
     @JsonProperty(IO_FIELD_CORE)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonCoreDataRecord> personCoreDataSet = new RecordSet<>();
+    Set<PersonCoreDataRecord> personCoreDataSet = new HashSet<>();
 
     public static final String IO_FIELD_PNR = "personnummer";
     @JsonProperty(IO_FIELD_PNR)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonNumberDataRecord> personNumberDataSet = new RecordSet<>();
+    Set<PersonNumberDataRecord> personNumberDataSet = new HashSet<>();
 
     public static final String IO_FIELD_POSITION = "stilling";
     @JsonProperty(IO_FIELD_POSITION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonPositionDataRecord> personPositionDataSet = new RecordSet<>();
+    Set<PersonPositionDataRecord> personPositionDataSet = new HashSet<>();
 
     public static final String IO_FIELD_STATUS = "status";
     @JsonProperty(IO_FIELD_STATUS)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonStatusDataRecord> personStatusDataSet = new RecordSet<>();
+    Set<PersonStatusDataRecord> personStatusDataSet = new HashSet<>();
 
     public static final String IO_FIELD_PROTECTION = "beskyttelse";
     @JsonProperty(IO_FIELD_PROTECTION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ProtectionDataRecord> personProtectionDataSet = new RecordSet<>();
+    Set<ProtectionDataRecord> personProtectionDataSet = new HashSet<>();
 
 
-    public void addBitemporalRecord(CprBitemporalPersonRecord record) {
+    public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session) {
         if (record instanceof AddressConameDataRecord) {
-            this.personAddressConameDataSet.add((AddressConameDataRecord) record);
+            addItem(this.personAddressConameDataSet, record, session);
         }
         if (record instanceof AddressDataRecord) {
-            this.personAddressDataSet.add((AddressDataRecord) record);
+            addItem(this.personAddressDataSet, record, session);
         }
         if (record instanceof AddressNameDataRecord) {
-            this.personAddressNameDataSet.add((AddressNameDataRecord) record);
+            addItem(this.personAddressNameDataSet, record, session);
         }
         if (record instanceof BirthPlaceDataRecord) {
-            this.personBirthPlaceDataSet.add((BirthPlaceDataRecord) record);
+            addItem(this.personBirthPlaceDataSet, record, session);
         }
         if (record instanceof BirthPlaceVerificationDataRecord) {
-            this.personBirthPlaceVerificationDataSet.add((BirthPlaceVerificationDataRecord) record);
+            addItem(this.personBirthPlaceVerificationDataSet, record, session);
         }
         if (record instanceof BirthTimeDataRecord) {
-            this.personBirthTimeDataSet.add((BirthTimeDataRecord) record);
+            addItem(this.personBirthTimeDataSet, record, session);
         }
         if (record instanceof ChurchDataRecord) {
-            this.personChurchDataSet.add((ChurchDataRecord) record);
+            addItem(this.personChurchDataSet, record, session);
         }
         if (record instanceof ChurchVerificationDataRecord) {
-            this.personChurchVerificationDataSet.add((ChurchVerificationDataRecord) record);
+            addItem(this.personChurchVerificationDataSet, record, session);
         }
         if (record instanceof CitizenshipDataRecord) {
-            this.personCitizenshipDataSet.add((CitizenshipDataRecord) record);
+            addItem(this.personCitizenshipDataSet, record, session);
         }
         if (record instanceof CitizenshipVerificationDataRecord) {
-            this.personCitizenshipVerificationDataSet.add((CitizenshipVerificationDataRecord) record);
+            addItem(this.personCitizenshipVerificationDataSet, record, session);
         }
         if (record instanceof CivilStatusDataRecord) {
-            this.personCivilstatusDataSet.add((CivilStatusDataRecord) record);
+            addItem(this.personCivilstatusDataSet, record, session);
         }
         if (record instanceof CivilStatusAuthorityTextDataRecord) {
-            this.personCivilstatusAuthorityTextDataSet.add((CivilStatusAuthorityTextDataRecord) record);
+            addItem(this.personCivilstatusAuthorityTextDataSet, record, session);
         }
         if (record instanceof CivilStatusVerificationDataRecord) {
-            this.personCivilstatusVerificationDataSet.add((CivilStatusVerificationDataRecord) record);
+            addItem(this.personCivilstatusVerificationDataSet, record, session);
         }
         if (record instanceof ForeignAddressDataRecord) {
-            this.personForeignAddressDataSet.add((ForeignAddressDataRecord) record);
+            addItem(this.personForeignAddressDataSet, record, session);
         }
         if (record instanceof ForeignAddressDataRecord) {
-            this.personForeignAddressDataSet.add((ForeignAddressDataRecord) record);
+            addItem(this.personForeignAddressDataSet, record, session);
         }
         if (record instanceof ForeignAddressEmigrationDataRecord) {
-            this.personForeignAddressEmigrationDataSet.add((ForeignAddressEmigrationDataRecord) record);
+            addItem(this.personForeignAddressEmigrationDataSet, record, session);
         }
         if (record instanceof MoveMunicipalityDataRecord) {
-            this.personMoveMunicipalityDataSet.add((MoveMunicipalityDataRecord) record);
+            addItem(this.personMoveMunicipalityDataSet, record, session);
         }
         if (record instanceof NameAuthorityTextDataRecord) {
-            this.personNameAuthorityTextDataSet.add((NameAuthorityTextDataRecord) record);
+            addItem(this.personNameAuthorityTextDataSet, record, session);
         }
         if (record instanceof NameDataRecord) {
-            this.personNameDataSet.add((NameDataRecord) record);
+            addItem(this.personNameDataSet, record, session);
         }
         if (record instanceof NameVerificationDataRecord) {
-            this.personNameVerificationDataSet.add((NameVerificationDataRecord) record);
+            addItem(this.personNameVerificationDataSet, record, session);
         }
         if (record instanceof ParentDataRecord) {
             ParentDataRecord pRecord = (ParentDataRecord) record;
             if (pRecord.isMother()) {
-                this.personMotherDataSet.add(pRecord);
+                addItem(this.personMotherDataSet, pRecord, session);
             } else {
-                this.personFatherDataSet.add(pRecord);
+                addItem(this.personFatherDataSet, pRecord, session);
             }
         }
         if (record instanceof ParentVerificationDataRecord) {
             ParentVerificationDataRecord pRecord = (ParentVerificationDataRecord) record;
             if (pRecord.isMother()) {
-                this.personMotherVerificationDataSet.add(pRecord);
+                addItem(this.personMotherVerificationDataSet, pRecord, session);
             } else {
-                this.personFatherVerificationDataSet.add(pRecord);
+                addItem(this.personFatherVerificationDataSet, pRecord, session);
             }
         }
         if (record instanceof PersonCoreDataRecord) {
-            this.personCoreDataSet.add((PersonCoreDataRecord) record);
+            addItem(this.personCoreDataSet, record, session);
         }
         if (record instanceof PersonNumberDataRecord) {
-            this.personNumberDataSet.add((PersonNumberDataRecord) record);
+            addItem(this.personNumberDataSet, record, session);
         }
         if (record instanceof PersonPositionDataRecord) {
-            this.personPositionDataSet.add((PersonPositionDataRecord) record);
+            addItem(this.personPositionDataSet, record, session);
         }
         if (record instanceof PersonStatusDataRecord) {
-            this.personStatusDataSet.add((PersonStatusDataRecord) record);
+            addItem(this.personStatusDataSet, record, session);
         }
         if (record instanceof ProtectionDataRecord) {
-            this.personProtectionDataSet.add((ProtectionDataRecord) record);
+            addItem(this.personProtectionDataSet, record, session);
         }
         record.setEntity(this);
+    }
+
+    private static <E extends CprBitemporalPersonRecord> boolean addItem(Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
+        if (newItem != null) {
+            for (E oldItem : set) {
+                if (newItem.equalData(oldItem) && Objects.equals(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom())) {
+                    if (newItem.isHistoric() && !oldItem.isHistoric() && oldItem.getEffectTo() == null) {
+                        //System.out.println("matching item, removing preexisting");
+                        set.remove(oldItem);
+                        session.delete(oldItem);
+                        return set.add((E) newItem);
+                    } else {
+                        //System.out.println("matching item with same historicity, not adding");
+                        return false;
+                    }
+                }
+            }
+            //System.out.println("nonmatching item");
+            return set.add((E) newItem);
+        }
+        return false;
     }
 
     @JsonIgnore

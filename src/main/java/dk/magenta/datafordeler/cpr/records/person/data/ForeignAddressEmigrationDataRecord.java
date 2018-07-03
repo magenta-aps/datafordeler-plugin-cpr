@@ -50,10 +50,10 @@ public class ForeignAddressEmigrationDataRecord extends CprBitemporalPersonRecor
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equalData(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (!super.equalData(o)) return false;
         ForeignAddressEmigrationDataRecord that = (ForeignAddressEmigrationDataRecord) o;
         return countryCode == that.countryCode;
     }

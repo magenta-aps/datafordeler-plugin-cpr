@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * Storage for data on a Person's core data (gender, current cpr number),
@@ -65,6 +66,21 @@ public class PersonCoreDataRecord extends CprBitemporalPersonRecord {
                 this.setGender(Koen.KVINDE);
             }
         }
+    }
+
+    @Override
+    public boolean equalData(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equalData(o)) return false;
+        PersonCoreDataRecord that = (PersonCoreDataRecord) o;
+        return gender == that.gender;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), gender);
     }
 
     @Override

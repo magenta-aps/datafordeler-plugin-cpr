@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.records.person.data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.cpr.records.CprAuthorityRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
@@ -51,17 +52,15 @@ public class ChurchDataRecord extends CprBitemporalPersonRecord {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        ChurchDataRecord that = (ChurchDataRecord) o;
-        return Objects.equals(churchRelation, that.churchRelation);
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), churchRelation);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), churchRelation);
+    public boolean equalData(Object o) {
+        if (o==null || (getClass() != o.getClass())) return false;
+        ChurchDataRecord that = (ChurchDataRecord) o;
+        return Objects.equals(this.churchRelation, that.churchRelation);
     }
 
     @Override

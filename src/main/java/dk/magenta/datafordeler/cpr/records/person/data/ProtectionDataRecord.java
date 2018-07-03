@@ -110,14 +110,13 @@ public class ProtectionDataRecord extends CprBitemporalPersonRecord {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equalData(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (!super.equalData(o)) return false;
         ProtectionDataRecord that = (ProtectionDataRecord) o;
         return protectionType == that.protectionType &&
-                reportMarking == that.reportMarking &&
-                Objects.equals(deletionDate, that.deletionDate);
+                reportMarking == that.reportMarking;
     }
 
     @Override

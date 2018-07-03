@@ -73,7 +73,7 @@ public class ChurchRecord extends PersonDataRecord {
                 this.getChar("fkirk")
         ).setAuthority(
                 this.getInt("start_mynkod-folkekirke", true)
-        ).setBitemporality( // TODO: Monotemporal?
+        ).setBitemporality(
                 this.churchTemporality
         ));
 
