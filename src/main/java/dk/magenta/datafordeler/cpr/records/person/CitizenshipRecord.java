@@ -5,9 +5,11 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.CitizenshipDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.CitizenshipVerificationDataRecord;
 import org.hibernate.Session;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -61,6 +63,30 @@ public class CitizenshipRecord extends PersonDataRecord {
             updated = true;
         }
         return updated;
+    }
+
+    @Override
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
+
+        records.add(new CitizenshipDataRecord(
+                this.getInt("landekod")
+        ).setAuthority(
+                this.getInt("start_mynkod-statsborgerskab")
+        ).setBitemporality( // TODO: Monotemporal?
+                this.citizenshipTemporality
+        ));
+
+        records.add(new CitizenshipVerificationDataRecord(
+                this.getBoolean("dok-statsborgerskab")
+        ).setAuthority(
+                this.getInt("dok_mynkod-statsborgerskab")
+        ).setBitemporality(
+                this.documentTemporality
+        ));
+
+        return records;
     }
 
     @Override

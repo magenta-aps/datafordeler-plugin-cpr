@@ -21,7 +21,7 @@ import javax.annotation.PostConstruct;
  * project, so it takes care of where to fetch data, how to parse it, how to 
  * store it (leveraging the Datafordeler bitemporality model), under what path 
  * to serve it, and which roles should exist for data access.
- * The Core and Engine take care of the generic glue around these, fetching and 
+ * The Core and Engine take care of the generic updateRegistrationTo around these, fetching and
  * serving based on the specifics laid out in the plugin.
  */
 @Component

@@ -38,6 +38,8 @@ public class PersonParser extends CprSubParser<PersonDataRecord> {
                     return new HistoricChurchRecord(line);
                 case PersonDataRecord.RECORDTYPE_PROTECTION:
                     return new ProtectionRecord(line);
+                case PersonDataRecord.RECORDTYPE_HISTORIC_PROTECTION:
+                    return new HistoricProtectionRecord(line);
                 case PersonDataRecord.RECORDTYPE_CURRENT_NAME:
                     return new NameRecord(line);
                 case PersonDataRecord.RECORDTYPE_DOMESTIC_ADDRESS:
