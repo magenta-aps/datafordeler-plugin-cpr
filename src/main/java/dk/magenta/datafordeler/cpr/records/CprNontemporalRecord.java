@@ -33,7 +33,7 @@ public class CprNontemporalRecord extends DatabaseEntry {
 
 
     public static final String DB_FIELD_UPDATED = "dafoUpdated";
-    public static final String IO_FIELD_UPDATED = "opdateret";
+    public static final String IO_FIELD_UPDATED = "sidstOpdateret";
     @Column(name = DB_FIELD_UPDATED)
     @JsonProperty(value = IO_FIELD_UPDATED)
     @XmlElement(name = IO_FIELD_UPDATED)

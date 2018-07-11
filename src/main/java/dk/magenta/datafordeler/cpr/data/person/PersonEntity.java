@@ -165,7 +165,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     }
 
     public static final String DB_FIELD_CHURCH = "churchRelation";
-    public static final String IO_FIELD_CHURCH = "folkekirkerelation";
+    public static final String IO_FIELD_CHURCH = "folkekirkeoplysning";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
             @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
@@ -179,7 +179,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     }
 
     public static final String DB_FIELD_CHURCH_VERIFICATION = "churchRelationVerification";
-    public static final String IO_FIELD_CHURCH_VERIFICATION = "folkekirkerelation_verifikation";
+    public static final String IO_FIELD_CHURCH_VERIFICATION = "folkekirkeoplysning_verifikation";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
             @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
@@ -406,7 +406,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
         return this.fatherVerification;
     }
 
-    public static final String DB_FIELD_CORE = "core";
+    public static final String DB_FIELD_CORE = "person";
     public static final String IO_FIELD_CORE = "kernedata";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
