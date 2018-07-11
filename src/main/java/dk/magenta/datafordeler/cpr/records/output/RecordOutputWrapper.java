@@ -58,15 +58,12 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
 
     public class OutputContainer {
 
-        private DoubleListHashMap<Bitemporality, String, JsonNode> bitemporalData = new DoubleListHashMap<>();
+        private DoubleListHashMap<Bitemporality, String, ObjectNode> bitemporalData = new DoubleListHashMap<>();
 
         private ListHashMap<String, JsonNode> nontemporalData = new ListHashMap<>();
 
-        private HashSet<String> forcedArrayKeys = new HashSet<>();
-
-        public boolean isArrayForced(String key) {
-            return this.forcedArrayKeys.contains(key);
-        }
+        private HashSet<String> trySingle = new HashSet<>();
+        private HashSet<String> forceList = new HashSet<>();
 
         public <T extends CprBitemporalRecord> void addBitemporal(String key, Set<T> records) {
             this.addBitemporal(key, records, null, false, false);
@@ -76,29 +73,23 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             this.addBitemporal(key, records, null, unwrapSingle, false);
         }
 
-        public <T extends CprBitemporalRecord> void addBitemporal(String key, Set<T> records, Function<T, JsonNode> converter) {
+        public <T extends CprBitemporalRecord> void addBitemporal(String key, Set<T> records, Function<T, ObjectNode> converter) {
             this.addBitemporal(key, records, converter, false, false);
         }
 
-        public <T extends CprBitemporalRecord> void addBitemporal(String key, Set<T> records, Function<T, JsonNode> converter, boolean unwrapSingle, boolean forceArray) {
+        public <T extends CprBitemporalRecord> void addBitemporal(String key, Set<T> records, Function<T, ObjectNode> converter, boolean unwrapSingle, boolean forceArray) {
             ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
-            List<String> removeFieldNames = RecordOutputWrapper.this.getRemoveFieldNames();
             for (T record : records) {
                 if (record != null) {
-                    JsonNode value = (converter != null) ? converter.apply(record) : objectMapper.valueToTree(record);
-                    if (value instanceof ObjectNode) {
-                        ObjectNode oValue = (ObjectNode) value;
-                        oValue.remove(removeFieldNames);
-                        if (unwrapSingle && value.size() == 1) {
-                            this.bitemporalData.add(record.getBitemporality(), key, oValue.get(oValue.fieldNames().next()));
-                            continue;
-                        }
-                    }
+                    ObjectNode value = (converter != null) ? converter.apply(record) : objectMapper.valueToTree(record);
                     this.bitemporalData.add(record.getBitemporality(), key, value);
                 }
             }
             if (forceArray) {
-                this.forcedArrayKeys.add(key);
+                this.forceList.add(key);
+            }
+            if (unwrapSingle) {
+                this.trySingle.add(key);
             }
         }
 
@@ -118,17 +109,13 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
             for (T record : records) {
                 JsonNode value = (converter != null) ? converter.apply(record) : objectMapper.valueToTree(record);
-                if (value instanceof ObjectNode) {
-                    ObjectNode oValue = (ObjectNode) value;
-                    if (unwrapSingle && value.size() == 1) {
-                        this.nontemporalData.add(key, oValue.get(oValue.fieldNames().next()));
-                        continue;
-                    }
-                }
                 this.nontemporalData.add(key, value);
             }
             if (forceArray) {
-                this.forcedArrayKeys.add(key);
+                this.forceList.add(key);
+            }
+            if (unwrapSingle) {
+                this.trySingle.add(key);
             }
         }
 
@@ -205,7 +192,7 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
                                 }
                                 effectNode.put("virkningFra", formatTime(bitemporality.effectFrom, true));
                                 effectNode.put("virkningTil", formatTime(bitemporality.effectTo, true));
-                                HashMap<String, ArrayList<JsonNode>> records = this.bitemporalData.get(bitemporality);
+                                HashMap<String, ArrayList<ObjectNode>> records = this.bitemporalData.get(bitemporality);
                                 for (String key : records.keySet()) {
                                     this.setValue(objectMapper, effectNode, key, records.get(key));
                                 }
@@ -217,7 +204,6 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             }
             return registrationsNode;
         }
-
 
         public ArrayNode getRDV(Bitemporality mustOverlap) {
             ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
@@ -257,33 +243,16 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
                             registrationNode.put("registreringTil", formatTime(next));
 
                             for (Bitemporality bitemporality : presentBitemporalities) {
-                                HashMap<String, ArrayList<JsonNode>> data = this.bitemporalData.get(bitemporality);
+                                HashMap<String, ArrayList<ObjectNode>> data = this.bitemporalData.get(bitemporality);
                                 for (String key : data.keySet()) {
                                     ArrayNode dataNode = (ArrayNode) registrationNode.get(key);
                                     if (dataNode == null) {
                                         dataNode = objectMapper.createArrayNode();
                                         registrationNode.set(key, dataNode);
                                     }
-                                    for (JsonNode item : data.get(key)) {
-                                        if (item instanceof ObjectNode) {
-                                            ObjectNode oItem = (ObjectNode) item;
-                                            oItem.put("virkningFra", formatTime(bitemporality.effectFrom));
-                                            oItem.put("virkningTil", formatTime(bitemporality.effectTo));
-                                        } else if (item instanceof ArrayNode) {
-                                            for (JsonNode subItem : (ArrayNode) item) {
-                                                if (subItem instanceof ObjectNode) {
-                                                    ObjectNode oItem = (ObjectNode) subItem;
-                                                    oItem.put("virkningFra", formatTime(bitemporality.effectFrom));
-                                                    oItem.put("virkningTil", formatTime(bitemporality.effectTo));
-                                                }
-                                            }
-                                        } else if (item instanceof ValueNode) {
-                                            ObjectNode oItem = objectMapper.createObjectNode();
-                                            oItem.set("value", item);
-                                            oItem.put("virkningFra", formatTime(bitemporality.effectFrom));
-                                            oItem.put("virkningTil", formatTime(bitemporality.effectTo));
-                                            item = oItem;
-                                        }
+                                    for (ObjectNode item : data.get(key)) {
+                                        item.put("virkningFra", formatTime(bitemporality.effectFrom));
+                                        item.put("virkningTil", formatTime(bitemporality.effectTo));
                                         dataNode.add(item);
                                     }
                                 }
@@ -295,6 +264,27 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             return registrationsNode;
         }
 
+        public ObjectNode getDRV(Bitemporality mustOverlap) {
+            ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
+            ObjectNode dataNode = objectMapper.createObjectNode();
+            for (Bitemporality bitemporality : this.bitemporalData.keySet()) {
+                if (bitemporality.overlaps(mustOverlap)) {
+                    HashMap<String, ArrayList<ObjectNode>> data = this.bitemporalData.get(bitemporality);
+                    for (String key : data.keySet()) {
+                        ArrayNode subDataNode = (ArrayNode) dataNode.get(key);
+                        if (subDataNode == null) {
+                            subDataNode = objectMapper.createArrayNode();
+                            dataNode.set(key, subDataNode);
+                        }
+                        for (JsonNode d : data.get(key)) {
+                            subDataNode.add(d);
+                        }
+                    }
+                }
+            }
+            return dataNode;
+        }
+
         public ObjectNode getBase() {
             ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
             ObjectNode objectNode = objectMapper.createObjectNode();
@@ -304,16 +294,28 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             return objectNode;
         }
 
-        private void setValue(ObjectMapper objectMapper, ObjectNode objectNode, String key, List<JsonNode> values) {
-            if (values.size() == 1 && !this.isArrayForced(key)) {
-                objectNode.set(key, values.get(0));
+        private void setValue(ObjectMapper objectMapper, ObjectNode objectNode, String key, List<? extends JsonNode> values) {
+            if (values.size() == 1 && !this.forceList.contains(key)) {
+                objectNode.set(key, this.prepareNode(key, values.get(0)));
             } else {
                 ArrayNode array = objectMapper.createArrayNode();
                 objectNode.set(key, array);
                 for (JsonNode value : values) {
-                    array.add(value);
+                    array.add(this.prepareNode(key, value));
                 }
             }
+        }
+
+        private JsonNode prepareNode(String key, JsonNode node) {
+            List<String> removeFieldNames = RecordOutputWrapper.this.getRemoveFieldNames();
+            if (node instanceof ObjectNode) {
+                ObjectNode objectNode = (ObjectNode) node;
+                objectNode.remove(removeFieldNames);
+                if (objectNode.size() == 1 && this.trySingle.contains(key)) {
+                    return objectNode.get(objectNode.fieldNames().next());
+                }
+            }
+            return node;
         }
     }
 
@@ -327,7 +329,8 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             this.fillContainer(recordOutput, record);
 
             root.setAll(recordOutput.getBase());
-            root.set("registreringer", recordOutput.getRDV(mustContain));
+            //root.set("registreringer", recordOutput.getRDV(mustContain));
+            root.set("data", recordOutput.getDRV(mustContain));
 
         } catch (Exception e) {
             e.printStackTrace();

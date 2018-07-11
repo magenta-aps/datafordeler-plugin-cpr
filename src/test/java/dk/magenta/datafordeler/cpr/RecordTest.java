@@ -199,10 +199,10 @@ public class RecordTest {
             this.loadPerson("/persondata.txt", importMetadata);
 
             PersonRecordQuery query = new PersonRecordQuery();
-            OffsetDateTime time = OffsetDateTime.now();
+            /*OffsetDateTime time = OffsetDateTime.now();
             query.setRegistrationTo(time);
             query.setEffectFrom(time);
-            query.setEffectTo(time);
+            query.setEffectTo(time);*/
             query.applyFilters(session);
 
             query.addKommunekode(958);
