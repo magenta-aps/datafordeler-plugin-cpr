@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @MappedSuperclass
-public class CprMonotemporalRecord extends CprAuthorityRecord {
+public class CprMonotemporalRecord extends CprNontemporalRecord {
 
     // For storing the calculated endRegistration time, ie. when the next registration "overrides" us
     public static final String DB_FIELD_REGISTRATION_FROM = "registrationFrom";
@@ -89,7 +89,7 @@ public class CprMonotemporalRecord extends CprAuthorityRecord {
     }
 
     protected static void copy(CprMonotemporalRecord from, CprMonotemporalRecord to) {
-        CprAuthorityRecord.copy(from, to);
+        CprNontemporalRecord.copy(from, to);
         to.registrationFrom = from.registrationFrom;
         to.registrationTo = from.registrationTo;
     }

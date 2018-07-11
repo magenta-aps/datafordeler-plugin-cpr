@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @MappedSuperclass
-public class CprAuthorityRecord extends DatabaseEntry {
+public class CprNontemporalRecord extends DatabaseEntry {
 
     public static final String DB_FIELD_AUTHORITY = "authority";
     public static final String IO_FIELD_AUTHORITY = "myndighed";
@@ -23,7 +23,7 @@ public class CprAuthorityRecord extends DatabaseEntry {
         return this.authority;
     }
 
-    public CprAuthorityRecord setAuthority(int authority) {
+    public CprNontemporalRecord setAuthority(int authority) {
         if (authority != 0 || this.authority == 0) {
             this.authority = authority;
         }
@@ -43,19 +43,19 @@ public class CprAuthorityRecord extends DatabaseEntry {
         return this.dafoUpdated;
     }
 
-    public CprAuthorityRecord setDafoUpdated(OffsetDateTime dafoUpdated) {
+    public CprNontemporalRecord setDafoUpdated(OffsetDateTime dafoUpdated) {
         this.dafoUpdated = dafoUpdated;
         return this;
     }
 
-    protected static void copy(CprAuthorityRecord from, CprAuthorityRecord to) {
+    protected static void copy(CprNontemporalRecord from, CprNontemporalRecord to) {
         to.authority = from.authority;
         to.dafoUpdated = from.dafoUpdated;
     }
 
     public boolean equalData(Object o) {
         if (o==null || (getClass() != o.getClass())) return false;
-        CprAuthorityRecord that = (CprAuthorityRecord) o;
+        CprNontemporalRecord that = (CprNontemporalRecord) o;
         return Objects.equals(this.authority, that.authority);
     }
 }
