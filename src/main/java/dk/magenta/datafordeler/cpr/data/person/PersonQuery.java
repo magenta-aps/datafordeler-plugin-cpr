@@ -85,6 +85,10 @@ public class PersonQuery extends CprQuery<PersonEntity> {
         this.addKommunekode(String.format("%03d", kommunekode));
     }
 
+    public void clearKommunekode() {
+        this.kommunekoder.clear();
+    }
+
 
 
     @Override

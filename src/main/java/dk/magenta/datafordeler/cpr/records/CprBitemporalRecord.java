@@ -2,6 +2,8 @@ package dk.magenta.datafordeler.cpr.records;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.Effect;
+import dk.magenta.datafordeler.core.database.Registration;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -15,9 +17,9 @@ import java.util.Objects;
 @MappedSuperclass
 public class CprBitemporalRecord extends CprMonotemporalRecord implements Comparable<CprBitemporalRecord> {
 
-    //public static final String FILTER_LAST_UPDATED = "(" + CprBitemporalRecord.DB_FIELD_LAST_UPDATED + " < :" + Registration.FILTERPARAM_REGISTRATION_TO + ")";
-    //public static final String FILTER_EFFECT_FROM = "(" + CvrRecordPeriod.DB_FIELD_VALID_TO + " >= :" + Effect.FILTERPARAM_EFFECT_FROM + " OR " + CvrRecordPeriod.DB_FIELD_VALID_TO + " is null)";
-    //public static final String FILTER_EFFECT_TO = "(" + CvrRecordPeriod.DB_FIELD_VALID_FROM + " < :" + Effect.FILTERPARAM_EFFECT_TO + " OR " + CvrRecordPeriod.DB_FIELD_VALID_FROM + " is null)";
+    public static final String FILTER_LAST_UPDATED = "(" + CprBitemporalRecord.DB_FIELD_UPDATED + " < :" + Registration.FILTERPARAM_REGISTRATION_TO + ")";
+    public static final String FILTER_EFFECT_FROM = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " >= :" + Effect.FILTERPARAM_EFFECT_FROM + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " is null)";
+    public static final String FILTER_EFFECT_TO = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " < :" + Effect.FILTERPARAM_EFFECT_TO + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " is null)";
 
     public static final String DB_FIELD_EFFECT_FROM = "effectFrom";
     public static final String IO_FIELD_EFFECT_FROM = "virkningFra";

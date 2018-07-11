@@ -3,12 +3,16 @@ package dk.magenta.datafordeler.cpr.data.person;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.database.Identification;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
 import org.hibernate.Session;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Filters;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -76,242 +80,493 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
 
 
 
+    public static final String DB_FIELD_ADDRESS_CONAME = "coname";
     public static final String IO_FIELD_ADDRESS_CONAME = "conavn";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_ADDRESS_CONAME)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<AddressConameDataRecord> personAddressConameDataSet = new HashSet<>();
+    Set<AddressConameDataRecord> coname = new HashSet<>();
 
-    public static final String IO_FIELD_ADDRESS = "addresse";
+    public Set<AddressConameDataRecord> getConame() {
+        return this.coname;
+    }
+
+    public static final String DB_FIELD_ADDRESS = "address";
+    public static final String IO_FIELD_ADDRESS = "adresse";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_ADDRESS)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<AddressDataRecord> personAddressDataSet = new HashSet<>();
+    Set<AddressDataRecord> address = new HashSet<>();
 
+    public Set<AddressDataRecord> getAddress() {
+        return this.address;
+    }
+
+    public static final String DB_FIELD_ADDRESS_NAME = "addressName";
     public static final String IO_FIELD_ADDRESS_NAME = "addresseringsnavn";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_ADDRESS_NAME)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<AddressNameDataRecord> personAddressNameDataSet = new HashSet<>();
+    Set<AddressNameDataRecord> addressName = new HashSet<>();
 
+    public Set<AddressNameDataRecord> getAddressName() {
+        return this.addressName;
+    }
+
+    public static final String DB_FIELD_BIRTHPLACE = "birthPlace";
     public static final String IO_FIELD_BIRTHPLACE = "fødselsted";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_BIRTHPLACE)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<BirthPlaceDataRecord> personBirthPlaceDataSet = new HashSet<>();
+    Set<BirthPlaceDataRecord> birthPlace = new HashSet<>();
 
+    public Set<BirthPlaceDataRecord> getBirthPlace() {
+        return this.birthPlace;
+    }
+
+    public static final String DB_FIELD_BIRTHPLACE_VERIFICATION = "birthPlaceVerification";
     public static final String IO_FIELD_BIRTHPLACE_VERIFICATION = "fødselssted_verifikation";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_BIRTHPLACE_VERIFICATION)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<BirthPlaceVerificationDataRecord> personBirthPlaceVerificationDataSet = new HashSet<>();
+    Set<BirthPlaceVerificationDataRecord> birthPlaceVerification = new HashSet<>();
 
+    public Set<BirthPlaceVerificationDataRecord> getBirthPlaceVerification() {
+        return this.birthPlaceVerification;
+    }
+
+    public static final String DB_FIELD_BIRTHTIME = "birthTime";
     public static final String IO_FIELD_BIRTHTIME = "fødselstidspunkt";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_BIRTHTIME)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<BirthTimeDataRecord> personBirthTimeDataSet = new HashSet<>();
+    Set<BirthTimeDataRecord> birthTime = new HashSet<>();
 
+    public Set<BirthTimeDataRecord> getBirthTime() {
+        return this.birthTime;
+    }
+
+    public static final String DB_FIELD_CHURCH = "churchRelation";
     public static final String IO_FIELD_CHURCH = "folkekirkerelation";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_CHURCH)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ChurchDataRecord> personChurchDataSet = new HashSet<>();
+    Set<ChurchDataRecord> churchRelation = new HashSet<>();
 
+    public Set<ChurchDataRecord> getChurchRelation() {
+        return this.churchRelation;
+    }
+
+    public static final String DB_FIELD_CHURCH_VERIFICATION = "churchRelationVerification";
     public static final String IO_FIELD_CHURCH_VERIFICATION = "folkekirkerelation_verifikation";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_CHURCH_VERIFICATION)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ChurchVerificationDataRecord> personChurchVerificationDataSet = new HashSet<>();
+    Set<ChurchVerificationDataRecord> churchRelationVerification = new HashSet<>();
 
+    public Set<ChurchVerificationDataRecord> getChurchRelationVerification() {
+        return this.churchRelationVerification;
+    }
+
+    public static final String DB_FIELD_CITIZENSHIP = "citizenship";
     public static final String IO_FIELD_CITIZENSHIP = "statsborgerskab";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_CITIZENSHIP)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CitizenshipDataRecord> personCitizenshipDataSet = new HashSet<>();
+    Set<CitizenshipDataRecord> citizenship = new HashSet<>();
 
+    public Set<CitizenshipDataRecord> getCitizenship() {
+        return this.citizenship;
+    }
+
+    public static final String DB_FIELD_CITIZENSHIP_VERIFICATION = "citizenshipVerification";
     public static final String IO_FIELD_CITIZENSHIP_VERIFICATION = "statsborgerskab_verifikation";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_CITIZENSHIP_VERIFICATION)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CitizenshipVerificationDataRecord> personCitizenshipVerificationDataSet = new HashSet<>();
+    Set<CitizenshipVerificationDataRecord> citizenshipVerification = new HashSet<>();
 
+    public Set<CitizenshipVerificationDataRecord> getCitizenshipVerification() {
+        return this.citizenshipVerification;
+    }
+
+    public static final String DB_FIELD_CIVILSTATUS = "civilstatus";
     public static final String IO_FIELD_CIVILSTATUS = "civilstatus";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_CIVILSTATUS)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CivilStatusDataRecord> personCivilstatusDataSet = new HashSet<>();
+    Set<CivilStatusDataRecord> civilstatus = new HashSet<>();
 
+    public Set<CivilStatusDataRecord> getCivilstatus() {
+        return this.civilstatus;
+    }
+
+    public static final String DB_FIELD_CIVILSTATUS_AUTHORITYTEXT = "civilstatusAuthorityText";
     public static final String IO_FIELD_CIVILSTATUS_AUTHORITYTEXT = "civilstatus_autoritetstekst";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_CIVILSTATUS_AUTHORITYTEXT)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CivilStatusAuthorityTextDataRecord> personCivilstatusAuthorityTextDataSet = new HashSet<>();
+    Set<CivilStatusAuthorityTextDataRecord> civilstatusAuthorityText = new HashSet<>();
 
+    public Set<CivilStatusAuthorityTextDataRecord> getCivilstatusAuthorityText() {
+        return this.civilstatusAuthorityText;
+    }
+
+    public static final String DB_FIELD_CIVILSTATUS_VERIFICATION = "civilstatusVerification";
     public static final String IO_FIELD_CIVILSTATUS_VERIFICATION = "civilstatus_verifikation";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_CIVILSTATUS_VERIFICATION)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<CivilStatusVerificationDataRecord> personCivilstatusVerificationDataSet = new HashSet<>();
+    Set<CivilStatusVerificationDataRecord> civilstatusVerification = new HashSet<>();
 
+    public Set<CivilStatusVerificationDataRecord> getCivilstatusVerification() {
+        return this.civilstatusVerification;
+    }
+
+    public static final String DB_FIELD_FOREIGN_ADDRESS = "foreignAddress";
     public static final String IO_FIELD_FOREIGN_ADDRESS = "udlandsadresse";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_FOREIGN_ADDRESS)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ForeignAddressDataRecord> personForeignAddressDataSet = new HashSet<>();
+    Set<ForeignAddressDataRecord> foreignAddress = new HashSet<>();
 
+    public Set<ForeignAddressDataRecord> getForeignAddress() {
+        return this.foreignAddress;
+    }
+
+    public static final String DB_FIELD_FOREIGN_ADDRESS_EMIGRATION = "emigration";
     public static final String IO_FIELD_FOREIGN_ADDRESS_EMIGRATION = "udrejse";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_FOREIGN_ADDRESS_EMIGRATION)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ForeignAddressEmigrationDataRecord> personForeignAddressEmigrationDataSet = new HashSet<>();
+    Set<ForeignAddressEmigrationDataRecord> emigration = new HashSet<>();
 
+    public Set<ForeignAddressEmigrationDataRecord> getEmigration() {
+        return this.emigration;
+    }
+
+    public static final String DB_FIELD_MOVE_MUNICIPALITY = "municipalityMove";
     public static final String IO_FIELD_MOVE_MUNICIPALITY = "kommuneflytning";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_MOVE_MUNICIPALITY)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<MoveMunicipalityDataRecord> personMoveMunicipalityDataSet = new HashSet<>();
+    Set<MoveMunicipalityDataRecord> municipalityMove = new HashSet<>();
 
+    public Set<MoveMunicipalityDataRecord> getMunicipalityMove() {
+        return this.municipalityMove;
+    }
+
+    public static final String DB_FIELD_NAME = "name";
     public static final String IO_FIELD_NAME = "navn";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_NAME)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<NameDataRecord> personNameDataSet = new HashSet<>();
+    Set<NameDataRecord> name = new HashSet<>();
 
+    public Set<NameDataRecord> getName() {
+        return this.name;
+    }
+
+    public static final String DB_FIELD_NAME_AUTHORITY_TEXT = "nameAuthorityText";
     public static final String IO_FIELD_NAME_AUTHORITY_TEXT = "navn_autoritetstekst";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_NAME_AUTHORITY_TEXT)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<NameAuthorityTextDataRecord> personNameAuthorityTextDataSet = new HashSet<>();
+    Set<NameAuthorityTextDataRecord> nameAuthorityText = new HashSet<>();
 
+    public Set<NameAuthorityTextDataRecord> getNameAuthorityText() {
+        return this.nameAuthorityText;
+    }
+
+    public static final String DB_FIELD_NAME_VERIFICATION = "nameVerification";
     public static final String IO_FIELD_NAME_VERIFICATION = "navn_verifikation";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_NAME_VERIFICATION)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<NameVerificationDataRecord> personNameVerificationDataSet = new HashSet<>();
+    Set<NameVerificationDataRecord> nameVerification = new HashSet<>();
 
+    public Set<NameVerificationDataRecord> getNameVerification() {
+        return this.nameVerification;
+    }
+
+    public static final String DB_FIELD_MOTHER = "mother";
     public static final String IO_FIELD_MOTHER = "mor";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=true")
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_MOTHER)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=true")
-    Set<ParentDataRecord> personMotherDataSet = new HashSet<>();
+    Set<ParentDataRecord> mother = new HashSet<>();
 
+    public Set<ParentDataRecord> getMother() {
+        return this.mother;
+    }
+
+    public static final String DB_FIELD_MOTHER_VERIFICATION = "motherVerification";
     public static final String IO_FIELD_MOTHER_VERIFICATION = "mor_verifikation";
-    @JsonProperty(IO_FIELD_MOTHER_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=true")
-    Set<ParentVerificationDataRecord> personMotherVerificationDataSet = new HashSet<>();
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
+    @JsonProperty(IO_FIELD_MOTHER_VERIFICATION)
+    Set<ParentVerificationDataRecord> motherVerification = new HashSet<>();
 
+    public Set<ParentVerificationDataRecord> getMotherVerification() {
+        return this.motherVerification;
+    }
+
+    public static final String DB_FIELD_FATHER = "father";
     public static final String IO_FIELD_FATHER = "far";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=false")
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_FATHER)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=false")
-    Set<ParentDataRecord> personFatherDataSet = new HashSet<>();
+    Set<ParentDataRecord> father = new HashSet<>();
 
+    public Set<ParentDataRecord> getFather() {
+        return this.father;
+    }
+
+    public static final String DB_FIELD_FATHER_VERIFICATION = "fatherVerification";
     public static final String IO_FIELD_FATHER_VERIFICATION = "far_verifikation";
-    @JsonProperty(IO_FIELD_FATHER_VERIFICATION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=false")
-    Set<ParentVerificationDataRecord> personFatherVerificationDataSet = new HashSet<>();
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
+    @JsonProperty(IO_FIELD_FATHER_VERIFICATION)
+    Set<ParentVerificationDataRecord> fatherVerification = new HashSet<>();
 
+    public Set<ParentVerificationDataRecord> getFatherVerification() {
+        return this.fatherVerification;
+    }
+
+    public static final String DB_FIELD_CORE = "core";
     public static final String IO_FIELD_CORE = "kernedata";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_CORE)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonCoreDataRecord> personCoreDataSet = new HashSet<>();
+    Set<PersonCoreDataRecord> core = new HashSet<>();
 
-    public static final String IO_FIELD_PNR = "personnummer";
+    public Set<PersonCoreDataRecord> getCore() {
+        return this.core;
+    }
+
+    public static final String DB_FIELD_PNR = "personNumber";
+    public static final String IO_FIELD_PNR = "historiskPersonnummer";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_PNR)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonNumberDataRecord> personNumberDataSet = new HashSet<>();
+    Set<PersonNumberDataRecord> personNumber = new HashSet<>();
 
+    public Set<PersonNumberDataRecord> getPersonNumber() {
+        return this.personNumber;
+    }
+
+    public static final String DB_FIELD_POSITION = "position";
     public static final String IO_FIELD_POSITION = "stilling";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_POSITION)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonPositionDataRecord> personPositionDataSet = new HashSet<>();
+    Set<PersonPositionDataRecord> position = new HashSet<>();
 
+    public Set<PersonPositionDataRecord> getPosition() {
+        return this.position;
+    }
+
+    public static final String DB_FIELD_STATUS = "status";
     public static final String IO_FIELD_STATUS = "status";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
     @JsonProperty(IO_FIELD_STATUS)
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<PersonStatusDataRecord> personStatusDataSet = new HashSet<>();
+    Set<PersonStatusDataRecord> status = new HashSet<>();
 
+    public Set<PersonStatusDataRecord> getStatus() {
+        return this.status;
+    }
+
+    public static final String DB_FIELD_PROTECTION = "protection";
     public static final String IO_FIELD_PROTECTION = "beskyttelse";
-    @JsonProperty(IO_FIELD_PROTECTION)
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    Set<ProtectionDataRecord> personProtectionDataSet = new HashSet<>();
+    @Filters({
+            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
+            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+    })
+    @JsonProperty(IO_FIELD_PROTECTION)
+    Set<ProtectionDataRecord> protection = new HashSet<>();
 
+    public Set<ProtectionDataRecord> getProtection() {
+        return this.protection;
+    }
 
     public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session) {
         if (record instanceof AddressConameDataRecord) {
-            addItem(this.personAddressConameDataSet, record, session);
+            addItem(this.coname, record, session);
         }
         if (record instanceof AddressDataRecord) {
-            addItem(this.personAddressDataSet, record, session);
+            addItem(this.address, record, session);
         }
         if (record instanceof AddressNameDataRecord) {
-            addItem(this.personAddressNameDataSet, record, session);
+            addItem(this.addressName, record, session);
         }
         if (record instanceof BirthPlaceDataRecord) {
-            addItem(this.personBirthPlaceDataSet, record, session);
+            addItem(this.birthPlace, record, session);
         }
         if (record instanceof BirthPlaceVerificationDataRecord) {
-            addItem(this.personBirthPlaceVerificationDataSet, record, session);
+            addItem(this.birthPlaceVerification, record, session);
         }
         if (record instanceof BirthTimeDataRecord) {
-            addItem(this.personBirthTimeDataSet, record, session);
+            addItem(this.birthTime, record, session);
         }
         if (record instanceof ChurchDataRecord) {
-            addItem(this.personChurchDataSet, record, session);
+            addItem(this.churchRelation, record, session);
         }
         if (record instanceof ChurchVerificationDataRecord) {
-            addItem(this.personChurchVerificationDataSet, record, session);
+            addItem(this.churchRelationVerification, record, session);
         }
         if (record instanceof CitizenshipDataRecord) {
-            addItem(this.personCitizenshipDataSet, record, session);
+            addItem(this.citizenship, record, session);
         }
         if (record instanceof CitizenshipVerificationDataRecord) {
-            addItem(this.personCitizenshipVerificationDataSet, record, session);
+            addItem(this.citizenshipVerification, record, session);
         }
         if (record instanceof CivilStatusDataRecord) {
-            addItem(this.personCivilstatusDataSet, record, session);
+            addItem(this.civilstatus, record, session);
         }
         if (record instanceof CivilStatusAuthorityTextDataRecord) {
-            addItem(this.personCivilstatusAuthorityTextDataSet, record, session);
+            addItem(this.civilstatusAuthorityText, record, session);
         }
         if (record instanceof CivilStatusVerificationDataRecord) {
-            addItem(this.personCivilstatusVerificationDataSet, record, session);
+            addItem(this.civilstatusVerification, record, session);
         }
         if (record instanceof ForeignAddressDataRecord) {
-            addItem(this.personForeignAddressDataSet, record, session);
+            addItem(this.foreignAddress, record, session);
         }
         if (record instanceof ForeignAddressDataRecord) {
-            addItem(this.personForeignAddressDataSet, record, session);
+            addItem(this.foreignAddress, record, session);
         }
         if (record instanceof ForeignAddressEmigrationDataRecord) {
-            addItem(this.personForeignAddressEmigrationDataSet, record, session);
+            addItem(this.emigration, record, session);
         }
         if (record instanceof MoveMunicipalityDataRecord) {
-            addItem(this.personMoveMunicipalityDataSet, record, session);
+            addItem(this.municipalityMove, record, session);
         }
         if (record instanceof NameAuthorityTextDataRecord) {
-            addItem(this.personNameAuthorityTextDataSet, record, session);
+            addItem(this.nameAuthorityText, record, session);
         }
         if (record instanceof NameDataRecord) {
-            addItem(this.personNameDataSet, record, session);
+            addItem(this.name, record, session);
         }
         if (record instanceof NameVerificationDataRecord) {
-            addItem(this.personNameVerificationDataSet, record, session);
+            addItem(this.nameVerification, record, session);
         }
         if (record instanceof ParentDataRecord) {
             ParentDataRecord pRecord = (ParentDataRecord) record;
             if (pRecord.isMother()) {
-                addItem(this.personMotherDataSet, pRecord, session);
+                addItem(this.mother, pRecord, session);
             } else {
-                addItem(this.personFatherDataSet, pRecord, session);
+                addItem(this.father, pRecord, session);
             }
         }
         if (record instanceof ParentVerificationDataRecord) {
             ParentVerificationDataRecord pRecord = (ParentVerificationDataRecord) record;
             if (pRecord.isMother()) {
-                addItem(this.personMotherVerificationDataSet, pRecord, session);
+                addItem(this.motherVerification, pRecord, session);
             } else {
-                addItem(this.personFatherVerificationDataSet, pRecord, session);
+                addItem(this.fatherVerification, pRecord, session);
             }
         }
         if (record instanceof PersonCoreDataRecord) {
-            addItem(this.personCoreDataSet, record, session);
+            addItem(this.core, record, session);
         }
         if (record instanceof PersonNumberDataRecord) {
-            addItem(this.personNumberDataSet, record, session);
+            addItem(this.personNumber, record, session);
         }
         if (record instanceof PersonPositionDataRecord) {
-            addItem(this.personPositionDataSet, record, session);
+            addItem(this.position, record, session);
         }
         if (record instanceof PersonStatusDataRecord) {
-            addItem(this.personStatusDataSet, record, session);
+            addItem(this.status, record, session);
         }
         if (record instanceof ProtectionDataRecord) {
-            addItem(this.personProtectionDataSet, record, session);
+            addItem(this.protection, record, session);
         }
         record.setEntity(this);
     }
@@ -340,33 +595,33 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     @JsonIgnore
     public Set<CprBitemporalPersonRecord> getBitemporalRecords() {
         HashSet<CprBitemporalPersonRecord> records = new HashSet<>();
-        records.addAll(this.personAddressConameDataSet);
-        records.addAll(this.personAddressDataSet);
-        records.addAll(this.personAddressNameDataSet);
-        records.addAll(this.personBirthPlaceDataSet);
-        records.addAll(this.personBirthPlaceVerificationDataSet);
-        records.addAll(this.personBirthTimeDataSet);
-        records.addAll(this.personChurchDataSet);
-        records.addAll(this.personChurchVerificationDataSet);
-        records.addAll(this.personCitizenshipDataSet);
-        records.addAll(this.personCitizenshipVerificationDataSet);
-        records.addAll(this.personCivilstatusDataSet);
-        records.addAll(this.personCivilstatusAuthorityTextDataSet);
-        records.addAll(this.personCivilstatusVerificationDataSet);
-        records.addAll(this.personForeignAddressDataSet);
-        records.addAll(this.personForeignAddressEmigrationDataSet);
-        records.addAll(this.personMoveMunicipalityDataSet);
-        records.addAll(this.personNameAuthorityTextDataSet);
-        records.addAll(this.personNameVerificationDataSet);
-        records.addAll(this.personMotherDataSet);
-        records.addAll(this.personMotherVerificationDataSet);
-        records.addAll(this.personFatherDataSet);
-        records.addAll(this.personFatherVerificationDataSet);
-        records.addAll(this.personCoreDataSet);
-        records.addAll(this.personNumberDataSet);
-        records.addAll(this.personPositionDataSet);
-        records.addAll(this.personStatusDataSet);
-        records.addAll(this.personProtectionDataSet);
+        records.addAll(this.coname);
+        records.addAll(this.address);
+        records.addAll(this.addressName);
+        records.addAll(this.birthPlace);
+        records.addAll(this.birthPlaceVerification);
+        records.addAll(this.birthTime);
+        records.addAll(this.churchRelation);
+        records.addAll(this.churchRelationVerification);
+        records.addAll(this.citizenship);
+        records.addAll(this.citizenshipVerification);
+        records.addAll(this.civilstatus);
+        records.addAll(this.civilstatusAuthorityText);
+        records.addAll(this.civilstatusVerification);
+        records.addAll(this.foreignAddress);
+        records.addAll(this.emigration);
+        records.addAll(this.municipalityMove);
+        records.addAll(this.nameAuthorityText);
+        records.addAll(this.nameVerification);
+        records.addAll(this.mother);
+        records.addAll(this.motherVerification);
+        records.addAll(this.father);
+        records.addAll(this.fatherVerification);
+        records.addAll(this.core);
+        records.addAll(this.personNumber);
+        records.addAll(this.position);
+        records.addAll(this.status);
+        records.addAll(this.protection);
         return records;
     }
 }
