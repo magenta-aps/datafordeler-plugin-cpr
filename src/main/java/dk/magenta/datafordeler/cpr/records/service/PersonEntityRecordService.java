@@ -17,8 +17,6 @@ import dk.magenta.datafordeler.cpr.CprAreaRestrictionDefinition;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.CprRolesDefinition;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
-import dk.magenta.datafordeler.cpr.data.person.PersonOutputWrapper;
-import dk.magenta.datafordeler.cpr.data.person.PersonQuery;
 import dk.magenta.datafordeler.cpr.data.person.PersonRecordQuery;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.output.PersonRecordOutputWrapper;
@@ -31,7 +29,7 @@ import java.util.Collection;
 
 @RestController
 @RequestMapping("/cpr/person/1/rest")
-public class PersonEntityRecordService extends FapiService<PersonEntity, PersonQuery> {
+public class PersonEntityRecordService extends FapiService<PersonEntity, PersonRecordQuery> {
 
     @Autowired
     private CprPlugin cprPlugin;
@@ -85,12 +83,12 @@ public class PersonEntityRecordService extends FapiService<PersonEntity, PersonQ
     }
 
     @Override
-    protected PersonQuery getEmptyQuery() {
+    protected PersonRecordQuery getEmptyQuery() {
         return new PersonRecordQuery();
     }
 
     @Override
-    protected void applyAreaRestrictionsToQuery(PersonQuery query, DafoUserDetails user) throws InvalidClientInputException {
+    protected void applyAreaRestrictionsToQuery(PersonRecordQuery query, DafoUserDetails user) throws InvalidClientInputException {
         Collection<AreaRestriction> restrictions = user.getAreaRestrictionsForRole(CprRolesDefinition.READ_CPR_ROLE);
         AreaRestrictionDefinition areaRestrictionDefinition = this.cprPlugin.getAreaRestrictionDefinition();
         AreaRestrictionType municipalityType = areaRestrictionDefinition.getAreaRestrictionTypeByName(CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER);
