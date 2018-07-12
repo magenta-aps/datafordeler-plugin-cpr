@@ -29,7 +29,7 @@ import javax.annotation.PostConstruct;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/cpr/person/2/rest")
+@RequestMapping("/cpr/person/1/rest")
 public class PersonEntityRecordService extends FapiService<PersonEntity, PersonQuery> {
 
     @Autowired
@@ -43,8 +43,8 @@ public class PersonEntityRecordService extends FapiService<PersonEntity, PersonQ
 
     @PostConstruct
     public void init() {
-        this.monitorService.addAccessCheckPoint("/cpr/person/2/rest/1234");
-        this.monitorService.addAccessCheckPoint("/cpr/person/2/rest/search?personnummer=1234");
+        this.monitorService.addAccessCheckPoint("/cpr/person/1/rest/1234");
+        this.monitorService.addAccessCheckPoint("/cpr/person/1/rest/search?personnummer=1234");
         this.setOutputWrapper(this.personRecordOutputWrapper);
     }
 

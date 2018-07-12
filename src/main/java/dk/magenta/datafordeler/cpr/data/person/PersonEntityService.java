@@ -23,8 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.PostConstruct;
 import java.util.Collection;
 
+// This service should eventually be deprecated
 @RestController
-@RequestMapping("/cpr/person/1/rest")
+@RequestMapping("/cpr/person/0/rest")
 public class PersonEntityService extends FapiService<PersonEntity, PersonQuery> {
 
     @Autowired
@@ -39,8 +40,8 @@ public class PersonEntityService extends FapiService<PersonEntity, PersonQuery> 
 
     @PostConstruct
     public void init() {
-        this.monitorService.addAccessCheckPoint("/cpr/person/1/rest/1234");
-        this.monitorService.addAccessCheckPoint("/cpr/person/1/rest/search?personnummer=1234");
+        this.monitorService.addAccessCheckPoint("/cpr/person/0/rest/1234");
+        this.monitorService.addAccessCheckPoint("/cpr/person/0/rest/search?personnummer=1234");
     }
 
     @Override
