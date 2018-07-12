@@ -1,14 +1,15 @@
 package dk.magenta.datafordeler.cpr.records.output;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.fapi.Query;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
 
 /**
  * A class for formatting a CompanyEntity to JSON, for FAPI output. The data hierarchy
@@ -50,24 +51,46 @@ public class PersonRecordOutputWrapper extends CprRecordOutputWrapper<PersonEnti
         return this.objectMapper;
     }
 
+    private static ObjectNode convert(Pair<String, ObjectNode> input) {
+        String key = input.getFirst();
+        ObjectNode data = input.getSecond();
+        switch (key) {
+            case PersonEntity.IO_FIELD_MOTHER:
+            case PersonEntity.IO_FIELD_MOTHER_VERIFICATION:
+                data.put("foraelderrolle", "MOR");
+                break;
+            case PersonEntity.IO_FIELD_FATHER:
+            case PersonEntity.IO_FIELD_FATHER_VERIFICATION:
+                data.put("foraelderrolle", "FAR_MEDMOR");
+                break;
+        }
+        return data;
+    }
+
     @Override
-    public Object wrapResult(PersonEntity record, Query query) {
+    protected ObjectNode fallbackOutput(Mode mode, OutputContainer recordOutput, Bitemporality mustContain) {
+        if (mode == Mode.LEGACY) {
+
+            HashMap<String, String> keyConversion = new HashMap<>();
+            keyConversion.put(PersonEntity.IO_FIELD_MOTHER, "foraeldreoplysning");
+            keyConversion.put(PersonEntity.IO_FIELD_FATHER, "foraeldreoplysning");
+            keyConversion.put(PersonEntity.IO_FIELD_MOTHER_VERIFICATION, "foraeldreverifikation");
+            keyConversion.put(PersonEntity.IO_FIELD_FATHER_VERIFICATION, "foraeldreverifikation");
+            keyConversion.put(PersonEntity.IO_FIELD_CORE, "person");
+
+            keyConversion.put("fødselsted", "fødselsdata");
+            keyConversion.put("fødselstidspunkt", "fødselsdata");
+
+            return recordOutput.getRDV(mustContain, keyConversion, PersonRecordOutputWrapper::convert);
+        }
+        return null;
+    }
+
+    @Override
+    public Object wrapResult(PersonEntity record, Query query, Mode mode) {
         Bitemporality mustContain = new Bitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
-        return this.asRVD(record, mustContain);
-        //return this.asRecord(record);
+        return this.getNode(record, mustContain, mode);
     }
-
-    private ObjectNode asRecord(PersonEntity record) {
-        return objectMapper.valueToTree(record);
-    }
-
-    protected ObjectNode asRVD(PersonEntity record, Bitemporality mustContain) {
-        ObjectNode root = this.getNode(record, mustContain);
-        root.put(Entity.IO_FIELD_UUID, record.getIdentification().getUuid().toString());
-        root.put(Entity.IO_FIELD_DOMAIN, record.getIdentification().getDomain());
-        return root;
-    }
-
 
     @Override
     protected void fillContainer(OutputContainer container, PersonEntity record) {

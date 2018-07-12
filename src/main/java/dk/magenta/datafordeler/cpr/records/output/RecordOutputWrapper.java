@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.records.output;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.*;
+import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.core.util.DoubleListHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
@@ -11,6 +12,7 @@ import dk.magenta.datafordeler.cpr.records.Bitemporality;
 import dk.magenta.datafordeler.cpr.records.BitemporalityComparator;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprNontemporalRecord;
+import org.springframework.data.util.Pair;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -143,7 +145,7 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             this.nontemporalData.add(key, data != null ? new TextNode(data.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)) : null);
         }
 
-        public ArrayNode getRVD(Bitemporality mustOverlap) {
+        public ObjectNode getRVD(Bitemporality mustOverlap) {
             ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
             ArrayNode registrationsNode = objectMapper.createArrayNode();
             ArrayList<Bitemporality> bitemporalities = new ArrayList<>(this.bitemporalData.keySet());
@@ -202,10 +204,14 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
                     }
                 }
             }
-            return registrationsNode;
+            ObjectNode output = objectMapper.createObjectNode();
+            output.set("registreringer", registrationsNode);
+            return output;
         }
-
-        public ArrayNode getRDV(Bitemporality mustOverlap) {
+        public ObjectNode getRDV(Bitemporality mustOverlap) {
+            return this.getRDV(mustOverlap, null, null);
+        }
+        public ObjectNode getRDV(Bitemporality mustOverlap, Map<String, String> keyConversion, Function<Pair<String, ObjectNode>, ObjectNode> dataConversion) {
             ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
             ArrayNode registrationsNode = objectMapper.createArrayNode();
             ArrayList<Bitemporality> bitemporalities = new ArrayList<>(this.bitemporalData.keySet());
@@ -245,14 +251,23 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
                             for (Bitemporality bitemporality : presentBitemporalities) {
                                 HashMap<String, ArrayList<ObjectNode>> data = this.bitemporalData.get(bitemporality);
                                 for (String key : data.keySet()) {
-                                    ArrayNode dataNode = (ArrayNode) registrationNode.get(key);
+
+                                    // key, data -> key, data
+                                    String outKey = (keyConversion != null && keyConversion.containsKey(key)) ? keyConversion.get(key) : key;
+
+                                    ArrayNode dataNode = (ArrayNode) registrationNode.get(outKey);
                                     if (dataNode == null) {
                                         dataNode = objectMapper.createArrayNode();
-                                        registrationNode.set(key, dataNode);
+                                        registrationNode.set(outKey, dataNode);
                                     }
                                     for (ObjectNode item : data.get(key)) {
+                                        item.remove("registreringFra");
+                                        item.remove("registreringTil");
                                         item.put("virkningFra", formatTime(bitemporality.effectFrom));
                                         item.put("virkningTil", formatTime(bitemporality.effectTo));
+                                        if (dataConversion != null) {
+                                            item = dataConversion.apply(Pair.of(key, item));
+                                        }
                                         dataNode.add(item);
                                     }
                                 }
@@ -261,7 +276,9 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
                     }
                 }
             }
-            return registrationsNode;
+            ObjectNode output = objectMapper.createObjectNode();
+            output.set("registreringer", registrationsNode);
+            return output;
         }
 
         public ObjectNode getDRV(Bitemporality mustOverlap) {
@@ -319,18 +336,32 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
         }
     }
 
-    protected final ObjectNode getNode(E record, Bitemporality mustContain) {
+    protected abstract ObjectNode fallbackOutput(Mode mode, OutputContainer recordOutput, Bitemporality mustContain);
+
+    protected final ObjectNode getNode(E record, Bitemporality mustContain, Mode mode) {
         ObjectMapper objectMapper = this.getObjectMapper();
         ObjectNode root = objectMapper.createObjectNode();
+        root.put(Entity.IO_FIELD_UUID, record.getIdentification().getUuid().toString());
+        root.put(Entity.IO_FIELD_DOMAIN, record.getIdentification().getDomain());
         try {
-            //root.put(CompanyEntity.IO_FIELD_UUID, record.getIdentification().getUuid().toString());
-
             OutputContainer recordOutput = new OutputContainer();
             this.fillContainer(recordOutput, record);
 
             root.setAll(recordOutput.getBase());
-            //root.set("registreringer", recordOutput.getRDV(mustContain));
-            root.set("data", recordOutput.getDRV(mustContain));
+            switch (mode) {
+                case RVD:
+                    root.setAll(recordOutput.getRVD(mustContain));
+                    break;
+                case RDV:
+                    root.setAll(recordOutput.getRDV(mustContain));
+                    break;
+                case DRV:
+                    root.setAll(recordOutput.getDRV(mustContain));
+                    break;
+                default:
+                    root.setAll(this.fallbackOutput(mode, recordOutput, mustContain));
+                    break;
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
