@@ -19,6 +19,7 @@ import dk.magenta.datafordeler.cpr.CprRolesDefinition;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.person.PersonOutputWrapper;
 import dk.magenta.datafordeler.cpr.data.person.PersonQuery;
+import dk.magenta.datafordeler.cpr.data.person.PersonRecordQuery;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.output.PersonRecordOutputWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +86,7 @@ public class PersonEntityRecordService extends FapiService<PersonEntity, PersonQ
 
     @Override
     protected PersonQuery getEmptyQuery() {
-        return new PersonQuery();
+        return new PersonRecordQuery();
     }
 
     @Override
