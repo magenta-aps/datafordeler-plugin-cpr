@@ -9,6 +9,7 @@ import dk.magenta.datafordeler.core.Application;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
+import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.user.DafoUserManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
@@ -208,9 +209,9 @@ public class RecordTest {
             query.addKommunekode(958);
             PersonEntity personEntity = QueryManager.getAllEntities(session, query, PersonEntity.class).get(0);
 
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString((ObjectNode) this.personRecordOutputWrapper.wrapResult(personEntity, query)));
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this.personRecordOutputWrapper.wrapResult(personEntity, query, OutputWrapper.Mode.LEGACY)));
             System.out.println("--------------------");
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString((ObjectNode) this.personOutputWrapper.wrapResult(personEntity, query)));
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this.personOutputWrapper.wrapResult(personEntity, query, OutputWrapper.Mode.LEGACY)));
 
         } finally {
             session.close();
