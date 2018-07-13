@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ForeignAddressDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ForeignAddressEmigrationDataRecord;
@@ -21,8 +21,8 @@ import java.util.Set;
  */
 public class ForeignAddressRecord extends PersonDataRecord {
 
-    private Bitemporality emigrationTemporality;
-    private Bitemporality foreignAddressTemporality;
+    private CprBitemporality emigrationTemporality;
+    private CprBitemporality foreignAddressTemporality;
 
     public ForeignAddressRecord(String line) throws ParseException {
         super(line);
@@ -41,12 +41,12 @@ public class ForeignAddressRecord extends PersonDataRecord {
 
         OffsetDateTime effectFrom = this.getOffsetDateTime("udrdto");
         boolean effectFromUncertain = this.getMarking("udrdto_umrk");
-        this.emigrationTemporality = new Bitemporality(this.getOffsetDateTime("udr_ts"), null, effectFrom, effectFromUncertain, null, false);
-        this.foreignAddressTemporality = new Bitemporality(this.getOffsetDateTime("udlandadr_ts"), null, effectFrom, effectFromUncertain, null, false);
+        this.emigrationTemporality = new CprBitemporality(this.getOffsetDateTime("udr_ts"), null, effectFrom, effectFromUncertain, null, false);
+        this.foreignAddressTemporality = new CprBitemporality(this.getOffsetDateTime("udlandadr_ts"), null, effectFrom, effectFromUncertain, null, false);
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (bitemporality.equals(this.emigrationTemporality)) {
             data.setEmigration(
@@ -106,8 +106,8 @@ public class ForeignAddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
-        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+    public List<CprBitemporality> getBitemporality() {
+        ArrayList<CprBitemporality> bitemporalities = new ArrayList<>();
         if (this.has("udr_ts") || this.has("udr_landekod")) {
             bitemporalities.add(this.emigrationTemporality);
         }

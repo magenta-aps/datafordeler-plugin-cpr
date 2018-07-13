@@ -81,7 +81,7 @@ public class RecordTest {
     }
 
     @Test
-    public void testCompany() throws DataFordelerException, IOException {
+    public void testPerson() throws DataFordelerException, IOException {
         Session session = sessionManager.getSessionFactory().openSession();
         ImportMetadata importMetadata = new ImportMetadata();
         importMetadata.setSession(session);

@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.AddressConameDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.AddressDataRecord;
@@ -18,9 +18,9 @@ import java.util.*;
  */
 public class HistoricAddressRecord extends HistoricPersonDataRecord {
 
-    private Bitemporality addressTemporality;
-    private Bitemporality conameTemporality;
-    private Bitemporality municipalityTemporality;
+    private CprBitemporality addressTemporality;
+    private CprBitemporality conameTemporality;
+    private CprBitemporality municipalityTemporality;
 
     public HistoricAddressRecord(String line) throws ParseException {
         super(line);
@@ -47,9 +47,9 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
         this.obtain("fraflykomdto", 158, 12);
         this.obtain("fraflykomdt_umrk", 170, 1);
 
-        this.addressTemporality = new Bitemporality(this.getOffsetDateTime("adr_ts"), null, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), this.getOffsetDateTime("fraflydto"), this.getBoolean("fraflydto_umrk"));
-        this.conameTemporality = new Bitemporality(this.getOffsetDateTime("convn_ts"));
-        this.municipalityTemporality = new Bitemporality(this.getOffsetDateTime("tilfra_ts"));
+        this.addressTemporality = new CprBitemporality(this.getOffsetDateTime("adr_ts"), null, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), this.getOffsetDateTime("fraflydto"), this.getBoolean("fraflydto_umrk"));
+        this.conameTemporality = new CprBitemporality(this.getOffsetDateTime("convn_ts"));
+        this.municipalityTemporality = new CprBitemporality(this.getOffsetDateTime("tilfra_ts"));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
 
         if (bitemporality.equals(this.addressTemporality)) {
@@ -135,17 +135,17 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+    public boolean cleanBaseData(PersonBaseData data, CprBitemporality bitemporality, CprBitemporality outdatedTemporality, Session session) {
         boolean updated = false;
-        if (bitemporality.equals(this.addressTemporality) && outdatedTemporality.equals(this.addressTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+        if (bitemporality.equals(this.addressTemporality) && outdatedTemporality.equals(this.addressTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearAddress(session);
             updated = true;
         }
-        if (bitemporality.equals(this.conameTemporality) && outdatedTemporality.equals(this.conameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+        if (bitemporality.equals(this.conameTemporality) && outdatedTemporality.equals(this.conameTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearCoName(session);
             updated = true;
         }
-        if (bitemporality.equals(this.municipalityTemporality) && outdatedTemporality.equals(this.municipalityTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+        if (bitemporality.equals(this.municipalityTemporality) && outdatedTemporality.equals(this.municipalityTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearMoveMunicipality(session);
             updated = true;
         }
@@ -210,7 +210,7 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
+    public List<CprBitemporality> getBitemporality() {
         return Arrays.asList(
                 this.addressTemporality,
                 this.conameTemporality,

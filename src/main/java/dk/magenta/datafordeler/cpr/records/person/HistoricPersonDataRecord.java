@@ -2,7 +2,7 @@ package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import org.hibernate.Session;
 
 /**
@@ -14,6 +14,6 @@ public abstract class HistoricPersonDataRecord extends PersonDataRecord {
         super(line);
     }
 
-    public abstract boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session);
+    public abstract boolean cleanBaseData(PersonBaseData data, CprBitemporality bitemporality, CprBitemporality outdatedTemporality, Session session);
 
 }

@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.NameAuthorityTextDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.NameDataRecord;
@@ -22,10 +22,10 @@ import java.util.Set;
  */
 public class HistoricNameRecord extends HistoricPersonDataRecord {
 
-    private Bitemporality nameTemporality;
-    private Bitemporality addressNameTemporality;
-    private Bitemporality documentNameTemporality;
-    private Bitemporality officiaryTemporality;
+    private CprBitemporality nameTemporality;
+    private CprBitemporality addressNameTemporality;
+    private CprBitemporality documentNameTemporality;
+    private CprBitemporality officiaryTemporality;
 
     public HistoricNameRecord(String line) throws ParseException {
         super(line);
@@ -55,14 +55,14 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
         boolean effectFromUncertain = this.getMarking("haenstart_umrk-navne");
         OffsetDateTime effectTo = this.getOffsetDateTime("nvnhaenslut");
         boolean effectToUncertain = this.getMarking("haenslut_umrk-navne");
-        this.nameTemporality = new Bitemporality(this.getOffsetDateTime("nvn_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
-        this.addressNameTemporality = new Bitemporality(this.getOffsetDateTime("adrnvn_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
-        this.documentNameTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-navne"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
-        this.officiaryTemporality = new Bitemporality(this.getOffsetDateTime("myntxt_ts-navne"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
+        this.nameTemporality = new CprBitemporality(this.getOffsetDateTime("nvn_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
+        this.addressNameTemporality = new CprBitemporality(this.getOffsetDateTime("adrnvn_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
+        this.documentNameTemporality = new CprBitemporality(this.getOffsetDateTime("dok_ts-navne"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
+        this.officiaryTemporality = new CprBitemporality(this.getOffsetDateTime("myntxt_ts-navne"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (bitemporality.equals(this.nameTemporality)) {
             data.setName(
@@ -126,21 +126,21 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+    public boolean cleanBaseData(PersonBaseData data, CprBitemporality bitemporality, CprBitemporality outdatedTemporality, Session session) {
         boolean updated = false;
-        if (bitemporality.equals(this.nameTemporality) && outdatedTemporality.equals(this.nameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+        if (bitemporality.equals(this.nameTemporality) && outdatedTemporality.equals(this.nameTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearName(session);
             updated = true;
         }
-        if (bitemporality.equals(this.addressNameTemporality) && outdatedTemporality.equals(this.addressNameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+        if (bitemporality.equals(this.addressNameTemporality) && outdatedTemporality.equals(this.addressNameTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearAddressName(session);
             updated = true;
         }
-        if (bitemporality.equals(this.documentNameTemporality) && outdatedTemporality.equals(this.documentNameTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+        if (bitemporality.equals(this.documentNameTemporality) && outdatedTemporality.equals(this.documentNameTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearNameVerification(session);
             updated = true;
         }
-        if (bitemporality.equals(this.officiaryTemporality) && outdatedTemporality.equals(this.officiaryTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+        if (bitemporality.equals(this.officiaryTemporality) && outdatedTemporality.equals(this.officiaryTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearNameAuthorityText(session);
             updated = true;
         }
@@ -196,8 +196,8 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
-        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+    public List<CprBitemporality> getBitemporality() {
+        ArrayList<CprBitemporality> bitemporalities = new ArrayList<>();
         if (this.has("fornvn") || this.has("melnvn") || this.has("efternvn") || this.has("slægtsnvn")) {
             bitemporalities.add(this.nameTemporality);
         }

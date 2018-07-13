@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.PersonNumberDataRecord;
 import org.hibernate.Session;
@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
 
-    private Bitemporality cprTemporality;
+    private CprBitemporality cprTemporality;
 
     public HistoricCprNumberRecord(String line) throws ParseException {
         super(line);
@@ -27,7 +27,7 @@ public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
         this.obtain("start_dt_umrk-person", 38, 1);
         this.obtain("slut_dt-person", 38, 10);
         this.obtain("slut_dt_umrk-person", 49, 1);
-        this.cprTemporality = new Bitemporality(
+        this.cprTemporality = new CprBitemporality(
                 null, null,
                 this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"),
                 this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person")
@@ -35,7 +35,7 @@ public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (bitemporality.equals(this.cprTemporality)) {
             data.setCprNumber(
@@ -49,9 +49,9 @@ public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+    public boolean cleanBaseData(PersonBaseData data, CprBitemporality bitemporality, CprBitemporality outdatedTemporality, Session session) {
         boolean updated = false;
-        if (bitemporality.equals(this.cprTemporality) && outdatedTemporality.equals(this.cprTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+        if (bitemporality.equals(this.cprTemporality) && outdatedTemporality.equals(this.cprTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearCprNumber(session);
             updated = true;
         }
@@ -88,7 +88,7 @@ public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
+    public List<CprBitemporality> getBitemporality() {
         return Collections.singletonList(this.cprTemporality);
     }
 
