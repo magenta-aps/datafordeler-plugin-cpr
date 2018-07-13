@@ -138,6 +138,36 @@ public abstract class Record extends HashMap<String, String> {
     }
 
 
+    private static DateTimeFormatter yearParser = DateTimeFormatter.ofPattern("uuuu");
+    public Year getYear(String key) {
+        String value = this.get(key);
+        if (value != null && !value.isEmpty() && value.length() >= 4) {
+            value = value.substring(0, 4);
+            try {
+                return Year.parse(value, yearParser);
+            } catch (DateTimeParseException e) {
+            }
+        }
+        return null;
+    }
+
+    private static DateTimeFormatter monthParser = DateTimeFormatter.ofPattern("uuuuMM");
+    public YearMonth getMonth(String key) {
+        String value = this.get(key);
+        if (value != null && !value.isEmpty() && value.length() >= 6) {
+            value = value.substring(0, 6);
+            try {
+                return YearMonth.parse(value, monthParser);
+            } catch (DateTimeParseException e) {
+            }
+            Year year = this.getYear(key);
+            if (year != null) {
+                return YearMonth.of(year.getValue(), 1);
+            }
+        }
+        return null;
+    }
+
     private static DateTimeFormatter[] dateParsers = {
             DateTimeFormatter.BASIC_ISO_DATE,
             DateTimeFormatter.ISO_LOCAL_DATE
@@ -150,6 +180,10 @@ public abstract class Record extends HashMap<String, String> {
                     return LocalDate.parse(value, parser);
                 } catch (DateTimeParseException e) {
                 }
+            }
+            YearMonth yearMonth = this.getMonth(key);
+            if (yearMonth != null) {
+                return LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1);
             }
         }
         return null;
@@ -183,6 +217,9 @@ public abstract class Record extends HashMap<String, String> {
         if (value != null && !value.isEmpty()) {
             if (value.length() == 12 && value.endsWith("99")) {
                 value = value.substring(0, 10) + "00";
+            }
+            if (value.equals("000000000000")) {
+                return null;
             }
             for (DateTimeFormatter parser : datetimeParsers) {
                 try {
