@@ -5,10 +5,15 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.ChurchDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.ChurchVerificationDataRecord;
 import org.hibernate.Session;
 
-import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Record for Person historic church relation (type 011).
@@ -80,6 +85,29 @@ public class HistoricChurchRecord extends HistoricPersonDataRecord {
         return updated;
     }
 
+    @Override
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
+
+        records.add(new ChurchDataRecord(
+                this.getChar("fkirk")
+        ).setAuthority(
+                this.getInt("start_mynkod-folkekirke", true)
+        ).setBitemporality( // TODO: Monotemporal?
+                this.churchTemporality // TODO: mangler registrationTo
+        ).setHistoric());
+
+        records.add(new ChurchVerificationDataRecord(
+                this.getBoolean("dok-folkekirke")
+        ).setAuthority(
+                this.getInt("dok_mynkod-folkekirke")
+        ).setBitemporality(
+                this.documentTemporality
+        ).setHistoric());
+
+        return records;
+    }
 
     @Override
     public List<Bitemporality> getBitemporality() {

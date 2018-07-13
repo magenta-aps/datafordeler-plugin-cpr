@@ -5,13 +5,12 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.PersonNumberDataRecord;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Record for Person historic cpr number (type 065).
@@ -62,6 +61,23 @@ public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
     @Override
     public String getRecordType() {
         return RECORDTYPE_HISTORIC_CPRNUMBER;
+    }
+
+
+    @Override
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
+
+        records.add(new PersonNumberDataRecord(
+                this.getString("gammelt_pnr", false)
+        ).setAuthority(
+                this.getInt("start_mynkod-pnrgaeld")
+        ).setBitemporality(
+                this.cprTemporality
+        ).setHistoric());
+
+        return records;
     }
 
     @Override

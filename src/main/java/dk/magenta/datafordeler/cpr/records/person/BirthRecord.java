@@ -5,10 +5,15 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.BirthPlaceDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.BirthPlaceVerificationDataRecord;
 import org.hibernate.Session;
 
-import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Record for Person birth (type 025).
@@ -59,6 +64,32 @@ public class BirthRecord extends PersonDataRecord {
             updated = true;
         }
         return updated;
+    }
+
+    @Override
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
+
+        records.add(new BirthPlaceDataRecord(
+                this.getInt("myntxt_mynkod-fødested", true),
+                this.getString("myntxt-fødested", true)
+        ).setAuthority(
+                this.getInt("start_mynkod-fødested")
+        ).setBitemporality( // TODO: Monotemporal?
+                this.birthTemporality
+        ));
+
+        records.add(new BirthPlaceVerificationDataRecord(
+                this.getBoolean("dok-fødested")
+                //importMetadata.getImportTime()
+        ).setAuthority(
+                this.getInt("dok_mynkod-fødested")
+        ).setBitemporality(
+                this.documentTemporality
+        ));
+
+        return records;
     }
 
     @Override

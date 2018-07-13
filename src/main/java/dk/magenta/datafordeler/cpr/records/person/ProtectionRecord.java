@@ -5,13 +5,11 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.ProtectionDataRecord;
 import org.hibernate.Session;
 
-import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Record for Person protection (type 015).
@@ -52,6 +50,29 @@ public class ProtectionRecord extends PersonDataRecord {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
+
+        records.add(new ProtectionDataRecord(
+                this.getInt("beskyttype"),
+                this.getBoolean("indrap-beskyttelse"),
+                this.getDate("slet_dt-beskyttelse")
+        ).setAuthority(
+                this.getInt("start_mynkod-beskyttelse")
+        ).setBitemporality(
+                new Bitemporality(
+                        this.getOffsetDateTime("start_ts-beskyttelse"),
+                        null,
+                        this.getOffsetDateTime("start_dt-beskyttelse"), false,
+                        this.getOffsetDateTime("slut_dt-beskyttelse"), false
+                )
+        ));
+
+        return records;
     }
 
     @Override

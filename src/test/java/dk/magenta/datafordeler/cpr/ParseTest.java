@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -29,6 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
@@ -97,6 +100,8 @@ public class ParseTest {
             loadPerson(importMetadata);
             entities = QueryManager.getAllEntities(session, PersonEntity.class);
             JsonNode secondImport = objectMapper.valueToTree(entities);
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(secondImport));
+
             assertJsonEquality(firstImport, secondImport, true, true);
 
         } finally {
@@ -132,7 +137,8 @@ public class ParseTest {
 
             System.out.println(
                     objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
-                        new PersonOutputWrapper().wrapResult(entity, query)
+                        //new PersonOutputWrapper().wrapResult(entity, query)
+                            entity
                     )
             );
 
@@ -473,7 +479,7 @@ public class ParseTest {
     static {
         ignoreKeys.add("sidstImporteret");
     }
-    private static void assertJsonEquality(JsonNode node1, JsonNode node2, boolean ignoreArrayOrdering, boolean printDifference) {
+    private void assertJsonEquality(JsonNode node1, JsonNode node2, boolean ignoreArrayOrdering, boolean printDifference) {
         try {
             Assert.assertEquals(node1.isNull(), node2.isNull());
             Assert.assertEquals(node1.isArray(), node2.isArray());
@@ -519,7 +525,11 @@ public class ParseTest {
             }
         } catch (AssertionError e) {
             if (printDifference) {
-                System.out.println("\n" + node1 + "\n != \n" + node2 + "\n\n\n");
+                try {
+                    System.out.println("\n" + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node1) + "\n != \n" + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node2) + "\n\n\n");
+                } catch (JsonProcessingException e1) {
+                    System.out.println("\n" + node1.asText() + "\n != \n" + node2.asText() + "\n\n\n");
+                }
             }
             throw e;
         }

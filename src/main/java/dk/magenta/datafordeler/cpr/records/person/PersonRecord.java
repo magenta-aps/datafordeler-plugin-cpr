@@ -5,10 +5,14 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.*;
 import org.hibernate.Session;
 
-import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Record for Person base data (type 001).
@@ -212,6 +216,98 @@ public class PersonRecord extends PersonDataRecord {
     public String getRecordType() {
         return RECORDTYPE_PERSON;
     }
+
+
+    @Override
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
+
+        if (this.hasPnrGaeld) {
+            records.add(new PersonNumberDataRecord(
+                    this.getString("pnrgaeld", false)
+            ));
+        }
+
+        records.add(new PersonStatusDataRecord(
+                this.getInt("status", true)
+        ).setBitemporality(
+                this.statusTemporality
+        ));
+
+        records.add(new ParentDataRecord(
+                true,
+                this.getString("pnrmor", false),
+                this.getDate("mor_foed_dt"),
+                this.getBoolean("mor_foed_dt_umrk"),
+                this.get("mornvn"),
+                this.getBoolean("mornvn_mrk")
+        ).setAuthority(
+                this.getInt("mor_mynkod")
+        ).setBitemporality(
+                this.motherTemporality
+        ));
+
+        records.add(new ParentVerificationDataRecord(
+                this.getBoolean("mor_dok"),
+                true
+        ).setAuthority(
+                this.getInt("mor_dok_mynkod")
+        ).setBitemporality(
+                this.motherVerificationTemporality
+        ));
+
+        records.add(new ParentDataRecord(
+                false,
+                this.getString("pnrfar", false),
+                this.getDate("far_foed_dt"),
+                this.getBoolean("far_foed_dt_umrk"),
+                this.get("farnvn"),
+                this.getBoolean("farnvn_mrk")
+        ).setAuthority(
+                this.getInt("far_mynkod")
+        ).setBitemporality(
+                this.fatherTemporality
+        ));
+
+        records.add(new ParentVerificationDataRecord(
+                this.getBoolean("far_dok"),
+                false
+        ).setAuthority(
+                this.getInt("far_dok_mynkod")
+        ).setBitemporality(
+                this.fatherVerificationTemporality
+        ));
+
+        records.add(new PersonPositionDataRecord(
+                this.get("stilling")
+        ).setAuthority(
+                this.getInt("stilling_mynkod")
+        ).setBitemporality(
+                this.positionTemporality
+        ));
+
+        records.add(new BirthTimeDataRecord(
+                this.getDateTime("foed_dt", "foed_tm"),
+                this.getBoolean("foed_dt_umrk"),
+                this.getInt("foedsekvens")
+        ).setAuthority(
+                this.getInt("start_mynkod-person")
+        ).setBitemporality(
+                this.birthTemporality
+        ));
+
+        records.add(new PersonCoreDataRecord(
+                this.get("koen")
+        ).setAuthority(
+                this.getInt("start_mynkod-person")
+        ).setBitemporality(
+                this.birthTemporality
+        ));
+
+        return records;
+    }
+
 
     @Override
     public List<Bitemporality> getBitemporality() {
