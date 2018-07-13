@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.*;
 import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
+import dk.magenta.datafordeler.core.util.BitemporalityComparator;
 import dk.magenta.datafordeler.core.util.DoubleListHashMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
-import dk.magenta.datafordeler.cpr.records.BitemporalityComparator;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprNontemporalRecord;
 import org.springframework.data.util.Pair;
@@ -60,7 +60,7 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
 
     public class OutputContainer {
 
-        private DoubleListHashMap<Bitemporality, String, ObjectNode> bitemporalData = new DoubleListHashMap<>();
+        private DoubleListHashMap<CprBitemporality, String, ObjectNode> bitemporalData = new DoubleListHashMap<>();
 
         private ListHashMap<String, JsonNode> nontemporalData = new ListHashMap<>();
 
@@ -145,13 +145,13 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             this.nontemporalData.add(key, data != null ? new TextNode(data.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)) : null);
         }
 
-        public ObjectNode getRVD(Bitemporality mustOverlap) {
+        public ObjectNode getRVD(CprBitemporality mustOverlap) {
             ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
             ArrayNode registrationsNode = objectMapper.createArrayNode();
-            ArrayList<Bitemporality> bitemporalities = new ArrayList<>(this.bitemporalData.keySet());
-            ListHashMap<OffsetDateTime, Bitemporality> startTerminators = new ListHashMap<>();
-            ListHashMap<OffsetDateTime, Bitemporality> endTerminators = new ListHashMap<>();
-            for (Bitemporality bitemporality : bitemporalities) {
+            ArrayList<CprBitemporality> bitemporalities = new ArrayList<>(this.bitemporalData.keySet());
+            ListHashMap<OffsetDateTime, CprBitemporality> startTerminators = new ListHashMap<>();
+            ListHashMap<OffsetDateTime, CprBitemporality> endTerminators = new ListHashMap<>();
+            for (CprBitemporality bitemporality : bitemporalities) {
                 startTerminators.add(bitemporality.registrationFrom, bitemporality);
                 endTerminators.add(bitemporality.registrationTo, bitemporality);
             }
@@ -162,11 +162,11 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             ArrayList<OffsetDateTime> terminators = new ArrayList<>(allTerminators);
             terminators.sort(Comparator.nullsFirst(OffsetDateTime::compareTo));
             terminators.add(null);
-            HashSet<Bitemporality> presentBitemporalities = new HashSet<>();
+            HashSet<CprBitemporality> presentBitemporalities = new HashSet<>();
             for (int i=0; i<terminators.size(); i++) {
                 OffsetDateTime t = terminators.get(i);
-                List<Bitemporality> startingHere = startTerminators.get(t);
-                List<Bitemporality> endingHere = endTerminators.get(t);
+                List<CprBitemporality> startingHere = startTerminators.get(t);
+                List<CprBitemporality> endingHere = endTerminators.get(t);
                 if (startingHere != null) {
                     presentBitemporalities.addAll(startingHere);
                 }
@@ -183,11 +183,11 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
                             registrationNode.put("registreringTil", formatTime(next));
                             ArrayNode effectsNode = objectMapper.createArrayNode();
                             registrationNode.set("virkninger", effectsNode);
-                            ArrayList<Bitemporality> sortedEffects = new ArrayList<>(presentBitemporalities);
-                            sortedEffects.sort(effectComparator);
-                            Bitemporality lastEffect = null;
+                            ArrayList<CprBitemporality> sortedEffects = new ArrayList<>(presentBitemporalities);
+                            sortedEffects.sort(BitemporalityComparator.EFFECT);
+                            CprBitemporality lastEffect = null;
                             ObjectNode effectNode = null;
-                            for (Bitemporality bitemporality : sortedEffects) {
+                            for (CprBitemporality bitemporality : sortedEffects) {
                                 if (lastEffect == null || effectNode == null || !lastEffect.equalEffect(bitemporality)) {
                                     effectNode = objectMapper.createObjectNode();
                                     effectsNode.add(effectNode);
@@ -208,16 +208,16 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             output.set("registreringer", registrationsNode);
             return output;
         }
-        public ObjectNode getRDV(Bitemporality mustOverlap) {
+        public ObjectNode getRDV(CprBitemporality mustOverlap) {
             return this.getRDV(mustOverlap, null, null);
         }
-        public ObjectNode getRDV(Bitemporality mustOverlap, Map<String, String> keyConversion, Function<Pair<String, ObjectNode>, ObjectNode> dataConversion) {
+        public ObjectNode getRDV(CprBitemporality mustOverlap, Map<String, String> keyConversion, Function<Pair<String, ObjectNode>, ObjectNode> dataConversion) {
             ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
             ArrayNode registrationsNode = objectMapper.createArrayNode();
-            ArrayList<Bitemporality> bitemporalities = new ArrayList<>(this.bitemporalData.keySet());
-            ListHashMap<OffsetDateTime, Bitemporality> startTerminators = new ListHashMap<>();
-            ListHashMap<OffsetDateTime, Bitemporality> endTerminators = new ListHashMap<>();
-            for (Bitemporality bitemporality : bitemporalities) {
+            ArrayList<CprBitemporality> bitemporalities = new ArrayList<>(this.bitemporalData.keySet());
+            ListHashMap<OffsetDateTime, CprBitemporality> startTerminators = new ListHashMap<>();
+            ListHashMap<OffsetDateTime, CprBitemporality> endTerminators = new ListHashMap<>();
+            for (CprBitemporality bitemporality : bitemporalities) {
                 startTerminators.add(bitemporality.registrationFrom, bitemporality);
                 endTerminators.add(bitemporality.registrationTo, bitemporality);
             }
@@ -228,11 +228,11 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             ArrayList<OffsetDateTime> terminators = new ArrayList<>(allTerminators);
             terminators.sort(Comparator.nullsFirst(OffsetDateTime::compareTo));
             terminators.add(null);
-            HashSet<Bitemporality> presentBitemporalities = new HashSet<>();
+            HashSet<CprBitemporality> presentBitemporalities = new HashSet<>();
             for (int i=0; i<terminators.size(); i++) {
                 OffsetDateTime t = terminators.get(i);
-                List<Bitemporality> startingHere = startTerminators.get(t);
-                List<Bitemporality> endingHere = endTerminators.get(t);
+                List<CprBitemporality> startingHere = startTerminators.get(t);
+                List<CprBitemporality> endingHere = endTerminators.get(t);
                 if (startingHere != null) {
                     presentBitemporalities.addAll(startingHere);
                 }
@@ -248,7 +248,7 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
                             registrationNode.put("registreringFra", formatTime(t));
                             registrationNode.put("registreringTil", formatTime(next));
 
-                            for (Bitemporality bitemporality : presentBitemporalities) {
+                            for (CprBitemporality bitemporality : presentBitemporalities) {
                                 HashMap<String, ArrayList<ObjectNode>> data = this.bitemporalData.get(bitemporality);
                                 for (String key : data.keySet()) {
 
@@ -281,10 +281,10 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             return output;
         }
 
-        public ObjectNode getDRV(Bitemporality mustOverlap) {
+        public ObjectNode getDRV(CprBitemporality mustOverlap) {
             ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
             ObjectNode dataNode = objectMapper.createObjectNode();
-            for (Bitemporality bitemporality : this.bitemporalData.keySet()) {
+            for (CprBitemporality bitemporality : this.bitemporalData.keySet()) {
                 if (bitemporality.overlaps(mustOverlap)) {
                     HashMap<String, ArrayList<ObjectNode>> data = this.bitemporalData.get(bitemporality);
                     for (String key : data.keySet()) {
@@ -336,9 +336,9 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
         }
     }
 
-    protected abstract ObjectNode fallbackOutput(Mode mode, OutputContainer recordOutput, Bitemporality mustContain);
+    protected abstract ObjectNode fallbackOutput(Mode mode, OutputContainer recordOutput, CprBitemporality mustContain);
 
-    protected final ObjectNode getNode(E record, Bitemporality mustContain, Mode mode) {
+    protected final ObjectNode getNode(E record, CprBitemporality mustContain, Mode mode) {
         ObjectMapper objectMapper = this.getObjectMapper();
         ObjectNode root = objectMapper.createObjectNode();
         root.put(Entity.IO_FIELD_UUID, record.getIdentification().getUuid().toString());
@@ -368,10 +368,6 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
         }
         return root;
     }
-
-    protected static final Comparator<Bitemporality> effectComparator =
-            Comparator.nullsFirst(new BitemporalityComparator(BitemporalityComparator.Type.EFFECT_FROM))
-            .thenComparing(Comparator.nullsLast(new BitemporalityComparator(BitemporalityComparator.Type.EFFECT_TO)));
 
     protected static String formatTime(OffsetDateTime time) {
         return formatTime(time, false);

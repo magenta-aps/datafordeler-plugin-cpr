@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
 import org.hibernate.Session;
@@ -19,13 +19,13 @@ import java.util.Set;
  */
 public class PersonRecord extends PersonDataRecord {
 
-    private Bitemporality statusTemporality;
-    private Bitemporality motherTemporality;
-    private Bitemporality fatherTemporality;
-    private Bitemporality motherVerificationTemporality;
-    private Bitemporality fatherVerificationTemporality;
-    private Bitemporality positionTemporality;
-    private Bitemporality birthTemporality;
+    private CprBitemporality statusTemporality;
+    private CprBitemporality motherTemporality;
+    private CprBitemporality fatherTemporality;
+    private CprBitemporality motherVerificationTemporality;
+    private CprBitemporality fatherVerificationTemporality;
+    private CprBitemporality positionTemporality;
+    private CprBitemporality birthTemporality;
 
     private boolean hasPnrGaeld = false;
 
@@ -75,13 +75,13 @@ public class PersonRecord extends PersonDataRecord {
         this.obtain("far_dok_ts", 352, 12);
         this.obtain("far_dok", 364, 3);
 
-        this.statusTemporality = new Bitemporality(this.getOffsetDateTime("status_ts"), null, this.getOffsetDateTime("statushaenstart"), this.getBoolean("statusdto_umrk"), null, false);
-        this.motherTemporality = new Bitemporality(this.getOffsetDateTime("mor_ts"), null, this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false);
-        this.fatherTemporality = new Bitemporality(this.getOffsetDateTime("far_ts"), null, this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false);
-        this.motherVerificationTemporality = new Bitemporality(this.getOffsetDateTime("mor_dok_ts"));
-        this.fatherVerificationTemporality = new Bitemporality(this.getOffsetDateTime("far_dok_ts"));
-        this.positionTemporality = new Bitemporality(this.getOffsetDateTime("stilling_ts"));
-        this.birthTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-person"), null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
+        this.statusTemporality = new CprBitemporality(this.getOffsetDateTime("status_ts"), null, this.getOffsetDateTime("statushaenstart"), this.getBoolean("statusdto_umrk"), null, false);
+        this.motherTemporality = new CprBitemporality(this.getOffsetDateTime("mor_ts"), null, this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false);
+        this.fatherTemporality = new CprBitemporality(this.getOffsetDateTime("far_ts"), null, this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false);
+        this.motherVerificationTemporality = new CprBitemporality(this.getOffsetDateTime("mor_dok_ts"));
+        this.fatherVerificationTemporality = new CprBitemporality(this.getOffsetDateTime("far_dok_ts"));
+        this.positionTemporality = new CprBitemporality(this.getOffsetDateTime("stilling_ts"));
+        this.birthTemporality = new CprBitemporality(this.getOffsetDateTime("start_ts-person"), null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
 
         this.hasPnrGaeld = !this.getString("pnrgaeld", false).trim().isEmpty();
     }
@@ -94,7 +94,7 @@ public class PersonRecord extends PersonDataRecord {
      * @return
      */
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = true;
 
         if (this.hasPnrGaeld) {
@@ -310,8 +310,8 @@ public class PersonRecord extends PersonDataRecord {
 
 
     @Override
-    public List<Bitemporality> getBitemporality() {
-        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+    public List<CprBitemporality> getBitemporality() {
+        ArrayList<CprBitemporality> bitemporalities = new ArrayList<>();
         if (this.has("status")) {
             bitemporalities.add(this.statusTemporality);
         }

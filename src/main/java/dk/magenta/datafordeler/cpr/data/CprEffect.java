@@ -5,8 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.database.Registration;
 import dk.magenta.datafordeler.core.util.Equality;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -75,7 +74,7 @@ public abstract class CprEffect<R extends Registration, V extends CprEffect, D e
         );
     }
 
-    public boolean compareRange(Bitemporality bitemporality) {
+    public boolean compareRange(CprBitemporality bitemporality) {
         return this.compareRange(bitemporality.effectFrom, bitemporality.effectFromUncertain, bitemporality.effectTo, bitemporality.effectToUncertain);
     }
 

@@ -4,14 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.core.fapi.Query;
+import dk.magenta.datafordeler.core.util.BitemporalityComparator;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.core.util.OffsetDateTimeAdapter;
 import dk.magenta.datafordeler.cpr.data.person.data.*;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
-import dk.magenta.datafordeler.cpr.records.BitemporalityComparator;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -29,17 +28,17 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         root.put(PersonEntity.IO_FIELD_UUID, input.getUUID().toString());
         root.put(PersonEntity.IO_FIELD_DOMAIN, input.getDomain());
         root.put(PersonEntity.IO_FIELD_CPR_NUMBER, input.getPersonnummer());
-        Bitemporality overlap = new Bitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
+        CprBitemporality overlap = new CprBitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
         ArrayNode registreringer = this.getRegistrations(input, overlap);
         root.set(PersonEntity.IO_FIELD_REGISTRATIONS, registreringer);
         return root;
     }
 
-    public ArrayNode getRegistrations(PersonEntity entity, Bitemporality mustOverlap) {
+    public ArrayNode getRegistrations(PersonEntity entity, CprBitemporality mustOverlap) {
 
         ArrayNode registrationsNode = objectMapper.createArrayNode();
         //HashMap<Bitemporality, ObjectNode> data = new HashMap<>();
-        ListHashMap<Bitemporality, PersonBaseData> data = new ListHashMap<>();
+        ListHashMap<CprBitemporality, PersonBaseData> data = new ListHashMap<>();
 
         // Populér map med bitemp -> json
         // Loop over alle registrationBorders
@@ -48,17 +47,17 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         for (PersonRegistration registration : entity.getRegistrations()) {
             for (PersonEffect virkning : registration.getEffects()) {
                 //ObjectNode dataPiece = objectMapper.createObjectNode();
-                Bitemporality bitemporality = new Bitemporality(registration.getRegistrationFrom(), registration.getRegistrationTo(), virkning.getEffectFrom(), virkning.getEffectTo());
+                CprBitemporality bitemporality = new CprBitemporality(registration.getRegistrationFrom(), registration.getRegistrationTo(), virkning.getEffectFrom(), virkning.getEffectTo());
                 for (PersonBaseData personBaseData : virkning.getDataItems()) {
                     data.add(bitemporality, personBaseData);
                 }
             }
         }
 
-        ListHashMap<OffsetDateTime, Bitemporality> startTerminators = new ListHashMap<>();
-        ListHashMap<OffsetDateTime, Bitemporality> endTerminators = new ListHashMap<>();
+        ListHashMap<OffsetDateTime, CprBitemporality> startTerminators = new ListHashMap<>();
+        ListHashMap<OffsetDateTime, CprBitemporality> endTerminators = new ListHashMap<>();
 
-        for (Bitemporality bitemporality : data.keySet()) {
+        for (CprBitemporality bitemporality : data.keySet()) {
             startTerminators.add(bitemporality.registrationFrom, bitemporality);
             endTerminators.add(bitemporality.registrationTo, bitemporality);
         }
@@ -71,12 +70,12 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         terminators.sort(Comparator.nullsFirst(OffsetDateTime::compareTo));
         terminators.add(null);
 
-        HashSet<Bitemporality> presentBitemporalities = new HashSet<>();
+        HashSet<CprBitemporality> presentBitemporalities = new HashSet<>();
 
         for (int i = 0; i < terminators.size(); i++) {
             OffsetDateTime t = terminators.get(i);
-            List<Bitemporality> startingHere = startTerminators.get(t);
-            List<Bitemporality> endingHere = (t != null) ? endTerminators.get(t) : null;
+            List<CprBitemporality> startingHere = startTerminators.get(t);
+            List<CprBitemporality> endingHere = (t != null) ? endTerminators.get(t) : null;
             if (startingHere != null) {
                 presentBitemporalities.addAll(startingHere);
             }
@@ -92,10 +91,10 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
                         registrationNode.put("registreringFra", formatTime(t));
                         registrationNode.put("registreringTil", formatTime(next));
 
-                        ArrayList<Bitemporality> sortedBitemporalities = new ArrayList<>(presentBitemporalities);
-                        sortedBitemporalities.sort(effectComparator);
+                        ArrayList<CprBitemporality> sortedBitemporalities = new ArrayList<>(presentBitemporalities);
+                        sortedBitemporalities.sort(BitemporalityComparator.EFFECT);
 
-                        for (Bitemporality bitemporality : sortedBitemporalities) {
+                        for (CprBitemporality bitemporality : sortedBitemporalities) {
 
                             ArrayList<PersonBaseData> dataItems = data.get(bitemporality);
 
@@ -213,11 +212,6 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return registrationsNode;
     }
 
-    protected static final Comparator<Bitemporality> effectComparator =
-            Comparator.nullsFirst(new BitemporalityComparator(BitemporalityComparator.Type.EFFECT_FROM))
-                    .thenComparing(Comparator.nullsLast(new BitemporalityComparator(BitemporalityComparator.Type.EFFECT_TO)));
-
-
     protected static String formatTime(OffsetDateTime time) {
         return formatTime(time, false);
     }
@@ -239,11 +233,11 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         ((ArrayNode) output.get(key)).add(value);
     }
 
-    protected ObjectNode createDataNode(Bitemporality bitemporality, OffsetDateTime lastUpdated) {
+    protected ObjectNode createDataNode(CprBitemporality bitemporality, OffsetDateTime lastUpdated) {
         return createDataNode(bitemporality, true, lastUpdated);
     }
 
-    protected ObjectNode createDataNode(Bitemporality bitemporality, boolean includeVirkningTil, OffsetDateTime lastUpdated) {
+    protected ObjectNode createDataNode(CprBitemporality bitemporality, boolean includeVirkningTil, OffsetDateTime lastUpdated) {
         ObjectNode output = objectMapper.createObjectNode();
         if (bitemporality != null) {
             output.put(
@@ -264,7 +258,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return output;
     }
 
-    protected ObjectNode createPersonNummerNode(Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonCoreData personCoreData) {
+    protected ObjectNode createPersonNummerNode(CprBitemporality bitemporality, OffsetDateTime lastUpdated, PersonCoreData personCoreData) {
         ObjectNode personnummer = createDataNode(bitemporality, lastUpdated);
         personnummer.put(PersonCoreData.IO_FIELD_CPR_NUMBER, personCoreData.getCprNumber());
         // TODO: Personnummer status enum?
@@ -272,8 +266,8 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createKerneDataNode(
-            Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonCoreData personCoreData, PersonStatusData personStatusData,
-                    PersonPositionData stilling
+            CprBitemporality bitemporality, OffsetDateTime lastUpdated, PersonCoreData personCoreData, PersonStatusData personStatusData,
+            PersonPositionData stilling
     ) {
         ObjectNode output = createDataNode(bitemporality, lastUpdated);
         if (personCoreData.getGender() != null) {
@@ -298,7 +292,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createFoedselNode(
-            Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonBirthData personBirthData
+            CprBitemporality bitemporality, OffsetDateTime lastUpdated, PersonBirthData personBirthData
     ) {
         ObjectNode output = createDataNode(bitemporality, true, lastUpdated);
         if (personBirthData.getBirthDatetime() != null) {
@@ -339,7 +333,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createFolkekirkeoplysningNode(
-            Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonChurchData personChurchData
+            CprBitemporality bitemporality, OffsetDateTime lastUpdated, PersonChurchData personChurchData
     ) {
         ObjectNode output = createDataNode(bitemporality, true, lastUpdated);
         Character relation = personChurchData.getChurchRelation();
@@ -348,7 +342,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createForaeldreoplysningNode(
-                    Bitemporality bitemporality, OffsetDateTime lastUpdated, String foraelderrolle, PersonParentData personParentData
+            CprBitemporality bitemporality, OffsetDateTime lastUpdated, String foraelderrolle, PersonParentData personParentData
     ) {
         ObjectNode output = createDataNode(bitemporality, false, lastUpdated);
         output.put(PersonParentData.IO_FIELD_CPR_NUMBER, personParentData.getCprNumber());
@@ -357,8 +351,8 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createAdresseOplysningNode(
-                    Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonAddressData adresse, PersonAddressConameData conavn,
-                    PersonMoveMunicipalityData flytteKommune
+            CprBitemporality bitemporality, OffsetDateTime lastUpdated, PersonAddressData adresse, PersonAddressConameData conavn,
+            PersonMoveMunicipalityData flytteKommune
     ) {
         ObjectNode output = createDataNode(bitemporality, lastUpdated);
         output.put(
@@ -407,7 +401,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createNavnNode(
-                    Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonNameData navn, PersonAddressNameData addresseringsnavn
+            CprBitemporality bitemporality, OffsetDateTime lastUpdated, PersonNameData navn, PersonAddressNameData addresseringsnavn
     ) {
         ObjectNode output = createDataNode(bitemporality, lastUpdated);
         output.put(
@@ -436,7 +430,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return output;
     }
 
-    protected ArrayNode createBeskyttelseNode(Bitemporality bitemporality, OffsetDateTime lastUpdated, Collection<PersonProtectionData> beskyttelse) {
+    protected ArrayNode createBeskyttelseNode(CprBitemporality bitemporality, OffsetDateTime lastUpdated, Collection<PersonProtectionData> beskyttelse) {
         ArrayNode output = objectMapper.createArrayNode();
         for (PersonProtectionData personProtectionData : beskyttelse) {
             ObjectNode item = createDataNode(bitemporality, lastUpdated);
@@ -447,8 +441,8 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
     }
 
     protected ObjectNode createUdrejseIndrejseNode(
-                    Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonEmigrationData udrejseIndrejse,
-                    PersonForeignAddressData udenlandsadresse
+            CprBitemporality bitemporality, OffsetDateTime lastUpdated, PersonEmigrationData udrejseIndrejse,
+            PersonForeignAddressData udenlandsadresse
     ) {
         ObjectNode output = createDataNode(bitemporality, lastUpdated);
         output.put(PersonEmigrationData.IO_FIELD_COUNTRY_CODE, udrejseIndrejse.getCountryCode());
@@ -465,7 +459,7 @@ public class PersonOutputWrapper extends OutputWrapper<PersonEntity> {
         return output;
     }
 
-    protected ObjectNode createNavneMyndighedNode(Bitemporality bitemporality, OffsetDateTime lastUpdated, PersonNameAuthorityTextData navnemyndighed) {
+    protected ObjectNode createNavneMyndighedNode(CprBitemporality bitemporality, OffsetDateTime lastUpdated, PersonNameAuthorityTextData navnemyndighed) {
         ObjectNode output = createDataNode(bitemporality, lastUpdated);
         output.put(PersonNameAuthorityTextData.IO_FIELD_AUTHORITY, navnemyndighed.getText());
         return output;

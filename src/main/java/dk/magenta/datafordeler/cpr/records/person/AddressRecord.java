@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.AddressConameDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.AddressDataRecord;
@@ -21,9 +21,9 @@ import java.util.Set;
  */
 public class AddressRecord extends PersonDataRecord {
 
-    private Bitemporality addressTemporality;
-    private Bitemporality conameTemporality;
-    private Bitemporality municipalityTemporality;
+    private CprBitemporality addressTemporality;
+    private CprBitemporality conameTemporality;
+    private CprBitemporality municipalityTemporality;
 
     public AddressRecord(String line) throws ParseException {
         super(line);
@@ -56,9 +56,9 @@ public class AddressRecord extends PersonDataRecord {
         this.obtain("start_dt-adrtxt", 335, 10);
         this.obtain("slet_dt-adrtxt", 345, 10);
 
-        this.addressTemporality = new Bitemporality(this.getOffsetDateTime("adr_ts"), null, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), null, false);
-        this.conameTemporality = new Bitemporality(this.getOffsetDateTime("convn_ts"));
-        this.municipalityTemporality = new Bitemporality(this.getOffsetDateTime("tilfra_ts"));
+        this.addressTemporality = new CprBitemporality(this.getOffsetDateTime("adr_ts"), null, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), null, false);
+        this.conameTemporality = new CprBitemporality(this.getOffsetDateTime("convn_ts"));
+        this.municipalityTemporality = new CprBitemporality(this.getOffsetDateTime("tilfra_ts"));
     }
 
     @Override
@@ -67,7 +67,7 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (bitemporality.equals(this.addressTemporality)) {
             data.setAddress(
@@ -204,8 +204,8 @@ public class AddressRecord extends PersonDataRecord {
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
-        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+    public List<CprBitemporality> getBitemporality() {
+        ArrayList<CprBitemporality> bitemporalities = new ArrayList<>();
         if (this.has("komkod") || this.has("vejkod") || this.has("bnr")) {
             bitemporalities.add(this.addressTemporality);
         }

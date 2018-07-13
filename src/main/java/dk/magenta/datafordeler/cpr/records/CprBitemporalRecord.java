@@ -113,14 +113,14 @@ public class CprBitemporalRecord extends CprMonotemporalRecord implements Compar
         return this.setBitemporality(
                 registrationFrom,
                 registrationTo,
-                Bitemporality.convertTime(effectFrom),
+                CprBitemporality.convertTime(effectFrom),
                 effectFromUncertain,
-                Bitemporality.convertTime(effectTo),
+                CprBitemporality.convertTime(effectTo),
                 effectToUncertain
         );
     }
 
-    public CprBitemporalRecord setBitemporality(Bitemporality bitemporality) {
+    public CprBitemporalRecord setBitemporality(CprBitemporality bitemporality) {
         return this.setBitemporality(
                 bitemporality.registrationFrom,
                 bitemporality.registrationTo,
@@ -151,8 +151,8 @@ public class CprBitemporalRecord extends CprMonotemporalRecord implements Compar
     }
 
     @JsonIgnore
-    public Bitemporality getBitemporality() {
-        return new Bitemporality(this.getRegistrationFrom(), this.getRegistrationTo(), this.effectFrom, this.effectFromUncertain, this.effectTo, this.effectToUncertain);
+    public CprBitemporality getBitemporality() {
+        return new CprBitemporality(this.getRegistrationFrom(), this.getRegistrationTo(), this.effectFrom, this.effectFromUncertain, this.effectTo, this.effectToUncertain);
     }
 
     @Override
