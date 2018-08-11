@@ -110,7 +110,10 @@ public class ForeignAddressEmigrationDataRecord extends CprBitemporalPersonRecor
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equalData(o)) return false;
         ForeignAddressEmigrationDataRecord that = (ForeignAddressEmigrationDataRecord) o;
-        return immigrationCountryCode == that.immigrationCountryCode && emigrationCountryCode == that.emigrationCountryCode;
+        return immigrationCountryCode == that.immigrationCountryCode &&
+                emigrationCountryCode == that.emigrationCountryCode &&
+                Objects.equals(emigrationRegistration, that.emigrationRegistration) &&
+                Objects.equals(immigrationRegistration, that.immigrationRegistration);
     }
 
     @Override
