@@ -263,4 +263,13 @@ public abstract class Record extends HashMap<String, String> {
         return value != null && !value.isEmpty();
     }
 
+    public static <T> T firstSet(T... times) {
+        for (T time : times) {
+            if (time != null) {
+                return time;
+            }
+        }
+        return null;
+    }
+
 }

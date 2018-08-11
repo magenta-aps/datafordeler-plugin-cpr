@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 /**
@@ -27,29 +28,81 @@ import java.util.Objects;
 })
 public class ForeignAddressEmigrationDataRecord extends CprBitemporalPersonRecord {
 
-    public static final String TABLE_NAME = "cpr_person_foreignaddress_emigration_record";
+    public static final String TABLE_NAME = "cpr_person_foreignaddress_migration_record";
 
     public ForeignAddressEmigrationDataRecord() {
     }
 
-    public ForeignAddressEmigrationDataRecord(int countryCode) {
-        this.countryCode = countryCode;
+    public ForeignAddressEmigrationDataRecord(int immigrationCountryCode, int emigrationCountryCode, OffsetDateTime emigrationRegistration, OffsetDateTime immigrationRegistration) {
+        this.immigrationCountryCode = immigrationCountryCode;
+        this.emigrationCountryCode = emigrationCountryCode;
+        this.emigrationRegistration = emigrationRegistration;
+        this.immigrationRegistration = immigrationRegistration;
     }
 
-    public static final String DB_FIELD_COUNTRY_CODE = "countryCode";
-    public static final String IO_FIELD_COUNTRY_CODE = "landekode";
-    @Column(name = DB_FIELD_COUNTRY_CODE)
-    @JsonProperty(value = IO_FIELD_COUNTRY_CODE)
-    @XmlElement(name = IO_FIELD_COUNTRY_CODE)
-    private int countryCode;
-
-    public int getCountryCode() {
-        return countryCode;
+    public ForeignAddressEmigrationDataRecord(int emigrationCountryCode) {
+        this.immigrationCountryCode = 0;
+        this.emigrationCountryCode = emigrationCountryCode;
     }
 
-    public void setCountryCode(int countryCode) {
-        this.countryCode = countryCode;
+    public static final String DB_FIELD_IN_COUNTRY_CODE = "immigrationCountryCode";
+    public static final String IO_FIELD_IN_COUNTRY_CODE = "indrejseLandekode";
+    @Column(name = DB_FIELD_IN_COUNTRY_CODE)
+    @JsonProperty(value = IO_FIELD_IN_COUNTRY_CODE)
+    @XmlElement(name = IO_FIELD_IN_COUNTRY_CODE)
+    private int immigrationCountryCode;
+
+    public int getImmigrationCountryCode() {
+        return this.immigrationCountryCode;
     }
+
+    public ForeignAddressEmigrationDataRecord setImmigrationCountryCode(int immigrationCountryCode) {
+        this.immigrationCountryCode = immigrationCountryCode;
+        return this;
+    }
+
+
+
+    public static final String DB_FIELD_OUT_COUNTRY_CODE = "emigrationCountryCode";
+    public static final String IO_FIELD_OUT_COUNTRY_CODE = "udrejseLandekode";
+    @Column(name = DB_FIELD_OUT_COUNTRY_CODE)
+    @JsonProperty(value = IO_FIELD_OUT_COUNTRY_CODE)
+    @XmlElement(name = IO_FIELD_OUT_COUNTRY_CODE)
+    private int emigrationCountryCode;
+
+    public int getEmigrationCountryCode() {
+        return this.emigrationCountryCode;
+    }
+
+    public ForeignAddressEmigrationDataRecord setEmigrationCountryCode(int emigrationCountryCode) {
+        this.emigrationCountryCode = emigrationCountryCode;
+        return this;
+    }
+
+
+    public static final String DB_FIELD_EXIT_REGISTRATION = "emigrationRegistration";
+    public static final String IO_FIELD_EXIT_REGISTRATION = "udrejseRegistrering";
+    @Column(name = DB_FIELD_EXIT_REGISTRATION)
+    @JsonProperty(value = IO_FIELD_EXIT_REGISTRATION)
+    @XmlElement(name = IO_FIELD_EXIT_REGISTRATION)
+    private OffsetDateTime emigrationRegistration;
+
+
+    public static final String DB_FIELD_RETURN_REGISTRATION = "immigrationRegistration";
+    public static final String IO_FIELD_RETURN_REGISTRATION = "indrejseRegistrering";
+    @Column(name = DB_FIELD_RETURN_REGISTRATION)
+    @JsonProperty(value = IO_FIELD_RETURN_REGISTRATION)
+    @XmlElement(name = IO_FIELD_RETURN_REGISTRATION)
+    private OffsetDateTime immigrationRegistration;
+
+    public OffsetDateTime getImmigrationRegistration() {
+        return this.immigrationRegistration;
+    }
+
+    public void setImmigrationRegistration(OffsetDateTime immigrationRegistration) {
+        this.immigrationRegistration = immigrationRegistration;
+    }
+    
 
     @Override
     public boolean equalData(Object o) {
@@ -57,18 +110,19 @@ public class ForeignAddressEmigrationDataRecord extends CprBitemporalPersonRecor
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equalData(o)) return false;
         ForeignAddressEmigrationDataRecord that = (ForeignAddressEmigrationDataRecord) o;
-        return countryCode == that.countryCode;
+        return immigrationCountryCode == that.immigrationCountryCode && emigrationCountryCode == that.emigrationCountryCode;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), countryCode);
+        return Objects.hash(super.hashCode(), immigrationCountryCode, emigrationCountryCode);
     }
 
     @Override
     protected ForeignAddressEmigrationDataRecord clone() {
         ForeignAddressEmigrationDataRecord clone = new ForeignAddressEmigrationDataRecord();
-        clone.countryCode = this.countryCode;
+        clone.immigrationCountryCode = this.immigrationCountryCode;
+        clone.emigrationCountryCode = this.emigrationCountryCode;
         CprBitemporalRecord.copy(this, clone);
         return clone;
     }
