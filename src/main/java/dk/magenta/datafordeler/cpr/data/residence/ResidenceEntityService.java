@@ -49,11 +49,6 @@ public class ResidenceEntityService extends FapiService<ResidenceEntity, Residen
     }
 
     @Override
-    protected Class<? extends DataItem> getDataClass() {
-        return ResidenceBaseData.class;
-    }
-
-    @Override
     public Plugin getPlugin() {
         return this.cprPlugin;
     }

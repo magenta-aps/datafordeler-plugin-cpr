@@ -60,11 +60,6 @@ public class PersonEntityService extends FapiService<PersonEntity, PersonQuery> 
     }
 
     @Override
-    protected Class<? extends DataItem> getDataClass() {
-        return PersonBaseData.class;
-    }
-
-    @Override
     public Plugin getPlugin() {
         return this.cprPlugin;
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import dk.magenta.datafordeler.core.fapi.BaseQuery;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.core.fapi.Query;
 import dk.magenta.datafordeler.core.util.ListHashMap;
@@ -25,7 +26,7 @@ public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
     private ObjectMapper objectMapper;
 
     @Override
-    public Object wrapResult(ResidenceEntity input, Query query) {
+    public Object wrapResult(ResidenceEntity input, BaseQuery query) {
         objectMapper = new ObjectMapper();
         ObjectNode root = objectMapper.createObjectNode();
         root.put(ResidenceEntity.IO_FIELD_UUID, input.getUUID().toString());

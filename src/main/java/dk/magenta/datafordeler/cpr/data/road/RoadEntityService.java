@@ -48,11 +48,6 @@ public class RoadEntityService extends FapiService<RoadEntity, RoadQuery> {
     }
 
     @Override
-    protected Class<? extends DataItem> getDataClass() {
-        return RoadBaseData.class;
-    }
-
-    @Override
     public Plugin getPlugin() {
         return this.cprPlugin;
     }
