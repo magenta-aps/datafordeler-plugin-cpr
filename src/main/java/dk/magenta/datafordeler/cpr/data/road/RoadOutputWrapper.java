@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.data.road;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import dk.magenta.datafordeler.core.fapi.BaseQuery;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.core.fapi.Query;
 import dk.magenta.datafordeler.core.util.BitemporalityComparator;
@@ -21,7 +22,7 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
     private ObjectMapper objectMapper;
 
     @Override
-    public Object wrapResult(RoadEntity input, Query query) {
+    public Object wrapResult(RoadEntity input, BaseQuery query) {
         objectMapper = new ObjectMapper();
         ObjectNode root = objectMapper.createObjectNode();
         root.put(RoadEntity.IO_FIELD_UUID, input.getUUID().toString());
