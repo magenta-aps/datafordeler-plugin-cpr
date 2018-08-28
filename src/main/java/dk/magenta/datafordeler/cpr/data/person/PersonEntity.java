@@ -12,6 +12,8 @@ import dk.magenta.datafordeler.cpr.data.CprEntity;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Filters;
@@ -532,7 +534,9 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
             added = addItem(this.nameAuthorityText, record, session);
         }
         if (record instanceof NameDataRecord) {
+            log.info("Add name to "+this.getPersonnummer());
             added = addItem(this.name, record, session);
+            log.info(added ? "Added":"Not added");
         }
         if (record instanceof NameVerificationDataRecord) {
             added = addItem(this.nameVerification, record, session);
@@ -573,22 +577,25 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
         }
     }
 
+    private static Logger log = LogManager.getLogger("PersonEntity");
     private static <E extends CprBitemporalPersonRecord> boolean addItem(Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
+        boolean isName = (newItem instanceof NameDataRecord);
+        if (isName) log.info("Add namerecord to set with "+set.size()+" preexisting entries");
         if (newItem != null) {
             for (E oldItem : set) {
                 if (newItem.equalData(oldItem) && Objects.equals(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom())) {
                     if (newItem.isHistoric() && !oldItem.isHistoric() && oldItem.getEffectTo() == null) {
-                        //System.out.println("matching item, removing preexisting");
+                        if (isName) log.info("matching item, removing preexisting");
                         set.remove(oldItem);
                         session.delete(oldItem);
                         return set.add((E) newItem);
                     } else {
-                        //System.out.println("matching item with same historicity, not adding");
+                        if (isName) log.info("matching item with same historicity, not adding");
                         return false;
                     }
                 }
             }
-            //System.out.println("nonmatching item");
+            if (isName) log.info("nonmatching item");
             return set.add((E) newItem);
         }
         return false;

@@ -418,9 +418,11 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                             throw e;
                         }
 
+                        System.out.println("flushing");
                         session.flush();
                         session.clear();
                         if (!wrappedInTransaction) {
+                            System.out.println("committing transaction");
                             session.getTransaction().commit();
                             importMetadata.setTransactionInProgress(false);
                         }
