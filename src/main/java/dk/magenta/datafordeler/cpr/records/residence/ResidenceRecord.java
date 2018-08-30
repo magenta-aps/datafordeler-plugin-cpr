@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import org.hibernate.Session;
 
@@ -21,7 +21,7 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
 
     public static final String RECORDTYPE_RESIDENCE = "002";
 
-    private Bitemporality residenceTemporality;
+    private CprBitemporality residenceTemporality;
 
     public ResidenceRecord(String line) throws ParseException {
         super(line);
@@ -34,7 +34,7 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
         this.obtain("haenstart", 35, 12);
         this.obtain("lokalitet", 59, 34);
 
-        this.residenceTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"), null, this.getOffsetDateTime("haenstart"), false, null, false);
+        this.residenceTemporality = new CprBitemporality(this.getOffsetDateTime("timestamp"), null, this.getOffsetDateTime("haenstart"), false, null, false);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
     }
 
     @Override
-    public boolean populateBaseData(ResidenceBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(ResidenceBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         if (bitemporality.equals(this.residenceTemporality)) {
             OffsetDateTime updateTime = importMetadata.getImportTime();
             data.setKommunekode(this.getInt("komkod"), updateTime);
@@ -85,7 +85,7 @@ public class ResidenceRecord extends CprDataRecord<ResidenceEffect, ResidenceBas
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
+    public List<CprBitemporality> getBitemporality() {
         return Collections.singletonList(this.residenceTemporality);
     }
 

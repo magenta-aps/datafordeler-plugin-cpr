@@ -1,17 +1,14 @@
 package dk.magenta.datafordeler.cpr.data.road;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.fapi.BaseQuery;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
-import dk.magenta.datafordeler.core.fapi.Query;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.core.util.OffsetDateTimeAdapter;
 import dk.magenta.datafordeler.cpr.data.road.data.*;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
-import dk.magenta.datafordeler.cpr.records.BitemporalityComparator;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -30,17 +27,17 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
         root.put(RoadEntity.IO_FIELD_DOMAIN, input.getDomain());
         root.put(RoadEntity.IO_FIELD_MUNICIPALITYCODE, input.getKommunekode());
         root.put(RoadEntity.IO_FIELD_ROADCODE, input.getVejkode());
-        Bitemporality overlap = new Bitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
+        CprBitemporality overlap = new CprBitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
         ArrayNode registreringer = this.getRegistrations(input, overlap);
         root.set(RoadEntity.IO_FIELD_REGISTRATIONS, registreringer);
         return root;
     }
 
-    public ArrayNode getRegistrations(RoadEntity entity, Bitemporality mustOverlap) {
+    public ArrayNode getRegistrations(RoadEntity entity, CprBitemporality mustOverlap) {
 
         ArrayNode registrationsNode = objectMapper.createArrayNode();
         //HashMap<Bitemporality, ObjectNode> data = new HashMap<>();
-        ListHashMap<Bitemporality, RoadBaseData> data = new ListHashMap<>();
+        ListHashMap<CprBitemporality, RoadBaseData> data = new ListHashMap<>();
 
         // Populér map med bitemp -> json
         // Loop over alle registrationBorders
@@ -49,17 +46,17 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
         for (RoadRegistration registration : entity.getRegistrations()) {
             for (RoadEffect virkning : registration.getEffects()) {
                 //ObjectNode dataPiece = objectMapper.createObjectNode();
-                Bitemporality bitemporality = new Bitemporality(registration.getRegistrationFrom(), registration.getRegistrationTo(), virkning.getEffectFrom(), virkning.getEffectTo());
+                CprBitemporality bitemporality = new CprBitemporality(registration.getRegistrationFrom(), registration.getRegistrationTo(), virkning.getEffectFrom(), virkning.getEffectTo());
                 for (RoadBaseData roadBaseData : virkning.getDataItems()) {
                     data.add(bitemporality, roadBaseData);
                 }
             }
         }
 
-        ListHashMap<OffsetDateTime, Bitemporality> startTerminators = new ListHashMap<>();
-        ListHashMap<OffsetDateTime, Bitemporality> endTerminators = new ListHashMap<>();
+        ListHashMap<OffsetDateTime, CprBitemporality> startTerminators = new ListHashMap<>();
+        ListHashMap<OffsetDateTime, CprBitemporality> endTerminators = new ListHashMap<>();
 
-        for (Bitemporality bitemporality : data.keySet()) {
+        for (CprBitemporality bitemporality : data.keySet()) {
             startTerminators.add(bitemporality.registrationFrom, bitemporality);
             endTerminators.add(bitemporality.registrationTo, bitemporality);
         }
@@ -72,12 +69,12 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
         terminators.sort(Comparator.nullsFirst(OffsetDateTime::compareTo));
         terminators.add(null);
 
-        HashSet<Bitemporality> presentBitemporalities = new HashSet<>();
+        HashSet<CprBitemporality> presentBitemporalities = new HashSet<>();
 
         for (int i = 0; i < terminators.size(); i++) {
             OffsetDateTime t = terminators.get(i);
-            List<Bitemporality> startingHere = startTerminators.get(t);
-            List<Bitemporality> endingHere = (t != null) ? endTerminators.get(t) : null;
+            List<CprBitemporality> startingHere = startTerminators.get(t);
+            List<CprBitemporality> endingHere = (t != null) ? endTerminators.get(t) : null;
             if (startingHere != null) {
                 presentBitemporalities.addAll(startingHere);
             }
@@ -93,10 +90,10 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
                         registrationNode.put("registreringFra", formatTime(t));
                         registrationNode.put("registreringTil", formatTime(next));
 
-                        ArrayList<Bitemporality> sortedBitemporalities = new ArrayList<>(presentBitemporalities);
-                        sortedBitemporalities.sort(effectComparator);
+                        ArrayList<CprBitemporality> sortedBitemporalities = new ArrayList<>(presentBitemporalities);
+                        sortedBitemporalities.sort(CprBitemporality.effectComparator);
 
-                        for (Bitemporality bitemporality : sortedBitemporalities) {
+                        for (CprBitemporality bitemporality : sortedBitemporalities) {
 
                             ArrayList<RoadBaseData> dataItems = data.get(bitemporality);
 
@@ -149,11 +146,6 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
         return registrationsNode;
     }
 
-    protected static final Comparator<Bitemporality> effectComparator =
-            Comparator.nullsFirst(new BitemporalityComparator(BitemporalityComparator.Type.EFFECT_FROM))
-                    .thenComparing(Comparator.nullsLast(new BitemporalityComparator(BitemporalityComparator.Type.EFFECT_TO)));
-
-
     protected static String formatTime(OffsetDateTime time) {
         return formatTime(time, false);
     }
@@ -182,11 +174,11 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
         ((ArrayNode) output.get(key)).addAll(value);
     }
 
-    protected ObjectNode createDataNode(Bitemporality bitemporality, OffsetDateTime lastUpdated) {
+    protected ObjectNode createDataNode(CprBitemporality bitemporality, OffsetDateTime lastUpdated) {
         return createDataNode(bitemporality, true, lastUpdated);
     }
 
-    protected ObjectNode createDataNode(Bitemporality bitemporality, boolean includeVirkningTil, OffsetDateTime lastUpdated) {
+    protected ObjectNode createDataNode(CprBitemporality bitemporality, boolean includeVirkningTil, OffsetDateTime lastUpdated) {
         ObjectNode output = objectMapper.createObjectNode();
         if (bitemporality != null) {
             output.put(
@@ -208,7 +200,7 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
     }
 
     protected ObjectNode createKerneDataNode(
-            Bitemporality bitemporality, OffsetDateTime lastUpdated, RoadCoreData roadCoreData
+            CprBitemporality bitemporality, OffsetDateTime lastUpdated, RoadCoreData roadCoreData
     ) {
         ObjectNode output = createDataNode(bitemporality, true, lastUpdated);
         output.put(RoadCoreData.IO_FIELD_ADDRESS_NAME, roadCoreData.getAddressingName());
@@ -221,7 +213,7 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
     }
 
     protected Set<ObjectNode> createByNode(
-            Bitemporality bitemporality, OffsetDateTime lastUpdated, Collection<RoadCityData> roadCityDataSet
+            CprBitemporality bitemporality, OffsetDateTime lastUpdated, Collection<RoadCityData> roadCityDataSet
     ) {
         HashSet<ObjectNode> output = new HashSet<>();
         for (RoadCityData roadCityData : roadCityDataSet) {
@@ -236,7 +228,7 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
     }
 
     protected Set<ObjectNode> createMemoNode(
-            Bitemporality bitemporality, OffsetDateTime lastUpdated, Collection<RoadMemoData> roadMemoDataSet
+            CprBitemporality bitemporality, OffsetDateTime lastUpdated, Collection<RoadMemoData> roadMemoDataSet
     ) {
         HashSet<ObjectNode> output = new HashSet<>();
         for (RoadMemoData roadMemoData : roadMemoDataSet) {
@@ -249,7 +241,7 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
     }
 
     protected Set<ObjectNode> createPostNode(
-            Bitemporality bitemporality, OffsetDateTime lastUpdated, Collection<RoadPostcodeData> roadPostcodeDataSet
+            CprBitemporality bitemporality, OffsetDateTime lastUpdated, Collection<RoadPostcodeData> roadPostcodeDataSet
     ) {
         HashSet<ObjectNode> output = new HashSet<>();
         for (RoadPostcodeData roadPostcodeData : roadPostcodeDataSet) {

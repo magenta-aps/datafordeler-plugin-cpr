@@ -1,16 +1,45 @@
 package dk.magenta.datafordeler.cpr.records;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
+import dk.magenta.datafordeler.core.database.Monotemporal;
+import dk.magenta.datafordeler.core.database.Nontemporal;
+import dk.magenta.datafordeler.core.database.Registration;
+import dk.magenta.datafordeler.cpr.data.CprEntity;
+import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.FilterDefs;
+import org.hibernate.annotations.ParamDef;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @MappedSuperclass
-public class CprNontemporalRecord extends DatabaseEntry {
+@FilterDefs({
+        @FilterDef(name = Nontemporal.FILTER_LASTUPDATED_AFTER, parameters = @ParamDef(name = Nontemporal.FILTERPARAM_LASTUPDATED_AFTER, type = "java.time.OffsetDateTime")),
+        @FilterDef(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, parameters = @ParamDef(name = Nontemporal.FILTERPARAM_LASTUPDATED_BEFORE, type = "java.time.OffsetDateTime"))
+})
+public abstract class CprNontemporalRecord<E extends CprEntity> extends DatabaseEntry implements Nontemporal<E> {
+
+    public static final String DB_FIELD_ENTITY = Nontemporal.DB_FIELD_ENTITY;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = CprNontemporalRecord.DB_FIELD_ENTITY + DatabaseEntry.REF)
+    @JsonIgnore
+    @XmlTransient
+    private E entity;
+
+    public E getEntity() {
+        return this.entity;
+    }
+
+    public void setEntity(E entity) {
+        this.entity = entity;
+    }
 
     public static final String DB_FIELD_AUTHORITY = "authority";
     public static final String IO_FIELD_AUTHORITY = "myndighed";
@@ -32,8 +61,9 @@ public class CprNontemporalRecord extends DatabaseEntry {
 
 
 
-    public static final String DB_FIELD_UPDATED = "dafoUpdated";
-    public static final String IO_FIELD_UPDATED = "sidstOpdateret";
+
+    public static final String DB_FIELD_UPDATED = Nontemporal.DB_FIELD_UPDATED;
+    public static final String IO_FIELD_UPDATED = Nontemporal.IO_FIELD_UPDATED;
     @Column(name = DB_FIELD_UPDATED)
     @JsonProperty(value = IO_FIELD_UPDATED)
     @XmlElement(name = IO_FIELD_UPDATED)
