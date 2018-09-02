@@ -1,10 +1,12 @@
 package dk.magenta.datafordeler.cpr.records;
 
 import dk.magenta.datafordeler.core.util.Bitemporality;
+import dk.magenta.datafordeler.core.util.BitemporalityComparator;
 import dk.magenta.datafordeler.cpr.data.CprEffect;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAccessor;
+import java.util.Objects;
 
 public class CprBitemporality extends Bitemporality {
     public boolean effectFromUncertain;
@@ -40,25 +42,24 @@ public class CprBitemporality extends Bitemporality {
         return new CprBitemporality(this.registrationFrom, this.registrationTo, effect.getEffectFrom(), effect.getEffectFromUncertain(), effect.getEffectTo(), effect.getEffectToUncertain());
     }
 
-    public boolean equals(Object o, char compare) {
+    public static final BitemporalityComparator<CprBitemporality> effectComparator = BitemporalityComparator.effect(CprBitemporality.class);
+
+    @Override
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
+        if (!super.equals(o)) return false;
         CprBitemporality that = (CprBitemporality) o;
-
-        if (((compare & COMPARE_EFFECT_FROM) != 0) && (effectFromUncertain != that.effectFromUncertain)) return false;
-        if (((compare & COMPARE_EFFECT_TO) != 0) && (effectToUncertain != that.effectToUncertain)) return false;
-        return super.equals(o, compare);
+        return effectFromUncertain == that.effectFromUncertain &&
+                effectToUncertain == that.effectToUncertain;
     }
 
     @Override
     public int hashCode() {
-        int result = registrationFrom != null ? registrationFrom.hashCode() : 0;
-        result = 31 * result + (effectFrom != null ? effectFrom.hashCode() : 0);
-        result = 31 * result + (effectFromUncertain ? 1 : 0);
-        result = 31 * result + (effectTo != null ? effectTo.hashCode() : 0);
-        result = 31 * result + (effectToUncertain ? 1 : 0);
-        return result;
+        return Objects.hash(super.hashCode(), effectFromUncertain, effectToUncertain);
     }
 
+    public int compareTo(CprBitemporality o) {
+        return super.compareTo(o);
+    }
 }

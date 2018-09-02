@@ -43,14 +43,6 @@ import java.util.HashMap;
 @Component
 public class PersonRecordOutputWrapper extends CprRecordOutputWrapper<PersonEntity> {
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Override
-    protected ObjectMapper getObjectMapper() {
-        return this.objectMapper;
-    }
-
     private static ObjectNode convert(Pair<String, ObjectNode> input) {
         String key = input.getFirst();
         ObjectNode data = input.getSecond();

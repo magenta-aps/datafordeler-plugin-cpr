@@ -5,17 +5,18 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.fapi.BaseQuery;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
-import dk.magenta.datafordeler.core.fapi.Query;
-import dk.magenta.datafordeler.core.util.BitemporalityComparator;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.core.util.OffsetDateTimeAdapter;
-import dk.magenta.datafordeler.cpr.data.residence.data.*;
+import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 
 public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
 
@@ -91,7 +92,7 @@ public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
                         registrationNode.put("registreringTil", formatTime(next));
 
                         ArrayList<CprBitemporality> sortedBitemporalities = new ArrayList<>(presentBitemporalities);
-                        sortedBitemporalities.sort(BitemporalityComparator.EFFECT);
+                        sortedBitemporalities.sort(CprBitemporality.effectComparator);
 
                         for (CprBitemporality bitemporality : sortedBitemporalities) {
 

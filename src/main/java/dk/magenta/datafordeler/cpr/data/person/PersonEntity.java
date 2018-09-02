@@ -3,14 +3,14 @@ package dk.magenta.datafordeler.cpr.data.person;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.magenta.datafordeler.core.database.Effect;
+import dk.magenta.datafordeler.core.database.Bitemporal;
 import dk.magenta.datafordeler.core.database.Identification;
+import dk.magenta.datafordeler.core.database.Monotemporal;
+import dk.magenta.datafordeler.core.database.Nontemporal;
+import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
-import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
-import dk.magenta.datafordeler.cpr.records.person.*;
+import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,9 +23,9 @@ import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.*;
-
-import static dk.magenta.datafordeler.cpr.data.person.PersonEntity.DB_FIELD_CPR_NUMBER;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * An Entity representing a person. Bitemporal data is structured as
@@ -34,7 +34,7 @@ import static dk.magenta.datafordeler.cpr.data.person.PersonEntity.DB_FIELD_CPR_
 @javax.persistence.Entity
 @Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_entity", indexes = {
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_identification", columnList = "identification_id", unique = true),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_personnummer", columnList = DB_FIELD_CPR_NUMBER, unique = true)
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_personnummer", columnList = PersonEntity.DB_FIELD_CPR_NUMBER, unique = true)
 })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
@@ -88,8 +88,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_ADDRESS_CONAME = "conavn";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_ADDRESS_CONAME)
     Set<AddressConameDataRecord> coname = new HashSet<>();
@@ -102,8 +106,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_ADDRESS = "adresse";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_ADDRESS)
     Set<AddressDataRecord> address = new HashSet<>();
@@ -116,8 +124,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_ADDRESS_NAME = "addresseringsnavn";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_ADDRESS_NAME)
     Set<AddressNameDataRecord> addressName = new HashSet<>();
@@ -130,8 +142,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_BIRTHPLACE = "fødselsted";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_BIRTHPLACE)
     Set<BirthPlaceDataRecord> birthPlace = new HashSet<>();
@@ -144,8 +160,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_BIRTHPLACE_VERIFICATION = "fødselssted_verifikation";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_BIRTHPLACE_VERIFICATION)
     Set<BirthPlaceVerificationDataRecord> birthPlaceVerification = new HashSet<>();
@@ -158,8 +178,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_BIRTHTIME = "fødselstidspunkt";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_BIRTHTIME)
     Set<BirthTimeDataRecord> birthTime = new HashSet<>();
@@ -172,8 +196,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CHURCH = "folkekirkeoplysning";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_CHURCH)
     Set<ChurchDataRecord> churchRelation = new HashSet<>();
@@ -186,8 +214,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CHURCH_VERIFICATION = "folkekirkeoplysning_verifikation";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_CHURCH_VERIFICATION)
     Set<ChurchVerificationDataRecord> churchRelationVerification = new HashSet<>();
@@ -200,8 +232,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CITIZENSHIP = "statsborgerskab";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_CITIZENSHIP)
     Set<CitizenshipDataRecord> citizenship = new HashSet<>();
@@ -214,8 +250,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CITIZENSHIP_VERIFICATION = "statsborgerskab_verifikation";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_CITIZENSHIP_VERIFICATION)
     Set<CitizenshipVerificationDataRecord> citizenshipVerification = new HashSet<>();
@@ -228,8 +268,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CIVILSTATUS = "civilstatus";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_CIVILSTATUS)
     Set<CivilStatusDataRecord> civilstatus = new HashSet<>();
@@ -242,8 +286,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CIVILSTATUS_AUTHORITYTEXT = "civilstatus_autoritetstekst";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_CIVILSTATUS_AUTHORITYTEXT)
     Set<CivilStatusAuthorityTextDataRecord> civilstatusAuthorityText = new HashSet<>();
@@ -256,8 +304,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CIVILSTATUS_VERIFICATION = "civilstatus_verifikation";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_CIVILSTATUS_VERIFICATION)
     Set<CivilStatusVerificationDataRecord> civilstatusVerification = new HashSet<>();
@@ -270,8 +322,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_FOREIGN_ADDRESS = "udlandsadresse";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_FOREIGN_ADDRESS)
     Set<ForeignAddressDataRecord> foreignAddress = new HashSet<>();
@@ -284,8 +340,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_FOREIGN_ADDRESS_EMIGRATION = "udrejse";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_FOREIGN_ADDRESS_EMIGRATION)
     Set<ForeignAddressEmigrationDataRecord> emigration = new HashSet<>();
@@ -298,8 +358,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_MOVE_MUNICIPALITY = "kommuneflytning";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_MOVE_MUNICIPALITY)
     Set<MoveMunicipalityDataRecord> municipalityMove = new HashSet<>();
@@ -312,8 +376,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_NAME = "navn";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_NAME)
     Set<NameDataRecord> name = new HashSet<>();
@@ -326,8 +394,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_NAME_AUTHORITY_TEXT = "navn_autoritetstekst";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_NAME_AUTHORITY_TEXT)
     Set<NameAuthorityTextDataRecord> nameAuthorityText = new HashSet<>();
@@ -340,8 +412,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_NAME_VERIFICATION = "navn_verifikation";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_NAME_VERIFICATION)
     Set<NameVerificationDataRecord> nameVerification = new HashSet<>();
@@ -355,8 +431,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=true")
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_MOTHER)
     Set<ParentDataRecord> mother = new HashSet<>();
@@ -370,8 +450,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=true")
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_MOTHER_VERIFICATION)
     Set<ParentVerificationDataRecord> motherVerification = new HashSet<>();
@@ -385,8 +469,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=false")
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_FATHER)
     Set<ParentDataRecord> father = new HashSet<>();
@@ -400,8 +488,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=false")
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_FATHER_VERIFICATION)
     Set<ParentVerificationDataRecord> fatherVerification = new HashSet<>();
@@ -414,8 +506,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CORE = "kernedata";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_CORE)
     Set<PersonCoreDataRecord> core = new HashSet<>();
@@ -428,8 +524,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_PNR = "historiskPersonnummer";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_PNR)
     Set<PersonNumberDataRecord> personNumber = new HashSet<>();
@@ -442,8 +542,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_POSITION = "stilling";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_POSITION)
     Set<PersonPositionDataRecord> position = new HashSet<>();
@@ -456,8 +560,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_STATUS = "status";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_STATUS)
     Set<PersonStatusDataRecord> status = new HashSet<>();
@@ -470,8 +578,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_PROTECTION = "beskyttelse";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Effect.FILTER_EFFECT_FROM, condition = CprBitemporalRecord.FILTER_EFFECT_FROM),
-            @Filter(name = Effect.FILTER_EFFECT_TO, condition = CprBitemporalRecord.FILTER_EFFECT_TO)
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
     @JsonProperty(IO_FIELD_PROTECTION)
     Set<ProtectionDataRecord> protection = new HashSet<>();
@@ -583,7 +695,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
         if (isName) log.info("Add namerecord to set with "+set.size()+" preexisting entries");
         if (newItem != null) {
             for (E oldItem : set) {
-                if (newItem.equalData(oldItem) && Objects.equals(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom())) {
+                if (newItem.equalData(oldItem) && Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom())) {
                     if (newItem.isHistoric() && !oldItem.isHistoric() && oldItem.getEffectTo() == null) {
                         if (isName) log.info("matching item, removing preexisting");
                         set.remove(oldItem);

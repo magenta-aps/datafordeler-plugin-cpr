@@ -8,7 +8,10 @@ import dk.magenta.datafordeler.core.io.ImportInputStream;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.Receipt;
 import dk.magenta.datafordeler.core.plugin.*;
-import dk.magenta.datafordeler.core.util.*;
+import dk.magenta.datafordeler.core.util.Equality;
+import dk.magenta.datafordeler.core.util.ItemInputStream;
+import dk.magenta.datafordeler.core.util.ListHashMap;
+import dk.magenta.datafordeler.core.util.Stopwatch;
 import dk.magenta.datafordeler.cpr.CprRegisterManager;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
@@ -25,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.time.*;
@@ -274,7 +276,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                 HashSet<R> entityRegistrations = new HashSet<>();
 
                                 ArrayList<CprBitemporality> sortedBitemporalities = new ArrayList<>(groups.keySet());
-                                sortedBitemporalities.sort(BitemporalityComparator.ALL);
+                                sortedBitemporalities.sort(CprBitemporality::compareTo);
 
                                 for (CprBitemporality bitemporality :sortedBitemporalities) {
                                     //System.out.println("Bitemporality "+bitemporality.toString());

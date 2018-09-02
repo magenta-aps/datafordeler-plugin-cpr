@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.fapi.BaseQuery;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
-import dk.magenta.datafordeler.core.fapi.Query;
-import dk.magenta.datafordeler.core.util.BitemporalityComparator;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.core.util.OffsetDateTimeAdapter;
 import dk.magenta.datafordeler.cpr.data.road.data.*;
@@ -93,7 +91,7 @@ public class RoadOutputWrapper extends OutputWrapper<RoadEntity> {
                         registrationNode.put("registreringTil", formatTime(next));
 
                         ArrayList<CprBitemporality> sortedBitemporalities = new ArrayList<>(presentBitemporalities);
-                        sortedBitemporalities.sort(BitemporalityComparator.EFFECT);
+                        sortedBitemporalities.sort(CprBitemporality.effectComparator);
 
                         for (CprBitemporality bitemporality : sortedBitemporalities) {
 

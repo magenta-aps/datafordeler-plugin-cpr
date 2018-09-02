@@ -12,7 +12,9 @@ import dk.magenta.datafordeler.cpr.data.CprEntity;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprNontemporalRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -21,44 +23,29 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 
-/**
- * A class for formatting a CompanyRecord to JSON, for FAPI output. The data hierarchy
- * in the output should ook like this:
- * {
- *     "UUID": <company uuid>
- *     "cvrnummer": <company cvr number>
- *     "id": {
- *         "domaene": <company domain>
- *     },
- *     registreringer: [
- *          {
- *              "registreringFra": <registrationFrom>,
- *              "registreringTil": <registrationTo>,
- *              "virkninger": [
- *              {
- *                  "navn": <companyName1>
- *                  "virkningFra": <effectFrom1>
- *                  "virkningTil": <effectTo1>
- *              },
- *              {
- *                  "navn": <companyName2>
- *                  "virkningFra": <effectFrom2>
- *                  "virkningTil": <effectTo2>
- *              }
- *              ]
- *          }
- *     ]
- * }
- */
+@Component
 public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWrapper<E> {
 
-    public abstract List<String> getRemoveFieldNames();
+    public static final String EFFECTS = "virkninger";
+    public static final String EFFECT_FROM = "virkningFra";
+    public static final String EFFECT_TO = "virkningTil";
+    public static final String REGISTRATIONS = "registreringer";
+    public static final String REGISTRATION_FROM = "registreringFra";
+    public static final String REGISTRATION_TO = "registreringTil";
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    public ObjectMapper getObjectMapper() {
+        return this.objectMapper;
+    }
+
+    public abstract Set<String> getRemoveFieldNames();
 
     protected abstract void fillContainer(OutputContainer container, E item);
 
-    protected abstract ObjectMapper getObjectMapper();
+    protected abstract ObjectNode fallbackOutput(Mode mode, OutputContainer recordOutput, CprBitemporality mustContain);
 
-    public class OutputContainer {
+    protected class OutputContainer {
 
         private DoubleListHashMap<CprBitemporality, String, ObjectNode> bitemporalData = new DoubleListHashMap<>();
 
@@ -80,7 +67,7 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
         }
 
         public <T extends CprBitemporalRecord> void addBitemporal(String key, Set<T> records, Function<T, ObjectNode> converter, boolean unwrapSingle, boolean forceArray) {
-            ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
+            ObjectMapper objectMapper = RecordOutputWrapper.this.objectMapper;
             for (T record : records) {
                 if (record != null) {
                     ObjectNode value = (converter != null) ? converter.apply(record) : objectMapper.valueToTree(record);
@@ -108,7 +95,7 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
         }
 
         public <T extends CprNontemporalRecord> void addNontemporal(String key, Set<T> records, Function<T, JsonNode> converter, boolean unwrapSingle, boolean forceArray) {
-            ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
+            ObjectMapper objectMapper = RecordOutputWrapper.this.objectMapper;
             for (T record : records) {
                 JsonNode value = (converter != null) ? converter.apply(record) : objectMapper.valueToTree(record);
                 this.nontemporalData.add(key, value);
@@ -146,7 +133,7 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
         }
 
         public ObjectNode getRVD(CprBitemporality mustOverlap) {
-            ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
+            ObjectMapper objectMapper = RecordOutputWrapper.this.objectMapper;
             ArrayNode registrationsNode = objectMapper.createArrayNode();
             ArrayList<CprBitemporality> bitemporalities = new ArrayList<>(this.bitemporalData.keySet());
             ListHashMap<OffsetDateTime, CprBitemporality> startTerminators = new ListHashMap<>();
@@ -179,12 +166,12 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
                         if (mustOverlap == null || mustOverlap.overlapsRegistration(t, next)) {
                             ObjectNode registrationNode = objectMapper.createObjectNode();
                             registrationsNode.add(registrationNode);
-                            registrationNode.put("registreringFra", formatTime(t));
-                            registrationNode.put("registreringTil", formatTime(next));
+                            registrationNode.put(REGISTRATION_FROM, formatTime(t));
+                            registrationNode.put(REGISTRATION_TO, formatTime(next));
                             ArrayNode effectsNode = objectMapper.createArrayNode();
-                            registrationNode.set("virkninger", effectsNode);
+                            registrationNode.set(EFFECTS, effectsNode);
                             ArrayList<CprBitemporality> sortedEffects = new ArrayList<>(presentBitemporalities);
-                            sortedEffects.sort(BitemporalityComparator.EFFECT);
+                            sortedEffects.sort(BitemporalityComparator.effect(CprBitemporality.class));
                             CprBitemporality lastEffect = null;
                             ObjectNode effectNode = null;
                             for (CprBitemporality bitemporality : sortedEffects) {
@@ -192,8 +179,8 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
                                     effectNode = objectMapper.createObjectNode();
                                     effectsNode.add(effectNode);
                                 }
-                                effectNode.put("virkningFra", formatTime(bitemporality.effectFrom, true));
-                                effectNode.put("virkningTil", formatTime(bitemporality.effectTo, true));
+                                effectNode.put(EFFECT_FROM, formatTime(bitemporality.effectFrom, true));
+                                effectNode.put(EFFECT_TO, formatTime(bitemporality.effectTo, true));
                                 HashMap<String, ArrayList<ObjectNode>> records = this.bitemporalData.get(bitemporality);
                                 for (String key : records.keySet()) {
                                     this.setValue(objectMapper, effectNode, key, records.get(key));
@@ -212,7 +199,7 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
             return this.getRDV(mustOverlap, null, null);
         }
         public ObjectNode getRDV(CprBitemporality mustOverlap, Map<String, String> keyConversion, Function<Pair<String, ObjectNode>, ObjectNode> dataConversion) {
-            ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
+            ObjectMapper objectMapper = RecordOutputWrapper.this.objectMapper;
             ArrayNode registrationsNode = objectMapper.createArrayNode();
             ArrayList<CprBitemporality> bitemporalities = new ArrayList<>(this.bitemporalData.keySet());
             ListHashMap<OffsetDateTime, CprBitemporality> startTerminators = new ListHashMap<>();
@@ -245,14 +232,13 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
                         if (mustOverlap == null || mustOverlap.overlapsRegistration(t, next)) {
                             ObjectNode registrationNode = objectMapper.createObjectNode();
                             registrationsNode.add(registrationNode);
-                            registrationNode.put("registreringFra", formatTime(t));
-                            registrationNode.put("registreringTil", formatTime(next));
+                            registrationNode.put(REGISTRATION_FROM, formatTime(t));
+                            registrationNode.put(REGISTRATION_TO, formatTime(next));
 
                             for (CprBitemporality bitemporality : presentBitemporalities) {
                                 HashMap<String, ArrayList<ObjectNode>> data = this.bitemporalData.get(bitemporality);
                                 for (String key : data.keySet()) {
 
-                                    // key, data -> key, data
                                     String outKey = (keyConversion != null && keyConversion.containsKey(key)) ? keyConversion.get(key) : key;
 
                                     ArrayNode dataNode = (ArrayNode) registrationNode.get(outKey);
@@ -282,16 +268,16 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
         }
 
         public ObjectNode getDRV(CprBitemporality mustOverlap) {
-            ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
-            ObjectNode dataNode = objectMapper.createObjectNode();
+            ObjectMapper objectMapper = RecordOutputWrapper.this.objectMapper;
+            ObjectNode objectNode = objectMapper.createObjectNode();
             for (CprBitemporality bitemporality : this.bitemporalData.keySet()) {
                 if (bitemporality.overlaps(mustOverlap)) {
                     HashMap<String, ArrayList<ObjectNode>> data = this.bitemporalData.get(bitemporality);
                     for (String key : data.keySet()) {
-                        ArrayNode subDataNode = (ArrayNode) dataNode.get(key);
+                        ArrayNode subDataNode = (ArrayNode) objectNode.get(key);
                         if (subDataNode == null) {
                             subDataNode = objectMapper.createArrayNode();
-                            dataNode.set(key, subDataNode);
+                            objectNode.set(key, subDataNode);
                         }
                         for (JsonNode d : data.get(key)) {
                             subDataNode.add(d);
@@ -299,11 +285,11 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
                     }
                 }
             }
-            return dataNode;
+            return objectNode;
         }
 
         public ObjectNode getBase() {
-            ObjectMapper objectMapper = RecordOutputWrapper.this.getObjectMapper();
+            ObjectMapper objectMapper = RecordOutputWrapper.this.objectMapper;
             ObjectNode objectNode = objectMapper.createObjectNode();
             for (String key : this.nontemporalData.keySet()) {
                 this.setValue(objectMapper, objectNode, key, this.nontemporalData.get(key));
@@ -324,10 +310,9 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
         }
 
         private JsonNode prepareNode(String key, JsonNode node) {
-            List<String> removeFieldNames = RecordOutputWrapper.this.getRemoveFieldNames();
             if (node instanceof ObjectNode) {
                 ObjectNode objectNode = (ObjectNode) node;
-                objectNode.remove(removeFieldNames);
+                objectNode.remove(RecordOutputWrapper.this.getRemoveFieldNames());
                 if (objectNode.size() == 1 && this.trySingle.contains(key)) {
                     return objectNode.get(objectNode.fieldNames().next());
                 }
@@ -336,35 +321,27 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
         }
     }
 
-    protected abstract ObjectNode fallbackOutput(Mode mode, OutputContainer recordOutput, CprBitemporality mustContain);
 
-    protected final ObjectNode getNode(E record, CprBitemporality mustContain, Mode mode) {
-        ObjectMapper objectMapper = this.getObjectMapper();
-        ObjectNode root = objectMapper.createObjectNode();
+    protected final ObjectNode getNode(E record, CprBitemporality overlap, Mode mode) {
+        ObjectNode root = this.objectMapper.createObjectNode();
         root.put(Entity.IO_FIELD_UUID, record.getIdentification().getUuid().toString());
         root.put(Entity.IO_FIELD_DOMAIN, record.getIdentification().getDomain());
-        try {
-            OutputContainer recordOutput = new OutputContainer();
-            this.fillContainer(recordOutput, record);
-
-            root.setAll(recordOutput.getBase());
-            switch (mode) {
-                case RVD:
-                    root.setAll(recordOutput.getRVD(mustContain));
-                    break;
-                case RDV:
-                    root.setAll(recordOutput.getRDV(mustContain));
-                    break;
-                case DRV:
-                    root.setAll(recordOutput.getDRV(mustContain));
-                    break;
-                default:
-                    root.setAll(this.fallbackOutput(mode, recordOutput, mustContain));
-                    break;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        OutputContainer recordOutput = new OutputContainer();
+        this.fillContainer(recordOutput, record);
+        root.setAll(recordOutput.getBase());
+        switch (mode) {
+            case RVD:
+                root.setAll(recordOutput.getRVD(overlap));
+                break;
+            case RDV:
+                root.setAll(recordOutput.getRDV(overlap));
+                break;
+            case DRV:
+                root.setAll(recordOutput.getDRV(overlap));
+                break;
+            default:
+                root.setAll(this.fallbackOutput(mode, recordOutput, overlap));
+                break;
         }
         return root;
     }
@@ -386,9 +363,5 @@ public abstract class RecordOutputWrapper<E extends CprEntity> extends OutputWra
     protected static LocalDate getUTCDate(OffsetDateTime offsetDateTime) {
         return offsetDateTime.atZoneSameInstant(ZoneId.of("UTC")).toLocalDate();
     }
-/*
-    private ObjectNode createItemNode(CprRecord record) {
-        return this.getObjectMapper().createObjectNode();
-    }*/
 
 }
