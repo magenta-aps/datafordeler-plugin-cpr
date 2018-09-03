@@ -8,6 +8,12 @@
     <property name="hibernate.connection.username">test</property>
     <property name="hibernate.connection.password">test</property>
 
+<!--
+    <property name="connection.username">test</property>
+    <property name="connection.password">test</property>
+    <property name="connection.url">jdbc:postgresql://localhost:5432/datafordeler</property>
+    <property name="connection.driver_class">org.postgresql.Driver</property>
+-->
     <property name="hibernate.show_sql">false</property>
     <property name="hibernate.hbm2ddl.auto">create-drop</property>
     <property name="hibernate.generate_statistics">false</property>

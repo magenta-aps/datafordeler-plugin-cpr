@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.records.output;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.fapi.BaseQuery;
+import dk.magenta.datafordeler.core.util.Bitemporality;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ public class PersonRecordOutputWrapper extends CprRecordOutputWrapper<PersonEnti
     }
 
     @Override
-    protected ObjectNode fallbackOutput(Mode mode, OutputContainer recordOutput, CprBitemporality mustContain) {
+    protected ObjectNode fallbackOutput(Mode mode, OutputContainer recordOutput, Bitemporality mustContain) {
         if (mode == Mode.LEGACY) {
 
             HashMap<String, String> keyConversion = new HashMap<>();

@@ -218,16 +218,22 @@ public class QueryTest {
         JsonNode jsonBody = objectMapper.readTree(response.getBody());
         JsonNode results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
-        Assert.assertEquals(0, results.size());
+
+        //System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(results));
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals(4, results.get(0).size());
 
         searchParameters = new ParameterMap();
         searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("fornavn", "Tester");
+        searchParameters.add("fmt", "drv");
 
         response = restSearch(searchParameters, "person");
         Assert.assertEquals(200, response.getStatusCode().value());
         jsonBody = objectMapper.readTree(response.getBody());
         results = jsonBody.get("results");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(results));
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(1, results.size());
     }
