@@ -2,8 +2,13 @@ package dk.magenta.datafordeler.cpr.records;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.Bitemporal;
 import dk.magenta.datafordeler.core.database.Effect;
 import dk.magenta.datafordeler.core.database.Registration;
+import dk.magenta.datafordeler.cpr.data.CprEntity;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.FilterDefs;
+import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -15,14 +20,24 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Objects;
 
 @MappedSuperclass
-public class CprBitemporalRecord extends CprMonotemporalRecord implements Comparable<CprBitemporalRecord> {
+@FilterDefs({
+        @FilterDef(name = Bitemporal.FILTER_EFFECT_AFTER, parameters = @ParamDef(name = Bitemporal.FILTERPARAM_EFFECT_AFTER, type = "java.time.OffsetDateTime")),
+        @FilterDef(name = Bitemporal.FILTER_EFFECT_BEFORE, parameters = @ParamDef(name = Bitemporal.FILTERPARAM_EFFECT_BEFORE, type = "java.time.OffsetDateTime"))
+})
+public abstract class CprBitemporalRecord<E extends CprEntity> extends CprMonotemporalRecord<E> implements Comparable<CprBitemporalRecord>, Bitemporal<E> {
 
-    public static final String FILTER_LAST_UPDATED = "(" + CprBitemporalRecord.DB_FIELD_UPDATED + " < :" + Registration.FILTERPARAM_REGISTRATION_TO + ")";
     public static final String FILTER_EFFECT_FROM = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " >= :" + Effect.FILTERPARAM_EFFECT_FROM + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " is null)";
     public static final String FILTER_EFFECT_TO = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " < :" + Effect.FILTERPARAM_EFFECT_TO + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " is null)";
 
-    public static final String DB_FIELD_EFFECT_FROM = "effectFrom";
-    public static final String IO_FIELD_EFFECT_FROM = "virkningFra";
+    public static final String DB_FIELD_ENTITY = CprMonotemporalRecord.DB_FIELD_ENTITY;
+
+    public static final String DB_FIELD_REGISTRATION_FROM = CprMonotemporalRecord.DB_FIELD_REGISTRATION_FROM;
+    public static final String IO_FIELD_REGISTRATION_FROM = CprMonotemporalRecord.IO_FIELD_REGISTRATION_FROM;
+    public static final String DB_FIELD_REGISTRATION_TO = CprMonotemporalRecord.DB_FIELD_REGISTRATION_TO;
+    public static final String IO_FIELD_REGISTRATION_TO = CprMonotemporalRecord.IO_FIELD_REGISTRATION_TO;
+
+    public static final String DB_FIELD_EFFECT_FROM = Bitemporal.DB_FIELD_EFFECT_FROM;
+    public static final String IO_FIELD_EFFECT_FROM = Bitemporal.IO_FIELD_EFFECT_FROM;
     @Column(name = DB_FIELD_EFFECT_FROM)
     @JsonProperty(value = IO_FIELD_EFFECT_FROM)
     @XmlElement(name = IO_FIELD_EFFECT_FROM)
@@ -51,8 +66,8 @@ public class CprBitemporalRecord extends CprMonotemporalRecord implements Compar
         this.effectFromUncertain = effectFromUncertain;
     }
 
-    public static final String DB_FIELD_EFFECT_TO = "effectTo";
-    public static final String IO_FIELD_EFFECT_TO = "virkningTil";
+    public static final String DB_FIELD_EFFECT_TO = Bitemporal.DB_FIELD_EFFECT_TO;
+    public static final String IO_FIELD_EFFECT_TO = Bitemporal.IO_FIELD_EFFECT_TO;
     @Column(name = DB_FIELD_EFFECT_TO)
     @JsonProperty(value = IO_FIELD_EFFECT_TO)
     @XmlElement(name = IO_FIELD_EFFECT_TO)
@@ -113,14 +128,14 @@ public class CprBitemporalRecord extends CprMonotemporalRecord implements Compar
         return this.setBitemporality(
                 registrationFrom,
                 registrationTo,
-                Bitemporality.convertTime(effectFrom),
+                CprBitemporality.convertTime(effectFrom),
                 effectFromUncertain,
-                Bitemporality.convertTime(effectTo),
+                CprBitemporality.convertTime(effectTo),
                 effectToUncertain
         );
     }
 
-    public CprBitemporalRecord setBitemporality(Bitemporality bitemporality) {
+    public CprBitemporalRecord setBitemporality(CprBitemporality bitemporality) {
         return this.setBitemporality(
                 bitemporality.registrationFrom,
                 bitemporality.registrationTo,
@@ -151,8 +166,8 @@ public class CprBitemporalRecord extends CprMonotemporalRecord implements Compar
     }
 
     @JsonIgnore
-    public Bitemporality getBitemporality() {
-        return new Bitemporality(this.getRegistrationFrom(), this.getRegistrationTo(), this.effectFrom, this.effectFromUncertain, this.effectTo, this.effectToUncertain);
+    public CprBitemporality getBitemporality() {
+        return new CprBitemporality(this.getRegistrationFrom(), this.getRegistrationTo(), this.effectFrom, this.effectFromUncertain, this.effectTo, this.effectToUncertain);
     }
 
     @Override
@@ -174,11 +189,4 @@ public class CprBitemporalRecord extends CprMonotemporalRecord implements Compar
         return Objects.hash(super.hashCode(), effectFrom, effectFromUncertain, effectTo, effectToUncertain);
     }
 
-    protected static void copy(CprBitemporalRecord from, CprBitemporalRecord to) {
-        CprMonotemporalRecord.copy(from, to);
-        to.effectFrom = from.effectFrom;
-        to.effectFromUncertain = from.effectFromUncertain;
-        to.effectTo = from.effectTo;
-        to.effectToUncertain = from.effectToUncertain;
-    }
 }

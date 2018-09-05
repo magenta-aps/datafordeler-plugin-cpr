@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.CitizenshipDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.CitizenshipVerificationDataRecord;
@@ -20,8 +20,8 @@ import java.util.Set;
  */
 public class CitizenshipRecord extends PersonDataRecord {
 
-    private Bitemporality citizenshipTemporality;
-    private Bitemporality documentTemporality;
+    private CprBitemporality citizenshipTemporality;
+    private CprBitemporality documentTemporality;
 
     public CitizenshipRecord(String line) throws ParseException {
         super(line);
@@ -34,8 +34,8 @@ public class CitizenshipRecord extends PersonDataRecord {
         this.obtain("dok_ts-statsborgerskab", 51, 12);
         this.obtain("dok-statsborgerskab", 63, 3);
 
-        this.citizenshipTemporality = new Bitemporality(this.getOffsetDateTime("stat_ts"), null, this.getOffsetDateTime("haenstart-statsborgerskab"), this.getBoolean("haenstart_umrk-statsborgerskab"), null, false);
-        this.documentTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-statsborgerskab"));
+        this.citizenshipTemporality = new CprBitemporality(this.getOffsetDateTime("stat_ts"), null, this.getOffsetDateTime("haenstart-statsborgerskab"), this.getBoolean("haenstart_umrk-statsborgerskab"), null, false);
+        this.documentTemporality = new CprBitemporality(this.getOffsetDateTime("dok_ts-statsborgerskab"));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class CitizenshipRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (bitemporality.equals(this.citizenshipTemporality)) {
             data.setCitizenship(
@@ -90,8 +90,8 @@ public class CitizenshipRecord extends PersonDataRecord {
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
-        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+    public List<CprBitemporality> getBitemporality() {
+        ArrayList<CprBitemporality> bitemporalities = new ArrayList<>();
         bitemporalities.add(this.citizenshipTemporality);
         if (this.documentTemporality != null) {
             bitemporalities.add(this.documentTemporality);

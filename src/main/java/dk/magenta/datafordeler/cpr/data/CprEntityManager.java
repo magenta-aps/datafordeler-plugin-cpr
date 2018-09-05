@@ -12,14 +12,13 @@ import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.core.util.ItemInputStream;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.core.util.Stopwatch;
-import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.CprRegisterManager;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.HistoricPersonDataRecord;
 import org.apache.logging.log4j.LogManager;
@@ -273,13 +272,13 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                 this.parseAlternate(entity, records, importMetadata);
 
 
-                                ListHashMap<Bitemporality, T> groups = this.sortIntoGroups(records);
+                                ListHashMap<CprBitemporality, T> groups = this.sortIntoGroups(records);
                                 HashSet<R> entityRegistrations = new HashSet<>();
 
-                                ArrayList<Bitemporality> sortedBitemporalities = new ArrayList<>(groups.keySet());
-                                sortedBitemporalities.sort(Bitemporality::compareTo);
+                                ArrayList<CprBitemporality> sortedBitemporalities = new ArrayList<>(groups.keySet());
+                                sortedBitemporalities.sort(CprBitemporality::compareTo);
 
-                                for (Bitemporality bitemporality :sortedBitemporalities) {
+                                for (CprBitemporality bitemporality :sortedBitemporalities) {
                                     //System.out.println("Bitemporality "+bitemporality.toString());
 
                                     timer.start(TASK_FIND_REGISTRATIONS);
@@ -359,7 +358,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                     for (R registration : registrations) {
                                         V effect = registration.getEffect(bitemporality.effectFrom, bitemporality.effectFromUncertain, null, false);
                                         if (effect != null) {
-                                            Bitemporality outdatedTemporality = bitemporality.withEffect(effect);
+                                            CprBitemporality outdatedTemporality = bitemporality.withEffect(effect);
                                             for (T record : groupRecords) {
                                                 if (record instanceof HistoricPersonDataRecord) {
                                                     HistoricPersonDataRecord historicRecord = (HistoricPersonDataRecord) record;
@@ -457,13 +456,13 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     }
 
 
-    public ListHashMap<Bitemporality, T> sortIntoGroups(Collection<T> records) {
+    public ListHashMap<CprBitemporality, T> sortIntoGroups(Collection<T> records) {
         // Sort the records into groups that share bitemporality
-        ListHashMap<Bitemporality, T> recordGroups = new ListHashMap<>();
+        ListHashMap<CprBitemporality, T> recordGroups = new ListHashMap<>();
         for (T record : records) {
             // Find the appropriate registration object
-            List<Bitemporality> bitemporalities = record.getBitemporality();
-            for (Bitemporality bitemporality : bitemporalities) {
+            List<CprBitemporality> bitemporalities = record.getBitemporality();
+            for (CprBitemporality bitemporality : bitemporalities) {
                 recordGroups.add(bitemporality, record);
             }
         }

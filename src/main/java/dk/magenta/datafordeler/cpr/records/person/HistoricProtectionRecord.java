@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ProtectionDataRecord;
 import org.hibernate.Session;
@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class HistoricProtectionRecord extends HistoricPersonDataRecord {
 
-    private Bitemporality protectionTemporality;
+    private CprBitemporality protectionTemporality;
 
     public HistoricProtectionRecord(String line) throws ParseException {
         super(line);
@@ -32,11 +32,11 @@ public class HistoricProtectionRecord extends HistoricPersonDataRecord {
         this.obtain("slut_dt-beskyttelse",73,10);
 
         //this.protectionTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-beskyttelse"), this.getOffsetDateTime("slut_ts-beskyttelse"), this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slut_dt-beskyttelse"), false);
-        this.protectionTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-beskyttelse"), this.getOffsetDateTime("slut_ts-beskyttelse"), this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slut_dt-beskyttelse"), false);
+        this.protectionTemporality = new CprBitemporality(this.getOffsetDateTime("start_ts-beskyttelse"), this.getOffsetDateTime("slut_ts-beskyttelse"), this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slut_dt-beskyttelse"), false);
     }
 
     @Override
-    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+    public boolean cleanBaseData(PersonBaseData data, CprBitemporality bitemporality, CprBitemporality outdatedTemporality, Session session) {
         return false;
     }
 
@@ -46,7 +46,7 @@ public class HistoricProtectionRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         /*
         Keep this off for now
         if (bitemporality.equals(this.protectionTemporality)) {
@@ -85,7 +85,7 @@ public class HistoricProtectionRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
+    public List<CprBitemporality> getBitemporality() {
         //return Collections.singletonList(this.protectionTemporality);
         return Collections.emptyList();
     }

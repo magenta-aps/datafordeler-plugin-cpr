@@ -3,8 +3,9 @@ package dk.magenta.datafordeler.cpr.records.output;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.fapi.BaseQuery;
+import dk.magenta.datafordeler.core.util.Bitemporality;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
@@ -43,14 +44,6 @@ import java.util.HashMap;
 @Component
 public class PersonRecordOutputWrapper extends CprRecordOutputWrapper<PersonEntity> {
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Override
-    protected ObjectMapper getObjectMapper() {
-        return this.objectMapper;
-    }
-
     private static ObjectNode convert(Pair<String, ObjectNode> input) {
         String key = input.getFirst();
         ObjectNode data = input.getSecond();
@@ -88,7 +81,7 @@ public class PersonRecordOutputWrapper extends CprRecordOutputWrapper<PersonEnti
 
     @Override
     public Object wrapResult(PersonEntity record, BaseQuery query, Mode mode) {
-        Bitemporality mustContain = new Bitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
+        CprBitemporality mustContain = new CprBitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
         return this.getNode(record, mustContain, mode);
     }
 

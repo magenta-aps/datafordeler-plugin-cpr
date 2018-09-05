@@ -5,7 +5,7 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.data.unversioned.PostCode;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
@@ -19,7 +19,7 @@ import java.util.Set;
  */
 public class RoadPostcodeRecord extends RoadDataRecord {
 
-    private Bitemporality postcodeTemporality;
+    private CprBitemporality postcodeTemporality;
 
     public RoadPostcodeRecord(String line) throws ParseException {
         super(line);
@@ -30,7 +30,7 @@ public class RoadPostcodeRecord extends RoadDataRecord {
         this.obtain("postnr", 33, 4);
         this.obtain("postdisttxt", 37, 20);
 
-        this.postcodeTemporality = new Bitemporality(this.getOffsetDateTime("timestamp"));
+        this.postcodeTemporality = new CprBitemporality(this.getOffsetDateTime("timestamp"));
     }
 
     @Override
@@ -39,7 +39,7 @@ public class RoadPostcodeRecord extends RoadDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(RoadBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(RoadBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         if (bitemporality.equals(this.postcodeTemporality)) {
             data.addPostcode(
                     this.getString("husnrfra", false),
@@ -61,7 +61,7 @@ public class RoadPostcodeRecord extends RoadDataRecord {
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
+    public List<CprBitemporality> getBitemporality() {
         return Collections.singletonList(this.postcodeTemporality);
     }
 

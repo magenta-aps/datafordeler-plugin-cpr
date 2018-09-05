@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ChurchDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ChurchVerificationDataRecord;
@@ -20,8 +20,8 @@ import java.util.Set;
  */
 public class ChurchRecord extends PersonDataRecord {
 
-    private Bitemporality churchTemporality;
-    private Bitemporality documentTemporality;
+    private CprBitemporality churchTemporality;
+    private CprBitemporality documentTemporality;
 
     public ChurchRecord(String line) throws ParseException {
         super(line);
@@ -33,8 +33,8 @@ public class ChurchRecord extends PersonDataRecord {
         this.obtain("dok_mynkod-folkekirke", 42, 4);
         this.obtain("dok_ts-folkekirke", 46, 12);
         this.obtain("dok-folkekirke", 58, 3);
-        this.churchTemporality = new Bitemporality(this.getOffsetDateTime("fkirk_ts"), null, this.getOffsetDateTime("start_dt-folkekirke"), this.getBoolean("start_dt-umrk-folkekirke"), null, false);
-        this.documentTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-folkekirke"));
+        this.churchTemporality = new CprBitemporality(this.getOffsetDateTime("fkirk_ts"), null, this.getOffsetDateTime("start_dt-folkekirke"), this.getBoolean("start_dt-umrk-folkekirke"), null, false);
+        this.documentTemporality = new CprBitemporality(this.getOffsetDateTime("dok_ts-folkekirke"));
     }
 
     @Override
@@ -43,7 +43,7 @@ public class ChurchRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (bitemporality.equals(this.churchTemporality)) {
             data.setChurch(
@@ -89,8 +89,8 @@ public class ChurchRecord extends PersonDataRecord {
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
-        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+    public List<CprBitemporality> getBitemporality() {
+        ArrayList<CprBitemporality> bitemporalities = new ArrayList<>();
         bitemporalities.add(this.churchTemporality);
         if (this.documentTemporality != null) {
             bitemporalities.add(this.documentTemporality);

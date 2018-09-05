@@ -22,7 +22,7 @@ public abstract class CprDataRecord<V extends CprEffect, B extends CprData> exte
         super(line);
     }
 
-    public abstract boolean populateBaseData(B data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata);
+    public abstract boolean populateBaseData(B data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata);
 
 
     protected B getBaseDataItem(HashMap<V, B> data) {
@@ -56,7 +56,7 @@ public abstract class CprDataRecord<V extends CprEffect, B extends CprData> exte
 
     public abstract Set<OffsetDateTime> getRegistrationTimestamps();
 
-    public abstract List<Bitemporality> getBitemporality();
+    public abstract List<CprBitemporality> getBitemporality();
 
     public boolean filter(ObjectNode importConfiguration) {
         if (importConfiguration != null && importConfiguration.size() > 0) {

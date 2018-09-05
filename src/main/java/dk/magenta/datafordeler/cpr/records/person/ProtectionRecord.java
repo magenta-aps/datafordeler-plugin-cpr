@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ProtectionDataRecord;
 import org.hibernate.Session;
@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class ProtectionRecord extends PersonDataRecord {
 
-    private Bitemporality protectionTemporality;
+    private CprBitemporality protectionTemporality;
 
     public ProtectionRecord(String line) throws ParseException {
         super(line);
@@ -27,7 +27,7 @@ public class ProtectionRecord extends PersonDataRecord {
         this.obtain("indrap-beskyttelse",44	,3);
         this.obtain("slet_dt-beskyttelse",47,10);
 
-        this.protectionTemporality = new Bitemporality(this.getOffsetDateTime("start_ts-beskyttelse"), null, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slet_dt-beskyttelse"), false);
+        this.protectionTemporality = new CprBitemporality(this.getOffsetDateTime("start_ts-beskyttelse"), null, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slet_dt-beskyttelse"), false);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class ProtectionRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         if (bitemporality.equals(this.protectionTemporality)) {
             data.addProtection(
                     // int authority,
@@ -64,7 +64,7 @@ public class ProtectionRecord extends PersonDataRecord {
         ).setAuthority(
                 this.getInt("start_mynkod-beskyttelse")
         ).setBitemporality(
-                new Bitemporality(
+                new CprBitemporality(
                         this.getOffsetDateTime("start_ts-beskyttelse"),
                         null,
                         this.getOffsetDateTime("start_dt-beskyttelse"), false,
@@ -76,7 +76,7 @@ public class ProtectionRecord extends PersonDataRecord {
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
+    public List<CprBitemporality> getBitemporality() {
         return Collections.singletonList(this.protectionTemporality);
     }
 

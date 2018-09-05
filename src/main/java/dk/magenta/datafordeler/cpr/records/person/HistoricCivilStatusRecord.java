@@ -4,7 +4,7 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.CivilStatusAuthorityTextDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.CivilStatusDataRecord;
@@ -21,9 +21,9 @@ import java.util.Set;
  */
 public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
 
-    private Bitemporality civilTemporality;
-    private Bitemporality documentTemporality;
-    private Bitemporality officiaryTemporality;
+    private CprBitemporality civilTemporality;
+    private CprBitemporality documentTemporality;
+    private CprBitemporality officiaryTemporality;
 
     public HistoricCivilStatusRecord(String line) throws ParseException {
         super(line);
@@ -48,13 +48,13 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
         this.obtain("myntxt-civilstand", 149, 20);
         this.obtain("sep_henvis_ts", 169, 12);
 
-        this.civilTemporality = new Bitemporality(this.getOffsetDateTime("civ_ts"), null, this.getOffsetDateTime("haenstart-civilstand"), this.getBoolean("haenstart_umrk-civilstand"), this.getOffsetDateTime("haenslut-civilstand"), this.getBoolean("haenslut_umrk-civilstand"));
-        this.documentTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-civilstand"));
-        this.officiaryTemporality = new Bitemporality(this.getOffsetDateTime("myntxt_ts-civilstand"));
+        this.civilTemporality = new CprBitemporality(this.getOffsetDateTime("civ_ts"), null, this.getOffsetDateTime("haenstart-civilstand"), this.getBoolean("haenstart_umrk-civilstand"), this.getOffsetDateTime("haenslut-civilstand"), this.getBoolean("haenslut_umrk-civilstand"));
+        this.documentTemporality = new CprBitemporality(this.getOffsetDateTime("dok_ts-civilstand"));
+        this.officiaryTemporality = new CprBitemporality(this.getOffsetDateTime("myntxt_ts-civilstand"));
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
+    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
         boolean updated = false;
         if (bitemporality.equals(this.civilTemporality)) {
             data.setCivilStatus(
@@ -98,17 +98,17 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public boolean cleanBaseData(PersonBaseData data, Bitemporality bitemporality, Bitemporality outdatedTemporality, Session session) {
+    public boolean cleanBaseData(PersonBaseData data, CprBitemporality bitemporality, CprBitemporality outdatedTemporality, Session session) {
         boolean updated = false;
-        if (bitemporality.equals(this.civilTemporality) && outdatedTemporality.equals(this.civilTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+        if (bitemporality.equals(this.civilTemporality) && outdatedTemporality.equals(this.civilTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearCivilStatus(session);
             updated = true;
         }
-        if (bitemporality.equals(this.documentTemporality) && outdatedTemporality.equals(this.documentTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+        if (bitemporality.equals(this.documentTemporality) && outdatedTemporality.equals(this.documentTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearCitizenshipVerification(session);
             updated = true;
         }
-        if (bitemporality.equals(this.officiaryTemporality) && outdatedTemporality.equals(this.officiaryTemporality, Bitemporality.EXCLUDE_EFFECT_TO)) {
+        if (bitemporality.equals(this.officiaryTemporality) && outdatedTemporality.equals(this.officiaryTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
             data.clearCivilStatusAuthorityText(session);
             updated = true;
         }
@@ -161,8 +161,8 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public List<Bitemporality> getBitemporality() {
-        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
+    public List<CprBitemporality> getBitemporality() {
+        ArrayList<CprBitemporality> bitemporalities = new ArrayList<>();
         if (this.has("civst") || this.has("aegtepnr")) {
             bitemporalities.add(this.civilTemporality);
         }
