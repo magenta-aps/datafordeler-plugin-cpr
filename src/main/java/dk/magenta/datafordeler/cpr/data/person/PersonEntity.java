@@ -12,6 +12,8 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Filters;
@@ -591,100 +593,103 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     }
 
     public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session) {
+        boolean added = false;
         if (record instanceof AddressConameDataRecord) {
-            addItem(this.coname, record, session);
+            added = addItem(this.coname, record, session);
         }
         if (record instanceof AddressDataRecord) {
-            addItem(this.address, record, session);
+            added = addItem(this.address, record, session);
         }
         if (record instanceof AddressNameDataRecord) {
-            addItem(this.addressName, record, session);
+            added = addItem(this.addressName, record, session);
         }
         if (record instanceof BirthPlaceDataRecord) {
-            addItem(this.birthPlace, record, session);
+            added = addItem(this.birthPlace, record, session);
         }
         if (record instanceof BirthPlaceVerificationDataRecord) {
-            addItem(this.birthPlaceVerification, record, session);
+            added = addItem(this.birthPlaceVerification, record, session);
         }
         if (record instanceof BirthTimeDataRecord) {
-            addItem(this.birthTime, record, session);
+            added = addItem(this.birthTime, record, session);
         }
         if (record instanceof ChurchDataRecord) {
-            addItem(this.churchRelation, record, session);
+            added = addItem(this.churchRelation, record, session);
         }
         if (record instanceof ChurchVerificationDataRecord) {
-            addItem(this.churchRelationVerification, record, session);
+            added = addItem(this.churchRelationVerification, record, session);
         }
         if (record instanceof CitizenshipDataRecord) {
-            addItem(this.citizenship, record, session);
+            added = addItem(this.citizenship, record, session);
         }
         if (record instanceof CitizenshipVerificationDataRecord) {
-            addItem(this.citizenshipVerification, record, session);
+            added = addItem(this.citizenshipVerification, record, session);
         }
         if (record instanceof CivilStatusDataRecord) {
-            addItem(this.civilstatus, record, session);
+            added = addItem(this.civilstatus, record, session);
         }
         if (record instanceof CivilStatusAuthorityTextDataRecord) {
-            addItem(this.civilstatusAuthorityText, record, session);
+            added = addItem(this.civilstatusAuthorityText, record, session);
         }
         if (record instanceof CivilStatusVerificationDataRecord) {
-            addItem(this.civilstatusVerification, record, session);
+            added = addItem(this.civilstatusVerification, record, session);
         }
         if (record instanceof ForeignAddressDataRecord) {
-            addItem(this.foreignAddress, record, session);
-        }
-        if (record instanceof ForeignAddressDataRecord) {
-            addItem(this.foreignAddress, record, session);
+            added = addItem(this.foreignAddress, record, session);
         }
         if (record instanceof ForeignAddressEmigrationDataRecord) {
-            addItem(this.emigration, record, session);
+            added = addItem(this.emigration, record, session);
         }
         if (record instanceof MoveMunicipalityDataRecord) {
-            addItem(this.municipalityMove, record, session);
+            added = addItem(this.municipalityMove, record, session);
         }
         if (record instanceof NameAuthorityTextDataRecord) {
-            addItem(this.nameAuthorityText, record, session);
+            added = addItem(this.nameAuthorityText, record, session);
         }
         if (record instanceof NameDataRecord) {
-            addItem(this.name, record, session);
+            log.info("Add name to "+this.getId());
+            added = addItem(this.name, record, session);
+            log.info(added ? "Added":"Not added");
         }
         if (record instanceof NameVerificationDataRecord) {
-            addItem(this.nameVerification, record, session);
+            added = addItem(this.nameVerification, record, session);
         }
         if (record instanceof ParentDataRecord) {
             ParentDataRecord pRecord = (ParentDataRecord) record;
             if (pRecord.isMother()) {
-                addItem(this.mother, pRecord, session);
+                added = addItem(this.mother, pRecord, session);
             } else {
-                addItem(this.father, pRecord, session);
+                added = addItem(this.father, pRecord, session);
             }
         }
         if (record instanceof ParentVerificationDataRecord) {
             ParentVerificationDataRecord pRecord = (ParentVerificationDataRecord) record;
             if (pRecord.isMother()) {
-                addItem(this.motherVerification, pRecord, session);
+                added = addItem(this.motherVerification, pRecord, session);
             } else {
-                addItem(this.fatherVerification, pRecord, session);
+                added = addItem(this.fatherVerification, pRecord, session);
             }
         }
         if (record instanceof PersonCoreDataRecord) {
-            addItem(this.core, record, session);
+            added = addItem(this.core, record, session);
         }
         if (record instanceof PersonNumberDataRecord) {
-            addItem(this.personNumber, record, session);
+            added = addItem(this.personNumber, record, session);
         }
         if (record instanceof PersonPositionDataRecord) {
-            addItem(this.position, record, session);
+            added = addItem(this.position, record, session);
         }
         if (record instanceof PersonStatusDataRecord) {
-            addItem(this.status, record, session);
+            added = addItem(this.status, record, session);
         }
         if (record instanceof ProtectionDataRecord) {
-            addItem(this.protection, record, session);
+            added = addItem(this.protection, record, session);
         }
-        record.setEntity(this);
+        if (added) {
+            record.setEntity(this);
+        }
     }
 
+    private static Logger log = LogManager.getLogger("PersonEntity");
     private static <E extends CprBitemporalPersonRecord> boolean addItem(Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
         //log.debug("Add "+newItem.getClass().getSimpleName()+" to set with "+set.size()+" preexisting entries");
         if (newItem != null) {

@@ -188,7 +188,8 @@ public class ParseTest {
             Assert.assertEquals(1, entities.size());
             RoadEntity entity = entities.get(0);
 
-            System.out.println(new RoadOutputWrapper().wrapResult(entity, query));
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new RoadOutputWrapper().wrapResult(entity, query)));
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity));
 
             Assert.assertEquals(RoadEntity.generateUUID(730, 4), entity.getUUID());
             Assert.assertEquals(roadEntityManager.getDomain(), entity.getDomain());
@@ -198,6 +199,9 @@ public class ParseTest {
             RoadRegistration registration1 = entity.getRegistrations().get(0);
             Assert.assertEquals(0, registration1.getSequenceNumber());
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), registration1.getRegistrationFrom()));
+
+            System.out.println(registration1.getRegistrationTo());
+
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2008-05-30T09:11:00+02:00"), registration1.getRegistrationTo()));
             List<RoadEffect> effects1 = registration1.getSortedEffects();
             Assert.assertEquals(2, effects1.size());

@@ -2,15 +2,10 @@ package dk.magenta.datafordeler.cpr.records;
 
 import dk.magenta.datafordeler.core.util.Bitemporality;
 import dk.magenta.datafordeler.core.util.BitemporalityComparator;
-import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.CprEffect;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.TemporalAccessor;
-import java.util.Comparator;
 import java.util.Objects;
 
 public class CprBitemporality extends Bitemporality {
