@@ -25,7 +25,7 @@ public class HistoricCprNumberRecord extends HistoricPersonDataRecord {
         this.obtain("gammelt_pnr", 18, 10);
         this.obtain("start_dt-person", 28, 10);
         this.obtain("start_dt_umrk-person", 38, 1);
-        this.obtain("slut_dt-person", 38, 10);
+        this.obtain("slut_dt-person", 39, 10);
         this.obtain("slut_dt_umrk-person", 49, 1);
         this.cprTemporality = new CprBitemporality(
                 null, null,
