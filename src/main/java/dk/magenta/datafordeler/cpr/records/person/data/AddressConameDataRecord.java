@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -32,6 +33,11 @@ public class AddressConameDataRecord extends CprBitemporalPersonRecord {
         this.coname = coname;
     }
 
+    public AddressConameDataRecord(String coname, LocalDateTime timestamp) {
+        this.coname = coname;
+        this.timestamp = timestamp;
+    }
+
     public static final String DB_FIELD_CONAME = "coname";
     public static final String IO_FIELD_CONAME = "conavn";
     @Column(name = DB_FIELD_CONAME)
@@ -46,6 +52,25 @@ public class AddressConameDataRecord extends CprBitemporalPersonRecord {
     public void setConame(String coname) {
         this.coname = coname;
     }
+
+
+
+    public static final String DB_FIELD_CONAME_TIMESTAMP = "timestamp";
+    public static final String IO_FIELD_CONAME_TIMESTAMP = "conavnTidspunkt";
+    @Column(name = DB_FIELD_CONAME_TIMESTAMP)
+    @JsonProperty(value = IO_FIELD_CONAME_TIMESTAMP)
+    @XmlElement(name = IO_FIELD_CONAME_TIMESTAMP)
+    private LocalDateTime timestamp;
+
+    public LocalDateTime getTimestamp() {
+        return this.timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+
+
 
     @Override
     public boolean equalData(Object o) {

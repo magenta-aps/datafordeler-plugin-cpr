@@ -3,11 +3,13 @@ package dk.magenta.datafordeler.cpr.data.person;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import dk.magenta.datafordeler.core.database.*;
+import dk.magenta.datafordeler.core.database.Bitemporal;
+import dk.magenta.datafordeler.core.database.Identification;
+import dk.magenta.datafordeler.core.database.Monotemporal;
+import dk.magenta.datafordeler.core.database.Nontemporal;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
-import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
 import org.hibernate.Session;
@@ -16,7 +18,6 @@ import org.hibernate.annotations.Filters;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -685,21 +686,21 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     }
 
     private static <E extends CprBitemporalPersonRecord> boolean addItem(Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
+        //log.debug("Add "+newItem.getClass().getSimpleName()+" to set with "+set.size()+" preexisting entries");
         if (newItem != null) {
             for (E oldItem : set) {
-                if (newItem.equalData(oldItem) && Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom())) {
-                    if (newItem.isHistoric() && !oldItem.isHistoric() && oldItem.getEffectTo() == null) {
-                        //System.out.println("matching item, removing preexisting");
+                    if (newItem.isHistoric() && !oldItem.isHistoric() && Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null) {
+                        //log.debug("matching item, removing preexisting");
                         set.remove(oldItem);
                         session.delete(oldItem);
                         return set.add((E) newItem);
-                    } else {
-                        //System.out.println("matching item with same historicity, not adding");
+                    } else if (Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && Equality.equal(newItem.getEffectTo(), oldItem.getEffectTo())) {
+                        //log.debug("matching item with same historicity, not adding");
                         return false;
                     }
-                }
+
             }
-            //System.out.println("nonmatching item");
+            //log.debug("nonmatching item");
             return set.add((E) newItem);
         }
         return false;
