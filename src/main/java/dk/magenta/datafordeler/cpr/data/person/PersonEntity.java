@@ -646,9 +646,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
             added = addItem(this.nameAuthorityText, record, session);
         }
         if (record instanceof NameDataRecord) {
-            log.info("Add name to "+this.getId());
             added = addItem(this.name, record, session);
-            log.info(added ? "Added":"Not added");
         }
         if (record instanceof NameVerificationDataRecord) {
             added = addItem(this.nameVerification, record, session);
