@@ -171,12 +171,11 @@ public class AddressRecord extends PersonDataRecord {
         ));
 
         records.add(new AddressConameDataRecord(
-                this.get("convn"),
-                this.getDateTime("convn_ts")
+                this.get("convn")
         ).setAuthority(
                 this.getInt("start_mynkod-personbolig")
         ).setBitemporality(
-                this.getOffsetDateTime("adr_ts"),
+                this.getOffsetDateTime("convn_ts"),
                 null,
                 this.getOffsetDateTime("tilflydto"),
                 this.getBoolean("tilflydto_umrk"),
