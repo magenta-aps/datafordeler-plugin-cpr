@@ -119,8 +119,7 @@ public class ProtectionDataRecord extends CprBitemporalPersonRecord {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equalData(o)) return false;
         ProtectionDataRecord that = (ProtectionDataRecord) o;
-        return protectionType == that.protectionType &&
-                reportMarking == that.reportMarking;
+        return protectionType == that.protectionType;
     }
 
     @Override

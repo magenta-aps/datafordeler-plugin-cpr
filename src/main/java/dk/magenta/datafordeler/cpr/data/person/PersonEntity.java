@@ -7,6 +7,7 @@ import dk.magenta.datafordeler.core.database.Bitemporal;
 import dk.magenta.datafordeler.core.database.Identification;
 import dk.magenta.datafordeler.core.database.Monotemporal;
 import dk.magenta.datafordeler.core.database.Nontemporal;
+import dk.magenta.datafordeler.core.util.BitemporalityComparator;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
@@ -689,21 +690,26 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
 
     private static Logger log = LogManager.getLogger("PersonEntity");
     private static <E extends CprBitemporalPersonRecord> boolean addItem(Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
-        //log.debug("Add "+newItem.getClass().getSimpleName()+" to set with "+set.size()+" preexisting entries");
+        log.debug("Add "+newItem.getClass().getSimpleName()+" to set with "+set.size()+" preexisting entries");
         if (newItem != null) {
             for (E oldItem : set) {
-                    if (newItem.isHistoric() && !oldItem.isHistoric() && Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null) {
-                        //log.debug("matching item, removing preexisting");
+                    if (newItem.isHistoric() && !oldItem.isHistoric() &&
+                            Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
+                            Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null) {
+                        log.debug("matching item, removing preexisting");
                         set.remove(oldItem);
                         session.delete(oldItem);
                         return set.add((E) newItem);
-                    } else if (Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && Equality.equal(newItem.getEffectTo(), oldItem.getEffectTo())) {
-                        //log.debug("matching item with same historicity, not adding");
-                        return false;
+
+                    } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
+                        log.debug("matching item with same temporality ("+newItem.getBitemporality()+"), replacing");
+                        set.remove(oldItem);
+                        session.delete(oldItem);
+                        return set.add((E) newItem);
                     }
 
             }
-            //log.debug("nonmatching item");
+            log.debug("nonmatching item");
             return set.add((E) newItem);
         }
         return false;

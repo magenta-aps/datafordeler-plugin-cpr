@@ -12,6 +12,7 @@ import dk.magenta.datafordeler.cpr.records.person.data.NameDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.NameVerificationDataRecord;
 import org.hibernate.Session;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -52,10 +53,12 @@ public class NameRecord extends PersonDataRecord {
         this.obtain("myntxt_ts-navne", 293, 12);
         this.obtain("myntxt-navne", 305, 20);
 
-        this.nameTemporality = new CprBitemporality(this.getOffsetDateTime("nvn_ts"), null, this.getOffsetDateTime("nvnhaenstart"), this.getBoolean("haenstart_umrk-navne"), null, false);
-        this.addressNameTemporality = new CprBitemporality(this.getOffsetDateTime("adrnvn_ts"));
-        this.documentNameTemporality = new CprBitemporality(this.getOffsetDateTime("dok_ts-navne"));
-        this.officiaryTemporality = new CprBitemporality(this.getOffsetDateTime("myntxt_ts-navne"));
+        OffsetDateTime effectFrom = this.getOffsetDateTime("nvnhaenstart");
+        boolean effectFromUncertain = this.getMarking("haenstart_umrk-navne");
+        this.nameTemporality = new CprBitemporality(this.getOffsetDateTime("nvn_ts"), null, effectFrom, effectFromUncertain, null, false);
+        this.addressNameTemporality = new CprBitemporality(this.getOffsetDateTime("adrnvn_ts"), null, effectFrom, effectFromUncertain, null, false);
+        this.documentNameTemporality = new CprBitemporality(this.getOffsetDateTime("dok_ts-navne"), null, effectFrom, effectFromUncertain, null, false);
+        this.officiaryTemporality = new CprBitemporality(this.getOffsetDateTime("myntxt_ts-navne"), null, effectFrom, effectFromUncertain, null, false);
     }
 
     @Override
