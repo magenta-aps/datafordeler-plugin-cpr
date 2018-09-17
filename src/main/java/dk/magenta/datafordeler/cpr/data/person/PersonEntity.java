@@ -693,7 +693,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
         log.debug("Add "+newItem.getClass().getSimpleName()+" to set with "+set.size()+" preexisting entries");
         if (newItem != null) {
             for (E oldItem : set) {
-                    if (newItem.isHistoric() && !oldItem.isHistoric() &&
+                    if (newItem.isHistoric() && !oldItem.isHistoric() && newItem.equalData(oldItem) &&
                             Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
                             Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null) {
                         log.debug("matching item, removing preexisting");
