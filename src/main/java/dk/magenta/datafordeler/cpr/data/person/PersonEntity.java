@@ -690,26 +690,28 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
 
     private static Logger log = LogManager.getLogger("PersonEntity");
     private static <E extends CprBitemporalPersonRecord> boolean addItem(Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
-        log.debug("Add "+newItem.getClass().getSimpleName()+" to set with "+set.size()+" preexisting entries");
+        log.debug("Add "+newItem.getClass().getSimpleName()+"("+newItem.getAuthority()+") at "+newItem.getBitemporality()+" to set with "+set.size()+" preexisting entries");
         if (newItem != null) {
             for (E oldItem : set) {
-                    if (newItem.isHistoric() && !oldItem.isHistoric() && newItem.equalData(oldItem) &&
-                            Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
-                            Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null) {
-                        log.debug("matching item, removing preexisting");
-                        set.remove(oldItem);
-                        session.delete(oldItem);
-                        return set.add((E) newItem);
+                if (newItem.isHistoric() && !oldItem.isHistoric() && newItem.equalData(oldItem) &&
+                        Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
+                        Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null &&
+                        !Equality.equal(newItem.getEffectFrom(), newItem.getEffectTo())
+                        ) {
+                    log.debug("matching item at "+oldItem.getBitemporality()+", removing preexisting ("+oldItem.getAuthority()+")");
+                    set.remove(oldItem);
+                    session.delete(oldItem);
+                    return set.add((E) newItem);
 
-                    } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
-                        log.debug("matching item with same temporality ("+newItem.getBitemporality()+"), replacing");
-                        set.remove(oldItem);
-                        session.delete(oldItem);
-                        return set.add((E) newItem);
-                    }
+                } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
+                    log.debug("matching item with same temporality ("+newItem.getBitemporality()+"), replacing ("+oldItem.getAuthority()+")");
+                    set.remove(oldItem);
+                    session.delete(oldItem);
+                    return set.add((E) newItem);
+                }
 
             }
-            log.debug("nonmatching item");
+            log.debug("nonmatching item, adding as new");
             return set.add((E) newItem);
         }
         return false;
