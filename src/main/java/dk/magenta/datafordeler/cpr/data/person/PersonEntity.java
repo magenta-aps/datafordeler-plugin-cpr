@@ -703,7 +703,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                     session.delete(oldItem);
                     return set.add((E) newItem);
 
-                } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
+                } else if (newItem.equalData(oldItem) && newItem.getBitemporality().equals(oldItem.getBitemporality())) {
                     log.debug("matching item with same temporality ("+newItem.getBitemporality()+"), replacing ("+oldItem.getAuthority()+")");
                     set.remove(oldItem);
                     session.delete(oldItem);
