@@ -24,10 +24,6 @@
             <id>central</id>
             <url>http://central.maven.org/maven2/</url>
         </repository>
-        <repository>
-            <id>novus</id>
-            <url>http://repo.novus.com/releases/</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -122,20 +118,14 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>dk.magenta.datafordeler</groupId>
-            <artifactId>datafordeler-plugin-gladdrreg</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-
-
 
         <!-- FTP4J -->
         <dependency>
             <groupId>it.sauronsoftware</groupId>
             <artifactId>ftp4j</artifactId>
             <version>1.6</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/extralib/ftp4j-1.6.jar</systemPath>
         </dependency>
 
 
