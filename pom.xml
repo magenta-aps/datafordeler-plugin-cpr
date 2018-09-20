@@ -118,17 +118,6 @@
             <scope>test</scope>
         </dependency>
 
-
-        <!-- FTP4J -->
-        <dependency>
-            <groupId>it.sauronsoftware</groupId>
-            <artifactId>ftp4j</artifactId>
-            <version>1.6</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/extralib/ftp4j-1.6.jar</systemPath>
-        </dependency>
-
-
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
