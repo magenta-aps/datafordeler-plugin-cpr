@@ -401,7 +401,8 @@ public class PullTest {
             File[] subFiles = localSubFolder.listFiles();
             Assert.assertEquals(1, subFiles.length);
             String contents = FileUtils.readFileToString(subFiles[0]);
-            Assert.assertEquals("06123400OP0101001234                                                            ", contents);
+            Assert.assertEquals("06123400OP0101001234                                                            \r\n" +
+                    "071234560101001234               ", contents);
         } finally {
             session.close();
             localSubFolder.delete();
