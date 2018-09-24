@@ -130,10 +130,10 @@ public class ParseTest {
             importConfiguration.remove(CprEntityManager.IMPORTCONFIG_PNR);
             loadPerson(importMetadata);
 
-            entities = QueryManager.getAllEntities(session, PersonEntity.class);
+            entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
             Assert.assertEquals(1, entities.size());
             PersonEntity entity = entities.get(0);
-            //Assert.assertEquals(PersonEntity.generateUUID("0101001234"), entity.getUUID());
+            Assert.assertEquals(PersonEntity.generateUUID("0101001234"), entity.getUUID());
 
             System.out.println(
                     objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(

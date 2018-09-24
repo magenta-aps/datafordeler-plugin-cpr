@@ -7,7 +7,6 @@ import dk.magenta.datafordeler.core.database.Bitemporal;
 import dk.magenta.datafordeler.core.database.Identification;
 import dk.magenta.datafordeler.core.database.Monotemporal;
 import dk.magenta.datafordeler.core.database.Nontemporal;
-import dk.magenta.datafordeler.core.util.BitemporalityComparator;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
@@ -693,21 +692,33 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
         log.debug("Add "+newItem.getClass().getSimpleName()+"("+newItem.getAuthority()+") at "+newItem.getBitemporality()+" to set with "+set.size()+" preexisting entries");
         if (newItem != null) {
             for (E oldItem : set) {
-                if (newItem.isHistoric() && !oldItem.isHistoric() && newItem.equalData(oldItem) &&
-                        Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
-                        Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null &&
-                        !Equality.equal(newItem.getEffectFrom(), newItem.getEffectTo())
-                        ) {
-                    log.debug("matching item at "+oldItem.getBitemporality()+", removing preexisting ("+oldItem.getAuthority()+")");
-                    set.remove(oldItem);
-                    session.delete(oldItem);
-                    return set.add((E) newItem);
+                if (newItem.equalData(oldItem)) {
+                    if (
+                            newItem.isHistoric() && !oldItem.isHistoric() &&
+                            Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
+                            Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null &&
+                            !Equality.equal(newItem.getEffectFrom(), newItem.getEffectTo())
+                            ) {
+                        log.debug("matching item at " + oldItem.getBitemporality() + ", removing preexisting (" + oldItem.getAuthority() + ")");
+                        set.remove(oldItem);
+                        session.delete(oldItem);
+                        return set.add((E) newItem);
 
-                } else if (newItem.equalData(oldItem) && newItem.getBitemporality().equals(oldItem.getBitemporality())) {
-                    log.debug("matching item with same temporality ("+newItem.getBitemporality()+"), replacing ("+oldItem.getAuthority()+")");
-                    set.remove(oldItem);
-                    session.delete(oldItem);
-                    return set.add((E) newItem);
+                    } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
+                        log.debug("matching item with same temporality (" + newItem.getBitemporality() + "), replacing (" + oldItem.getAuthority() + ")");
+                        set.remove(oldItem);
+                        session.delete(oldItem);
+                        return set.add((E) newItem);
+
+                    } else if (
+                            Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
+                            (Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) || newItem.getRegistrationTo() == null) &&
+                            Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
+                            newItem.getEffectTo() == null
+                            ) {
+                        log.debug("matching item with insufficient temporality (" + newItem.getBitemporality() + "), not adding");
+                        return false;
+                    }
                 }
 
             }

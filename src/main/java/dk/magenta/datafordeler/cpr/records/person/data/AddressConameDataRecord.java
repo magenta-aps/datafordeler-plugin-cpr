@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity

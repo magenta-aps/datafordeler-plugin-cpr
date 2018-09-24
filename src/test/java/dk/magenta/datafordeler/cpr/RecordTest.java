@@ -132,7 +132,7 @@ public class RecordTest {
         ImportMetadata importMetadata = new ImportMetadata();
         importMetadata.setSession(session);
         this.loadPerson("/persondata.txt", importMetadata);
-        //this.loadPerson("/persondata2.txt", importMetadata);
+        this.loadPerson("/persondata2.txt", importMetadata);
         try {
             PersonRecordQuery query = new PersonRecordQuery();
             query.setPersonnummer("0101001234");
@@ -156,7 +156,7 @@ public class RecordTest {
             Assert.assertEquals(1, personEntity.getEmigration().size());
             Assert.assertEquals(1, personEntity.getMunicipalityMove().size());
             Assert.assertEquals(3, personEntity.getName().size());
-            Assert.assertEquals(3, personEntity.getNameAuthorityText().size());
+            Assert.assertEquals(4, personEntity.getNameAuthorityText().size());
             Assert.assertEquals(3, personEntity.getNameVerification().size());
             Assert.assertEquals(1, personEntity.getMother().size());
             Assert.assertEquals(1, personEntity.getMotherVerification().size());
