@@ -4,8 +4,8 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.person.data.ForeignAddressDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ForeignAddressEmigrationDataRecord;
 import org.hibernate.Session;
@@ -137,12 +137,24 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
                 this.foreignAddressTemporality
         ).setHistoric());
 
+
         records.add(new ForeignAddressEmigrationDataRecord(
-                this.getInt("udr_landekod")
+                this.getInt("indr_landekod"),
+                this.getInt("udr_landekod"),
+                this.getOffsetDateTime("udr_ts"),
+                this.getOffsetDateTime("indr_ts")
         ).setAuthority(
-                this.getInt("start_mynkod-udrindrejs")
+                this.getInt("start_mynkod-udrindrejse")
         ).setBitemporality(
-                this.emigrationTemporality
+                new CprBitemporality(
+                        firstSet(
+                                this.getOffsetDateTime("udr_ts"),
+                                this.getOffsetDateTime("indr_ts")
+                        ),
+                        null,
+                        this.getOffsetDateTime("udrdto"), this.getMarking("udrdto_umrk"),
+                        this.getOffsetDateTime("indrdto"), this.getMarking("indrdto_umrk")
+                )
         ).setHistoric());
 
         return records;

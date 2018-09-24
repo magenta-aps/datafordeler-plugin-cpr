@@ -119,7 +119,6 @@ public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
         return registrationsNode;
     }
 
-
     protected static String formatTime(OffsetDateTime time) {
         return formatTime(time, false);
     }

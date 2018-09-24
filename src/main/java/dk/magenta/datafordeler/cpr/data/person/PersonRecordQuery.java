@@ -1,17 +1,9 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
 import dk.magenta.datafordeler.core.database.LookupDefinition;
-import dk.magenta.datafordeler.core.fapi.ParameterMap;
-import dk.magenta.datafordeler.core.fapi.QueryField;
 import dk.magenta.datafordeler.cpr.CprRecordLookupDefinition;
-import dk.magenta.datafordeler.cpr.data.CprQuery;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonAddressData;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonNameData;
 import dk.magenta.datafordeler.cpr.records.person.data.AddressDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.NameDataRecord;
-
-import java.util.*;
 
 /**
  * Container for a query for Persons, defining fields and database lookup

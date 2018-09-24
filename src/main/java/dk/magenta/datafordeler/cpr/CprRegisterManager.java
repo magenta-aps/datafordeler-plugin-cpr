@@ -190,7 +190,11 @@ public class CprRegisterManager extends RegisterManager {
             case "ftps":
                 try {
                     FtpCommunicator ftpFetcher = this.getFtpCommunicator(eventInterface, cprEntityManager);
-                    responseBody = ftpFetcher.fetch(eventInterface);
+                    if (importMetadata != null && importMetadata.getImportConfiguration() != null && importMetadata.getImportConfiguration().size() > 0) {
+                        responseBody = ftpFetcher.fetchLocal();
+                    } else {
+                        responseBody = ftpFetcher.fetch(eventInterface);
+                    }
                 } catch (DataStreamException e) {
                     this.log.error(e);
                     throw e;

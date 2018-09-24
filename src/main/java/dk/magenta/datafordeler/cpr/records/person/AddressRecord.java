@@ -4,13 +4,14 @@ import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.person.data.AddressConameDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.AddressDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.MoveMunicipalityDataRecord;
 import org.hibernate.Session;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -170,12 +171,17 @@ public class AddressRecord extends PersonDataRecord {
                 false
         ));
 
+
+        OffsetDateTime convnTs = this.getOffsetDateTime("convn_ts");
+        if (convnTs == null) {
+           convnTs = this.getOffsetDateTime("adr_ts");
+        }
         records.add(new AddressConameDataRecord(
                 this.get("convn")
         ).setAuthority(
                 this.getInt("start_mynkod-personbolig")
         ).setBitemporality(
-                this.getOffsetDateTime("convn_ts"),
+                convnTs,
                 null,
                 this.getOffsetDateTime("tilflydto"),
                 this.getBoolean("tilflydto_umrk"),

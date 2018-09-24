@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.Bitemporal;
 import dk.magenta.datafordeler.core.database.Effect;
-import dk.magenta.datafordeler.core.database.Registration;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.FilterDefs;

@@ -96,9 +96,22 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
         if (importConfiguration != null && importConfiguration.size() > 0) {
             if (importConfiguration.has(CprEntityManager.IMPORTCONFIG_PNR)) {
                 HashSet<String> acceptedCprNumbers = new HashSet<>(
-                        getConfigValueAsText(importConfiguration.get(CprEntityManager.IMPORTCONFIG_PNR), "%010d")
+                        getConfigValueAsText(importConfiguration.get(CprEntityManager.IMPORTCONFIG_PNR), "%d")
                 );
-                if (!acceptedCprNumbers.contains(this.getCprNumber())) {
+                boolean found = false;
+                for (String accept : acceptedCprNumbers) {
+                    if (accept.endsWith("*")) {
+                        accept = accept.substring(0, accept.indexOf("*"));
+                        if (this.getCprNumber().startsWith(accept)) {
+                            found = true;
+                            break;
+                        }
+                    } else if (accept.equals(this.getCprNumber())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
                     return false;
                 }
             }
