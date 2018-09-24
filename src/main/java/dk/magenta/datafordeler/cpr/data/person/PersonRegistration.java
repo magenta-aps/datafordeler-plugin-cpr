@@ -6,7 +6,6 @@ import dk.magenta.datafordeler.cpr.data.CprRegistration;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 
 /**
  * Representation of registrations in the bitemporal model for persons.

@@ -156,8 +156,8 @@ public class RecordTest {
             Assert.assertEquals(1, personEntity.getEmigration().size());
             Assert.assertEquals(1, personEntity.getMunicipalityMove().size());
             Assert.assertEquals(3, personEntity.getName().size());
-            Assert.assertEquals(3, personEntity.getNameAuthorityText().size());
-            Assert.assertEquals(2, personEntity.getNameVerification().size());
+            Assert.assertEquals(4, personEntity.getNameAuthorityText().size());
+            Assert.assertEquals(3, personEntity.getNameVerification().size());
             Assert.assertEquals(1, personEntity.getMother().size());
             Assert.assertEquals(1, personEntity.getMotherVerification().size());
             Assert.assertEquals(1, personEntity.getFather().size());
