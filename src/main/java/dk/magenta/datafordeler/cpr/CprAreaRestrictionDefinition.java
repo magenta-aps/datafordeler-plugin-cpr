@@ -15,6 +15,8 @@ public class CprAreaRestrictionDefinition extends AreaRestrictionDefinition {
     public static final String RESTRICTION_KOMMUNE_SERMERSOOQ = "Sermersooq";
     public static final String RESTRICTION_KOMMUNE_PITUFFIK = "Pituffik";
     public static final String RESTRICTION_KOMMUNE_NATIONALPARK = "Nationalpark";
+    public static final String RESTRICTION_KOMMUNE_AVANNAATA = "Avannaata";
+    public static final String RESTRICTION_KOMMUNE_QEQERTALIK = "Qeqertalik";
 
 
     public CprAreaRestrictionDefinition(CprPlugin plugin) {
@@ -26,6 +28,8 @@ public class CprAreaRestrictionDefinition extends AreaRestrictionDefinition {
         kommunekodeRestriction.addChoice(RESTRICTION_KOMMUNE_SERMERSOOQ, "Sermersooq kommune", null, "956");
         kommunekodeRestriction.addChoice(RESTRICTION_KOMMUNE_PITUFFIK, "Pituffik (udenf.komm.ind.)", null, "961");
         kommunekodeRestriction.addChoice(RESTRICTION_KOMMUNE_NATIONALPARK, "Nationalpark (udenf.komm.ind.)", null, "961");
+        kommunekodeRestriction.addChoice(RESTRICTION_KOMMUNE_QEQERTALIK, "Kommune Qeqertalik", null, "959");
+        kommunekodeRestriction.addChoice(RESTRICTION_KOMMUNE_AVANNAATA, "Avannaata Kommunia", null, "960");
     }
 
     @Override
