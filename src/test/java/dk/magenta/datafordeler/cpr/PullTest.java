@@ -20,6 +20,7 @@ import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
 import dk.magenta.datafordeler.cpr.data.road.RoadQuery;
+import dk.magenta.datafordeler.cpr.records.person.data.BirthPlaceDataRecord;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Session;
 import org.junit.After;
@@ -52,6 +53,7 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -278,9 +280,7 @@ public class PullTest {
         configuration.setPersonRegisterFtpPassword(password);
         configuration.setPersonRegisterDataCharset(CprConfiguration.Charset.UTF_8);
 
-
-
-        ObjectNode config = (ObjectNode) objectMapper.readTree("{\""+CprEntityManager.IMPORTCONFIG_RECORDTYPE+"\": [5]}");
+        ObjectNode config = (ObjectNode) objectMapper.readTree("{\""+CprEntityManager.IMPORTCONFIG_RECORDTYPE+"\": [5], \"remote\":true}");
         Pull pull = new Pull(engine, plugin, config);
         pull.run();
 
@@ -296,20 +296,13 @@ public class PullTest {
             Assert.assertEquals(1, personEntities.size());
             PersonEntity personEntity = personEntities.get(0);
             Assert.assertEquals(PersonEntity.generateUUID("0101001234"), personEntity.getUUID());
-
-            System.out.println(
-                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
-                            new PersonOutputWrapper().wrapResult(personEntities.get(0), personQuery)
-                    )
-            );
-            Assert.assertEquals(1, personEntity.getRegistrations().size());
-            Assert.assertTrue(LocalDateTime.parse("1991-09-23T12:00").isEqual(personEntity.getRegistrations().get(0).getRegistrationFrom().toLocalDateTime()));
-            Assert.assertNull(personEntity.getRegistrations().get(0).getRegistrationTo());
-            Assert.assertEquals(1, personEntity.getRegistrations().get(0).getEffects().size());
-            PersonBirthData birthData = personEntity.getRegistrations().get(0).getEffects().get(0).getDataItems().get(0).getBirth();
-            Assert.assertNotNull(birthData);
-            Assert.assertEquals(9510, birthData.getBirthPlaceCode().intValue());
-            Assert.assertEquals(1234, birthData.getBirthAuthorityText().intValue());
+            Set<BirthPlaceDataRecord> birthPlaceDataRecords = personEntity.getBirthPlace();
+            Assert.assertEquals(1, birthPlaceDataRecords.size());
+            BirthPlaceDataRecord birthPlaceDataRecord = birthPlaceDataRecords.iterator().next();
+            Assert.assertTrue(OffsetDateTime.parse("1991-09-23T12:00+02:00").isEqual(birthPlaceDataRecord.getRegistrationFrom()));
+            Assert.assertNull(birthPlaceDataRecord.getRegistrationTo());
+            Assert.assertEquals(9510, birthPlaceDataRecord.getAuthority());
+            Assert.assertEquals(1234, birthPlaceDataRecord.getBirthPlaceCode().intValue());
         } finally {
             session.close();
         }

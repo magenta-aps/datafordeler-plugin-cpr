@@ -7,15 +7,14 @@ import dk.magenta.datafordeler.core.exception.*;
 import dk.magenta.datafordeler.core.io.ImportInputStream;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.Receipt;
+import dk.magenta.datafordeler.core.io.WrappedInputStream;
 import dk.magenta.datafordeler.core.plugin.*;
-import dk.magenta.datafordeler.core.util.Equality;
-import dk.magenta.datafordeler.core.util.ItemInputStream;
-import dk.magenta.datafordeler.core.util.ListHashMap;
-import dk.magenta.datafordeler.core.util.Stopwatch;
+import dk.magenta.datafordeler.core.util.*;
 import dk.magenta.datafordeler.cpr.CprRegisterManager;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
+import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
@@ -28,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.time.*;
@@ -175,7 +175,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
     @Override
     public List<R> parseData(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
         String charset = this.getConfiguration().getRegisterCharset(this);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
         CprSubParser<T> parser = this.getParser();
         Session session = importMetadata.getSession();
         boolean wrappedInTransaction = importMetadata.isTransactionInProgress();
@@ -184,6 +183,8 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         int maxChunkSize = 1000;
         List<File> cacheFiles = null;
         int totalChunks = 0;
+        LabeledSequenceInputStream labeledSequenceInputStream = null;
+
         if (registrationData instanceof ImportInputStream) {
             ImportInputStream importStream = (ImportInputStream) registrationData;
             cacheFiles = importStream.getCacheFiles();
@@ -193,7 +194,16 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
             //totalChunks = (int) Math.ceil((float) lines / (float) maxChunkSize);
             totalChunks = (lines + maxChunkSize - 1) / maxChunkSize;
             //totalChunks = (lines / maxChunkSize) + (lines % maxChunkSize == 0 ? 0 : 1);
+            InputStream innerStream = importStream;
+            while (innerStream instanceof WrappedInputStream) {
+                innerStream = ((WrappedInputStream) innerStream).getInner();
+            }
+            if (innerStream instanceof LabeledSequenceInputStream) {
+                labeledSequenceInputStream = (LabeledSequenceInputStream) innerStream;
+            }
         }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(registrationData, Charset.forName(charset)));
 
         boolean done = false;
         long chunkCount = 1;
@@ -204,9 +214,11 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 String line;
                 int i = 0;
                 int size = 0;
-                ArrayList<String> dataChunk = new ArrayList<>();
+                LinkedHashMap<String, ArrayList<String>> dataChunks = new LinkedHashMap<>();
                 try {
                     for (i = 0; (line = reader.readLine()) != null && i < maxChunkSize; i++) {
+                        String origin = labeledSequenceInputStream != null ? labeledSequenceInputStream.getCurrentLabel() : null;
+                        ArrayList<String> dataChunk = dataChunks.computeIfAbsent(origin, k -> new ArrayList<>());
                         dataChunk.add(line);
                         size += line.length();
                     }
@@ -223,7 +235,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     timer.start(TASK_CHUNK_HANDLE);
                     // Parse chunk into a set of records
                     timer.start(TASK_PARSE);
-                    List<T> chunkRecords = parser.parse(dataChunk, charset);
+                    List<T> chunkRecords = parser.parse(dataChunks, charset);
                     log.debug("Batch parsed into " + chunkRecords.size() + " records");
                     timer.measure(TASK_PARSE);
 
