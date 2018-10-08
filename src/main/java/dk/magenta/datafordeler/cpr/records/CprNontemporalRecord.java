@@ -80,6 +80,22 @@ public abstract class CprNontemporalRecord<E extends CprEntity> extends Database
         to.dafoUpdated = from.dafoUpdated;
     }
 
+
+
+    public static final String DB_FIELD_ORIGIN = "origin";
+    @Column(name = DB_FIELD_ORIGIN)
+    public String origin;
+
+    public String getOrigin() {
+        return this.origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+
+
     public boolean equalData(Object o) {
         if (o==null || (getClass() != o.getClass())) return false;
         CprNontemporalRecord that = (CprNontemporalRecord) o;

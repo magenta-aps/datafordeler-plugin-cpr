@@ -17,6 +17,8 @@ public abstract class Record extends HashMap<String, String> {
 
     private static Pattern leadingZero = Pattern.compile("^0+");
 
+    private String origin;
+
     private String line;
 
     public Record(String line) throws ParseException {
@@ -29,6 +31,14 @@ public abstract class Record extends HashMap<String, String> {
         if (!this.get("type").equals(thisType)) {
             throw new ParseException("Invalid recordtype "+this.get("type")+" for class "+this.getClass().getName()+", was expecting the input to begin with "+thisType+". Input was "+line+".");
         }
+    }
+
+    public String getOrigin() {
+        return this.origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 
     protected String substr(String line, int position, int length) {
