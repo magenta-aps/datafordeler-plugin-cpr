@@ -200,13 +200,16 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         long startChunk = importMetadata.getStartChunk();
         while (!done) {
             try {
-
-                String line;
+                String line = null;
                 int i = 0;
                 int size = 0;
                 ArrayList<String> dataChunk = new ArrayList<>();
                 try {
-                    for (i = 0; (line = reader.readLine()) != null && i < maxChunkSize; i++) {
+                    for (i = 0; i < maxChunkSize; i++) {
+                        line = reader.readLine();
+                        if (line == null) {
+                            break;
+                        }
                         dataChunk.add(line);
                         size += line.length();
                     }
