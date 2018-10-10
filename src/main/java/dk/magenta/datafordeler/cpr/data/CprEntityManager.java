@@ -210,13 +210,16 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
         long startChunk = importMetadata.getStartChunk();
         while (!done) {
             try {
-
-                String line;
+                String line = null;
                 int i = 0;
                 int size = 0;
                 LinkedHashMap<String, ArrayList<String>> dataChunks = new LinkedHashMap<>();
                 try {
-                    for (i = 0; (line = reader.readLine()) != null && i < maxChunkSize; i++) {
+                    for (i = 0; i < maxChunkSize; i++) {
+                        line = reader.readLine();
+                        if (line == null) {
+                            break;
+                        }
                         String origin = labeledSequenceInputStream != null ? labeledSequenceInputStream.getCurrentLabel() : null;
                         ArrayList<String> dataChunk = dataChunks.computeIfAbsent(origin, k -> new ArrayList<>());
                         dataChunk.add(line);
