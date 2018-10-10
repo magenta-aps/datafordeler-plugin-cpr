@@ -98,7 +98,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     public List<PersonRegistration> parseData(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
         try {
             List<PersonRegistration> result = super.parseData(registrationData, importMetadata);
-            if (this.isSetupSubscriptionEnabled() && !this.nonGreenlandicCprNumbers.isEmpty()) {
+            if (this.isSetupSubscriptionEnabled() && !this.nonGreenlandicCprNumbers.isEmpty() && importMetadata.getImportConfiguration().size() == 0) {
                 this.createSubscription(this.nonGreenlandicCprNumbers);
             }
             return result;
