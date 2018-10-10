@@ -12,8 +12,12 @@ import org.hibernate.annotations.ParamDef;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @MappedSuperclass
 @FilterDefs({
@@ -94,11 +98,29 @@ public abstract class CprNontemporalRecord<E extends CprEntity> extends Database
         this.origin = origin;
     }
 
+    private static final Pattern originPattern = Pattern.compile("d(\\d\\d)(\\d\\d)(\\d\\d)\\.l(\\d\\d\\d\\d\\d\\d)");
+    public LocalDate getOriginDate() {
+        if (this.origin != null) {
+            Matcher matcher = originPattern.matcher(this.origin);
+            if (matcher.find()) {
+                try {
+                    return LocalDate.of(
+                            2000 + Integer.parseInt(matcher.group(1)),
+                            Integer.parseInt(matcher.group(2)),
+                            Integer.parseInt(matcher.group(3))
+                    );
+                } catch (NumberFormatException | IndexOutOfBoundsException | IllegalStateException | DateTimeException e) {
+                }
+            }
+        }
+        return null;
+    }
+
 
 
     public boolean equalData(Object o) {
         if (o==null || (getClass() != o.getClass())) return false;
         CprNontemporalRecord that = (CprNontemporalRecord) o;
-        return Objects.equals(this.authority, that.authority);
+        return Objects.equals(this.authority, that.authority) && Objects.equals(this.origin, that.origin);
     }
 }
