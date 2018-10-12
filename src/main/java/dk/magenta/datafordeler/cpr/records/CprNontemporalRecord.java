@@ -88,7 +88,7 @@ public abstract class CprNontemporalRecord<E extends CprEntity> extends Database
 
     public static final String DB_FIELD_ORIGIN = "origin";
     @Column(name = DB_FIELD_ORIGIN)
-    public String origin;
+    private String origin;
 
     public String getOrigin() {
         return this.origin;
@@ -96,12 +96,13 @@ public abstract class CprNontemporalRecord<E extends CprEntity> extends Database
 
     public void setOrigin(String origin) {
         this.origin = origin;
+        this.originDate = parseOrigin(origin);
     }
 
     private static final Pattern originPattern = Pattern.compile("d(\\d\\d)(\\d\\d)(\\d\\d)\\.l(\\d\\d\\d\\d\\d\\d)");
-    public LocalDate getOriginDate() {
-        if (this.origin != null) {
-            Matcher matcher = originPattern.matcher(this.origin);
+    public static LocalDate parseOrigin(String origin) {
+        if (origin != null) {
+            Matcher matcher = originPattern.matcher(origin);
             if (matcher.find()) {
                 try {
                     return LocalDate.of(
@@ -114,6 +115,14 @@ public abstract class CprNontemporalRecord<E extends CprEntity> extends Database
             }
         }
         return null;
+    }
+
+    public static final String DB_FIELD_ORIGIN_DATE = "originDate";
+    @Column(name = DB_FIELD_ORIGIN_DATE)
+    private LocalDate originDate;
+
+    public LocalDate getOriginDate() {
+        return this.originDate;
     }
 
 
