@@ -10,6 +10,8 @@ import dk.magenta.datafordeler.core.database.Nontemporal;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.CprNontemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
 import org.apache.logging.log4j.LogManager;
@@ -23,9 +25,7 @@ import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * An Entity representing a person. Bitemporal data is structured as
@@ -599,6 +599,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
         }
         if (record instanceof AddressDataRecord) {
             added = addItem(this.address, record, session);
+            if (added) {
+                System.out.println("Setting entity " + System.identityHashCode(this) + " for item " + System.identityHashCode(record));
+            }
+            /*for (AddressDataRecord a : this.address) {
+                System.out.println("Address id: "+this.getPersonnummer()+"|"+a.getId());
+            }*/
         }
         if (record instanceof AddressNameDataRecord) {
             added = addItem(this.addressName, record, session);
@@ -685,45 +691,141 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
         if (added) {
             record.setEntity(this);
         }
+
     }
 
     private static Logger log = LogManager.getLogger("PersonEntity");
     private static <E extends CprBitemporalPersonRecord> boolean addItem(Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
-        log.debug("Add "+newItem.getClass().getSimpleName()+"("+newItem.getAuthority()+") at "+newItem.getBitemporality()+" to set with "+set.size()+" preexisting entries");
+        //log.info("Add "+newItem.getClass().getSimpleName()+"("+newItem.getAuthority()+") at "+newItem.getBitemporality()+" to set with "+set.size()+" preexisting entries");
+        boolean isAddress = false; //(newItem instanceof AddressDataRecord);
         if (newItem != null) {
-            for (E oldItem : set) {
-                if (newItem.equalData(oldItem)) {
+            //System.out.println("correction: "+newItem.isCorrection());
+            boolean equal = false;
+            E correctedRecord = null;
+            E correctingRecord = null;
+            ArrayList<E> items = new ArrayList<>(set);
+            if (isAddress) System.out.println(System.identityHashCode(newItem));
+            //if (isAddress) System.out.println(newItem.line);
+            //if (isAddress) System.out.println(newItem.getBitemporality());
+
+            items.sort(Comparator.comparing(CprNontemporalRecord::getOriginDate));
+            //items.sort(Comparator.comparing(CprNontemporalRecord::getCnt));
+            for (E oldItem : items) {
+                /*
+                if (newItem.isCorrection() && Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) && Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo())) {
+                    System.out.println("CORRECTION: "+newItem.getBitemporality()+" "+oldItem.getBitemporality());
+
+                    //log.info("matching item with correction (" + newItem.getBitemporality() + "), replacing (" + oldItem.getAuthority() + ")");
+                    set.remove(oldItem);
+                    session.delete(oldItem);
+                    //System.out.println("Remove "+oldItem.cnt);
+                    return set.add((E) newItem);
+                    //return false;
+
+                }
+                */
+
+
+                if (newItem.isCorrection() || newItem.isTechnicalCorrection()) {
+                    if (Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom())) {
+                        // The new record with corrected data
+                        correctingRecord = oldItem;
+                    } else if (newItem.equalData(oldItem)) {
+                        // The old record that is being corrected
+                        correctedRecord = oldItem;
+                    }
+                }
+
+                else if (newItem.isUndo() && Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && newItem.equalData(oldItem)) {
+                    oldItem.setUndone(true);
+                    if (isAddress) System.out.println("oldItem id: "+System.identityHashCode(oldItem));
+                    session.saveOrUpdate(oldItem);
+                    if (isAddress) System.out.println("undo");
+                    return false;
+                }
+
+                else if (newItem.equalData(oldItem)) {
+
+                    equal = true;
+
                     if (
                             newItem.isHistoric() && !oldItem.isHistoric() &&
-                            Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
+                            //Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
                             Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null &&
                             !Equality.equal(newItem.getEffectFrom(), newItem.getEffectTo())
+                            && oldItem.getReplacedBy() == null
                             ) {
-                        log.debug("matching item at " + oldItem.getBitemporality() + ", removing preexisting (" + oldItem.getAuthority() + ")");
-                        set.remove(oldItem);
-                        session.delete(oldItem);
+
+                        // Historic item matching prior current item
+
+                        //log.info("matching item at " + oldItem.getBitemporality() + ", removing preexisting (" + oldItem.getAuthority() + ")");
+
+                        oldItem.setReplacedBy(newItem);
+
+                        //System.out.println("Remove "+oldItem.cnt);
+                        //System.out.println("Insert "+newItem.cnt);
+                        if (isAddress) System.out.println("demote "+oldItem.cnt+" to historic");
                         return set.add((E) newItem);
 
                     } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
-                        log.debug("matching item with same temporality (" + newItem.getBitemporality() + "), replacing (" + oldItem.getAuthority() + ")");
-                        set.remove(oldItem);
-                        session.delete(oldItem);
-                        return set.add((E) newItem);
-
+                        if (isAddress) System.out.println("exact match with "+oldItem.cnt);
+                        return false;
                     } else if (
                             Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
                             (Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) || newItem.getRegistrationTo() == null) &&
                             Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
                             newItem.getEffectTo() == null
                             ) {
-                        log.debug("matching item with insufficient temporality (" + newItem.getBitemporality() + "), not adding");
+                        if (isAddress) System.out.println("something");
+                        //log.info("matching item with insufficient temporality (" + newItem.getBitemporality() + "), not adding");
                         return false;
+                    } else {
+                        //System.out.println("Fall through");
                     }
+                } else {
+                    //System.out.println(newItem.line+" is not equal to "+oldItem.line);
                 }
-
             }
-            log.debug("nonmatching item, adding as new");
-            return set.add((E) newItem);
+
+
+            if (!equal) {
+                if (isAddress) System.out.println("not equal to any existing");
+            }
+            if (newItem.isCorrection() || newItem.isTechnicalCorrection()) {
+                //System.out.println("correction");
+                if (correctedRecord != null && correctingRecord != null && correctedRecord != correctingRecord) {
+                    boolean alreadyFound = false;
+                    for (Object otherCorrector : correctedRecord.getCorrectors()) {
+                        if (otherCorrector instanceof CprBitemporalRecord) {
+                            CprBitemporalRecord other = (CprBitemporalRecord) otherCorrector;
+                            if (correctingRecord.equalData(other) && correctingRecord.getBitemporality().equals(other.getBitemporality())) {
+                                alreadyFound = true;
+                                break;
+                            }
+                        } else if (otherCorrector instanceof CprNontemporalRecord) {
+                            CprNontemporalRecord other = (CprNontemporalRecord) otherCorrector;
+                            if (correctingRecord.equalData(other)) {
+                                alreadyFound = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!alreadyFound) {
+                        correctedRecord.setRegistrationTo(newItem.getRegistrationFrom());
+                        correctingRecord.setCorrectionOf(correctedRecord);
+                        //correctedRecord.addCorrector(correctingRecord);
+                        if (isAddress) System.out.println("record "+correctingRecord.cnt+" corrects "+correctedRecord.cnt);
+                    } else {
+                        if (isAddress) System.out.println("Orphan correction A");
+                    }
+                } else {
+                    if (isAddress) System.out.println("Orphan correction B");
+                }
+            } else {
+                if (isAddress) System.out.println("Insert");
+                //log.info("nonmatching item, adding as new");
+                return set.add((E) newItem);
+            }
         }
         return false;
     }

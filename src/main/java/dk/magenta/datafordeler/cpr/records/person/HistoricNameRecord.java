@@ -157,7 +157,9 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
     public List<CprBitemporalRecord> getBitemporalRecords() {
 
         ArrayList<CprBitemporalRecord> records = new ArrayList<>();
-
+        Character annkor = this.getChar("annkor");
+        boolean corrected = Character.valueOf('K').equals(annkor);
+        boolean undo = Character.valueOf('A').equals(annkor);
         records.add(new NameDataRecord(
                 null,
                 this.get("fornvn"),
@@ -172,7 +174,12 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
                 this.getInt("start_mynkod-navne")
         ).setBitemporality(
                 this.nameTemporality
-        ).setHistoric());
+        ).setHistoric(
+        ).setCorrection(
+                corrected
+        ).setUndo(
+                undo
+        ));
 
         records.add(new NameVerificationDataRecord(
                 this.getBoolean("dok-navne"),
@@ -181,7 +188,12 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
                 this.getInt("dok_mynkod-navne")
         ).setBitemporality(
                 this.documentNameTemporality
-        ).setHistoric());
+        ).setHistoric(
+        ).setCorrection(
+                corrected
+        ).setUndo(
+                undo
+        ));
 
         records.add(new NameAuthorityTextDataRecord(
                 this.getString("myntxt-navne", true),
@@ -190,7 +202,12 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
                 this.getInt("myntxt_mynkod-navne")
         ).setBitemporality(
                 this.officiaryTemporality
-        ).setHistoric());
+        ).setHistoric(
+        ).setCorrection(
+                corrected
+        ).setUndo(
+                undo
+        ));
 
         return records;
     }

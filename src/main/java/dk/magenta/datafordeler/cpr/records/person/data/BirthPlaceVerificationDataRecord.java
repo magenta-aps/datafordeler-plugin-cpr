@@ -5,9 +5,9 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Storage for data on a Person's birth verification,
@@ -20,9 +20,19 @@ import javax.persistence.Table;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthPlaceDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthPlaceDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-public class BirthPlaceVerificationDataRecord extends VerificationDataRecord {
+public class BirthPlaceVerificationDataRecord extends VerificationDataRecord<BirthPlaceVerificationDataRecord> {
 
     public static final String TABLE_NAME = "cpr_person_birthplace_verification_record";
+
+
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
+    private Set<BirthPlaceVerificationDataRecord> correctors = new HashSet<>();
+
+    public Set<BirthPlaceVerificationDataRecord> getCorrectors() {
+        return this.correctors;
+    }
 
     public BirthPlaceVerificationDataRecord() {
     }

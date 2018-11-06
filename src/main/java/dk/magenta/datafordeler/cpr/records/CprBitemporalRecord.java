@@ -23,7 +23,18 @@ import java.util.Objects;
         @FilterDef(name = Bitemporal.FILTER_EFFECT_AFTER, parameters = @ParamDef(name = Bitemporal.FILTERPARAM_EFFECT_AFTER, type = "java.time.OffsetDateTime")),
         @FilterDef(name = Bitemporal.FILTER_EFFECT_BEFORE, parameters = @ParamDef(name = Bitemporal.FILTERPARAM_EFFECT_BEFORE, type = "java.time.OffsetDateTime"))
 })
-public abstract class CprBitemporalRecord<E extends CprEntity> extends CprMonotemporalRecord<E> implements Comparable<CprBitemporalRecord>, Bitemporal<E> {
+public abstract class CprBitemporalRecord<E extends CprEntity, S extends CprBitemporalRecord<E, S>> extends CprMonotemporalRecord<E, S> implements Comparable<CprBitemporalRecord>, Bitemporal<E> {
+
+
+
+    //@Column
+    //public String line;
+
+/*
+    @Column(name = "cnt")
+    public int cnt;
+*/
+
 
     public static final String FILTER_EFFECT_FROM = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " >= :" + Effect.FILTERPARAM_EFFECT_FROM + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " is null)";
     public static final String FILTER_EFFECT_TO = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " < :" + Effect.FILTERPARAM_EFFECT_TO + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " is null)";
@@ -112,6 +123,66 @@ public abstract class CprBitemporalRecord<E extends CprEntity> extends CprMonote
     public boolean isHistoric() {
         return this.historic;
     }
+
+
+
+    public CprBitemporalRecord setAnnKor(Character annkor) {
+        if (annkor != null) {
+            if (annkor == 'A') {
+                this.setUndo(true);
+            } else if (annkor == 'K') {
+                this.setCorrection(true);
+            } else if (annkor == 'Æ') {
+                this.setTechnicalCorrection(true);
+            }
+        }
+        return this;
+    }
+
+
+    //@Column(name = DB_FIELD_CORRECTED)
+    @Transient
+    private boolean correction = false;
+
+    public CprBitemporalRecord setCorrection(boolean correction) {
+        this.correction = correction;
+        return this;
+    }
+
+    public boolean isCorrection() {
+        return this.correction;
+    }
+
+
+    @Transient
+    private boolean technicalCorrection = false;
+
+    public CprBitemporalRecord setTechnicalCorrection(boolean technicalCorrection) {
+        this.technicalCorrection = technicalCorrection;
+        return this;
+    }
+
+    public boolean isTechnicalCorrection() {
+        return this.technicalCorrection;
+    }
+
+
+
+    public static final String DB_FIELD_UNDO = "undo";
+
+    //@Column(name = DB_FIELD_UNDO)
+    @Transient
+    private boolean undo = false;
+
+    public boolean isUndo() {
+        return this.undo;
+    }
+
+    public CprBitemporalRecord setUndo(boolean undo) {
+        this.undo = undo;
+        return this;
+    }
+
 
 
     public CprBitemporalRecord setBitemporality(OffsetDateTime registrationFrom, OffsetDateTime registrationTo, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {

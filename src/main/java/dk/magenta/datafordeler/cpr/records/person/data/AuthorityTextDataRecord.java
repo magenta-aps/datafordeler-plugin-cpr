@@ -5,13 +5,17 @@ import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
 import javax.persistence.Column;
+import javax.persistence.FetchType;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 
 @MappedSuperclass
-public abstract class AuthorityTextDataRecord extends CprBitemporalPersonRecord {
+public abstract class AuthorityTextDataRecord<S extends AuthorityTextDataRecord<S>> extends CprBitemporalPersonRecord<S> {
 
     public AuthorityTextDataRecord(String text, String correctionMarking) {
         this.text = text;

@@ -6,9 +6,9 @@ import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Storage for data on a Person's church verification,
@@ -22,7 +22,7 @@ import javax.persistence.Table;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CitizenshipVerificationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CitizenshipVerificationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-public class CitizenshipVerificationDataRecord extends VerificationDataRecord {
+public class CitizenshipVerificationDataRecord extends VerificationDataRecord<CitizenshipVerificationDataRecord> {
 
     public static final String TABLE_NAME = "cpr_person_citizenship_verification_record";
 
@@ -32,6 +32,17 @@ public class CitizenshipVerificationDataRecord extends VerificationDataRecord {
     public CitizenshipVerificationDataRecord(boolean verified) {
         super(verified);
     }
+
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
+    private Set<CitizenshipVerificationDataRecord> correctors = new HashSet<>();
+
+    public Set<CitizenshipVerificationDataRecord> getCorrectors() {
+        return this.correctors;
+    }
+
+
 
     @Override
     protected CitizenshipVerificationDataRecord clone() {

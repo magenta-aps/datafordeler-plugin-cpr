@@ -86,14 +86,17 @@ public class HistoricCitizenshipRecord extends HistoricPersonDataRecord {
     public List<CprBitemporalRecord> getBitemporalRecords() {
 
         ArrayList<CprBitemporalRecord> records = new ArrayList<>();
-
+        Character annkor = this.getChar("annkor");
+        boolean corrected = Character.valueOf('K').equals(annkor);
+        boolean undo = Character.valueOf('A').equals(annkor);
         records.add(new CitizenshipDataRecord(
                 this.getInt("landekod")
         ).setAuthority(
                 this.getInt("start_mynkod-statsborgerskab")
         ).setBitemporality( // TODO: Monotemporal?
                 this.citizenshipTemporality // TODO: mangler registrationTo
-        ).setHistoric());
+        ).setHistoric(
+        ).setAnnKor(annkor));
 
         records.add(new CitizenshipVerificationDataRecord(
                 this.getBoolean("dok-statsborgerskab")
@@ -101,7 +104,8 @@ public class HistoricCitizenshipRecord extends HistoricPersonDataRecord {
                 this.getInt("dok_mynkod-statsborgerskab")
         ).setBitemporality(
                 this.documentTemporality
-        ).setHistoric());
+        ).setHistoric(
+        ).setAnnKor(annkor));
 
         return records;
     }

@@ -15,7 +15,7 @@ import java.util.Objects;
  * referenced by {@link PersonBaseData}
  */
 @MappedSuperclass
-public abstract class VerificationDataRecord extends CprBitemporalPersonRecord {
+public abstract class VerificationDataRecord<S extends VerificationDataRecord<S>> extends CprBitemporalPersonRecord<S> {
 
     public VerificationDataRecord() {
     }

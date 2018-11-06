@@ -6,12 +6,11 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Storage for data on a Person's addressing name,
@@ -25,7 +24,7 @@ import java.util.Objects;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + AddressNameDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + AddressNameDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-public class AddressNameDataRecord extends CprBitemporalPersonRecord {
+public class AddressNameDataRecord extends CprBitemporalPersonRecord<AddressNameDataRecord> {
 
     public static final String TABLE_NAME = "cpr_person_address_name_record";
 
@@ -63,6 +62,14 @@ public class AddressNameDataRecord extends CprBitemporalPersonRecord {
 
     public void setRapportnavne(boolean rapportnavne) {
         this.rapportnavne = rapportnavne;
+    }
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
+    private Set<AddressNameDataRecord> correctors = new HashSet<>();
+
+    public Set<AddressNameDataRecord> getCorrectors() {
+        return this.correctors;
     }
 
     @Override

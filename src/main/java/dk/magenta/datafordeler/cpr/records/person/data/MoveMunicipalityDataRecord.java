@@ -6,13 +6,12 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Storage for data on a Person's moving between municipalities,
@@ -26,7 +25,7 @@ import java.util.Objects;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + MoveMunicipalityDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + MoveMunicipalityDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-public class MoveMunicipalityDataRecord extends CprBitemporalPersonRecord {
+public class MoveMunicipalityDataRecord extends CprBitemporalPersonRecord<MoveMunicipalityDataRecord> {
 
     public static final String TABLE_NAME = "cpr_person_movemunicipality_record";
 
@@ -122,6 +121,17 @@ public class MoveMunicipalityDataRecord extends CprBitemporalPersonRecord {
     public void setInDatetimeUncertain(boolean inDatetimeUncertain) {
         this.inDatetimeUncertain = inDatetimeUncertain;
     }
+
+
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
+    private Set<MoveMunicipalityDataRecord> correctors = new HashSet<>();
+
+    public Set<MoveMunicipalityDataRecord> getCorrectors() {
+        return this.correctors;
+    }
+
 
     @Override
     public boolean equalData(Object o) {

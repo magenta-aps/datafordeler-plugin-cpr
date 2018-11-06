@@ -5,9 +5,9 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Storage for data on a Person's name authority data,
@@ -21,7 +21,7 @@ import javax.persistence.Table;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameAuthorityTextDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameAuthorityTextDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-public class NameAuthorityTextDataRecord extends AuthorityTextDataRecord {
+public class NameAuthorityTextDataRecord extends AuthorityTextDataRecord<NameAuthorityTextDataRecord> {
 
     public static final String TABLE_NAME = "cpr_person_name_authoritytext_record";
 
@@ -31,6 +31,17 @@ public class NameAuthorityTextDataRecord extends AuthorityTextDataRecord {
     public NameAuthorityTextDataRecord(String text, String correctionMarking) {
         super(text, correctionMarking);
     }
+
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
+    private Set<NameAuthorityTextDataRecord> correctors = new HashSet<>();
+
+    public Set<NameAuthorityTextDataRecord> getCorrectors() {
+        return this.correctors;
+    }
+
+
 
     @Override
     protected NameAuthorityTextDataRecord clone() {

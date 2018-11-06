@@ -14,6 +14,7 @@ import dk.magenta.datafordeler.cpr.records.person.AddressRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import dk.magenta.datafordeler.cpr.records.person.ForeignAddressRecord;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.AddressDataRecord;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -250,13 +251,23 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     @Override
     protected void parseAlternate(PersonEntity entity, Collection<PersonDataRecord> records, ImportMetadata importMetadata) {
         OffsetDateTime updateTime = importMetadata.getImportTime();
+        int i = 1;
         for (PersonDataRecord record : records) {
+            System.out.println("-------------------------");
+            System.out.println(record.getLine());
+            System.out.println(i);
             for (CprBitemporalRecord bitemporalRecord : record.getBitemporalRecords()) {
                 bitemporalRecord.setDafoUpdated(updateTime);
                 bitemporalRecord.setOrigin(record.getOrigin());
+                bitemporalRecord.cnt = i;
                 entity.addBitemporalRecord((CprBitemporalPersonRecord) bitemporalRecord, importMetadata.getSession());
             }
+            i++;
         }
+        /*System.out.println("Resulting addresses: ");
+        for (AddressDataRecord addressDataRecord : entity.getAddress()) {
+            System.out.println(addressDataRecord.cnt+" "+addressDataRecord.getMunicipalityCode()+"|"+addressDataRecord.getRoadCode()+"|"+addressDataRecord.getHouseNumber()+"|"+addressDataRecord.getFloor()+"|"+addressDataRecord.getDoor()+"    "+addressDataRecord.getBitemporality());
+        }*/
     }
 
 }

@@ -24,6 +24,7 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
 
     public HistoricAddressRecord(String line) throws ParseException {
         super(line);
+        //System.out.println(line);
         this.obtain("annkor", 14, 1);
         this.obtain("start_mynkod-personbolig", 15, 4);
         this.obtain("adr_ts", 19, 12);
@@ -47,7 +48,11 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
         this.obtain("fraflykomdto", 158, 12);
         this.obtain("fraflykomdt_umrk", 170, 1);
 
+
         this.addressTemporality = new CprBitemporality(this.getOffsetDateTime("adr_ts"), null, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), this.getOffsetDateTime("fraflydto"), this.getBoolean("fraflydto_umrk"));
+
+        //System.out.println(this.addressTemporality);
+
         this.conameTemporality = new CprBitemporality(this.getOffsetDateTime("convn_ts"));
         this.municipalityTemporality = new CprBitemporality(this.getOffsetDateTime("tilfra_ts"));
     }
@@ -163,18 +168,18 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
                 this.getString("husnr", true),
                 this.get("etage"),
                 this.getString("sidedoer", true),
-                this.get("adr1-supladr"),
-                this.get("adr2-supladr"),
-                this.get("adr3-supladr"),
-                this.get("adr4-supladr"),
-                this.get("adr5-supladr"),
+                "",
+                "",
+                "",
+                "",
+                "",
                 this.getInt("adrtxttype"),
                 this.getInt("start_mynkod-adrtxt")
         ).setAuthority(
                 this.getInt("start_mynkod-personbolig")
         ).setBitemporality(
                 this.addressTemporality
-        ).setHistoric());
+        ));
 
         records.add(new AddressConameDataRecord(
                 this.get("convn")
@@ -187,7 +192,8 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
                 this.getBoolean("tilflydto_umrk"),
                 this.getOffsetDateTime("fraflydto"),
                 this.getBoolean("fraflydto_umrk")
-        ).setHistoric());
+        ).setHistoric(
+        ));
 
         records.add(new MoveMunicipalityDataRecord(
                 this.getDateTime("fraflykomdto"),
@@ -204,7 +210,15 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
                 this.getBoolean("tilflydto_umrk"),
                 this.getOffsetDateTime("fraflydto"),
                 this.getBoolean("fraflydto_umrk")
-        ).setHistoric());
+        ).setHistoric(
+        ));
+
+        Character annkor = this.getChar("annkor");
+        for (CprBitemporalRecord p : records) {
+            //p.line = this.getLine();
+            p.setHistoric();
+            p.setAnnKor(annkor);
+        }
 
         return records;
     }

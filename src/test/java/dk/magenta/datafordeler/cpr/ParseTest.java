@@ -60,6 +60,7 @@ public class ParseTest {
 
 
     private void loadPerson(ImportMetadata importMetadata) throws DataFordelerException, IOException {
+        System.out.println("LOAD PERSON");
         InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
         personEntityManager.parseData(testData, importMetadata);
         testData.close();
@@ -119,16 +120,17 @@ public class ParseTest {
         importMetadata.setTransactionInProgress(true);
         PersonQuery query = new PersonQuery();
         try {
-            ObjectNode importConfiguration = (ObjectNode) objectMapper.readTree("{\""+ CprEntityManager.IMPORTCONFIG_PNR+"\":\"0101008888\"}");
+            //ObjectNode importConfiguration = (ObjectNode) objectMapper.readTree("{\""+ CprEntityManager.IMPORTCONFIG_PNR+"\":\"0706852417\"}");
+            ObjectNode importConfiguration = objectMapper.createObjectNode();
             importMetadata.setImportConfiguration(importConfiguration);
             loadPerson(importMetadata);
-
+/*
             query.setFornavn("Tester");
             List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
             Assert.assertEquals(0, entities.size());
 
             importConfiguration.remove(CprEntityManager.IMPORTCONFIG_PNR);
-            loadPerson(importMetadata);
+            //loadPerson(importMetadata);
 
             entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
             Assert.assertEquals(1, entities.size());
@@ -140,7 +142,7 @@ public class ParseTest {
                         //new PersonOutputWrapper().wrapResult(entity, query)
                             entity
                     )
-            );
+            );*/
 
         } finally {
             transaction.rollback();

@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.database.*;
@@ -17,9 +18,11 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.HistoricPersonDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.AddressDataRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -241,6 +244,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     List<T> chunkRecords = parser.parse(dataChunks, charset);
                     log.debug("Batch parsed into " + chunkRecords.size() + " records");
                     timer.measure(TASK_PARSE);
+                    E test = null;
 
                     if (!chunkRecords.isEmpty()) {
 
@@ -248,13 +252,14 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                             session.beginTransaction();
                             importMetadata.setTransactionInProgress(true);
                         }
+                        LinkedHashSet<UUID> uuids = new LinkedHashSet<>();
+
                         try {
 
                             // Find Entities (or create those that are missing), and put them in the recordMap
                             timer.start(TASK_FIND_ENTITY);
                             ListHashMap<E, T> recordMap = new ListHashMap<>();
                             HashMap<UUID, E> entityCache = new HashMap<>();
-                            LinkedHashSet<UUID> uuids = new LinkedHashSet<>();
                             for (T record : chunkRecords) {
                                 this.checkInterrupt(importMetadata);
                                 this.handleRecord(record, importMetadata);
@@ -266,6 +271,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                         Identification identification = QueryManager.getOrCreateIdentification(session, uuid, this.getDomain());
                                         entity = QueryManager.getEntity(session, identification, this.getEntityClass());
                                         if (entity == null) {
+                                            System.out.println("Create new entity");
                                             entity = this.createBasicEntity(record);
                                             entity.setIdentifikation(identification);
                                         }
@@ -283,144 +289,13 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                 E entity = entityCache.get(uuid);
                                 List<T> records = recordMap.get(entity);
 
-
+                                System.out.println("Saving entity "+System.identityHashCode(entity));
+                                session.saveOrUpdate(entity);
                                 this.parseAlternate(entity, records, importMetadata);
 
-
-                                ListHashMap<CprBitemporality, T> groups = this.sortIntoGroups(records);
-                                HashSet<R> entityRegistrations = new HashSet<>();
-
-                                ArrayList<CprBitemporality> sortedBitemporalities = new ArrayList<>(groups.keySet());
-                                sortedBitemporalities.sort(CprBitemporality::compareTo);
-
-                                for (CprBitemporality bitemporality :sortedBitemporalities) {
-                                    //System.out.println("Bitemporality "+bitemporality.toString());
-
-                                    timer.start(TASK_FIND_REGISTRATIONS);
-                                    List<T> groupRecords = groups.get(bitemporality);
-
-                                    ArrayList<String> recordtypes = new ArrayList<>();
-                                    for (T rec : groupRecords) {
-                                        recordtypes.add(rec.getRecordType());
-                                    }
-
-                                    //List<R> registrations = entity.findRegistrations(bitemporality.registrationFrom, bitemporality.registrationTo);
-                                    HashSet<R> registrations = new HashSet<>();
-                                    for (R reg : entity.getRegistrations()) {
-                                        if (Equality.equal(reg.getRegistrationFrom(), bitemporality.registrationFrom) && Equality.equal(reg.getRegistrationTo(), bitemporality.registrationTo)){
-                                            registrations.add(reg);
-                                        }
-                                    }
-                                    if (registrations.isEmpty()) {
-                                        R reg = entity.createRegistration();
-                                        reg.setRegistrationFrom(bitemporality.registrationFrom);
-                                        reg.setRegistrationTo(bitemporality.registrationTo);
-                                        registrations.add(reg);
-                                    }
-
-
-                                    ArrayList<V> effects = new ArrayList<>();
-                                    for (R registration : registrations) {
-                                        this.checkInterrupt(importMetadata);
-                                        V effect = registration.getEffect(bitemporality);
-                                        if (effect == null) {
-                                            effect = registration.createEffect(bitemporality);
-                                            //System.out.println("Create new effect "+effect);
-                                        } else {
-                                            //System.out.println("Use existing effect "+effect);
-                                        }
-                                        effects.add(effect);
-                                    }
-                                    entityRegistrations.addAll(registrations);
-                                    timer.measure(TASK_FIND_REGISTRATIONS);
-
-
-                                    // R-V-D scenario
-                                    // Every DataItem that we locate for population must match the given effects exactly,
-                                    // or we risk assigning data to an item that shouldn't be assigned to
-
-                                    timer.start(TASK_POPULATE_DATA);
-                                    for (V e : effects) {
-                                        if (e.getDataItems().isEmpty()) {
-                                            D baseData = this.createDataItem();
-                                            baseData.addEffect(e);
-                                        }
-                                        for (D baseData : e.getDataItems()) {
-                                            for (T record : groupRecords) {
-                                                boolean updated = false;
-
-                                                if (record.populateBaseData(baseData, bitemporality, session, importMetadata)) {
-                                                       updated = true;
-                                                }
-                                                this.checkInterrupt(importMetadata);
-                                                if (updated) {
-                                                    baseData.setUpdated(importMetadata.getImportTime());
-                                                    if (SAVE_RECORD_DATA) {
-                                                        RecordData recordData = new RecordData(importMetadata.getImportTime());
-                                                        recordData.setSourceData(record.getLine());
-                                                        baseData.addRecordData(recordData);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    timer.measure(TASK_POPULATE_DATA);
-
-
-                                    // When a historic piece of data should be used instead of an earlier loaded piece,
-                                    // e.g. an address that was loaded as "current" is later found to be present as "historic",
-                                    // we should remove the old entry that has effectTo=null; the historic data is already loaded in with effectTo!=null
-                                    for (R registration : registrations) {
-                                        V effect = registration.getEffect(bitemporality.effectFrom, bitemporality.effectFromUncertain, null, false);
-                                        if (effect != null) {
-                                            CprBitemporality outdatedTemporality = bitemporality.withEffect(effect);
-                                            for (T record : groupRecords) {
-                                                if (record instanceof HistoricPersonDataRecord) {
-                                                    HistoricPersonDataRecord historicRecord = (HistoricPersonDataRecord) record;
-                                                    for (D baseData : effect.getDataItems()) {
-                                                        PersonBaseData personBaseData = (PersonBaseData) baseData;
-                                                        if (historicRecord.cleanBaseData(personBaseData, bitemporality, outdatedTemporality, session)) {
-                                                            if (personBaseData.isEmpty()) {
-                                                                HashSet<PersonEffect> personEffects = new HashSet<>(personBaseData.getEffects());
-                                                                for (PersonEffect personEffect : personEffects) {
-                                                                    personBaseData.removeEffect(personEffect);
-                                                                }
-                                                                session.delete(personBaseData);
-                                                                for (PersonEffect personEffect : personEffects) {
-                                                                    if (personEffect.getDataItems().isEmpty()) {
-                                                                        personEffect.getRegistration().removeEffect(personEffect);
-                                                                        session.delete(personEffect);
-                                                                    }
-                                                                }
-                                                            } else {
-                                                                baseData.setUpdated(importMetadata.getImportTime());
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                timer.start(TASK_SAVE);
-                                ArrayList<R> registrationList = new ArrayList<>(entityRegistrations);
-                                Collections.sort(registrationList);
-                                int j = 0;
-
-                                session.save(entity);
-
-                                for (R registration : registrationList) {
-                                    this.checkInterrupt(importMetadata);
-                                    registration.setSequenceNumber(j++);
-                                    registration.setLastImportTime(importMetadata.getImportTime());
-                                    try {
-                                        session.save(registration);
-                                    } catch (javax.persistence.EntityNotFoundException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                timer.measure(TASK_SAVE);
+                                session.saveOrUpdate(entity);
+                                //this.parseRVD(entity, records, importMetadata);
+                                test = entity;
                             }
 
                             this.checkInterrupt(importMetadata);
@@ -433,12 +308,40 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                             }
                             e.setChunk(chunkCount);
                             throw e;
+                        //} catch (JsonProcessingException e) {
+                        //    e.printStackTrace();
                         }
 
                         System.out.println("flushing");
                         session.flush();
+
+                        if (test != null) {
+                            for (AddressDataRecord dataRecord : ((PersonEntity)test).getAddress()) {
+                                System.out.println(dataRecord.getId()+"  "+System.identityHashCode(dataRecord));
+                            }
+                        }
+
+
+
                         session.clear();
-                        if (!wrappedInTransaction) {
+
+
+                        for (UUID uuid : uuids) {
+                            System.out.println(uuid);
+                            E entity = QueryManager.getEntity(session, uuid, this.getEntityClass());
+                            PersonEntity personEntity = (PersonEntity) entity;
+                            ArrayList<AddressDataRecord> addressDataRecords = new ArrayList<>(personEntity.getAddress());
+                            addressDataRecords.sort(Comparator.comparing(CprBitemporalRecord::getCnt));
+                            for (AddressDataRecord addressDataRecord : addressDataRecords) {
+                                try {
+                                    System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(addressDataRecord));
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                            if (!wrappedInTransaction) {
                             System.out.println("committing transaction");
                             session.getTransaction().commit();
                             importMetadata.setTransactionInProgress(false);
@@ -464,8 +367,147 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 e.setEntityManager(this);
                 throw e;
             }
+
+            ////////////////////
+            break;
+
+
         }
         return null;
+    }
+
+    private void parseRVD(E entity, List<T> records, ImportMetadata importMetadata) throws ImportInterruptedException {
+        Session session = importMetadata.getSession();
+        ListHashMap<CprBitemporality, T> groups = this.sortIntoGroups(records);
+        HashSet<R> entityRegistrations = new HashSet<>();
+
+        ArrayList<CprBitemporality> sortedBitemporalities = new ArrayList<>(groups.keySet());
+        sortedBitemporalities.sort(CprBitemporality::compareTo);
+
+        for (CprBitemporality bitemporality :sortedBitemporalities) {
+            //System.out.println("Bitemporality "+bitemporality.toString());
+
+            timer.start(TASK_FIND_REGISTRATIONS);
+            List<T> groupRecords = groups.get(bitemporality);
+
+            ArrayList<String> recordtypes = new ArrayList<>();
+            for (T rec : groupRecords) {
+                recordtypes.add(rec.getRecordType());
+            }
+
+            //List<R> registrations = entity.findRegistrations(bitemporality.registrationFrom, bitemporality.registrationTo);
+            HashSet<R> registrations = new HashSet<>();
+            for (R reg : entity.getRegistrations()) {
+                if (Equality.equal(reg.getRegistrationFrom(), bitemporality.registrationFrom) && Equality.equal(reg.getRegistrationTo(), bitemporality.registrationTo)){
+                    registrations.add(reg);
+                }
+            }
+            if (registrations.isEmpty()) {
+                R reg = entity.createRegistration();
+                reg.setRegistrationFrom(bitemporality.registrationFrom);
+                reg.setRegistrationTo(bitemporality.registrationTo);
+                registrations.add(reg);
+            }
+
+
+            ArrayList<V> effects = new ArrayList<>();
+            for (R registration : registrations) {
+                this.checkInterrupt(importMetadata);
+                V effect = registration.getEffect(bitemporality);
+                if (effect == null) {
+                    effect = registration.createEffect(bitemporality);
+                    //System.out.println("Create new effect "+effect);
+                } else {
+                    //System.out.println("Use existing effect "+effect);
+                }
+                effects.add(effect);
+            }
+            entityRegistrations.addAll(registrations);
+            timer.measure(TASK_FIND_REGISTRATIONS);
+
+
+            // R-V-D scenario
+            // Every DataItem that we locate for population must match the given effects exactly,
+            // or we risk assigning data to an item that shouldn't be assigned to
+
+            timer.start(TASK_POPULATE_DATA);
+            for (V e : effects) {
+                if (e.getDataItems().isEmpty()) {
+                    D baseData = this.createDataItem();
+                    baseData.addEffect(e);
+                }
+                for (D baseData : e.getDataItems()) {
+                    for (T record : groupRecords) {
+                        boolean updated = false;
+
+                        if (record.populateBaseData(baseData, bitemporality, session, importMetadata)) {
+                               updated = true;
+                        }
+                        this.checkInterrupt(importMetadata);
+                        if (updated) {
+                            baseData.setUpdated(importMetadata.getImportTime());
+                            if (SAVE_RECORD_DATA) {
+                                RecordData recordData = new RecordData(importMetadata.getImportTime());
+                                recordData.setSourceData(record.getLine());
+                                baseData.addRecordData(recordData);
+                            }
+                        }
+                    }
+                }
+            }
+            timer.measure(TASK_POPULATE_DATA);
+
+
+            // When a historic piece of data should be used instead of an earlier loaded piece,
+            // e.g. an address that was loaded as "current" is later found to be present as "historic",
+            // we should remove the old entry that has effectTo=null; the historic data is already loaded in with effectTo!=null
+            for (R registration : registrations) {
+                V effect = registration.getEffect(bitemporality.effectFrom, bitemporality.effectFromUncertain, null, false);
+                if (effect != null) {
+                    CprBitemporality outdatedTemporality = bitemporality.withEffect(effect);
+                    for (T record : groupRecords) {
+                        if (record instanceof HistoricPersonDataRecord) {
+                            HistoricPersonDataRecord historicRecord = (HistoricPersonDataRecord) record;
+                            for (D baseData : effect.getDataItems()) {
+                                PersonBaseData personBaseData = (PersonBaseData) baseData;
+                                if (historicRecord.cleanBaseData(personBaseData, bitemporality, outdatedTemporality, session)) {
+                                    if (personBaseData.isEmpty()) {
+                                        HashSet<PersonEffect> personEffects = new HashSet<>(personBaseData.getEffects());
+                                        for (PersonEffect personEffect : personEffects) {
+                                            personBaseData.removeEffect(personEffect);
+                                        }
+                                        session.delete(personBaseData);
+                                        for (PersonEffect personEffect : personEffects) {
+                                            if (personEffect.getDataItems().isEmpty()) {
+                                                personEffect.getRegistration().removeEffect(personEffect);
+                                                session.delete(personEffect);
+                                            }
+                                        }
+                                    } else {
+                                        baseData.setUpdated(importMetadata.getImportTime());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        ArrayList<R> registrationList = new ArrayList<>(entityRegistrations);
+        Collections.sort(registrationList);
+        int j = 0;
+
+        for (R registration : registrationList) {
+            this.checkInterrupt(importMetadata);
+            registration.setSequenceNumber(j++);
+            registration.setLastImportTime(importMetadata.getImportTime());
+            try {
+                session.save(registration);
+            } catch (javax.persistence.EntityNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     protected boolean filter(T record, ObjectNode importConfiguration) {

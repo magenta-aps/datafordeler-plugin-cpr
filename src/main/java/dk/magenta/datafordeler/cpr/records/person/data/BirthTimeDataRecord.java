@@ -9,7 +9,9 @@ import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Storage for data on a Person's birth,
@@ -24,7 +26,7 @@ import java.util.Objects;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthTimeDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthTimeDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-public class BirthTimeDataRecord extends CprBitemporalPersonRecord {
+public class BirthTimeDataRecord extends CprBitemporalPersonRecord<BirthTimeDataRecord> {
 
     public static final String TABLE_NAME = "cpr_person_birthtime_record";
 
@@ -82,6 +84,17 @@ public class BirthTimeDataRecord extends CprBitemporalPersonRecord {
     public void setFoedselsraekkefoelge(int foedselsraekkefoelge) {
         this.foedselsraekkefoelge = foedselsraekkefoelge;
     }
+
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
+    private Set<BirthTimeDataRecord> correctors = new HashSet<>();
+
+    public Set<BirthTimeDataRecord> getCorrectors() {
+        return this.correctors;
+    }
+
+
 
     @Override
     public boolean equalData(Object o) {

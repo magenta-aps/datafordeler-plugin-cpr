@@ -18,7 +18,7 @@ import java.util.Objects;
         @FilterDef(name = Monotemporal.FILTER_REGISTRATION_AFTER, parameters = @ParamDef(name = Monotemporal.FILTERPARAM_REGISTRATION_AFTER, type = "java.time.OffsetDateTime")),
         @FilterDef(name = Monotemporal.FILTER_REGISTRATION_BEFORE, parameters = @ParamDef(name = Monotemporal.FILTERPARAM_REGISTRATION_BEFORE, type = "java.time.OffsetDateTime"))
 })
-public abstract class CprMonotemporalRecord<E extends CprEntity> extends CprNontemporalRecord<E> implements Monotemporal<E> {
+public abstract class CprMonotemporalRecord<E extends CprEntity, S extends CprMonotemporalRecord<E, S>> extends CprNontemporalRecord<E, S> implements Monotemporal<E> {
 
     public static final String DB_FIELD_ENTITY = CprNontemporalRecord.DB_FIELD_ENTITY;
 

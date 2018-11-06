@@ -124,7 +124,9 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
     public List<CprBitemporalRecord> getBitemporalRecords() {
 
         ArrayList<CprBitemporalRecord> records = new ArrayList<>();
-
+        Character annkor = this.getChar("annkor");
+        boolean corrected = Character.valueOf('K').equals(annkor);
+        boolean undo = Character.valueOf('A').equals(annkor);
         records.add(new ForeignAddressDataRecord(
                 this.get("udlandadr1"),
                 this.get("udlandadr2"),
@@ -135,7 +137,8 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
                 this.getInt("udlandadr_mynkod")
         ).setBitemporality(
                 this.foreignAddressTemporality
-        ).setHistoric());
+        ).setHistoric(
+        ).setAnnKor(annkor));
 
 
         records.add(new ForeignAddressEmigrationDataRecord(
@@ -155,7 +158,8 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
                         this.getOffsetDateTime("udrdto"), this.getMarking("udrdto_umrk"),
                         this.getOffsetDateTime("indrdto"), this.getMarking("indrdto_umrk")
                 )
-        ).setHistoric());
+        ).setHistoric(
+        ).setAnnKor(annkor));
 
         return records;
     }

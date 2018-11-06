@@ -8,7 +8,9 @@ import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Storage for data on a Person's name,
@@ -24,7 +26,7 @@ import java.util.Objects;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-public class NameDataRecord extends CprBitemporalPersonRecord {
+public class NameDataRecord extends CprBitemporalPersonRecord<NameDataRecord> {
 
     public static final String TABLE_NAME = "cpr_person_name_record";
 
@@ -185,6 +187,17 @@ public class NameDataRecord extends CprBitemporalPersonRecord {
     public void setEgetEfternavnMarkering(boolean egetEfternavnMarkering) {
         this.egetEfternavnMarkering = egetEfternavnMarkering;
     }
+
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
+    private Set<NameDataRecord> correctors = new HashSet<>();
+
+    public Set<NameDataRecord> getCorrectors() {
+        return this.correctors;
+    }
+
+
 
     @Override
     public boolean equalData(Object o) {

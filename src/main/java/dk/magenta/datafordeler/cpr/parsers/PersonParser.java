@@ -26,6 +26,10 @@ public class PersonParser extends CprSubParser<PersonDataRecord> {
     @Override
     public PersonDataRecord parseLine(String recordType, String line) {
         this.logType(recordType);
+        int idx = line.indexOf("##");
+        if (idx != -1) {
+            line = line.substring(0, idx);
+        }
         try {
             switch (recordType) {
                 case PersonDataRecord.RECORDTYPE_PERSON:

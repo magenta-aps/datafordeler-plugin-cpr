@@ -6,12 +6,11 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Storage for data on a Person's core data (gender, current cpr number),
@@ -25,7 +24,7 @@ import java.util.Objects;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonCoreDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonCoreDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
 })
-public class PersonCoreDataRecord extends CprBitemporalPersonRecord {
+public class PersonCoreDataRecord extends CprBitemporalPersonRecord<PersonCoreDataRecord> {
 
     public static final String TABLE_NAME = "cpr_person_core_record";
 
@@ -69,6 +68,17 @@ public class PersonCoreDataRecord extends CprBitemporalPersonRecord {
             }
         }
     }
+
+
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
+    private Set<PersonCoreDataRecord> correctors = new HashSet<>();
+
+    public Set<PersonCoreDataRecord> getCorrectors() {
+        return this.correctors;
+    }
+
+
 
     @Override
     public boolean equalData(Object o) {

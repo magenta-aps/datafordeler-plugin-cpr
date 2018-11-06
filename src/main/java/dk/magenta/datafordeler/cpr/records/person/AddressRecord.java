@@ -206,6 +206,9 @@ public class AddressRecord extends PersonDataRecord {
                 false
         ));
 
+        /*for (CprBitemporalRecord p : records) {
+            p.line = this.getLine();
+        }*/
         return records;
     }
 

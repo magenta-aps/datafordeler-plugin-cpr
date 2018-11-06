@@ -119,7 +119,9 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
     public List<CprBitemporalRecord> getBitemporalRecords() {
 
         ArrayList<CprBitemporalRecord> records = new ArrayList<>();
-
+        Character annkor = this.getChar("annkor");
+        boolean corrected = Character.valueOf('K').equals(annkor);
+        boolean undo = Character.valueOf('A').equals(annkor);
         records.add(new CivilStatusDataRecord(
                 null,
                 this.getString("civst", true),
@@ -132,7 +134,8 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
                 this.getInt("start_mynkod-civilstand")
         ).setBitemporality(
                 this.civilTemporality
-        ).setHistoric());
+        ).setHistoric(
+        ).setAnnKor(annkor));
 
         records.add(new CivilStatusVerificationDataRecord(
                 this.getBoolean("dok-civilstand"),
@@ -141,7 +144,8 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
                 this.getInt("dok_mynkod-civilstand")
         ).setBitemporality(
                 this.documentTemporality
-        ).setHistoric());
+        ).setHistoric(
+        ).setAnnKor(annkor));
 
         records.add(new CivilStatusAuthorityTextDataRecord(
                 this.getString("myntxt-civilstand", true),
@@ -150,7 +154,8 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
                 this.getInt("myntxt_mynkod-civilstand")
         ).setBitemporality(
                 this.officiaryTemporality
-        ).setHistoric());
+        ).setHistoric(
+        ).setAnnKor(annkor));
 
         return records;
     }
