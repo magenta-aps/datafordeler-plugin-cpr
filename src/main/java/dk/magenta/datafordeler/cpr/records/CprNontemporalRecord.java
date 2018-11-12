@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.core.database.Nontemporal;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.FilterDefs;
 import org.hibernate.annotations.ParamDef;
@@ -16,7 +15,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -61,26 +59,40 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
         return this.cnt;
     }
 
-    public static final String DB_FIELD_CORRECTION_OF = "correctionOf";
+
+
+    public static final String DB_FIELD_CORRECTION_OF = "correctionof";
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private S correctionOf;
+    private S correctionof;
 
-    public S getCorrectionOf() {
-        return this.correctionOf;
+    public S getCorrectionof() {
+        return this.correctionof;
     }
 
-    public void setCorrectionOf(S correctionOf) {
-        this.correctionOf = correctionOf;
+    public void setCorrectionof(S correctionof) {
+        this.correctionof = correctionof;
     }
 
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
+    @JsonIgnore
+    private S corrector;
+
+    public S getCorrector() {
+        return this.corrector;
+    }
+
+
+
+/*
     @JsonIgnore
     public abstract Set<S> getCorrectors();
 
     public void addCorrector(S corrector) {
         this.getCorrectors().add(corrector);
     }
-
+*/
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "replacedBy")
     private S replaces;

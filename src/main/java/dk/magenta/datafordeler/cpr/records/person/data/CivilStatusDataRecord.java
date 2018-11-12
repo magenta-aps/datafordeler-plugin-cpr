@@ -24,6 +24,7 @@ import java.util.Set;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CivilStatusDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CivilStatusDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CivilStatusDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CivilStatusDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF)
 })
 public class CivilStatusDataRecord extends CprBitemporalPersonRecord<CivilStatusDataRecord> {
 
@@ -154,15 +155,6 @@ public class CivilStatusDataRecord extends CprBitemporalPersonRecord<CivilStatus
 
     public void setSpouseNameMarking(boolean spouseNameMarking) {
         this.spouseNameMarking = spouseNameMarking;
-    }
-
-
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
-    private Set<CivilStatusDataRecord> correctors = new HashSet<>();
-
-    public Set<CivilStatusDataRecord> getCorrectors() {
-        return this.correctors;
     }
 
 

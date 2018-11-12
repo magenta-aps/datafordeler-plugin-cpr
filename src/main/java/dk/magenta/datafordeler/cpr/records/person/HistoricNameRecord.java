@@ -175,11 +175,7 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
         ).setBitemporality(
                 this.nameTemporality
         ).setHistoric(
-        ).setCorrection(
-                corrected
-        ).setUndo(
-                undo
-        ));
+        ).setAnnKor(annkor));
 
         records.add(new NameVerificationDataRecord(
                 this.getBoolean("dok-navne"),
@@ -189,11 +185,7 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
         ).setBitemporality(
                 this.documentNameTemporality
         ).setHistoric(
-        ).setCorrection(
-                corrected
-        ).setUndo(
-                undo
-        ));
+        ).setAnnKor(annkor));
 
         records.add(new NameAuthorityTextDataRecord(
                 this.getString("myntxt-navne", true),
@@ -203,11 +195,7 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
         ).setBitemporality(
                 this.officiaryTemporality
         ).setHistoric(
-        ).setCorrection(
-                corrected
-        ).setUndo(
-                undo
-        ));
+        ).setAnnKor(annkor));
 
         return records;
     }

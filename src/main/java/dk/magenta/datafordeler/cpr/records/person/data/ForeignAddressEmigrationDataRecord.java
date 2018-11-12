@@ -24,6 +24,7 @@ import java.util.Set;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressEmigrationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressEmigrationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressEmigrationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressEmigrationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF)
 })
 public class ForeignAddressEmigrationDataRecord extends CprBitemporalPersonRecord<ForeignAddressEmigrationDataRecord> {
 
@@ -100,16 +101,6 @@ public class ForeignAddressEmigrationDataRecord extends CprBitemporalPersonRecor
 
     public void setImmigrationRegistration(OffsetDateTime immigrationRegistration) {
         this.immigrationRegistration = immigrationRegistration;
-    }
-
-
-
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
-    private Set<ForeignAddressEmigrationDataRecord> correctors = new HashSet<>();
-
-    public Set<ForeignAddressEmigrationDataRecord> getCorrectors() {
-        return this.correctors;
     }
 
 

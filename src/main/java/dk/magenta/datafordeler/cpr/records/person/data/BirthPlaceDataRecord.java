@@ -21,8 +21,7 @@ import java.util.Set;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthPlaceDataRecord.TABLE_NAME + BirthPlaceDataRecord.DB_FIELD_BIRTH_PLACE_CODE, columnList = BirthPlaceDataRecord.DB_FIELD_BIRTH_PLACE_CODE),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthPlaceDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_FROM, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthPlaceDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthPlaceDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthPlaceDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + BirthPlaceDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM)
 })
 public class BirthPlaceDataRecord extends CprBitemporalPersonRecord<BirthPlaceDataRecord> {
 
@@ -71,13 +70,6 @@ public class BirthPlaceDataRecord extends CprBitemporalPersonRecord<BirthPlaceDa
     }
 
 
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
-    private Set<BirthPlaceDataRecord> correctors = new HashSet<>();
-
-    public Set<BirthPlaceDataRecord> getCorrectors() {
-        return this.correctors;
-    }
 
     @Override
     public boolean equalData(Object o) {

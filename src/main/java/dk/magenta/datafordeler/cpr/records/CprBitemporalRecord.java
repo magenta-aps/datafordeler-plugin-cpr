@@ -30,10 +30,6 @@ public abstract class CprBitemporalRecord<E extends CprEntity, S extends CprBite
     //@Column
     //public String line;
 
-/*
-    @Column(name = "cnt")
-    public int cnt;
-*/
 
 
     public static final String FILTER_EFFECT_FROM = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " >= :" + Effect.FILTERPARAM_EFFECT_FROM + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " is null)";

@@ -24,6 +24,7 @@ import java.util.StringJoiner;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF)
 })
 public class ForeignAddressDataRecord extends CprBitemporalPersonRecord<ForeignAddressDataRecord> {
 
@@ -122,16 +123,6 @@ public class ForeignAddressDataRecord extends CprBitemporalPersonRecord<ForeignA
     public void setAddressLine5(String addressLine5) {
         this.addressLine5 = addressLine5;
     }
-
-
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
-    private Set<ForeignAddressDataRecord> correctors = new HashSet<>();
-
-    public Set<ForeignAddressDataRecord> getCorrectors() {
-        return this.correctors;
-    }
-
 
 
 

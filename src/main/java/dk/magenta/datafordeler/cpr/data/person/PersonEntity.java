@@ -104,7 +104,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
 
     public static final String DB_FIELD_ADDRESS = "address";
     public static final String IO_FIELD_ADDRESS = "adresse";
-    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Filters({
             @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
             @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
@@ -599,12 +599,6 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
         }
         if (record instanceof AddressDataRecord) {
             added = addItem(this.address, record, session);
-            if (added) {
-                System.out.println("Setting entity " + System.identityHashCode(this) + " for item " + System.identityHashCode(record));
-            }
-            /*for (AddressDataRecord a : this.address) {
-                System.out.println("Address id: "+this.getPersonnummer()+"|"+a.getId());
-            }*/
         }
         if (record instanceof AddressNameDataRecord) {
             added = addItem(this.addressName, record, session);
@@ -697,57 +691,32 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     private static Logger log = LogManager.getLogger("PersonEntity");
     private static <E extends CprBitemporalPersonRecord> boolean addItem(Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
         //log.info("Add "+newItem.getClass().getSimpleName()+"("+newItem.getAuthority()+") at "+newItem.getBitemporality()+" to set with "+set.size()+" preexisting entries");
-        boolean isAddress = false; //(newItem instanceof AddressDataRecord);
         if (newItem != null) {
-            //System.out.println("correction: "+newItem.isCorrection());
-            boolean equal = false;
             E correctedRecord = null;
             E correctingRecord = null;
             ArrayList<E> items = new ArrayList<>(set);
-            if (isAddress) System.out.println(System.identityHashCode(newItem));
-            //if (isAddress) System.out.println(newItem.line);
-            //if (isAddress) System.out.println(newItem.getBitemporality());
 
-            items.sort(Comparator.comparing(CprNontemporalRecord::getOriginDate));
-            //items.sort(Comparator.comparing(CprNontemporalRecord::getCnt));
+            //items.sort(Comparator.comparing(CprNontemporalRecord::getOriginDate));
+            items.sort(Comparator.comparing(CprNontemporalRecord::getCnt));
             for (E oldItem : items) {
-                /*
-                if (newItem.isCorrection() && Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) && Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo())) {
-                    System.out.println("CORRECTION: "+newItem.getBitemporality()+" "+oldItem.getBitemporality());
-
-                    //log.info("matching item with correction (" + newItem.getBitemporality() + "), replacing (" + oldItem.getAuthority() + ")");
-                    set.remove(oldItem);
-                    session.delete(oldItem);
-                    //System.out.println("Remove "+oldItem.cnt);
-                    return set.add((E) newItem);
-                    //return false;
-
-                }
-                */
-
 
                 if (newItem.isCorrection() || newItem.isTechnicalCorrection()) {
-                    if (Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom())) {
+                    if (newItem.equalData(oldItem) && Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) && oldItem.getCorrectionof() == null) {
                         // The new record with corrected data
                         correctingRecord = oldItem;
-                    } else if (newItem.equalData(oldItem)) {
+                    } else if (newItem.equalData(oldItem) && oldItem.getCorrector() == null) {
                         // The old record that is being corrected
                         correctedRecord = oldItem;
                     }
                 }
 
-                else if (newItem.isUndo() && Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && newItem.equalData(oldItem)) {
+                else if (newItem.isUndo() && Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && newItem.equalData(oldItem) && oldItem.getReplacedBy() == null) {
                     oldItem.setUndone(true);
-                    if (isAddress) System.out.println("oldItem id: "+System.identityHashCode(oldItem));
                     session.saveOrUpdate(oldItem);
-                    if (isAddress) System.out.println("undo");
                     return false;
                 }
 
                 else if (newItem.equalData(oldItem)) {
-
-                    equal = true;
-
                     if (
                             newItem.isHistoric() && !oldItem.isHistoric() &&
                             //Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
@@ -755,20 +724,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                             !Equality.equal(newItem.getEffectFrom(), newItem.getEffectTo())
                             && oldItem.getReplacedBy() == null
                             ) {
-
                         // Historic item matching prior current item
-
                         //log.info("matching item at " + oldItem.getBitemporality() + ", removing preexisting (" + oldItem.getAuthority() + ")");
-
                         oldItem.setReplacedBy(newItem);
-
-                        //System.out.println("Remove "+oldItem.cnt);
-                        //System.out.println("Insert "+newItem.cnt);
-                        if (isAddress) System.out.println("demote "+oldItem.cnt+" to historic");
+                        oldItem.setRegistrationTo(newItem.getRegistrationFrom());
                         return set.add((E) newItem);
-
                     } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
-                        if (isAddress) System.out.println("exact match with "+oldItem.cnt);
                         return false;
                     } else if (
                             Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
@@ -776,53 +737,21 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                             Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
                             newItem.getEffectTo() == null
                             ) {
-                        if (isAddress) System.out.println("something");
                         //log.info("matching item with insufficient temporality (" + newItem.getBitemporality() + "), not adding");
                         return false;
-                    } else {
-                        //System.out.println("Fall through");
                     }
                 } else {
                     //System.out.println(newItem.line+" is not equal to "+oldItem.line);
                 }
             }
-
-
-            if (!equal) {
-                if (isAddress) System.out.println("not equal to any existing");
-            }
             if (newItem.isCorrection() || newItem.isTechnicalCorrection()) {
-                //System.out.println("correction");
                 if (correctedRecord != null && correctingRecord != null && correctedRecord != correctingRecord) {
-                    boolean alreadyFound = false;
-                    for (Object otherCorrector : correctedRecord.getCorrectors()) {
-                        if (otherCorrector instanceof CprBitemporalRecord) {
-                            CprBitemporalRecord other = (CprBitemporalRecord) otherCorrector;
-                            if (correctingRecord.equalData(other) && correctingRecord.getBitemporality().equals(other.getBitemporality())) {
-                                alreadyFound = true;
-                                break;
-                            }
-                        } else if (otherCorrector instanceof CprNontemporalRecord) {
-                            CprNontemporalRecord other = (CprNontemporalRecord) otherCorrector;
-                            if (correctingRecord.equalData(other)) {
-                                alreadyFound = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!alreadyFound) {
+                    if (correctedRecord.getCorrector() == null) {
                         correctedRecord.setRegistrationTo(newItem.getRegistrationFrom());
-                        correctingRecord.setCorrectionOf(correctedRecord);
-                        //correctedRecord.addCorrector(correctingRecord);
-                        if (isAddress) System.out.println("record "+correctingRecord.cnt+" corrects "+correctedRecord.cnt);
-                    } else {
-                        if (isAddress) System.out.println("Orphan correction A");
+                        correctingRecord.setCorrectionof(correctedRecord);
                     }
-                } else {
-                    if (isAddress) System.out.println("Orphan correction B");
                 }
             } else {
-                if (isAddress) System.out.println("Insert");
                 //log.info("nonmatching item, adding as new");
                 return set.add((E) newItem);
             }

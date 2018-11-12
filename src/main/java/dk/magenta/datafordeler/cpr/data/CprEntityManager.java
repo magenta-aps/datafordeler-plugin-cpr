@@ -244,7 +244,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     List<T> chunkRecords = parser.parse(dataChunks, charset);
                     log.debug("Batch parsed into " + chunkRecords.size() + " records");
                     timer.measure(TASK_PARSE);
-                    E test = null;
 
                     if (!chunkRecords.isEmpty()) {
 
@@ -271,7 +270,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                         Identification identification = QueryManager.getOrCreateIdentification(session, uuid, this.getDomain());
                                         entity = QueryManager.getEntity(session, identification, this.getEntityClass());
                                         if (entity == null) {
-                                            System.out.println("Create new entity");
                                             entity = this.createBasicEntity(record);
                                             entity.setIdentifikation(identification);
                                         }
@@ -289,13 +287,10 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                                 E entity = entityCache.get(uuid);
                                 List<T> records = recordMap.get(entity);
 
-                                System.out.println("Saving entity "+System.identityHashCode(entity));
                                 session.saveOrUpdate(entity);
                                 this.parseAlternate(entity, records, importMetadata);
 
-                                session.saveOrUpdate(entity);
                                 //this.parseRVD(entity, records, importMetadata);
-                                test = entity;
                             }
 
                             this.checkInterrupt(importMetadata);
@@ -308,41 +303,12 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                             }
                             e.setChunk(chunkCount);
                             throw e;
-                        //} catch (JsonProcessingException e) {
-                        //    e.printStackTrace();
                         }
 
-                        System.out.println("flushing");
                         session.flush();
-
-                        if (test != null) {
-                            for (AddressDataRecord dataRecord : ((PersonEntity)test).getAddress()) {
-                                System.out.println(dataRecord.getId()+"  "+System.identityHashCode(dataRecord));
-                            }
-                        }
-
-
-
                         session.clear();
 
-
-                        for (UUID uuid : uuids) {
-                            System.out.println(uuid);
-                            E entity = QueryManager.getEntity(session, uuid, this.getEntityClass());
-                            PersonEntity personEntity = (PersonEntity) entity;
-                            ArrayList<AddressDataRecord> addressDataRecords = new ArrayList<>(personEntity.getAddress());
-                            addressDataRecords.sort(Comparator.comparing(CprBitemporalRecord::getCnt));
-                            for (AddressDataRecord addressDataRecord : addressDataRecords) {
-                                try {
-                                    System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(addressDataRecord));
-                                } catch (JsonProcessingException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-
-                            if (!wrappedInTransaction) {
-                            System.out.println("committing transaction");
+                        if (!wrappedInTransaction) {
                             session.getTransaction().commit();
                             importMetadata.setTransactionInProgress(false);
                         }
@@ -367,11 +333,6 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                 e.setEntityManager(this);
                 throw e;
             }
-
-            ////////////////////
-            break;
-
-
         }
         return null;
     }

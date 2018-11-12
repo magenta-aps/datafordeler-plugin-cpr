@@ -253,9 +253,9 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
         OffsetDateTime updateTime = importMetadata.getImportTime();
         int i = 1;
         for (PersonDataRecord record : records) {
-            System.out.println("-------------------------");
-            System.out.println(record.getLine());
-            System.out.println(i);
+            //System.out.println("-------------------------");
+            //System.out.println(record.getLine());
+            //System.out.println("cnt: "+i);
             for (CprBitemporalRecord bitemporalRecord : record.getBitemporalRecords()) {
                 bitemporalRecord.setDafoUpdated(updateTime);
                 bitemporalRecord.setOrigin(record.getOrigin());
@@ -264,10 +264,6 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
             }
             i++;
         }
-        /*System.out.println("Resulting addresses: ");
-        for (AddressDataRecord addressDataRecord : entity.getAddress()) {
-            System.out.println(addressDataRecord.cnt+" "+addressDataRecord.getMunicipalityCode()+"|"+addressDataRecord.getRoadCode()+"|"+addressDataRecord.getHouseNumber()+"|"+addressDataRecord.getFloor()+"|"+addressDataRecord.getDoor()+"    "+addressDataRecord.getBitemporality());
-        }*/
     }
 
 }

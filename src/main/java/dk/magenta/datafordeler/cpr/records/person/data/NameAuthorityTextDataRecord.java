@@ -20,6 +20,7 @@ import java.util.Set;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameAuthorityTextDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameAuthorityTextDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameAuthorityTextDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameAuthorityTextDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF)
 })
 public class NameAuthorityTextDataRecord extends AuthorityTextDataRecord<NameAuthorityTextDataRecord> {
 
@@ -30,15 +31,6 @@ public class NameAuthorityTextDataRecord extends AuthorityTextDataRecord<NameAut
 
     public NameAuthorityTextDataRecord(String text, String correctionMarking) {
         super(text, correctionMarking);
-    }
-
-
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
-    private Set<NameAuthorityTextDataRecord> correctors = new HashSet<>();
-
-    public Set<NameAuthorityTextDataRecord> getCorrectors() {
-        return this.correctors;
     }
 
 
