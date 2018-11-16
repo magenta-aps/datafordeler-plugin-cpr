@@ -11,6 +11,7 @@ import dk.magenta.datafordeler.cpr.records.person.data.AddressDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.MoveMunicipalityDataRecord;
 import org.hibernate.Session;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 
 /**
@@ -181,37 +182,41 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
                 this.addressTemporality
         ));
 
+        OffsetDateTime convnTs = this.getOffsetDateTime("convn_ts");
+        if (convnTs == null) {
+            convnTs = this.getOffsetDateTime("adr_ts");
+        }
         records.add(new AddressConameDataRecord(
                 this.get("convn")
         ).setAuthority(
                 this.getInt("start_mynkod-personbolig")
         ).setBitemporality(
-                this.getOffsetDateTime("convn_ts"),
+                convnTs,
                 null,
                 this.getOffsetDateTime("tilflydto"),
                 this.getBoolean("tilflydto_umrk"),
                 this.getOffsetDateTime("fraflydto"),
                 this.getBoolean("fraflydto_umrk")
-        ).setHistoric(
         ));
 
-        records.add(new MoveMunicipalityDataRecord(
-                this.getDateTime("fraflykomdto"),
-                this.getBoolean("fraflykomdt_umrk"),
-                this.getInt("fraflykomkod"),
-                this.getDateTime("tilflykomdto"),
-                this.getBoolean("tilflykomdt_umrk")
-        ).setAuthority(
-                this.getInt("tilfra_mynkod")
-        ).setBitemporality(
-                this.getOffsetDateTime("tilfra_ts"),
-                null,
-                this.getOffsetDateTime("tilflydto"),
-                this.getBoolean("tilflydto_umrk"),
-                this.getOffsetDateTime("fraflydto"),
-                this.getBoolean("fraflydto_umrk")
-        ).setHistoric(
-        ));
+        if (this.getInt("tilfra_mynkod") != 0) {
+            records.add(new MoveMunicipalityDataRecord(
+                    this.getDateTime("fraflykomdto"),
+                    this.getBoolean("fraflykomdt_umrk"),
+                    this.getInt("fraflykomkod"),
+                    this.getDateTime("tilflykomdto"),
+                    this.getBoolean("tilflykomdt_umrk")
+            ).setAuthority(
+                    this.getInt("tilfra_mynkod")
+            ).setBitemporality(
+                    this.getOffsetDateTime("tilfra_ts"),
+                    null,
+                    this.getOffsetDateTime("tilflydto"),
+                    this.getBoolean("tilflydto_umrk"),
+                    this.getOffsetDateTime("fraflydto"),
+                    this.getBoolean("fraflydto_umrk")
+            ));
+        }
 
         Character annkor = this.getChar("annkor");
         for (CprBitemporalRecord p : records) {

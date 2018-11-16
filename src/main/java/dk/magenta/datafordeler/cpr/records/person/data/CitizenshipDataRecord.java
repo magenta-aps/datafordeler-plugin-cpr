@@ -24,7 +24,8 @@ import java.util.Set;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CitizenshipDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CitizenshipDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CitizenshipDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CitizenshipDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF)
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CitizenshipDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + CitizenshipDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REPLACED_BY, columnList = CprBitemporalRecord.DB_FIELD_REPLACED_BY + DatabaseEntry.REF)
 })
 public class CitizenshipDataRecord extends CprBitemporalPersonRecord<CitizenshipDataRecord> {
 
@@ -61,6 +62,11 @@ public class CitizenshipDataRecord extends CprBitemporalPersonRecord<Citizenship
         if (!super.equalData(o)) return false;
         CitizenshipDataRecord that = (CitizenshipDataRecord) o;
         return countryCode == that.countryCode;
+    }
+
+    @Override
+    public boolean hasData() {
+        return this.countryCode != 0;
     }
 
     @Override

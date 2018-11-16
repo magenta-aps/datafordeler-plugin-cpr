@@ -68,6 +68,11 @@ public abstract class AuthorityTextDataRecord<S extends AuthorityTextDataRecord<
     }
 
     @Override
+    public boolean hasData() {
+        return stringNonEmpty(this.correctionMarking) || stringNonEmpty(this.text);
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), text, correctionMarking);
     }

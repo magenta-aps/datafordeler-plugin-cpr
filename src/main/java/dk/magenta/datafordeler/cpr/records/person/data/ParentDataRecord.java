@@ -26,6 +26,7 @@ import java.util.Set;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ParentDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ParentDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ParentDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ParentDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REPLACED_BY, columnList = CprBitemporalRecord.DB_FIELD_REPLACED_BY + DatabaseEntry.REF)
 })
 public class ParentDataRecord extends CprBitemporalPersonRecord<ParentDataRecord> {
 
@@ -166,6 +167,11 @@ public class ParentDataRecord extends CprBitemporalPersonRecord<ParentDataRecord
                 Objects.equals(cprNumber, that.cprNumber) &&
                 Objects.equals(birthDate, that.birthDate) &&
                 Objects.equals(name, that.name);
+    }
+
+    @Override
+    public boolean hasData() {
+        return this.birthDateUncertain || this.nameMarking || stringNonEmpty(this.cprNumber) || this.birthDate != null || stringNonEmpty(this.name);
     }
 
     @Override

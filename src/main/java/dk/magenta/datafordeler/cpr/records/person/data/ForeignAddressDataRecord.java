@@ -24,7 +24,8 @@ import java.util.StringJoiner;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF)
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + ForeignAddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REPLACED_BY, columnList = CprBitemporalRecord.DB_FIELD_REPLACED_BY + DatabaseEntry.REF)
 })
 public class ForeignAddressDataRecord extends CprBitemporalPersonRecord<ForeignAddressDataRecord> {
 
@@ -157,6 +158,11 @@ public class ForeignAddressDataRecord extends CprBitemporalPersonRecord<ForeignA
                 Objects.equals(addressLine3, that.addressLine3) &&
                 Objects.equals(addressLine4, that.addressLine4) &&
                 Objects.equals(addressLine5, that.addressLine5);
+    }
+
+    @Override
+    public boolean hasData() {
+        return stringNonEmpty(this.addressLine1) || stringNonEmpty(this.addressLine2) || stringNonEmpty(this.addressLine3) || stringNonEmpty(this.addressLine4) || stringNonEmpty(this.addressLine5);
     }
 
     @Override

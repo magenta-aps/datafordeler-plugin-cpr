@@ -23,6 +23,7 @@ import java.util.Set;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonNumberDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonNumberDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonNumberDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonNumberDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REPLACED_BY, columnList = CprBitemporalRecord.DB_FIELD_REPLACED_BY + DatabaseEntry.REF)
 })
 public class PersonNumberDataRecord extends CprBitemporalPersonRecord<PersonNumberDataRecord> {
 
@@ -68,6 +69,11 @@ public class PersonNumberDataRecord extends CprBitemporalPersonRecord<PersonNumb
         if (!super.equalData(o)) return false;
         PersonNumberDataRecord that = (PersonNumberDataRecord) o;
         return Objects.equals(cprNumber, that.cprNumber);
+    }
+
+    @Override
+    public boolean hasData() {
+        return stringNonEmpty(this.cprNumber);
     }
 
     @Override

@@ -23,7 +23,8 @@ import java.util.Set;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameVerificationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameVerificationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameVerificationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameVerificationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF)
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameVerificationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + NameVerificationDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REPLACED_BY, columnList = CprBitemporalRecord.DB_FIELD_REPLACED_BY + DatabaseEntry.REF)
 })
 public class NameVerificationDataRecord extends VerificationDataRecord<NameVerificationDataRecord> {
 
@@ -61,6 +62,11 @@ public class NameVerificationDataRecord extends VerificationDataRecord<NameVerif
         if (!super.equalData(o)) return false;
         NameVerificationDataRecord that = (NameVerificationDataRecord) o;
         return Objects.equals(correctionMarking, that.correctionMarking);
+    }
+
+    @Override
+    public boolean hasData() {
+        return super.hasData() || stringNonEmpty(this.correctionMarking);
     }
 
     @Override

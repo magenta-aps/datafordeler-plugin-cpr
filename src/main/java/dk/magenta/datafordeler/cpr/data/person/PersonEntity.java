@@ -10,7 +10,6 @@ import dk.magenta.datafordeler.core.database.Nontemporal;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
-import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprNontemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
@@ -700,17 +699,27 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
             items.sort(Comparator.comparing(CprNontemporalRecord::getCnt));
             for (E oldItem : items) {
 
-                if (newItem.isCorrection() || newItem.isTechnicalCorrection()) {
-                    if (newItem.equalData(oldItem) && Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) && oldItem.getCorrectionof() == null) {
+                if (newItem.isCorrection() && newItem.hasData()) {
+                    if (Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) && Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) && oldItem.getCorrectionof() == null) {
                         // The new record with corrected data
                         correctingRecord = oldItem;
-                    } else if (newItem.equalData(oldItem) && oldItem.getCorrector() == null) {
+                    } else if (newItem.equalData(oldItem) && !Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) && oldItem.getCorrector() == null) {
                         // The old record that is being corrected
                         correctedRecord = oldItem;
                     }
                 }
 
-                else if (newItem.isUndo() && Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && newItem.equalData(oldItem) && oldItem.getReplacedBy() == null) {
+                else if (newItem.isTechnicalCorrection() && newItem.hasData()) {
+                    if (Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) && Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) && oldItem.getCorrectionof() == null) {
+                        // The new record with corrected data
+                        correctingRecord = oldItem;
+                    } else if (newItem.equalData(oldItem) && !Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) && oldItem.getCorrector() == null) {
+                        // The old record that is being corrected
+                        correctedRecord = oldItem;
+                    }
+                }
+
+                else if (newItem.isUndo() && Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && newItem.equalData(oldItem) && oldItem.getReplacedby() == null) {
                     oldItem.setUndone(true);
                     session.saveOrUpdate(oldItem);
                     return false;
@@ -722,11 +731,11 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                             //Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
                             Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null &&
                             !Equality.equal(newItem.getEffectFrom(), newItem.getEffectTo())
-                            && oldItem.getReplacedBy() == null
+                            && oldItem.getReplacedby() == null
                             ) {
                         // Historic item matching prior current item
                         //log.info("matching item at " + oldItem.getBitemporality() + ", removing preexisting (" + oldItem.getAuthority() + ")");
-                        oldItem.setReplacedBy(newItem);
+                        oldItem.setReplacedby(newItem);
                         oldItem.setRegistrationTo(newItem.getRegistrationFrom());
                         return set.add((E) newItem);
                     } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {

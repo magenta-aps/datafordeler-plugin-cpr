@@ -16,7 +16,6 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,7 +62,7 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
 
     public static final String DB_FIELD_CORRECTION_OF = "correctionof";
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     private S correctionof;
 
     public S getCorrectionof() {
@@ -71,7 +70,11 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
     }
 
     public void setCorrectionof(S correctionof) {
+        if (correctionof != null && correctionof.getCorrector() != null && correctionof.getCorrector() != this) {
+            System.out.println("Tried to point "+this.cnt+" to "+correctionof.cnt+", but "+correctionof.cnt+" already has "+correctionof.getCorrector().cnt+" pointing to it");
+        }
         this.correctionof = correctionof;
+        correctionof.setCorrector((S) this);
     }
 
 
@@ -83,18 +86,11 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
         return this.corrector;
     }
 
-
-
-/*
-    @JsonIgnore
-    public abstract Set<S> getCorrectors();
-
-    public void addCorrector(S corrector) {
-        this.getCorrectors().add(corrector);
+    public void setCorrector(S corrector) {
+        this.corrector = corrector;
     }
-*/
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "replacedBy")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "replacedby")
     private S replaces;
 
     @JsonIgnore
@@ -103,6 +99,9 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
     }
 
     public void setReplaces(S replaces) {
+        if (replaces != null && replaces.getReplacedby() != null && replaces.getReplacedby() != this) {
+            System.out.println("Tried to point "+this.cnt+" to "+replaces.cnt+", but "+replaces.cnt+" already has "+replaces.getReplacedby().cnt+" pointing to it");
+        }
         this.replaces = replaces;
     }
 
@@ -113,25 +112,29 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
 
 
 
+    public static final String DB_FIELD_REPLACED_BY = "replacedby";
 
     @OneToOne(fetch = FetchType.LAZY)
-    private S replacedBy;
+    private S replacedby;
 
     @JsonIgnore
-    public S getReplacedBy() {
-        return this.replacedBy;
+    public S getReplacedby() {
+        return this.replacedby;
     }
 
-    public void setReplacedBy(S replacedBy) {
-        this.replacedBy = replacedBy;
-        if (replacedBy != null) {
-            replacedBy.setReplaces((S) this);
+    public void setReplacedby(S replacedby) {
+        if (replacedby != null && replacedby.getReplaces() != null && replacedby.getReplaces() != this) {
+            System.out.println("Tried to point "+this.cnt+" to "+ replacedby.cnt+", but "+ replacedby.cnt+" already has "+ replacedby.getReplaces().cnt+" pointing to it");
+        }
+        this.replacedby = replacedby;
+        if (replacedby != null) {
+            replacedby.setReplaces((S) this);
         }
     }
 
     @JsonProperty
     public Long getReplacedById() {
-        return (this.replacedBy != null) ? this.replacedBy.getId() : null;
+        return (this.replacedby != null) ? this.replacedby.getId() : null;
     }
 
 
@@ -242,6 +245,16 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
         CprNontemporalRecord that = (CprNontemporalRecord) o;
         //System.out.println(authority+(authority == that.authority ? " == ":" != ")+that.authority);
         return Objects.equals(this.authority, that.authority)/* && Objects.equals(this.origin, that.origin)*/;
+    }
+
+    public abstract boolean hasData();
+
+    protected static boolean stringNonEmpty(String s) {
+        return s != null && !s.isEmpty();
+    }
+
+    protected static boolean intNonZero(Integer i) {
+        return i != null && i != 0;
     }
 
     protected static String trim(String text) {

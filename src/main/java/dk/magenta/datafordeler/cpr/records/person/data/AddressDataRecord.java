@@ -21,7 +21,8 @@ import java.util.Set;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + AddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + AddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + AddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + AddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF)
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + AddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_CORRECTION_OF, columnList = CprBitemporalRecord.DB_FIELD_CORRECTION_OF + DatabaseEntry.REF),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + AddressDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REPLACED_BY, columnList = CprBitemporalRecord.DB_FIELD_REPLACED_BY + DatabaseEntry.REF)
 })
 public class AddressDataRecord extends CprBitemporalPersonRecord<AddressDataRecord> {
 
@@ -305,7 +306,7 @@ public class AddressDataRecord extends CprBitemporalPersonRecord<AddressDataReco
         System.out.println(roadAddressLine4+(Objects.equals(roadAddressLine4, that.roadAddressLine4) ? " == ":" != ")+that.roadAddressLine4);
         System.out.println(roadAddressLine5+(Objects.equals(roadAddressLine5, that.roadAddressLine5) ? " == ":" != ")+that.roadAddressLine5);
 */
-        return (municipalityCode == that.municipalityCode/* || this.oldMunicipalityCode() == that.oldMunicipalityCode()*/) &&
+        return (municipalityCode == that.municipalityCode || this.oldMunicipalityCode() == that.oldMunicipalityCode()) &&
                 roadCode == that.roadCode &&
                 addressTextType == that.addressTextType &&
                 startAuthority == that.startAuthority &&
@@ -318,6 +319,24 @@ public class AddressDataRecord extends CprBitemporalPersonRecord<AddressDataReco
                 Objects.equals(roadAddressLine3, that.roadAddressLine3) &&
                 Objects.equals(roadAddressLine4, that.roadAddressLine4) &&
                 Objects.equals(roadAddressLine5, that.roadAddressLine5);
+    }
+
+    @Override
+    public boolean hasData() {
+        return
+                municipalityCode != 0 ||
+                roadCode != 0 ||
+                addressTextType != 0 ||
+                startAuthority != 0 ||
+                stringNonEmpty(buildingNumber) ||
+                stringNonEmpty(houseNumber) ||
+                stringNonEmpty(floor) ||
+                stringNonEmpty(door) ||
+                stringNonEmpty(roadAddressLine1) ||
+                stringNonEmpty(roadAddressLine2) ||
+                stringNonEmpty(roadAddressLine3) ||
+                stringNonEmpty(roadAddressLine4) ||
+                stringNonEmpty(roadAddressLine5);
     }
 
     private int oldMunicipalityCode() {

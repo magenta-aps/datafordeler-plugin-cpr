@@ -289,6 +289,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
 
                                 session.saveOrUpdate(entity);
                                 this.parseAlternate(entity, records, importMetadata);
+                                session.saveOrUpdate(entity);
 
                                 //this.parseRVD(entity, records, importMetadata);
                             }

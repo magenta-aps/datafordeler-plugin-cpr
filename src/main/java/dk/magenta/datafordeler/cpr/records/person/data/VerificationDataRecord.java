@@ -49,6 +49,11 @@ public abstract class VerificationDataRecord<S extends VerificationDataRecord<S>
     }
 
     @Override
+    public boolean hasData() {
+        return true;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), verified);
     }

@@ -23,6 +23,7 @@ import java.util.Set;
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonCoreDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REGISTRATION_TO, columnList = CprBitemporalRecord.DB_FIELD_REGISTRATION_TO),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonCoreDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_FROM, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_FROM),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonCoreDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_EFFECT_TO, columnList = CprBitemporalRecord.DB_FIELD_EFFECT_TO),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonCoreDataRecord.TABLE_NAME + CprBitemporalRecord.DB_FIELD_REPLACED_BY, columnList = CprBitemporalRecord.DB_FIELD_REPLACED_BY + DatabaseEntry.REF)
 })
 public class PersonCoreDataRecord extends CprBitemporalPersonRecord<PersonCoreDataRecord> {
 
@@ -87,6 +88,11 @@ public class PersonCoreDataRecord extends CprBitemporalPersonRecord<PersonCoreDa
         if (!super.equalData(o)) return false;
         PersonCoreDataRecord that = (PersonCoreDataRecord) o;
         return gender == that.gender;
+    }
+
+    @Override
+    public boolean hasData() {
+        return true;
     }
 
     @Override

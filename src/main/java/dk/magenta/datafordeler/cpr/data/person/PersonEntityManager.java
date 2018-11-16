@@ -260,6 +260,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
                 bitemporalRecord.setDafoUpdated(updateTime);
                 bitemporalRecord.setOrigin(record.getOrigin());
                 bitemporalRecord.cnt = i;
+                bitemporalRecord.line = record.getLine();
                 entity.addBitemporalRecord((CprBitemporalPersonRecord) bitemporalRecord, importMetadata.getSession());
             }
             i++;
