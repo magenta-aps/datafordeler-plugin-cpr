@@ -50,6 +50,10 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
     }
 
 
+    @Column(length = 1024)
+    //@Transient
+    public String line;
+
 
     @Column
     public int cnt;

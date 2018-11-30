@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
@@ -248,10 +249,17 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
         }
     }
 
+
+    private HashMap<String, Integer> cnts = new HashMap<>();
+
     @Override
     protected void parseAlternate(PersonEntity entity, Collection<PersonDataRecord> records, ImportMetadata importMetadata) {
         OffsetDateTime updateTime = importMetadata.getImportTime();
         int i = 1;
+        Integer c = cnts.get(entity.getPersonnummer());
+        if (c!=null) {
+            i=c;
+        }
         for (PersonDataRecord record : records) {
             //System.out.println("-------------------------");
             //System.out.println(record.getLine());
@@ -265,6 +273,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
             }
             i++;
         }
+        cnts.put(entity.getPersonnummer(), i);
     }
 
 }

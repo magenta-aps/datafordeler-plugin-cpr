@@ -22,8 +22,22 @@ public abstract class CprSubParser<T extends Record> {
         return this.log;
     }
 
-    public T parseLine(String line) {
+    /*public T parseLine(String line) {
         return this.parseLine(line.substring(0, 3), line);
+    }*/
+
+    public T parseLine(String line) {
+        int colonIndex = line.indexOf(':');
+        String origin = null;
+        if (colonIndex != -1) {
+            origin = line.substring(2, colonIndex);
+            line = line.substring(colonIndex+1);
+        }
+        T record = this.parseLine(line.substring(0, 3), line);
+        if (origin != null && record != null) {
+            record.setOrigin(origin);
+        }
+        return record;
     }
 
     protected void logType(String recordType) {
@@ -54,8 +68,10 @@ public abstract class CprSubParser<T extends Record> {
                     try {
                         T record = this.parseLine(line);
                         if (record != null) {
-                            record.setOrigin(origin);
+                            //record.setOrigin(origin);
                             records.add(record);
+                        } else {
+                            System.out.println("ignoring line "+line);
                         }
                     } catch (OutOfMemoryError e) {
                         System.out.println(line);

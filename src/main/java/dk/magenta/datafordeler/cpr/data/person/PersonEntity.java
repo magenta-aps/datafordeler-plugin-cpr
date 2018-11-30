@@ -691,6 +691,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     private static <E extends CprBitemporalPersonRecord> boolean addItem(Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
         //log.info("Add "+newItem.getClass().getSimpleName()+"("+newItem.getAuthority()+") at "+newItem.getBitemporality()+" to set with "+set.size()+" preexisting entries");
         if (newItem != null) {
+            //System.out.println("Add "+newItem.cnt+" ("+newItem.getClass().getSimpleName()+")");
             E correctedRecord = null;
             E correctingRecord = null;
             ArrayList<E> items = new ArrayList<>(set);
@@ -699,17 +700,28 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
             items.sort(Comparator.comparing(CprNontemporalRecord::getCnt));
             for (E oldItem : items) {
 
+                //System.out.println("compare "+oldItem.cnt);
                 if (newItem.isCorrection() && newItem.hasData()) {
-                    if (Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) && Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) && oldItem.getCorrectionof() == null) {
-                        // The new record with corrected data
+
+                    // Annkor: K
+                    if (
+                            Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) &&
+                                    Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
+                                    oldItem.getCorrectionof() == null &&
+                                    correctingRecord == null
+                            ) {
+                        // The new record with corrected data is the first record with the same origin that shares registration
+                        //System.out.println("    Corrector: "+oldItem.cnt+"  "+oldItem.getRegistrationFrom()+" - "+oldItem.getRegistrationTo());
                         correctingRecord = oldItem;
                     } else if (newItem.equalData(oldItem) && !Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) && oldItem.getCorrector() == null) {
-                        // The old record that is being corrected
+                        // The old record that is being corrected has equal data with the correction marking and shares registration
                         correctedRecord = oldItem;
+                        //System.out.println("    Corrected: "+oldItem.cnt+"  "+oldItem.getRegistrationFrom()+" - "+oldItem.getRegistrationTo());
                     }
                 }
 
                 else if (newItem.isTechnicalCorrection() && newItem.hasData()) {
+                    // Annkor: Æ
                     if (Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) && Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) && oldItem.getCorrectionof() == null) {
                         // The new record with corrected data
                         correctingRecord = oldItem;
@@ -720,12 +732,15 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                 }
 
                 else if (newItem.isUndo() && Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && newItem.equalData(oldItem) && oldItem.getReplacedby() == null) {
+                    // Annkor: A
                     oldItem.setUndone(true);
                     session.saveOrUpdate(oldItem);
                     return false;
                 }
 
                 else if (newItem.equalData(oldItem)) {
+                    //System.out.println(newItem.cnt +" matches "+oldItem.cnt);
+
                     if (
                             newItem.isHistoric() && !oldItem.isHistoric() &&
                             //Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
@@ -739,14 +754,24 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                         oldItem.setRegistrationTo(newItem.getRegistrationFrom());
                         return set.add((E) newItem);
                     } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
-                        return false;
+                        if (newItem instanceof AddressDataRecord) {
+                            AddressDataRecord addressDataRecord = (AddressDataRecord) newItem;
+                            if (!addressDataRecord.equalDataWithMunicipalityChange(oldItem, false)) {
+                                oldItem.setReplacedby(newItem);
+                                oldItem.setRegistrationTo(newItem.getRegistrationFrom());
+                                return set.add((E) newItem);
+                            }
+                        } else {
+                            //System.out.println(newItem.cnt + " matches and has same bitemporality as " + oldItem.cnt + ", not adding");
+                            return false;
+                        }
                     } else if (
                             Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
                             (Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) || newItem.getRegistrationTo() == null) &&
                             Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
                             newItem.getEffectTo() == null
                             ) {
-                        //log.info("matching item with insufficient temporality (" + newItem.getBitemporality() + "), not adding");
+                        //System.out.println("matching item with insufficient temporality (" + newItem.getBitemporality() + "), not adding");
                         return false;
                     }
                 } else {
@@ -758,6 +783,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                     if (correctedRecord.getCorrector() == null) {
                         correctedRecord.setRegistrationTo(newItem.getRegistrationFrom());
                         correctingRecord.setCorrectionof(correctedRecord);
+                        session.save(correctingRecord);
                     }
                 }
             } else {

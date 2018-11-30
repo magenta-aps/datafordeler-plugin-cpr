@@ -27,9 +27,6 @@ public abstract class CprBitemporalRecord<E extends CprEntity, S extends CprBite
 
 
 
-    //@Column
-    @Transient
-    public String line;
 
 
 

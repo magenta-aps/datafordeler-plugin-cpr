@@ -287,38 +287,40 @@ public class AddressDataRecord extends CprBitemporalPersonRecord<AddressDataReco
 
     @Override
     public boolean equalData(Object o) {
+        return this.equalDataWithMunicipalityChange(o, true);
+    }
+
+    public boolean equalDataWithMunicipalityChange(Object o, boolean equateMunicipality) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equalData(o)) return false;
         AddressDataRecord that = (AddressDataRecord) o;
-/*
-        System.out.println(municipalityCode+(municipalityCode == that.municipalityCode ? " == ":" != ")+that.municipalityCode);
-        System.out.println(roadCode+(roadCode == that.roadCode ? " == ":" != ")+that.roadCode);
-        System.out.println(addressTextType+(addressTextType == that.addressTextType ? " == ":" != ")+that.addressTextType);
-        System.out.println(startAuthority+(startAuthority == that.startAuthority ? " == ":" != ")+that.startAuthority);
-        System.out.println(buildingNumber+(Objects.equals(buildingNumber, that.buildingNumber) ? " == ":" != ")+that.buildingNumber);
-        System.out.println(houseNumber+(Objects.equals(houseNumber, that.houseNumber) ? " == ":" != ")+that.houseNumber);
-        System.out.println(floor+(Objects.equals(floor, that.floor) ? " == ":" != ")+that.floor);
-        System.out.println(door+(Objects.equals(door, that.door) ? " == ":" != ")+that.door);
-        System.out.println(roadAddressLine1+(Objects.equals(roadAddressLine1, that.roadAddressLine1) ? " == ":" != ")+that.roadAddressLine1);
-        System.out.println(roadAddressLine2+(Objects.equals(roadAddressLine2, that.roadAddressLine2) ? " == ":" != ")+that.roadAddressLine2);
-        System.out.println(roadAddressLine3+(Objects.equals(roadAddressLine3, that.roadAddressLine3) ? " == ":" != ")+that.roadAddressLine3);
-        System.out.println(roadAddressLine4+(Objects.equals(roadAddressLine4, that.roadAddressLine4) ? " == ":" != ")+that.roadAddressLine4);
-        System.out.println(roadAddressLine5+(Objects.equals(roadAddressLine5, that.roadAddressLine5) ? " == ":" != ")+that.roadAddressLine5);
-*/
-        return (municipalityCode == that.municipalityCode || this.oldMunicipalityCode() == that.oldMunicipalityCode()) &&
+
+        if (!(
+                (municipalityCode == that.municipalityCode || (equateMunicipality && this.oldMunicipalityCode() == that.oldMunicipalityCode())) &&
                 roadCode == that.roadCode &&
-                addressTextType == that.addressTextType &&
-                startAuthority == that.startAuthority &&
                 Objects.equals(buildingNumber, that.buildingNumber) &&
                 Objects.equals(houseNumber, that.houseNumber) &&
                 Objects.equals(floor, that.floor) &&
-                Objects.equals(door, that.door) &&
-                Objects.equals(roadAddressLine1, that.roadAddressLine1) &&
-                Objects.equals(roadAddressLine2, that.roadAddressLine2) &&
-                Objects.equals(roadAddressLine3, that.roadAddressLine3) &&
-                Objects.equals(roadAddressLine4, that.roadAddressLine4) &&
-                Objects.equals(roadAddressLine5, that.roadAddressLine5);
+                Objects.equals(door, that.door)
+        )) {
+            return false;
+        }
+
+        if (!this.isHistoric() && !that.isHistoric()) {
+            if (!(
+            addressTextType == that.addressTextType &&
+            startAuthority == that.startAuthority &&
+            Objects.equals(roadAddressLine1, that.roadAddressLine1) &&
+            Objects.equals(roadAddressLine2, that.roadAddressLine2) &&
+            Objects.equals(roadAddressLine3, that.roadAddressLine3) &&
+            Objects.equals(roadAddressLine4, that.roadAddressLine4) &&
+            Objects.equals(roadAddressLine5, that.roadAddressLine5)
+            )) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
