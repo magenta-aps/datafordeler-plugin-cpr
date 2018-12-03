@@ -9,6 +9,7 @@ import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
 import org.hibernate.Session;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -75,7 +76,11 @@ public class PersonRecord extends PersonDataRecord {
         this.obtain("far_dok_ts", 352, 12);
         this.obtain("far_dok", 364, 3);
 
-        this.statusTemporality = new CprBitemporality(this.getOffsetDateTime("status_ts"), null, this.getOffsetDateTime("statushaenstart"), this.getBoolean("statusdto_umrk"), null, false);
+        OffsetDateTime statusEffectTime = this.getOffsetDateTime("statushaenstart");
+        if (statusEffectTime == null) {
+            statusEffectTime = this.getOffsetDateTime("status_ts");
+        }
+        this.statusTemporality = new CprBitemporality(this.getOffsetDateTime("status_ts"), null, statusEffectTime, this.getBoolean("statusdto_umrk"), null, false);
         this.motherTemporality = new CprBitemporality(this.getOffsetDateTime("mor_ts"), null, this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false);
         this.fatherTemporality = new CprBitemporality(this.getOffsetDateTime("far_ts"), null, this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false);
         this.motherVerificationTemporality = new CprBitemporality(this.getOffsetDateTime("mor_dok_ts"));
