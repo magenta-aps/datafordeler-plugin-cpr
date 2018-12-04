@@ -150,7 +150,7 @@ public class MoveMunicipalityDataRecord extends CprBitemporalPersonRecord<MoveMu
     }
 
     @Override
-    protected MoveMunicipalityDataRecord clone() {
+    public MoveMunicipalityDataRecord clone() {
         MoveMunicipalityDataRecord clone = new MoveMunicipalityDataRecord();
         clone.outDatetime = this.outDatetime;
         clone.outDatetimeUncertain = this.outDatetimeUncertain;

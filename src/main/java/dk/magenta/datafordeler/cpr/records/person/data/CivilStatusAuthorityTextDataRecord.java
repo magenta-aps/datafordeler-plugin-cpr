@@ -37,7 +37,7 @@ public class CivilStatusAuthorityTextDataRecord extends AuthorityTextDataRecord<
 
 
     @Override
-    protected CivilStatusAuthorityTextDataRecord clone() {
+    public CivilStatusAuthorityTextDataRecord clone() {
         CivilStatusAuthorityTextDataRecord clone = new CivilStatusAuthorityTextDataRecord();
         AuthorityTextDataRecord.copy(this, clone);
         return clone;

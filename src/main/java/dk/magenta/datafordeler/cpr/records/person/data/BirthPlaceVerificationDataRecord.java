@@ -43,7 +43,7 @@ public class BirthPlaceVerificationDataRecord extends VerificationDataRecord<Bir
     }
 
     @Override
-    protected BirthPlaceVerificationDataRecord clone() {
+    public BirthPlaceVerificationDataRecord clone() {
         BirthPlaceVerificationDataRecord clone = new BirthPlaceVerificationDataRecord();
         VerificationDataRecord.copy(this, clone);
         return clone;

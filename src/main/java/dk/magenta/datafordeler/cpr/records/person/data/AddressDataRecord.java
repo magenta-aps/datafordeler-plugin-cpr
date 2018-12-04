@@ -354,7 +354,7 @@ public class AddressDataRecord extends CprBitemporalPersonRecord<AddressDataReco
     }
 
     @Override
-    protected AddressDataRecord clone() {
+    public AddressDataRecord clone() {
         AddressDataRecord clone = new AddressDataRecord();
         clone.buildingNumber = this.buildingNumber;
         clone.municipalityCode = this.municipalityCode;

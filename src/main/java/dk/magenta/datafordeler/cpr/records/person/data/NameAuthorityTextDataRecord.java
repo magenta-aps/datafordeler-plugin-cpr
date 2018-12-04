@@ -37,7 +37,7 @@ public class NameAuthorityTextDataRecord extends AuthorityTextDataRecord<NameAut
 
 
     @Override
-    protected NameAuthorityTextDataRecord clone() {
+    public NameAuthorityTextDataRecord clone() {
         NameAuthorityTextDataRecord clone = new NameAuthorityTextDataRecord();
         AuthorityTextDataRecord.copy(this, clone);
         return clone;

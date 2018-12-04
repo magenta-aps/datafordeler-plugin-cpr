@@ -144,7 +144,7 @@ public class ProtectionDataRecord extends CprBitemporalPersonRecord<ProtectionDa
     }
 
     @Override
-    protected ProtectionDataRecord clone() {
+    public ProtectionDataRecord clone() {
         ProtectionDataRecord clone = new ProtectionDataRecord();
         clone.protectionType = this.protectionType;
         clone.reportMarking = this.reportMarking;

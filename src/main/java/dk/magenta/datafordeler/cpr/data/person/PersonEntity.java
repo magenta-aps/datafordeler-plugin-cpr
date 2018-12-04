@@ -687,7 +687,7 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
 
     }
 
-    private static Logger log = LogManager.getLogger("PersonEntity");
+    private static Logger log = LogManager.getLogger(PersonEntity.class.getCanonicalName());
     private static <E extends CprBitemporalPersonRecord> boolean addItem(Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
         //log.info("Add "+newItem.getClass().getSimpleName()+"("+newItem.getAuthority()+") at "+newItem.getBitemporality()+" to set with "+set.size()+" preexisting entries");
         if (newItem != null) {
@@ -698,9 +698,9 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
 
             //items.sort(Comparator.comparing(CprNontemporalRecord::getOriginDate));
             items.sort(Comparator.comparing(CprNontemporalRecord::getCnt));
+
             for (E oldItem : items) {
 
-                //System.out.println("compare "+oldItem.cnt);
                 if (newItem.isCorrection() && newItem.hasData()) {
 
                     // Annkor: K
@@ -778,6 +778,46 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                     //System.out.println(newItem.line+" is not equal to "+oldItem.line);
                 }
             }
+
+
+            if (newItem.updateBitemporalityByCloning()) {
+
+                E newestOlderItem = null;
+                E oldestNewerItem = null;
+                for (E oldItem : items) {
+                    if ( (newestOlderItem == null || oldItem.getRegistrationFrom().isAfter(newestOlderItem.getRegistrationFrom())) && oldItem.getRegistrationFrom().isBefore(newItem.getRegistrationFrom())) {
+                        newestOlderItem = oldItem;
+                    } else {
+                        //System.out.println("not matching "+oldItem.cnt+" "+oldItem.getRegistrationFrom());
+                        //System.out.println(oldItem.getRegistrationFrom().isBefore(newItem.getRegistrationFrom())+" && "+oldItem.getRegistrationFrom().isAfter(newestOlderItem.getRegistrationFrom()));
+                    }
+                    if ( (oldestNewerItem == null || oldItem.getRegistrationFrom().isBefore(oldestNewerItem.getRegistrationFrom())) && oldItem.getRegistrationFrom().isAfter(newItem.getRegistrationFrom()) ) {
+                        oldestNewerItem = oldItem;
+                    }
+                }
+
+                if (newestOlderItem != null) {
+                    // Copy newest older (A and B)
+                    E clone = (E) newestOlderItem.clone();
+                    newestOlderItem.setRegistrationTo(newItem.getRegistrationFrom());
+                    clone.setRegistrationFrom(newItem.getRegistrationFrom());
+                    clone.setEffectTo(newItem.getEffectFrom());
+                    clone.setEntity(newestOlderItem.getEntity());
+                    set.add(clone);
+                }
+                if (oldestNewerItem != null) {
+                    if (newItem.getRegistrationTo() == null) {
+                        E clone = (E) newItem.clone();
+                        newItem.setRegistrationTo(oldestNewerItem.getRegistrationFrom());
+                        clone.setRegistrationFrom(oldestNewerItem.getRegistrationFrom());
+                        clone.setEffectTo(oldestNewerItem.getEffectFrom());
+                        clone.setEntity(oldestNewerItem.getEntity());
+                        set.add(clone);
+                    }
+                }
+            }
+
+
             if (newItem.isCorrection() || newItem.isTechnicalCorrection()) {
                 if (correctedRecord != null && correctingRecord != null && correctedRecord != correctingRecord) {
                     if (correctedRecord.getCorrector() == null) {

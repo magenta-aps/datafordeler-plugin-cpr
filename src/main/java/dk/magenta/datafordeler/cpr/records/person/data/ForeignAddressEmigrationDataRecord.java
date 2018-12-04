@@ -129,7 +129,7 @@ public class ForeignAddressEmigrationDataRecord extends CprBitemporalPersonRecor
     }
 
     @Override
-    protected ForeignAddressEmigrationDataRecord clone() {
+    public ForeignAddressEmigrationDataRecord clone() {
         ForeignAddressEmigrationDataRecord clone = new ForeignAddressEmigrationDataRecord();
         clone.immigrationCountryCode = this.immigrationCountryCode;
         clone.emigrationCountryCode = this.emigrationCountryCode;

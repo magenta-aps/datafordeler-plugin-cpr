@@ -15,4 +15,10 @@ public abstract class CprBitemporalPersonRecord<S extends CprBitemporalPersonRec
 
     public static final String DB_FIELD_ENTITY = CprBitemporalRecord.DB_FIELD_ENTITY;
 
+    public abstract S clone();
+
+    public boolean updateBitemporalityByCloning() {
+        return false;
+    }
+
 }

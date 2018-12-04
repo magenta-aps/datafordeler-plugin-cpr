@@ -70,7 +70,7 @@ public class AddressConameDataRecord extends CprBitemporalPersonRecord<AddressCo
     }
 
     @Override
-    protected AddressConameDataRecord clone() {
+    public AddressConameDataRecord clone() {
         AddressConameDataRecord clone = new AddressConameDataRecord();
         clone.coname = this.coname;
         CprBitemporalRecord.copy(this, clone);

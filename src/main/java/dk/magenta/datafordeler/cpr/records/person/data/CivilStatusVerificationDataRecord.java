@@ -75,7 +75,7 @@ public class CivilStatusVerificationDataRecord extends VerificationDataRecord<Ci
     }
 
     @Override
-    protected CivilStatusVerificationDataRecord clone() {
+    public CivilStatusVerificationDataRecord clone() {
         CivilStatusVerificationDataRecord clone = new CivilStatusVerificationDataRecord();
         clone.setCorrectionMarking(this.getCorrectionMarking());
         VerificationDataRecord.copy(this, clone);

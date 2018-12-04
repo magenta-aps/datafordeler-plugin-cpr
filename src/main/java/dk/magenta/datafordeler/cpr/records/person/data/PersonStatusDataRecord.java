@@ -83,10 +83,15 @@ public class PersonStatusDataRecord extends CprBitemporalPersonRecord<PersonStat
     }
 
     @Override
-    protected PersonStatusDataRecord clone() {
+    public PersonStatusDataRecord clone() {
         PersonStatusDataRecord clone = new PersonStatusDataRecord();
         clone.status = this.status;
         CprBitemporalRecord.copy(this, clone);
         return clone;
+    }
+
+    @Override
+    public boolean updateBitemporalityByCloning() {
+        return true;
     }
 }

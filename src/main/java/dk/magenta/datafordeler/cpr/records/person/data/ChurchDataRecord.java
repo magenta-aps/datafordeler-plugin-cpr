@@ -81,7 +81,7 @@ public class ChurchDataRecord extends CprBitemporalPersonRecord<ChurchDataRecord
     }
 
     @Override
-    protected ChurchDataRecord clone() {
+    public ChurchDataRecord clone() {
         ChurchDataRecord clone = new ChurchDataRecord();
         clone.churchRelation = this.churchRelation;
         CprBitemporalRecord.copy(this, clone);

@@ -186,7 +186,7 @@ public class CivilStatusDataRecord extends CprBitemporalPersonRecord<CivilStatus
     }
 
     @Override
-    protected CivilStatusDataRecord clone() {
+    public CivilStatusDataRecord clone() {
         CivilStatusDataRecord clone = new CivilStatusDataRecord();
         clone.correctionMarking = this.correctionMarking;
         clone.civilStatus = this.civilStatus;

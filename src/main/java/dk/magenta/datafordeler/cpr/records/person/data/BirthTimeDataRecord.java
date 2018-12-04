@@ -119,7 +119,7 @@ public class BirthTimeDataRecord extends CprBitemporalPersonRecord<BirthTimeData
     }
 
     @Override
-    protected BirthTimeDataRecord clone() {
+    public BirthTimeDataRecord clone() {
         BirthTimeDataRecord clone = new BirthTimeDataRecord();
         clone.birthDatetime = this.birthDatetime;
         clone.birthDatetimeUncertain = this.birthDatetimeUncertain;

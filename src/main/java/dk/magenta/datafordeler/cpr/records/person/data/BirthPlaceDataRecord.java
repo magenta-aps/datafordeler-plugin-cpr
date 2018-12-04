@@ -93,7 +93,7 @@ public class BirthPlaceDataRecord extends CprBitemporalPersonRecord<BirthPlaceDa
     }
 
     @Override
-    protected BirthPlaceDataRecord clone() {
+    public BirthPlaceDataRecord clone() {
         BirthPlaceDataRecord clone = new BirthPlaceDataRecord();
         clone.birthPlaceCode = this.birthPlaceCode;
         clone.birthPlaceName = this.birthPlaceName;

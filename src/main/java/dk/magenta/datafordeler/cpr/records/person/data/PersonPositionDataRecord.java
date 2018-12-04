@@ -82,7 +82,7 @@ public class PersonPositionDataRecord extends CprBitemporalPersonRecord<PersonPo
     }
 
     @Override
-    protected PersonPositionDataRecord clone() {
+    public PersonPositionDataRecord clone() {
         PersonPositionDataRecord clone = new PersonPositionDataRecord();
         clone.position = this.position;
         CprBitemporalRecord.copy(this, clone);

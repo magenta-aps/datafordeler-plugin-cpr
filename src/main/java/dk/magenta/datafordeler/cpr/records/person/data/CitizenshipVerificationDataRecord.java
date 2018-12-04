@@ -38,7 +38,7 @@ public class CitizenshipVerificationDataRecord extends VerificationDataRecord<Ci
 
 
     @Override
-    protected CitizenshipVerificationDataRecord clone() {
+    public CitizenshipVerificationDataRecord clone() {
         CitizenshipVerificationDataRecord clone = new CitizenshipVerificationDataRecord();
         VerificationDataRecord.copy(this, clone);
         return clone;

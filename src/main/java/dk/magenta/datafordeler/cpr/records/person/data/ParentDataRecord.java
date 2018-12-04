@@ -180,7 +180,7 @@ public class ParentDataRecord extends CprBitemporalPersonRecord<ParentDataRecord
     }
 
     @Override
-    protected ParentDataRecord clone() {
+    public ParentDataRecord clone() {
         ParentDataRecord clone = new ParentDataRecord();
         clone.cprNumber = this.cprNumber;
         clone.birthDate = this.birthDate;

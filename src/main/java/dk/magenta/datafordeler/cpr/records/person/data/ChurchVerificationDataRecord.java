@@ -44,7 +44,7 @@ public class ChurchVerificationDataRecord extends VerificationDataRecord<ChurchV
 
 
     @Override
-    protected ChurchVerificationDataRecord clone() {
+    public ChurchVerificationDataRecord clone() {
         ChurchVerificationDataRecord clone = new ChurchVerificationDataRecord();
         VerificationDataRecord.copy(this, clone);
         return clone;

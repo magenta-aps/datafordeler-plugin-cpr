@@ -102,7 +102,7 @@ public class PersonCoreDataRecord extends CprBitemporalPersonRecord<PersonCoreDa
     }
 
     @Override
-    protected PersonCoreDataRecord clone() {
+    public PersonCoreDataRecord clone() {
         PersonCoreDataRecord clone = new PersonCoreDataRecord();
         clone.gender = this.gender;
         CprBitemporalRecord.copy(this, clone);

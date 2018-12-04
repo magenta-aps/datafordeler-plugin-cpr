@@ -75,7 +75,7 @@ public class CitizenshipDataRecord extends CprBitemporalPersonRecord<Citizenship
     }
 
     @Override
-    protected CitizenshipDataRecord clone() {
+    public CitizenshipDataRecord clone() {
         CitizenshipDataRecord clone = new CitizenshipDataRecord();
         clone.countryCode = this.countryCode;
         CprBitemporalRecord.copy(this, clone);

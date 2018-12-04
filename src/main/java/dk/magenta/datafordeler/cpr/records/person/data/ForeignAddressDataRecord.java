@@ -171,7 +171,7 @@ public class ForeignAddressDataRecord extends CprBitemporalPersonRecord<ForeignA
     }
 
     @Override
-    protected ForeignAddressDataRecord clone() {
+    public ForeignAddressDataRecord clone() {
         ForeignAddressDataRecord clone = new ForeignAddressDataRecord();
         clone.addressLine1 = this.addressLine1;
         clone.addressLine2 = this.addressLine2;

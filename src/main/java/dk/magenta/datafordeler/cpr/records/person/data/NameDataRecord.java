@@ -221,7 +221,7 @@ public class NameDataRecord extends CprBitemporalPersonRecord<NameDataRecord> {
     }
 
     @Override
-    protected NameDataRecord clone() {
+    public NameDataRecord clone() {
         NameDataRecord clone = new NameDataRecord();
         clone.addressingName = this.addressingName;
         clone.firstNames = this.firstNames;

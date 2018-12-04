@@ -75,7 +75,7 @@ public class NameVerificationDataRecord extends VerificationDataRecord<NameVerif
     }
 
     @Override
-    protected NameVerificationDataRecord clone() {
+    public NameVerificationDataRecord clone() {
         NameVerificationDataRecord clone = new NameVerificationDataRecord();
         clone.setCorrectionMarking(this.getCorrectionMarking());
         VerificationDataRecord.copy(this, clone);

@@ -89,7 +89,7 @@ public class AddressNameDataRecord extends CprBitemporalPersonRecord<AddressName
     }
 
     @Override
-    protected AddressNameDataRecord clone() {
+    public AddressNameDataRecord clone() {
         AddressNameDataRecord clone = new AddressNameDataRecord();
         clone.addressName = this.addressName;
         clone.rapportnavne = this.rapportnavne;

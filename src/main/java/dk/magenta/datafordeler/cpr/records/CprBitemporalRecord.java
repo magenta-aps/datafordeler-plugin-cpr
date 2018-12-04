@@ -234,6 +234,12 @@ public abstract class CprBitemporalRecord<E extends CprEntity, S extends CprBite
         return new CprBitemporality(this.getRegistrationFrom(), this.getRegistrationTo(), this.effectFrom, this.effectFromUncertain, this.effectTo, this.effectToUncertain);
     }
 
+    protected static void copy(CprBitemporalRecord from, CprBitemporalRecord to) {
+        CprMonotemporalRecord.copy(from, to);
+        to.effectFrom = from.effectFrom;
+        to.effectTo = from.effectTo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

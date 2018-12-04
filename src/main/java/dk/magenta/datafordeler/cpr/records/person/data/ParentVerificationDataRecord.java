@@ -79,7 +79,7 @@ public class ParentVerificationDataRecord extends VerificationDataRecord<ParentV
     }
 
     @Override
-    protected ParentVerificationDataRecord clone() {
+    public ParentVerificationDataRecord clone() {
         ParentVerificationDataRecord clone = new ParentVerificationDataRecord();
         clone.isMother = this.isMother;
         VerificationDataRecord.copy(this, clone);
