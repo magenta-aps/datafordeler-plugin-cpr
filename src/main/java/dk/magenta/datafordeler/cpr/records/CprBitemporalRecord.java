@@ -19,19 +19,11 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Objects;
 
 @MappedSuperclass
-@FilterDefs({
-        @FilterDef(name = Bitemporal.FILTER_EFFECT_AFTER, parameters = @ParamDef(name = Bitemporal.FILTERPARAM_EFFECT_AFTER, type = "java.time.OffsetDateTime")),
-        @FilterDef(name = Bitemporal.FILTER_EFFECT_BEFORE, parameters = @ParamDef(name = Bitemporal.FILTERPARAM_EFFECT_BEFORE, type = "java.time.OffsetDateTime"))
-})
-public abstract class CprBitemporalRecord<E extends CprEntity, S extends CprBitemporalRecord<E, S>> extends CprMonotemporalRecord<E, S> implements Comparable<CprBitemporalRecord>, Bitemporal<E> {
+public abstract class CprBitemporalRecord<E extends CprEntity, S extends CprBitemporalRecord<E, S>> extends CprMonotemporalRecord<E, S> implements Comparable<CprBitemporalRecord>, Bitemporal {
 
 
-
-
-
-
-    public static final String FILTER_EFFECT_FROM = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " >= :" + Effect.FILTERPARAM_EFFECT_FROM + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " is null)";
-    public static final String FILTER_EFFECT_TO = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " < :" + Effect.FILTERPARAM_EFFECT_TO + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " is null)";
+    //public static final String FILTER_EFFECT_FROM = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " >= :" + Effect.FILTERPARAM_EFFECT_FROM + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " is null)";
+    //public static final String FILTER_EFFECT_TO = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " < :" + Effect.FILTERPARAM_EFFECT_TO + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " is null)";
 
     public static final String DB_FIELD_ENTITY = CprMonotemporalRecord.DB_FIELD_ENTITY;
 
@@ -212,11 +204,6 @@ public abstract class CprBitemporalRecord<E extends CprEntity, S extends CprBite
 
     public CprBitemporalRecord setAuthority(int authority) {
         super.setAuthority(authority);
-        return this;
-    }
-
-    public CprBitemporalRecord setDafoUpdated(OffsetDateTime updateTime) {
-        super.setDafoUpdated(updateTime);
         return this;
     }
 

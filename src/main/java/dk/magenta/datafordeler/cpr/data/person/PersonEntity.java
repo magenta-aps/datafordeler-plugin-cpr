@@ -8,6 +8,8 @@ import dk.magenta.datafordeler.core.database.Identification;
 import dk.magenta.datafordeler.core.database.Monotemporal;
 import dk.magenta.datafordeler.core.database.Nontemporal;
 import dk.magenta.datafordeler.core.util.Equality;
+import dk.magenta.datafordeler.core.util.FixedQueueMap;
+import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
 import dk.magenta.datafordeler.cpr.records.CprNontemporalRecord;
@@ -16,14 +18,16 @@ import dk.magenta.datafordeler.cpr.records.person.data.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.Filters;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 /**
@@ -34,6 +38,18 @@ import java.util.*;
 @Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_entity", indexes = {
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_identification", columnList = "identification_id", unique = true),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_personnummer", columnList = PersonEntity.DB_FIELD_CPR_NUMBER, unique = true)
+})
+@FilterDefs({
+        @FilterDef(name = Bitemporal.FILTER_EFFECTFROM_AFTER, parameters = @ParamDef(name = Bitemporal.FILTERPARAM_EFFECTFROM_AFTER, type = "java.time.OffsetDateTime")),
+        @FilterDef(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, parameters = @ParamDef(name = Bitemporal.FILTERPARAM_EFFECTFROM_BEFORE, type = "java.time.OffsetDateTime")),
+        @FilterDef(name = Bitemporal.FILTER_EFFECTTO_AFTER, parameters = @ParamDef(name = Bitemporal.FILTERPARAM_EFFECTTO_AFTER, type = "java.time.OffsetDateTime")),
+        @FilterDef(name = Bitemporal.FILTER_EFFECTTO_BEFORE, parameters = @ParamDef(name = Bitemporal.FILTERPARAM_EFFECTTO_BEFORE, type = "java.time.OffsetDateTime")),
+        @FilterDef(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, parameters = @ParamDef(name = Monotemporal.FILTERPARAM_REGISTRATIONFROM_AFTER, type = "java.time.OffsetDateTime")),
+        @FilterDef(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, parameters = @ParamDef(name = Monotemporal.FILTERPARAM_REGISTRATIONFROM_BEFORE, type = "java.time.OffsetDateTime")),
+        @FilterDef(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, parameters = @ParamDef(name = Monotemporal.FILTERPARAM_REGISTRATIONTO_AFTER, type = "java.time.OffsetDateTime")),
+        @FilterDef(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, parameters = @ParamDef(name = Monotemporal.FILTERPARAM_REGISTRATIONTO_BEFORE, type = "java.time.OffsetDateTime")),
+        @FilterDef(name = Nontemporal.FILTER_LASTUPDATED_AFTER, parameters = @ParamDef(name = Nontemporal.FILTERPARAM_LASTUPDATED_AFTER, type = "java.time.OffsetDateTime")),
+        @FilterDef(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, parameters = @ParamDef(name = Nontemporal.FILTERPARAM_LASTUPDATED_BEFORE, type = "java.time.OffsetDateTime"))
 })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
@@ -87,10 +103,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_ADDRESS_CONAME = "conavn";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -105,10 +125,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_ADDRESS = "adresse";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -123,10 +147,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_ADDRESS_NAME = "addresseringsnavn";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -141,10 +169,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_BIRTHPLACE = "fødselsted";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -159,10 +191,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_BIRTHPLACE_VERIFICATION = "fødselssted_verifikation";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -177,10 +213,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_BIRTHTIME = "fødselstidspunkt";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -195,10 +235,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CHURCH = "folkekirkeoplysning";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -213,10 +257,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CHURCH_VERIFICATION = "folkekirkeoplysning_verifikation";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -231,10 +279,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CITIZENSHIP = "statsborgerskab";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -249,10 +301,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CITIZENSHIP_VERIFICATION = "statsborgerskab_verifikation";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -267,10 +323,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CIVILSTATUS = "civilstatus";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -285,10 +345,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CIVILSTATUS_AUTHORITYTEXT = "civilstatus_autoritetstekst";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -303,10 +367,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CIVILSTATUS_VERIFICATION = "civilstatus_verifikation";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -321,10 +389,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_FOREIGN_ADDRESS = "udlandsadresse";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -339,10 +411,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_FOREIGN_ADDRESS_EMIGRATION = "udrejse";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -357,10 +433,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_MOVE_MUNICIPALITY = "kommuneflytning";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -375,10 +455,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_NAME = "navn";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -393,10 +477,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_NAME_AUTHORITY_TEXT = "navn_autoritetstekst";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -411,10 +499,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_NAME_VERIFICATION = "navn_verifikation";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -430,10 +522,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=true")
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -449,10 +545,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=true")
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -468,10 +568,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=false")
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -487,10 +591,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Where(clause = ParentDataRecord.DB_FIELD_IS_MOTHER + "=false")
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -505,10 +613,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_CORE = "kernedata";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -523,10 +635,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_PNR = "historiskPersonnummer";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -541,10 +657,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_POSITION = "stilling";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -559,10 +679,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_STATUS = "status";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -577,10 +701,14 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public static final String IO_FIELD_PROTECTION = "beskyttelse";
     @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
-            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
-            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
-            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
             @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
     })
@@ -594,92 +722,92 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session) {
         boolean added = false;
         if (record instanceof AddressConameDataRecord) {
-            added = addItem(this.coname, record, session);
+            added = addItem(this, this.coname, record, session);
         }
         if (record instanceof AddressDataRecord) {
-            added = addItem(this.address, record, session);
+            added = addItem(this, this.address, record, session);
         }
         if (record instanceof AddressNameDataRecord) {
-            added = addItem(this.addressName, record, session);
+            added = addItem(this, this.addressName, record, session);
         }
         if (record instanceof BirthPlaceDataRecord) {
-            added = addItem(this.birthPlace, record, session);
+            added = addItem(this, this.birthPlace, record, session);
         }
         if (record instanceof BirthPlaceVerificationDataRecord) {
-            added = addItem(this.birthPlaceVerification, record, session);
+            added = addItem(this, this.birthPlaceVerification, record, session);
         }
         if (record instanceof BirthTimeDataRecord) {
-            added = addItem(this.birthTime, record, session);
+            added = addItem(this, this.birthTime, record, session);
         }
         if (record instanceof ChurchDataRecord) {
-            added = addItem(this.churchRelation, record, session);
+            added = addItem(this, this.churchRelation, record, session);
         }
         if (record instanceof ChurchVerificationDataRecord) {
-            added = addItem(this.churchRelationVerification, record, session);
+            added = addItem(this, this.churchRelationVerification, record, session);
         }
         if (record instanceof CitizenshipDataRecord) {
-            added = addItem(this.citizenship, record, session);
+            added = addItem(this, this.citizenship, record, session);
         }
         if (record instanceof CitizenshipVerificationDataRecord) {
-            added = addItem(this.citizenshipVerification, record, session);
+            added = addItem(this, this.citizenshipVerification, record, session);
         }
         if (record instanceof CivilStatusDataRecord) {
-            added = addItem(this.civilstatus, record, session);
+            added = addItem(this, this.civilstatus, record, session);
         }
         if (record instanceof CivilStatusAuthorityTextDataRecord) {
-            added = addItem(this.civilstatusAuthorityText, record, session);
+            added = addItem(this, this.civilstatusAuthorityText, record, session);
         }
         if (record instanceof CivilStatusVerificationDataRecord) {
-            added = addItem(this.civilstatusVerification, record, session);
+            added = addItem(this, this.civilstatusVerification, record, session);
         }
         if (record instanceof ForeignAddressDataRecord) {
-            added = addItem(this.foreignAddress, record, session);
+            added = addItem(this, this.foreignAddress, record, session);
         }
         if (record instanceof ForeignAddressEmigrationDataRecord) {
-            added = addItem(this.emigration, record, session);
+            added = addItem(this, this.emigration, record, session);
         }
         if (record instanceof MoveMunicipalityDataRecord) {
-            added = addItem(this.municipalityMove, record, session);
+            added = addItem(this, this.municipalityMove, record, session);
         }
         if (record instanceof NameAuthorityTextDataRecord) {
-            added = addItem(this.nameAuthorityText, record, session);
+            added = addItem(this, this.nameAuthorityText, record, session);
         }
         if (record instanceof NameDataRecord) {
-            added = addItem(this.name, record, session);
+            added = addItem(this, this.name, record, session);
         }
         if (record instanceof NameVerificationDataRecord) {
-            added = addItem(this.nameVerification, record, session);
+            added = addItem(this, this.nameVerification, record, session);
         }
         if (record instanceof ParentDataRecord) {
             ParentDataRecord pRecord = (ParentDataRecord) record;
             if (pRecord.isMother()) {
-                added = addItem(this.mother, pRecord, session);
+                added = addItem(this, this.mother, pRecord, session);
             } else {
-                added = addItem(this.father, pRecord, session);
+                added = addItem(this, this.father, pRecord, session);
             }
         }
         if (record instanceof ParentVerificationDataRecord) {
             ParentVerificationDataRecord pRecord = (ParentVerificationDataRecord) record;
             if (pRecord.isMother()) {
-                added = addItem(this.motherVerification, pRecord, session);
+                added = addItem(this, this.motherVerification, pRecord, session);
             } else {
-                added = addItem(this.fatherVerification, pRecord, session);
+                added = addItem(this, this.fatherVerification, pRecord, session);
             }
         }
         if (record instanceof PersonCoreDataRecord) {
-            added = addItem(this.core, record, session);
+            added = addItem(this, this.core, record, session);
         }
         if (record instanceof PersonNumberDataRecord) {
-            added = addItem(this.personNumber, record, session);
+            added = addItem(this, this.personNumber, record, session);
         }
         if (record instanceof PersonPositionDataRecord) {
-            added = addItem(this.position, record, session);
+            added = addItem(this, this.position, record, session);
         }
         if (record instanceof PersonStatusDataRecord) {
-            added = addItem(this.status, record, session);
+            added = addItem(this, this.status, record, session);
         }
         if (record instanceof ProtectionDataRecord) {
-            added = addItem(this.protection, record, session);
+            added = addItem(this, this.protection, record, session);
         }
         if (added) {
             record.setEntity(this);
@@ -687,8 +815,27 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
 
     }
 
+    private static FixedQueueMap<PersonEntity, ListHashMap<OffsetDateTime, CprBitemporalPersonRecord>> recentTechnicalCorrections = new FixedQueueMap<>(10);
+
     private static Logger log = LogManager.getLogger(PersonEntity.class.getCanonicalName());
-    private static <E extends CprBitemporalPersonRecord> boolean addItem(Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
+    private static <E extends CprBitemporalPersonRecord> boolean addItem(PersonEntity entity, Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
+
+
+        /*
+        * Technical
+        * */
+        ListHashMap<OffsetDateTime, CprBitemporalPersonRecord> recentTechnicalCorrectionRecords = recentTechnicalCorrections.get(entity);
+        if (recentTechnicalCorrectionRecords == null) {
+            recentTechnicalCorrectionRecords = new ListHashMap<>();
+            recentTechnicalCorrections.put(entity, recentTechnicalCorrectionRecords);
+        }
+        if (newItem.isTechnicalCorrection()) {
+            recentTechnicalCorrectionRecords.add(newItem.getEffectFrom(), newItem);
+        }
+
+
+
+
         //log.info("Add "+newItem.getClass().getSimpleName()+"("+newItem.getAuthority()+") at "+newItem.getBitemporality()+" to set with "+set.size()+" preexisting entries");
         if (newItem != null) {
             //System.out.println("Add "+newItem.cnt+" ("+newItem.getClass().getSimpleName()+")");
@@ -701,6 +848,12 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
 
             for (E oldItem : items) {
 
+                /*
+                * Items with correction marking specify that an older record should be corrected with new data and/or effect time
+                * The incoming item itself is not the corrected data, but another record with the same origin will hold it
+                * It is not a replacement, but a correction. We keep both the corrected and corrector records, with a link between them,
+                * and set registrationTo on the corrected record
+                * */
                 if (newItem.isCorrection() && newItem.hasData()) {
 
                     // Annkor: K
@@ -713,24 +866,16 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                         // The new record with corrected data is the first record with the same origin that shares registration
                         //System.out.println("    Corrector: "+oldItem.cnt+"  "+oldItem.getRegistrationFrom()+" - "+oldItem.getRegistrationTo());
                         correctingRecord = oldItem;
-                    } else if (newItem.equalData(oldItem) && !Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) && oldItem.getCorrector() == null) {
+                    } else if (newItem.equalData(oldItem) && !Objects.equals(newItem.getOrigin(), oldItem.getOrigin())/* && oldItem.getCorrector() == null*/) {
                         // The old record that is being corrected has equal data with the correction marking and shares registration
                         correctedRecord = oldItem;
                         //System.out.println("    Corrected: "+oldItem.cnt+"  "+oldItem.getRegistrationFrom()+" - "+oldItem.getRegistrationTo());
                     }
                 }
 
-                else if (newItem.isTechnicalCorrection() && newItem.hasData()) {
-                    // Annkor: Æ
-                    if (Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) && Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) && oldItem.getCorrectionof() == null) {
-                        // The new record with corrected data
-                        correctingRecord = oldItem;
-                    } else if (newItem.equalData(oldItem) && !Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) && oldItem.getCorrector() == null) {
-                        // The old record that is being corrected
-                        correctedRecord = oldItem;
-                    }
-                }
-
+                /*
+                 * Item marking that a previous record should be undone by setting a flag on it, enabling lookups to ignore it
+                 * */
                 else if (newItem.isUndo() && Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && newItem.equalData(oldItem) && oldItem.getReplacedby() == null) {
                     // Annkor: A
                     oldItem.setUndone(true);
@@ -741,6 +886,10 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                 else if (newItem.equalData(oldItem)) {
                     //System.out.println(newItem.cnt +" matches "+oldItem.cnt);
 
+                    /*
+                     * Historic item matching prior current item. This means we have the prior item ended, and should set registrationTo
+                     * The new item is added without change
+                     * */
                     if (
                             newItem.isHistoric() && !oldItem.isHistoric() &&
                             //Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
@@ -748,11 +897,16 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                             !Equality.equal(newItem.getEffectFrom(), newItem.getEffectTo())
                             && oldItem.getReplacedby() == null
                             ) {
-                        // Historic item matching prior current item
-                        //log.info("matching item at " + oldItem.getBitemporality() + ", removing preexisting (" + oldItem.getAuthority() + ")");
                         oldItem.setReplacedby(newItem);
                         oldItem.setRegistrationTo(newItem.getRegistrationFrom());
+                        session.saveOrUpdate(oldItem);
                         return set.add((E) newItem);
+
+
+                    /*
+                    * Special case for addresses: Municipality codes may have changed without us getting a change record (AnnKor: Æ)
+                    *
+                    * */
                     } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
                         if (newItem instanceof AddressDataRecord) {
                             AddressDataRecord addressDataRecord = (AddressDataRecord) newItem;
@@ -765,6 +919,10 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                             //System.out.println(newItem.cnt + " matches and has same bitemporality as " + oldItem.cnt + ", not adding");
                             return false;
                         }
+
+                        /*
+                        * We see a record that is a near-repeat of a prior record. No need to add it
+                        * */
                     } else if (
                             Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
                             (Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) || newItem.getRegistrationTo() == null) &&
@@ -774,22 +932,30 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                         //System.out.println("matching item with insufficient temporality (" + newItem.getBitemporality() + "), not adding");
                         return false;
                     }
-                } else {
-                    //System.out.println(newItem.line+" is not equal to "+oldItem.line);
                 }
             }
 
 
-            if (newItem.updateBitemporalityByCloning()) {
 
+
+            /*
+            * Items with only registrationFrom, with no historical record, come in and replace older items of the same type
+            * The new item is added, but there must be a third item to represent the older item with a limited effect
+            * Consider:
+            *   ItemA   reg: 2000 -> inf.  eff: 2000 -> inf
+            *   ItemB   reg: 2005 -> inf.  eff: 2005 -> inf
+            *
+            * Result:
+            *   Item1   reg: 2000 -> 2005  eff: 2000 -> inf
+            *   Item2   reg: 2005 -> inf   eff: 2000 -> 2005
+            *   Item3   reg: 2005 -> inf   eff: 2005 -> inf
+            * */
+            if (newItem.updateBitemporalityByCloning()) {
                 E newestOlderItem = null;
                 E oldestNewerItem = null;
                 for (E oldItem : items) {
                     if ( (newestOlderItem == null || oldItem.getRegistrationFrom().isAfter(newestOlderItem.getRegistrationFrom())) && oldItem.getRegistrationFrom().isBefore(newItem.getRegistrationFrom())) {
                         newestOlderItem = oldItem;
-                    } else {
-                        //System.out.println("not matching "+oldItem.cnt+" "+oldItem.getRegistrationFrom());
-                        //System.out.println(oldItem.getRegistrationFrom().isBefore(newItem.getRegistrationFrom())+" && "+oldItem.getRegistrationFrom().isAfter(newestOlderItem.getRegistrationFrom()));
                     }
                     if ( (oldestNewerItem == null || oldItem.getRegistrationFrom().isBefore(oldestNewerItem.getRegistrationFrom())) && oldItem.getRegistrationFrom().isAfter(newItem.getRegistrationFrom()) ) {
                         oldestNewerItem = oldItem;
@@ -799,32 +965,54 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
                 if (newestOlderItem != null) {
                     // Copy newest older (A and B)
                     E clone = (E) newestOlderItem.clone();
-                    newestOlderItem.setRegistrationTo(newItem.getRegistrationFrom());
                     clone.setRegistrationFrom(newItem.getRegistrationFrom());
+                    newestOlderItem.setRegistrationTo(clone.getRegistrationFrom());
                     clone.setEffectTo(newItem.getEffectFrom());
                     clone.setEntity(newestOlderItem.getEntity());
+                    newestOlderItem.setReplacedby(clone);
                     set.add(clone);
                 }
                 if (oldestNewerItem != null) {
                     if (newItem.getRegistrationTo() == null) {
                         E clone = (E) newItem.clone();
-                        newItem.setRegistrationTo(oldestNewerItem.getRegistrationFrom());
                         clone.setRegistrationFrom(oldestNewerItem.getRegistrationFrom());
+                        newItem.setRegistrationTo(clone.getRegistrationFrom());
                         clone.setEffectTo(oldestNewerItem.getEffectFrom());
                         clone.setEntity(oldestNewerItem.getEntity());
+                        newItem.setReplacedby(clone);
                         set.add(clone);
                     }
                 }
             }
 
 
-            if (newItem.isCorrection() || newItem.isTechnicalCorrection()) {
+            if (newItem.getEffectFrom() != null && !newItem.isTechnicalCorrection()) {
+                List<CprBitemporalPersonRecord> corrections = recentTechnicalCorrections.get(entity).get(newItem.getEffectFrom());
+                if (corrections != null) {
+                    for (CprBitemporalPersonRecord olderRecord : corrections) {
+                        if (olderRecord.getClass() == newItem.getClass() && olderRecord.isTechnicalCorrection() && olderRecord.getOrigin().equals(newItem.getOrigin())) {
+                            //if (olderRecord.getEffectFrom() != null && olderRecord.getEffectFrom().equals(newItem.getEffectFrom())) {
+
+                            System.out.println(newItem.cnt+" corrects "+olderRecord.cnt);
+                            newItem.setCorrectionof(olderRecord);
+                            olderRecord.setEntity(entity);
+                            session.saveOrUpdate(olderRecord);
+                            return set.add((E) newItem);
+                            //}
+                        }
+                    }
+                }
+            }
+
+
+            if (newItem.isCorrection()) {
                 if (correctedRecord != null && correctingRecord != null && correctedRecord != correctingRecord) {
-                    if (correctedRecord.getCorrector() == null) {
+                    //if (correctedRecord.getCorrector() == null) {
+                        System.out.println(correctingRecord.cnt+" corrects "+correctedRecord.cnt);
                         correctedRecord.setRegistrationTo(newItem.getRegistrationFrom());
                         correctingRecord.setCorrectionof(correctedRecord);
-                        session.save(correctingRecord);
-                    }
+                        session.saveOrUpdate(correctingRecord);
+                    //}
                 }
             } else {
                 //log.info("nonmatching item, adding as new");

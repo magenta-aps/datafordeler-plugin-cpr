@@ -68,7 +68,7 @@ public abstract class CprSubParser<T extends Record> {
                     try {
                         T record = this.parseLine(line);
                         if (record != null) {
-                            //record.setOrigin(origin);
+                            record.setOrigin(origin);
                             records.add(record);
                         } else {
                             System.out.println("ignoring line "+line);

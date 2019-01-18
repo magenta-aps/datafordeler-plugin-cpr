@@ -51,11 +51,14 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     @Autowired
     private SessionManager sessionManager;
 
+    private static PersonEntityManager instance;
+
     public PersonEntityManager() {
         this.managedEntityClass = PersonEntity.class;
         this.managedEntityReferenceClass = PersonEntityReference.class;
         this.managedRegistrationClass = PersonRegistration.class;
         this.managedRegistrationReferenceClass = PersonRegistrationReference.class;
+        instance = this;
     }
 
     public int getJobId() {
@@ -274,6 +277,20 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
             i++;
         }
         cnts.put(entity.getPersonnummer(), i);
+        /*try {
+            System.out.println("address: "+getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(entity.getAddress()));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }*/
+    }
+
+    public static String json(Object o) {
+        try {
+            return instance.getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

@@ -10,10 +10,7 @@ import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.CprEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
-import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.PersonOutputWrapper;
-import dk.magenta.datafordeler.cpr.data.person.PersonQuery;
+import dk.magenta.datafordeler.cpr.data.person.*;
 import dk.magenta.datafordeler.cpr.data.residence.*;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.data.road.*;
@@ -118,19 +115,20 @@ public class ParseTest {
         ImportMetadata importMetadata = new ImportMetadata();
         importMetadata.setSession(session);
         importMetadata.setTransactionInProgress(true);
-        PersonQuery query = new PersonQuery();
+        PersonRecordQuery query = new PersonRecordQuery();
         try {
             //ObjectNode importConfiguration = (ObjectNode) objectMapper.readTree("{\""+ CprEntityManager.IMPORTCONFIG_PNR+"\":\"0706852417\"}");
             ObjectNode importConfiguration = objectMapper.createObjectNode();
             importMetadata.setImportConfiguration(importConfiguration);
             loadPerson(importMetadata);
-/*
+            List<PersonEntity> entities;
+
             query.setFornavn("Tester");
-            List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
-            Assert.assertEquals(0, entities.size());
+            //List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
+            //Assert.assertEquals(0, entities.size());
 
             importConfiguration.remove(CprEntityManager.IMPORTCONFIG_PNR);
-            //loadPerson(importMetadata);
+            loadPerson(importMetadata);
 
             entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
             Assert.assertEquals(1, entities.size());
@@ -140,9 +138,9 @@ public class ParseTest {
             System.out.println(
                     objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
                         //new PersonOutputWrapper().wrapResult(entity, query)
-                            entity
+                            entity.getStatus()
                     )
-            );*/
+            );
 
         } finally {
             transaction.rollback();

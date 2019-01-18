@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.records.person.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.Bitemporal;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
@@ -283,6 +284,12 @@ public class AddressDataRecord extends CprBitemporalPersonRecord<AddressDataReco
         this.startAuthority = startAuthority;
     }
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
+    private Set<AddressDataRecord> correctors = new HashSet<>();
+
+    public Set<AddressDataRecord> getCorrectors() {
+        return this.correctors;
+    }
 
 
     @Override

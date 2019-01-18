@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.records;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
+import dk.magenta.datafordeler.core.database.IdentifiedEntity;
 import dk.magenta.datafordeler.core.database.Nontemporal;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
 import org.hibernate.annotations.FilterDef;
@@ -20,13 +21,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @MappedSuperclass
-@FilterDefs({
-        @FilterDef(name = Nontemporal.FILTER_LASTUPDATED_AFTER, parameters = @ParamDef(name = Nontemporal.FILTERPARAM_LASTUPDATED_AFTER, type = "java.time.OffsetDateTime")),
-        @FilterDef(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, parameters = @ParamDef(name = Nontemporal.FILTERPARAM_LASTUPDATED_BEFORE, type = "java.time.OffsetDateTime"))
-})
-public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNontemporalRecord<E, S>> extends DatabaseEntry implements Nontemporal<E> {
+public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNontemporalRecord<E, S>> extends DatabaseEntry implements Nontemporal {
 
-    public static final String DB_FIELD_ENTITY = Nontemporal.DB_FIELD_ENTITY;
+    public static final String DB_FIELD_ENTITY = "entity";
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = CprNontemporalRecord.DB_FIELD_ENTITY + DatabaseEntry.REF)
@@ -40,6 +37,10 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
 
     public void setEntity(E entity) {
         this.entity = entity;
+    }
+
+    public void setEntity(IdentifiedEntity entity) {
+        this.entity = (E) entity;
     }
 
 
@@ -66,7 +67,7 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
 
     public static final String DB_FIELD_CORRECTION_OF = "correctionof";
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private S correctionof;
 
     public S getCorrectionof() {
@@ -74,15 +75,15 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
     }
 
     public void setCorrectionof(S correctionof) {
-        if (correctionof != null && correctionof.getCorrector() != null && correctionof.getCorrector() != this) {
+        /*if (correctionof != null && correctionof.getCorrector() != null && correctionof.getCorrector() != this) {
             System.out.println("Tried to point "+this.cnt+" to "+correctionof.cnt+", but "+correctionof.cnt+" already has "+correctionof.getCorrector().cnt+" pointing to it");
-        }
+        }*/
         this.correctionof = correctionof;
-        correctionof.setCorrector((S) this);
+        //correctionof.setCorrector((S) this);
     }
 
-
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
+/*
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
     @JsonIgnore
     private S corrector;
 
@@ -92,7 +93,7 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
 
     public void setCorrector(S corrector) {
         this.corrector = corrector;
-    }
+    }*/
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "replacedby")
     private S replaces;
@@ -191,9 +192,9 @@ public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNon
         return this.dafoUpdated;
     }
 
-    public CprNontemporalRecord setDafoUpdated(OffsetDateTime dafoUpdated) {
+    @Override
+    public void setDafoUpdated(OffsetDateTime dafoUpdated) {
         this.dafoUpdated = dafoUpdated;
-        return this;
     }
 
     protected static void copy(CprNontemporalRecord from, CprNontemporalRecord to) {

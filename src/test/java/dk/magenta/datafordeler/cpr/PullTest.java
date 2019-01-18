@@ -208,8 +208,7 @@ public class PullTest {
 
         Session session = sessionManager.getSessionFactory().openSession();
         try {
-
-            PersonQuery personQuery = new PersonQuery();
+            PersonRecordQuery personQuery = new PersonRecordQuery();
             personQuery.setFornavn("Tester");
             List<PersonEntity> personEntities = QueryManager.getAllEntities(session, personQuery, PersonEntity.class);
             Assert.assertEquals(1, personEntities.size());
@@ -222,20 +221,6 @@ public class PullTest {
             Assert.assertEquals(1, roadEntities.size());
             Assert.assertEquals(RoadEntity.generateUUID(730, 4), roadEntities.get(0).getUUID());
 
-            ResidenceQuery residenceQuery = new ResidenceQuery();
-            residenceQuery.addKommunekode(360);
-            residenceQuery.setVejkode(206);
-            residenceQuery.setHusnummer("44E");
-            List<ResidenceEntity> residenceEntities = QueryManager.getAllEntities(session, residenceQuery, ResidenceEntity.class);
-            Assert.assertEquals(1, residenceEntities.size());
-            Assert.assertEquals(ResidenceEntity.generateUUID(360, 206, "44E", "", ""), residenceEntities.get(0).getUUID());
-
-            /*
-            RecordCollection firstRecordCollection = residenceEntities.get(0).getRegistrations().get(0).getEffects().get(0).getDataItems().get(0).getRecordSet();
-            Assert.assertEquals(1, firstRecordCollection.getRecords().size());
-            RecordData firstRecordData = firstRecordCollection.getRecords().iterator().next();
-            Assert.assertEquals("00203600206044E      200612221200 199109231200000000000000Provstelunden", firstRecordData.getSourceData());
-            */
         } finally {
             session.close();
         }

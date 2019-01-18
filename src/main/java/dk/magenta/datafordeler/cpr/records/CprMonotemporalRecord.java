@@ -1,8 +1,10 @@
 package dk.magenta.datafordeler.cpr.records;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.Monotemporal;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.FilterDefs;
 import org.hibernate.annotations.ParamDef;
@@ -14,17 +16,15 @@ import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @MappedSuperclass
-@FilterDefs({
-        @FilterDef(name = Monotemporal.FILTER_REGISTRATION_AFTER, parameters = @ParamDef(name = Monotemporal.FILTERPARAM_REGISTRATION_AFTER, type = "java.time.OffsetDateTime")),
-        @FilterDef(name = Monotemporal.FILTER_REGISTRATION_BEFORE, parameters = @ParamDef(name = Monotemporal.FILTERPARAM_REGISTRATION_BEFORE, type = "java.time.OffsetDateTime"))
-})
-public abstract class CprMonotemporalRecord<E extends CprEntity, S extends CprMonotemporalRecord<E, S>> extends CprNontemporalRecord<E, S> implements Monotemporal<E> {
+public abstract class CprMonotemporalRecord<E extends CprEntity, S extends CprMonotemporalRecord<E, S>> extends CprNontemporalRecord<E, S> implements Monotemporal {
 
     public static final String DB_FIELD_ENTITY = CprNontemporalRecord.DB_FIELD_ENTITY;
 
     // For storing the calculated endRegistration time, ie. when the next registration "overrides" us
     public static final String DB_FIELD_REGISTRATION_FROM = Monotemporal.DB_FIELD_REGISTRATION_FROM;
     public static final String IO_FIELD_REGISTRATION_FROM = Monotemporal.IO_FIELD_REGISTRATION_FROM;
+
+
     @Column(name = DB_FIELD_REGISTRATION_FROM)
     @JsonProperty(value = IO_FIELD_REGISTRATION_FROM)
     @XmlElement(name = IO_FIELD_REGISTRATION_FROM)
@@ -34,9 +34,8 @@ public abstract class CprMonotemporalRecord<E extends CprEntity, S extends CprMo
         return this.registrationFrom;
     }
 
-    public CprMonotemporalRecord setRegistrationFrom(OffsetDateTime registrationFrom) {
+    public void setRegistrationFrom(OffsetDateTime registrationFrom) {
         this.registrationFrom = registrationFrom;
-        return this;
     }
 
 
@@ -52,9 +51,8 @@ public abstract class CprMonotemporalRecord<E extends CprEntity, S extends CprMo
         return this.registrationTo;
     }
 
-    public CprMonotemporalRecord setRegistrationTo(OffsetDateTime registrationTo) {
+    public void setRegistrationTo(OffsetDateTime registrationTo) {
         this.registrationTo = registrationTo;
-        return this;
     }
 
 
@@ -66,11 +64,6 @@ public abstract class CprMonotemporalRecord<E extends CprEntity, S extends CprMo
 
     public CprMonotemporalRecord setAuthority(int authority) {
         super.setAuthority(authority);
-        return this;
-    }
-
-    public CprMonotemporalRecord setDafoUpdated(OffsetDateTime updateTime) {
-        super.setDafoUpdated(updateTime);
         return this;
     }
 
