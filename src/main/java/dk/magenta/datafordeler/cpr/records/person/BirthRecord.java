@@ -1,19 +1,13 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthPlaceDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthPlaceVerificationDataRecord;
-import org.hibernate.Session;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Record for Person birth (type 025).
@@ -44,29 +38,6 @@ public class BirthRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
-        boolean updated = false;
-        if (bitemporality.equals(this.birthTemporality)) {
-            data.setBirth(
-                    this.getInt("start_mynkod-fødested"),
-                    this.getInt("myntxt_mynkod-fødested", true),
-                    this.getString("myntxt-fødested", true),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        if (bitemporality.equals(this.documentTemporality)) {
-            data.setBirthVerification(
-                    this.getInt("dok_mynkod-fødested"),
-                    this.getBoolean("dok-fødested"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        return updated;
-    }
-
-    @Override
     public List<CprBitemporalRecord> getBitemporalRecords() {
 
         ArrayList<CprBitemporalRecord> records = new ArrayList<>();
@@ -90,22 +61,5 @@ public class BirthRecord extends PersonDataRecord {
         ));
 
         return records;
-    }
-
-    @Override
-    public List<CprBitemporality> getBitemporality() {
-        ArrayList<CprBitemporality> bitemporalities = new ArrayList<>();
-        bitemporalities.add(this.birthTemporality);
-        if (this.documentTemporality != null) {
-            bitemporalities.add(this.documentTemporality);
-        }
-        return bitemporalities;
-    }
-
-    @Override
-    public Set<PersonEffect> getEffects() {
-        HashSet<PersonEffect> effects = new HashSet<>();
-        effects.add(new PersonEffect(null, null, false, null, false));
-        return effects;
     }
 }

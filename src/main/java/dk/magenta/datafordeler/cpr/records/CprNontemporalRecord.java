@@ -6,6 +6,7 @@ import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.core.database.IdentifiedEntity;
 import dk.magenta.datafordeler.core.database.Nontemporal;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntity;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.FilterDefs;
 import org.hibernate.annotations.ParamDef;
@@ -21,7 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @MappedSuperclass
-public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNontemporalRecord<E, S>> extends DatabaseEntry implements Nontemporal {
+public abstract class CprNontemporalRecord<E extends CprRecordEntity, S extends CprNontemporalRecord<E, S>> extends DatabaseEntry implements Nontemporal {
 
 
     public static final String FILTERPARAMTYPE_LASTUPDATED = "java.time.OffsetDateTime";

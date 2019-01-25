@@ -1,15 +1,12 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.person.data.ProtectionDataRecord;
-import org.hibernate.Session;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Record for Person protection (type 015).
@@ -36,23 +33,6 @@ public class ProtectionRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
-        if (bitemporality.equals(this.protectionTemporality)) {
-            data.addProtection(
-                    // int authority,
-                    this.getInt("start_mynkod-beskyttelse"),
-                    // int beskyttelsestype,
-                    this.getInt("beskyttype"),
-                    // boolean reportMarking
-                    this.getBoolean("indrap-beskyttelse"),
-                    importMetadata.getImportTime()
-            );
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     public List<CprBitemporalRecord> getBitemporalRecords() {
 
         ArrayList<CprBitemporalRecord> records = new ArrayList<>();
@@ -75,15 +55,4 @@ public class ProtectionRecord extends PersonDataRecord {
         return records;
     }
 
-    @Override
-    public List<CprBitemporality> getBitemporality() {
-        return Collections.singletonList(this.protectionTemporality);
-    }
-
-    @Override
-    public Set<PersonEffect> getEffects() {
-        HashSet<PersonEffect> effects = new HashSet<>();
-        effects.add(new PersonEffect(null, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slet_dt-beskyttelse"), false));
-        return effects;
-    }
 }

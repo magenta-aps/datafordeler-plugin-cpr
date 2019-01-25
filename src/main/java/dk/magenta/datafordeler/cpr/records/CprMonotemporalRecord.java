@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.Monotemporal;
 import dk.magenta.datafordeler.cpr.data.CprEntity;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntity;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.FilterDefs;
@@ -16,7 +17,7 @@ import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @MappedSuperclass
-public abstract class CprMonotemporalRecord<E extends CprEntity, S extends CprMonotemporalRecord<E, S>> extends CprNontemporalRecord<E, S> implements Monotemporal {
+public abstract class CprMonotemporalRecord<E extends CprRecordEntity, S extends CprMonotemporalRecord<E, S>> extends CprNontemporalRecord<E, S> implements Monotemporal {
 
     public static final String FILTERPARAMTYPE_REGISTRATIONFROM = "java.time.OffsetDateTime";
     public static final String FILTERPARAMTYPE_REGISTRATIONTO = "java.time.OffsetDateTime";

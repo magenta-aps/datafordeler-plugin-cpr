@@ -2,21 +2,18 @@ package dk.magenta.datafordeler.cpr.records.person;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.cpr.data.CprEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 /**
  * Superclass for Person records
  */
-public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, PersonBaseData> {
+public abstract class PersonDataRecord extends CprDataRecord {
 
     public static final String RECORDTYPE_PERSON = "001";
     public static final String RECORDTYPE_BIRTH = "005";
@@ -46,57 +43,16 @@ public abstract class PersonDataRecord extends CprDataRecord<PersonEffect, Perso
     }
 
     public String getCprNumber() {
-        return this.get("pnr");
+        return this.getString("pnr", false);
     }
 
-    @Override
-    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
-        return new HashSet<>();
-    }
-
-    protected PersonBaseData getBaseDataItem(HashMap<PersonEffect, PersonBaseData> data) {
-        return this.getBaseDataItem(data, null, false, null, false);
-    }
-
-    protected PersonBaseData getBaseDataItem(HashMap<PersonEffect, PersonBaseData> data, OffsetDateTime effectFrom, boolean effectFromUncertain) {
-        return this.getBaseDataItem(data, effectFrom, effectFromUncertain, null, false);
-    }
-
-    protected PersonBaseData getBaseDataItem(HashMap<PersonEffect, PersonBaseData> data, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
-        PersonEffect effect = null;
-        for (PersonEffect e : data.keySet()) {
-            if (e.compareRange(effectFrom, effectFromUncertain, effectTo, effectToUncertain)) {
-                effect = e;
-                break;
-            }
-        }
-        if (effect == null) {
-            effect = new PersonEffect(null, effectFrom, effectTo);
-            effect.setEffectFromUncertain(effectFromUncertain);
-            effect.setEffectToUncertain(effectToUncertain);
-            data.put(effect, this.createEmptyBaseData());
-        }
-        return data.get(effect);
-    }
-
-    protected PersonBaseData createEmptyBaseData() {
-        return new PersonBaseData();
-    }
-
-    @Override
-    protected PersonEffect createEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
-        PersonEffect effect = new PersonEffect(null, effectFrom, effectTo);
-        effect.setEffectFromUncertain(effectFromUncertain);
-        effect.setEffectToUncertain(effectToUncertain);
-        return effect;
-    }
 
     @Override
     public boolean filter(ObjectNode importConfiguration) {
         if (importConfiguration != null && importConfiguration.size() > 0) {
-            if (importConfiguration.has(CprEntityManager.IMPORTCONFIG_PNR)) {
+            if (importConfiguration.has(CprRecordEntityManager.IMPORTCONFIG_PNR)) {
                 HashSet<String> acceptedCprNumbers = new HashSet<>(
-                        getConfigValueAsText(importConfiguration.get(CprEntityManager.IMPORTCONFIG_PNR), "%d")
+                        getConfigValueAsText(importConfiguration.get(CprRecordEntityManager.IMPORTCONFIG_PNR), "%d")
                 );
                 boolean found = false;
                 for (String accept : acceptedCprNumbers) {

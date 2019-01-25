@@ -2,8 +2,8 @@ package dk.magenta.datafordeler.cpr.configuration;
 
 import dk.magenta.datafordeler.core.configuration.Configuration;
 import dk.magenta.datafordeler.core.exception.ConfigurationException;
+import dk.magenta.datafordeler.core.plugin.EntityManager;
 import dk.magenta.datafordeler.cpr.CprPlugin;
-import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
@@ -317,7 +317,7 @@ public class CprConfiguration implements Configuration {
 
 
 
-    public String getRegisterPullCronSchedule(CprEntityManager entityManager) {
+    public String getRegisterPullCronSchedule(EntityManager entityManager) {
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterPullCronSchedule();
         }
@@ -330,7 +330,7 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
-    public RegisterType getRegisterType(CprEntityManager entityManager) {
+    public RegisterType getRegisterType(EntityManager entityManager) {
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterType();
         }
@@ -343,7 +343,7 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
-    public String getRegisterFtpAddress(CprEntityManager entityManager) {
+    public String getRegisterFtpAddress(EntityManager entityManager) {
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterFtpAddress();
         }
@@ -356,7 +356,7 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
-    public String getRegisterFtpUsername(CprEntityManager entityManager) {
+    public String getRegisterFtpUsername(EntityManager entityManager) {
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterFtpUsername();
         }
@@ -369,7 +369,7 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
-    public String getRegisterFtpPassword(CprEntityManager entityManager) {
+    public String getRegisterFtpPassword(EntityManager entityManager) {
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterFtpPassword();
         }
@@ -382,7 +382,7 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
-    public String getRegisterLocalFile(CprEntityManager entityManager) {
+    public String getRegisterLocalFile(EntityManager entityManager) {
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterLocalFile();
         }
@@ -395,7 +395,7 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
-    public String getRegisterCharset(CprEntityManager entityManager) {
+    public String getRegisterCharset(EntityManager entityManager) {
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterCharset();
         }
@@ -408,7 +408,7 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
-    public URI getRegisterURI(CprEntityManager entityManager) throws ConfigurationException {
+    public URI getRegisterURI(EntityManager entityManager) throws ConfigurationException {
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterURI();
         }
@@ -421,7 +421,7 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
-    public URI getRegisterSubscriptionURI(CprEntityManager entityManager) throws ConfigurationException {
+    public URI getRegisterSubscriptionURI(EntityManager entityManager) throws ConfigurationException {
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterSubscriptionURI();
         }

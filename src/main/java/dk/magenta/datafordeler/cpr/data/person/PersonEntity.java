@@ -3,15 +3,12 @@ package dk.magenta.datafordeler.cpr.data.person;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import dk.magenta.datafordeler.core.database.Bitemporal;
-import dk.magenta.datafordeler.core.database.Identification;
-import dk.magenta.datafordeler.core.database.Monotemporal;
-import dk.magenta.datafordeler.core.database.Nontemporal;
+import dk.magenta.datafordeler.core.database.*;
 import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.core.util.FixedQueueMap;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.CprPlugin;
-import dk.magenta.datafordeler.cpr.data.CprEntity;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntity;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprMonotemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprNontemporalRecord;
@@ -22,8 +19,8 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.annotations.*;
 
-import javax.persistence.*;
 import javax.persistence.CascadeType;
+import javax.persistence.*;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -38,7 +35,7 @@ import java.util.*;
  */
 @javax.persistence.Entity
 @Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_entity", indexes = {
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_identification", columnList = "identification_id", unique = true),
+        //@Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_identification", columnList = PersonEntity.DB_FIELD_IDENTIFICATION + DatabaseEntry.REF, unique = true),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_personnummer", columnList = PersonEntity.DB_FIELD_CPR_NUMBER, unique = true)
 })
 @FilterDefs({
@@ -54,7 +51,7 @@ import java.util.*;
         @FilterDef(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, parameters = @ParamDef(name = Nontemporal.FILTERPARAM_LASTUPDATED_BEFORE, type = CprNontemporalRecord.FILTERPARAMTYPE_LASTUPDATED))
 })
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
+public class PersonEntity extends CprRecordEntity {
 
     public PersonEntity() {
     }
@@ -65,11 +62,6 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
 
     public PersonEntity(UUID uuid, String domain) {
         super(uuid, domain);
-    }
-
-    @Override
-    protected PersonRegistration createEmptyRegistration() {
-        return new PersonRegistration();
     }
 
     @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="type")
@@ -95,7 +87,6 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
         String uuidInput = "person:"+cprNumber;
         return UUID.nameUUIDFromBytes(uuidInput.getBytes());
     }
-
 
 
 
@@ -1055,5 +1046,10 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
         records.addAll(this.status);
         records.addAll(this.protection);
         return records;
+    }
+
+    @Override
+    public IdentifiedEntity getNewest(Collection<IdentifiedEntity> collection) {
+        return null;
     }
 }

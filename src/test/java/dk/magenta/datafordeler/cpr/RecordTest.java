@@ -14,10 +14,10 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.user.DafoUserManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.PersonOutputWrapper;
 import dk.magenta.datafordeler.cpr.data.person.PersonRecordQuery;
 import dk.magenta.datafordeler.cpr.records.output.PersonRecordOutputWrapper;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,7 +54,7 @@ public class RecordTest {
     private PersonRecordOutputWrapper personRecordOutputWrapper;
 
     //@Autowired
-    private PersonOutputWrapper personOutputWrapper = new PersonOutputWrapper();
+    private PersonRecordOutputWrapper personOutputWrapper = new PersonRecordOutputWrapper();
 
     @Autowired
     private CprPlugin plugin;
@@ -171,6 +171,16 @@ public class RecordTest {
         } finally {
             session.close();
         }
+    }
+
+
+    @Test
+    public void testPersonIdempotence() throws Exception {
+        Session session = sessionManager.getSessionFactory().openSession();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        this.loadPerson("/persondata.txt", importMetadata);
+        // TODO: check updated
     }
 
 /*

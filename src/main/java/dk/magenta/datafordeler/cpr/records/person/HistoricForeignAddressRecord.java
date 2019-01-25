@@ -1,20 +1,14 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.person.data.ForeignAddressDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ForeignAddressEmigrationDataRecord;
-import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Record for Person foreign address (type 028).
@@ -55,67 +49,6 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
-        boolean updated = false;
-        if (this.emigrationTemporality.registrationFrom != null && bitemporality.equals(this.emigrationTemporality)) {
-            data.setEmigration(
-                    this.getInt("start_mynkod-udrindrejse"),
-                    this.getInt("udr_landekod"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        if (this.immigrationTemporality.registrationFrom != null && bitemporality.equals(this.immigrationTemporality)) {
-            data.setEmigration(
-                    this.getInt("start_mynkod-udrindrejse"),
-                    this.getInt("indr_landekod"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        if (bitemporality.equals(this.foreignAddressTemporality)) {
-            data.setForeignAddress(
-                    this.getInt("udlandadr_mynkod"),
-                    this.get("udlandadr1"),
-                    this.get("udlandadr2"),
-                    this.get("udlandadr3"),
-                    this.get("udlandadr4"),
-                    this.get("udlandadr5"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        return updated;
-    }
-
-    /**
-     * Delete obsolete data that has been replaced
-     * The obsolete data must not match the new bitemporality, but must match it without effectTo
-     * @param data
-     * @param bitemporality
-     * @param outdatedTemporality
-     * @param session
-     * @return
-     */
-    @Override
-    public boolean cleanBaseData(PersonBaseData data, CprBitemporality bitemporality, CprBitemporality outdatedTemporality, Session session) {
-        boolean updated = false;
-        if (bitemporality.equals(this.emigrationTemporality) && outdatedTemporality.equals(this.emigrationTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
-            data.clearEmigration(session);
-            updated = true;
-        }
-        if (bitemporality.equals(this.immigrationTemporality) && outdatedTemporality.equals(this.immigrationTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
-            data.clearEmigration(session);
-            updated = true;
-        }
-        if (bitemporality.equals(this.foreignAddressTemporality) && outdatedTemporality.equals(this.foreignAddressTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
-            data.clearForeignAddress(session);
-            updated = true;
-        }
-        return updated;
-    }
-
-    @Override
     public String getRecordType() {
         return RECORDTYPE_HISTORIC_FOREIGN_ADDRESS;
     }
@@ -128,11 +61,11 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
         boolean corrected = Character.valueOf('K').equals(annkor);
         boolean undo = Character.valueOf('A').equals(annkor);
         records.add(new ForeignAddressDataRecord(
-                this.get("udlandadr1"),
-                this.get("udlandadr2"),
-                this.get("udlandadr3"),
-                this.get("udlandadr4"),
-                this.get("udlandadr5")
+                this.getString("udlandadr1", false),
+                this.getString("udlandadr2", false),
+                this.getString("udlandadr3", false),
+                this.getString("udlandadr4", false),
+                this.getString("udlandadr5", false)
         ).setAuthority(
                 this.getInt("udlandadr_mynkod")
         ).setBitemporality(
@@ -164,25 +97,4 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
         return records;
     }
 
-    @Override
-    public List<CprBitemporality> getBitemporality() {
-        ArrayList<CprBitemporality> bitemporalities = new ArrayList<>();
-        if (this.has("udr_ts") || this.has("udr_landekod")) {
-            bitemporalities.add(this.emigrationTemporality);
-        }
-        if (this.has("indr_ts") || this.has("indr_landekod")) {
-            bitemporalities.add(this.immigrationTemporality);
-        }
-        if (this.has("udlandadr_mynkod") || this.has("udlandadr1")) {
-            bitemporalities.add(this.foreignAddressTemporality);
-        }
-        return bitemporalities;
-    }
-
-    @Override
-    public Set<PersonEffect> getEffects() {
-        HashSet<PersonEffect> effects = new HashSet<>();
-        effects.add(new PersonEffect(null, this.getOffsetDateTime("udrdto"), this.getMarking("udrdto_umrk"), this.getOffsetDateTime("indrdto"), this.getMarking("indrdto_umrk")));
-        return effects;
-    }
 }

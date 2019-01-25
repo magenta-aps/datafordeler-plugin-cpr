@@ -5,7 +5,9 @@ import dk.magenta.datafordeler.core.arearestriction.AreaRestriction;
 import dk.magenta.datafordeler.core.arearestriction.AreaRestrictionType;
 import dk.magenta.datafordeler.core.exception.AccessDeniedException;
 import dk.magenta.datafordeler.core.exception.AccessRequiredException;
+import dk.magenta.datafordeler.core.exception.HttpNotFoundException;
 import dk.magenta.datafordeler.core.exception.InvalidClientInputException;
+import dk.magenta.datafordeler.core.fapi.FapiBaseService;
 import dk.magenta.datafordeler.core.fapi.FapiService;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
 import dk.magenta.datafordeler.core.plugin.AreaRestrictionDefinition;
@@ -23,11 +25,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/cpr/person/1/rest")
-public class PersonEntityRecordService extends FapiService<PersonEntity, PersonRecordQuery> {
+public class PersonEntityRecordService extends FapiBaseService<PersonEntity, PersonRecordQuery> {
 
     @Autowired
     private CprPlugin cprPlugin;
@@ -90,6 +96,11 @@ public class PersonEntityRecordService extends FapiService<PersonEntity, PersonR
                 query.addKommunekodeRestriction(restriction.getValue());
             }
         }
+    }
+
+    @Override
+    protected void sendAsCSV(Stream<PersonEntity> stream, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, HttpNotFoundException {
+
     }
 
 }

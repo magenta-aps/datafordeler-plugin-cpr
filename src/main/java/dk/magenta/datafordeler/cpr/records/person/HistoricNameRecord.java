@@ -1,21 +1,15 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.person.data.NameAuthorityTextDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.NameDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.NameVerificationDataRecord;
-import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Record for Person historic name (type 021).
@@ -62,92 +56,6 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
-        boolean updated = false;
-        if (bitemporality.equals(this.nameTemporality)) {
-            data.setName(
-                    // int authority,
-                    this.getInt("start_mynkod-navne"),
-                    // String adresseringsnavn,
-                    null,
-                    // String efternavn,
-                    this.get("efternvn"),
-                    // String fornavne,
-                    this.get("fornvn"),
-                    // String mellemnavn,
-                    this.get("melnvn"),
-                    // boolean efternavnMarkering,
-                    this.getMarking("efternvn_mrk"),
-                    // boolean fornavneMarkering,
-                    this.getMarking("fornvn_mrk"),
-                    // boolean mellemnavnMarkering,
-                    this.getMarking("melnvn_mrk"),
-                    // String egetEfternavn,
-                    this.get("slægtsnvn"),
-                    // boolean ownLastNameMarking,
-                    this.getMarking("slægtsnvn_mrk"),
-                    // boolean reportNames
-                    false,
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        if (bitemporality.equals(this.addressNameTemporality)) {
-            data.setAddressName(
-                    // int authority,
-                    this.getInt("adrnvn_mynkod"),
-                    // String addressName
-                    this.get("adrnvn"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        if (bitemporality.equals(this.documentNameTemporality)) {
-            data.setNameVerification(
-                    // int authority,
-                    this.getInt("dok_mynkod-navne"),
-                    // boolean verification
-                    this.getBoolean("dok-navne"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        if (bitemporality.equals(this.officiaryTemporality)) {
-            data.setNameAuthorityText(
-                    // int authority,
-                    this.getInt("myntxt_mynkod-navne"),
-                    // String text
-                    this.get("myntxt-navne"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        return updated;
-    }
-
-    @Override
-    public boolean cleanBaseData(PersonBaseData data, CprBitemporality bitemporality, CprBitemporality outdatedTemporality, Session session) {
-        boolean updated = false;
-        if (bitemporality.equals(this.nameTemporality) && outdatedTemporality.equals(this.nameTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
-            data.clearName(session);
-            updated = true;
-        }
-        if (bitemporality.equals(this.addressNameTemporality) && outdatedTemporality.equals(this.addressNameTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
-            data.clearAddressName(session);
-            updated = true;
-        }
-        if (bitemporality.equals(this.documentNameTemporality) && outdatedTemporality.equals(this.documentNameTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
-            data.clearNameVerification(session);
-            updated = true;
-        }
-        if (bitemporality.equals(this.officiaryTemporality) && outdatedTemporality.equals(this.officiaryTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
-            data.clearNameAuthorityText(session);
-            updated = true;
-        }
-        return updated;
-    }
-
-    @Override
     public String getRecordType() {
         return RECORDTYPE_HISTORIC_NAME;
     }
@@ -162,13 +70,13 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
         boolean undo = Character.valueOf('A').equals(annkor);
         records.add(new NameDataRecord(
                 null,
-                this.get("fornvn"),
+                this.getString("fornvn", true),
                 this.getMarking("fornvn_mrk"),
-                this.get("melnvn"),
+                this.getString("melnvn", true),
                 this.getMarking("melnvn_mrk"),
-                this.get("efternvn"),
+                this.getString("efternvn", true),
                 this.getMarking("efternvn_mrk"),
-                this.get("slægtsnvn"),
+                this.getString("slægtsnvn", true),
                 this.getMarking("slægtsnvn_mrk")
         ).setAuthority(
                 this.getInt("start_mynkod-navne")
@@ -200,28 +108,4 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
         return records;
     }
 
-    @Override
-    public List<CprBitemporality> getBitemporality() {
-        ArrayList<CprBitemporality> bitemporalities = new ArrayList<>();
-        if (this.has("fornvn") || this.has("melnvn") || this.has("efternvn") || this.has("slægtsnvn")) {
-            bitemporalities.add(this.nameTemporality);
-        }
-        if (this.has("adrnvn") || this.has("adrnvn_mynkod")) {
-            bitemporalities.add(this.addressNameTemporality);
-        }
-        if (this.has("dok-navne") || this.has("dok_mynkod-navne")) {
-            bitemporalities.add(this.documentNameTemporality);
-        }
-        if (this.has("myntxt-navne") || this.has("myntxt_mynkod-navne")) {
-            bitemporalities.add(this.officiaryTemporality);
-        }
-        return bitemporalities;
-    }
-
-    @Override
-    public Set<PersonEffect> getEffects() {
-        HashSet<PersonEffect> effects = new HashSet<>();
-        effects.add(new PersonEffect(null, this.getOffsetDateTime("nvnhaenstart"), this.getMarking("haenstart_umrk-navne"), this.getOffsetDateTime("nvnhaenslut"), this.getMarking("haenslut_umrk-navne")));
-        return effects;
-    }
 }

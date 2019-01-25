@@ -12,7 +12,7 @@ import dk.magenta.datafordeler.core.plugin.*;
 import dk.magenta.datafordeler.core.util.ItemInputStream;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
-import dk.magenta.datafordeler.cpr.data.CprEntityManager;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 import dk.magenta.datafordeler.cpr.synchronization.CprSourceData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -106,9 +106,9 @@ public class CprRegisterManager extends RegisterManager {
 
     @Override
     public URI getEventInterface(EntityManager entityManager) throws DataFordelerException {
-        if (entityManager instanceof CprEntityManager) {
+        if (entityManager instanceof CprRecordEntityManager) {
             CprConfiguration configuration = this.configurationManager.getConfiguration();
-            return configuration.getRegisterURI((CprEntityManager) entityManager);
+            return configuration.getRegisterURI((CprRecordEntityManager) entityManager);
         }
         return null;
     }
@@ -133,7 +133,7 @@ public class CprRegisterManager extends RegisterManager {
         return this.configurationManager.getConfiguration().getPersonRegisterPullCronSchedule();
     }
 
-    public FtpCommunicator getFtpCommunicator(URI eventInterface, CprEntityManager cprEntityManager) throws DataStreamException {
+    public FtpCommunicator getFtpCommunicator(URI eventInterface, EntityManager cprEntityManager) throws DataStreamException {
         CprConfiguration configuration = this.configurationManager.getConfiguration();
         return new FtpCommunicator(
                 configuration.getRegisterFtpUsername(cprEntityManager),
@@ -161,15 +161,15 @@ public class CprRegisterManager extends RegisterManager {
     */
     @Override
     public ImportInputStream pullRawData(URI eventInterface, EntityManager entityManager, ImportMetadata importMetadata) throws DataFordelerException {
-        if (!(entityManager instanceof CprEntityManager)) {
-            throw new WrongSubclassException(CprEntityManager.class, entityManager);
+        if (!(entityManager instanceof CprRecordEntityManager)) {
+            throw new WrongSubclassException(CprRecordEntityManager.class, entityManager);
         }
         if (eventInterface == null) {
             this.log.info("Not pulling for "+entityManager.toString());
             return null;
         }
         this.log.info("Pulling from "+eventInterface.toString() + " for entitymanager "+entityManager);
-        CprEntityManager cprEntityManager = (CprEntityManager) entityManager;
+        CprRecordEntityManager cprEntityManager = (CprRecordEntityManager) entityManager;
         ImportInputStream responseBody = null;
         String scheme = eventInterface.getScheme();
         this.log.info("scheme: "+scheme);
@@ -215,8 +215,8 @@ public class CprRegisterManager extends RegisterManager {
 
     @Override
     protected ItemInputStream<? extends PluginSourceData> parseEventResponse(InputStream rawData, EntityManager entityManager) throws DataFordelerException {
-        if (!(entityManager instanceof CprEntityManager)) {
-            throw new WrongSubclassException(CprEntityManager.class, entityManager);
+        if (!(entityManager instanceof CprRecordEntityManager)) {
+            throw new WrongSubclassException(CprRecordEntityManager.class, entityManager);
         }
 
         final int linesPerEvent = 1000;

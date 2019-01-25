@@ -2,7 +2,8 @@ package dk.magenta.datafordeler.cpr.data.road;
 
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
-import dk.magenta.datafordeler.cpr.data.CprEntityManager;
+import dk.magenta.datafordeler.cpr.data.CprGeoEntityManager;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.parsers.RoadParser;
@@ -14,7 +15,7 @@ import java.net.URI;
 import java.util.UUID;
 
 @Component("cprRoadEntityMananger")
-public class RoadEntityManager extends CprEntityManager<RoadDataRecord, RoadEntity, RoadRegistration, RoadEffect, RoadBaseData> {
+public class RoadEntityManager extends CprGeoEntityManager<RoadDataRecord, RoadEntity, RoadRegistration, RoadEffect, RoadBaseData> {
 
     @Autowired
     private RoadEntityService roadEntityService;
