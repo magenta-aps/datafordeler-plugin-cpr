@@ -7,7 +7,9 @@ import dk.magenta.datafordeler.cpr.data.CprData;
 import dk.magenta.datafordeler.cpr.data.CprEffect;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 
 /**

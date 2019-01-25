@@ -15,7 +15,6 @@ import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
-import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import dk.magenta.datafordeler.cpr.records.CprGeoRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -280,12 +279,8 @@ public abstract class CprGeoEntityManager<T extends CprGeoRecord<V, D>, E extend
                             for (UUID uuid : uuids) {
                                 E entity = entityCache.get(uuid);
                                 List<T> records = recordMap.get(entity);
-
                                 session.saveOrUpdate(entity);
-                                this.parseAlternate(entity, records, importMetadata);
-                                session.saveOrUpdate(entity);
-
-                                //this.parseRVD(entity, records, importMetadata);
+                                this.parseRVD(entity, records, importMetadata);
                             }
 
                             this.checkInterrupt(importMetadata);

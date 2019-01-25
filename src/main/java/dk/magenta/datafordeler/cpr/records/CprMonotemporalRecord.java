@@ -1,14 +1,8 @@
 package dk.magenta.datafordeler.cpr.records;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.database.Monotemporal;
-import dk.magenta.datafordeler.cpr.data.CprEntity;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntity;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.FilterDefs;
-import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;

@@ -1,6 +1,5 @@
 package dk.magenta.datafordeler.cpr.records.output;
 
-import dk.magenta.datafordeler.cpr.data.CprEntity;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntity;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 

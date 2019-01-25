@@ -6,7 +6,6 @@ import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.person.data.ProtectionDataRecord;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

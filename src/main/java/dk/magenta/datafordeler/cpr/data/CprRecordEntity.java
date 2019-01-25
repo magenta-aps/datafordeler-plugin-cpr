@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import javax.persistence.*;
 import java.util.UUID;
 
+@MappedSuperclass
 public abstract class CprRecordEntity extends DatabaseEntry implements IdentifiedEntity {
 
     public CprRecordEntity() {
@@ -16,7 +17,7 @@ public abstract class CprRecordEntity extends DatabaseEntry implements Identifie
     public static final String DB_FIELD_IDENTIFICATION = "identification";
 
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = DB_FIELD_IDENTIFICATION + DatabaseEntry.REF)
+    @JoinColumn(name = DB_FIELD_IDENTIFICATION)
     public Identification identification;
 
     @Override

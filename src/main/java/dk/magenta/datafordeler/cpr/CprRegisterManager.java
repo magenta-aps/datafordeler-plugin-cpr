@@ -108,7 +108,7 @@ public class CprRegisterManager extends RegisterManager {
     public URI getEventInterface(EntityManager entityManager) throws DataFordelerException {
         if (entityManager instanceof CprRecordEntityManager) {
             CprConfiguration configuration = this.configurationManager.getConfiguration();
-            return configuration.getRegisterURI((CprRecordEntityManager) entityManager);
+            return configuration.getRegisterURI(entityManager);
         }
         return null;
     }

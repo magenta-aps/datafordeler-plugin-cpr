@@ -8,7 +8,6 @@ import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
-import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import dk.magenta.datafordeler.cpr.records.CprGeoRecord;
 import org.hibernate.Session;
 

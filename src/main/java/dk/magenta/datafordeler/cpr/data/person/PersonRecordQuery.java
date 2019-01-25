@@ -5,7 +5,6 @@ import dk.magenta.datafordeler.core.database.LookupDefinition;
 import dk.magenta.datafordeler.core.fapi.BaseQuery;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.fapi.QueryField;
-import dk.magenta.datafordeler.cpr.CprRecordLookupDefinition;
 import dk.magenta.datafordeler.cpr.records.person.data.AddressDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.NameDataRecord;
 
@@ -18,7 +17,7 @@ public class PersonRecordQuery extends BaseQuery {
 
     
     public static final String PERSONNUMMER = PersonEntity.IO_FIELD_CPR_NUMBER;
-    public static final String FORNAVNE = "fornavne";
+    public static final String FORNAVNE = "fornavn";
     public static final String EFTERNAVN = "efternavn";
     public static final String KOMMUNEKODE = "cprKommunekode";
 

@@ -64,6 +64,8 @@ public class PersonEntity extends CprRecordEntity {
         super(uuid, domain);
     }
 
+
+
     @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="type")
     public static final String schema = "Person";
 

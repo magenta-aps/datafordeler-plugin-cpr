@@ -6,7 +6,6 @@ import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 
-import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
 
@@ -36,10 +35,6 @@ public abstract class PersonDataRecord extends CprDataRecord {
     public PersonDataRecord(String line) throws ParseException {
         super(line);
         this.obtain("pnr", 4, 10);
-    }
-
-    protected int getTimestampStart() {
-        return 21;
     }
 
     public String getCprNumber() {

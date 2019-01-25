@@ -53,9 +53,6 @@ public class RecordTest {
     @Autowired
     private PersonRecordOutputWrapper personRecordOutputWrapper;
 
-    //@Autowired
-    private PersonRecordOutputWrapper personOutputWrapper = new PersonRecordOutputWrapper();
-
     @Autowired
     private CprPlugin plugin;
 
@@ -221,8 +218,6 @@ public class RecordTest {
             PersonEntity personEntity = QueryManager.getAllEntities(session, query, PersonEntity.class).get(0);
 
             System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this.personRecordOutputWrapper.wrapResult(personEntity, query, OutputWrapper.Mode.LEGACY)));
-            System.out.println("--------------------");
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this.personOutputWrapper.wrapResult(personEntity, query, OutputWrapper.Mode.LEGACY)));
 
         } finally {
             session.close();
