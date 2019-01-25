@@ -23,6 +23,10 @@ import java.util.regex.Pattern;
 @MappedSuperclass
 public abstract class CprNontemporalRecord<E extends CprEntity, S extends CprNontemporalRecord<E, S>> extends DatabaseEntry implements Nontemporal {
 
+
+    public static final String FILTERPARAMTYPE_LASTUPDATED = "java.time.OffsetDateTime";
+
+
     public static final String DB_FIELD_ENTITY = "entity";
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

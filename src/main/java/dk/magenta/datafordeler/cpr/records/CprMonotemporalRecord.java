@@ -18,6 +18,9 @@ import java.util.Objects;
 @MappedSuperclass
 public abstract class CprMonotemporalRecord<E extends CprEntity, S extends CprMonotemporalRecord<E, S>> extends CprNontemporalRecord<E, S> implements Monotemporal {
 
+    public static final String FILTERPARAMTYPE_REGISTRATIONFROM = "java.time.OffsetDateTime";
+    public static final String FILTERPARAMTYPE_REGISTRATIONTO = "java.time.OffsetDateTime";
+
     public static final String DB_FIELD_ENTITY = CprNontemporalRecord.DB_FIELD_ENTITY;
 
     // For storing the calculated endRegistration time, ie. when the next registration "overrides" us

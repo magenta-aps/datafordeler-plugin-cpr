@@ -22,8 +22,13 @@ import java.util.Objects;
 public abstract class CprBitemporalRecord<E extends CprEntity, S extends CprBitemporalRecord<E, S>> extends CprMonotemporalRecord<E, S> implements Comparable<CprBitemporalRecord>, Bitemporal {
 
 
-    //public static final String FILTER_EFFECT_FROM = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " >= :" + Effect.FILTERPARAM_EFFECT_FROM + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_TO + " is null)";
-    //public static final String FILTER_EFFECT_TO = "(" + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " < :" + Effect.FILTERPARAM_EFFECT_TO + " OR " + CprBitemporalRecord.DB_FIELD_EFFECT_FROM + " is null)";
+    public static final String FILTERPARAMTYPE_EFFECTFROM = "java.time.OffsetDateTime";
+    public static final String FILTERPARAMTYPE_EFFECTTO = "java.time.OffsetDateTime";
+
+
+
+
+
 
     public static final String DB_FIELD_ENTITY = CprMonotemporalRecord.DB_FIELD_ENTITY;
 
