@@ -540,10 +540,6 @@ public abstract class CprGeoEntityManager<T extends CprGeoRecord<V, D>, E extend
      */
     @Override
     public boolean pullEnabled() {
-        try {
-            return this.getRegisterManager().getEventInterface(this) != null;
-        } catch (DataFordelerException e) {
-            return false;
-        }
+        return this.getConfiguration().getRegisterType(this) != CprConfiguration.RegisterType.DISABLED;
     }
 }

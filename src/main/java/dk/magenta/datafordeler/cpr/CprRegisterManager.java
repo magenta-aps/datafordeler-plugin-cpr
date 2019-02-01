@@ -12,6 +12,7 @@ import dk.magenta.datafordeler.core.plugin.*;
 import dk.magenta.datafordeler.core.util.ItemInputStream;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
+import dk.magenta.datafordeler.cpr.data.CprGeoEntityManager;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 import dk.magenta.datafordeler.cpr.synchronization.CprSourceData;
 import org.apache.logging.log4j.LogManager;
@@ -106,7 +107,7 @@ public class CprRegisterManager extends RegisterManager {
 
     @Override
     public URI getEventInterface(EntityManager entityManager) throws DataFordelerException {
-        if (entityManager instanceof CprRecordEntityManager) {
+        if (entityManager instanceof CprRecordEntityManager || entityManager instanceof CprGeoEntityManager) {
             CprConfiguration configuration = this.configurationManager.getConfiguration();
             return configuration.getRegisterURI(entityManager);
         }
@@ -161,7 +162,7 @@ public class CprRegisterManager extends RegisterManager {
     */
     @Override
     public ImportInputStream pullRawData(URI eventInterface, EntityManager entityManager, ImportMetadata importMetadata) throws DataFordelerException {
-        if (!(entityManager instanceof CprRecordEntityManager)) {
+        if (!(entityManager instanceof CprRecordEntityManager) && !(entityManager instanceof CprGeoEntityManager)) {
             throw new WrongSubclassException(CprRecordEntityManager.class, entityManager);
         }
         if (eventInterface == null) {
@@ -169,7 +170,6 @@ public class CprRegisterManager extends RegisterManager {
             return null;
         }
         this.log.info("Pulling from "+eventInterface.toString() + " for entitymanager "+entityManager);
-        CprRecordEntityManager cprEntityManager = (CprRecordEntityManager) entityManager;
         ImportInputStream responseBody = null;
         String scheme = eventInterface.getScheme();
         this.log.info("scheme: "+scheme);
@@ -189,7 +189,7 @@ public class CprRegisterManager extends RegisterManager {
             case "ftp":
             case "ftps":
                 try {
-                    FtpCommunicator ftpFetcher = this.getFtpCommunicator(eventInterface, cprEntityManager);
+                    FtpCommunicator ftpFetcher = this.getFtpCommunicator(eventInterface, entityManager);
                     if (
                             importMetadata != null &&
                                     importMetadata.getImportConfiguration() != null &&

@@ -35,7 +35,7 @@ import java.util.*;
  */
 @javax.persistence.Entity
 @Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_entity", indexes = {
-        //@Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_identification", columnList = PersonEntity.DB_FIELD_IDENTIFICATION + DatabaseEntry.REF, unique = true),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_identification", columnList = PersonEntity.DB_FIELD_IDENTIFICATION, unique = true),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_personnummer", columnList = PersonEntity.DB_FIELD_CPR_NUMBER, unique = true)
 })
 @FilterDefs({
@@ -987,8 +987,7 @@ public class PersonEntity extends CprRecordEntity {
                     for (CprBitemporalPersonRecord olderRecord : corrections) {
                         if (olderRecord.getClass() == newItem.getClass() && olderRecord.isTechnicalCorrection() && olderRecord.getOrigin().equals(newItem.getOrigin())) {
                             //if (olderRecord.getEffectFrom() != null && olderRecord.getEffectFrom().equals(newItem.getEffectFrom())) {
-
-                            System.out.println(newItem.cnt+" corrects "+olderRecord.cnt);
+                            // System.out.println(newItem.cnt+" corrects "+olderRecord.cnt);
                             newItem.setCorrectionof(olderRecord);
                             olderRecord.setEntity(entity);
                             session.saveOrUpdate(olderRecord);
@@ -1003,7 +1002,7 @@ public class PersonEntity extends CprRecordEntity {
             if (newItem.isCorrection()) {
                 if (correctedRecord != null && correctingRecord != null && correctedRecord != correctingRecord) {
                     //if (correctedRecord.getCorrector() == null) {
-                        System.out.println(correctingRecord.cnt+" corrects "+correctedRecord.cnt);
+                        // System.out.println(correctingRecord.cnt+" corrects "+correctedRecord.cnt);
                         correctedRecord.setRegistrationTo(newItem.getRegistrationFrom());
                         correctingRecord.setCorrectionof(correctedRecord);
                         session.saveOrUpdate(correctingRecord);
