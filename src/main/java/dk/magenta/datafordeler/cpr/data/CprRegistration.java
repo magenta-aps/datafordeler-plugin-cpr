@@ -3,7 +3,7 @@ package dk.magenta.datafordeler.cpr.data;
 import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.database.Registration;
 import dk.magenta.datafordeler.core.util.Equality;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 
 import java.time.OffsetDateTime;
 
@@ -23,7 +23,7 @@ public abstract class CprRegistration<E extends Entity<E, R>, R extends CprRegis
         return null;
     }
 
-    public V getEffect(Bitemporality bitemporality) {
+    public V getEffect(CprBitemporality bitemporality) {
         return this.getEffect(bitemporality.effectFrom, bitemporality.effectFromUncertain, bitemporality.effectTo, bitemporality.effectToUncertain);
     }
 
@@ -34,7 +34,7 @@ public abstract class CprRegistration<E extends Entity<E, R>, R extends CprRegis
         return effect;
     }
 
-    public V createEffect(Bitemporality bitemporality) {
+    public V createEffect(CprBitemporality bitemporality) {
         return this.createEffect(bitemporality.effectFrom, bitemporality.effectFromUncertain, bitemporality.effectTo, bitemporality.effectToUncertain);
     }
 

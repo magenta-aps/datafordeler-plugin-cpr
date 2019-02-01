@@ -26,6 +26,10 @@ public class PersonParser extends CprSubParser<PersonDataRecord> {
     @Override
     public PersonDataRecord parseLine(String recordType, String line) {
         this.logType(recordType);
+        int idx = line.indexOf("##");
+        if (idx != -1) {
+            line = line.substring(0, idx);
+        }
         try {
             switch (recordType) {
                 case PersonDataRecord.RECORDTYPE_PERSON:
@@ -38,6 +42,8 @@ public class PersonParser extends CprSubParser<PersonDataRecord> {
                     return new HistoricChurchRecord(line);
                 case PersonDataRecord.RECORDTYPE_PROTECTION:
                     return new ProtectionRecord(line);
+                case PersonDataRecord.RECORDTYPE_HISTORIC_PROTECTION:
+                    return new HistoricProtectionRecord(line);
                 case PersonDataRecord.RECORDTYPE_CURRENT_NAME:
                     return new NameRecord(line);
                 case PersonDataRecord.RECORDTYPE_DOMESTIC_ADDRESS:

@@ -1,18 +1,21 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.magenta.datafordeler.core.database.QueryManager;
-import dk.magenta.datafordeler.core.database.RegistrationReference;
+import dk.magenta.datafordeler.core.database.Registration;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
-import dk.magenta.datafordeler.cpr.CprRegisterManager;
-import dk.magenta.datafordeler.cpr.data.CprEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
+import dk.magenta.datafordeler.core.io.Receipt;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.AddressRecord;
+import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import dk.magenta.datafordeler.cpr.records.person.ForeignAddressRecord;
 import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
+import dk.magenta.datafordeler.cpr.records.service.PersonEntityRecordService;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,10 +23,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 @Component
-public class PersonEntityManager extends CprEntityManager<PersonDataRecord, PersonEntity, PersonRegistration, PersonEffect, PersonBaseData> {
+public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord, PersonEntity> {
 
     @Value("${dafo.cpr.person.subscription-enabled:false}")
     private boolean setupSubscriptionEnabled;
@@ -39,7 +43,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
 
 
     @Autowired
-    private PersonEntityService personEntityService;
+    private PersonEntityRecordService personEntityService;
 
     @Autowired
     private PersonParser personParser;
@@ -47,11 +51,11 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     @Autowired
     private SessionManager sessionManager;
 
+    private static PersonEntityManager instance;
+
     public PersonEntityManager() {
-        this.managedEntityClass = PersonEntity.class;
-        this.managedEntityReferenceClass = PersonEntityReference.class;
-        this.managedRegistrationClass = PersonRegistration.class;
         this.managedRegistrationReferenceClass = PersonRegistrationReference.class;
+        instance = this;
     }
 
     public int getJobId() {
@@ -76,7 +80,7 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     }
 
     @Override
-    public PersonEntityService getEntityService() {
+    public PersonEntityRecordService getEntityService() {
         return this.personEntityService;
     }
 
@@ -90,13 +94,18 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
         return PersonEntity.schema;
     }
 
+    @Override
+    protected URI getReceiptEndpoint(Receipt receipt) {
+        return null;
+    }
+
     private HashSet<String> nonGreenlandicCprNumbers = new HashSet<>();
 
     @Override
-    public List<PersonRegistration> parseData(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
+    public List<? extends Registration> parseData(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
         try {
-            List<PersonRegistration> result = super.parseData(registrationData, importMetadata);
-            if (this.isSetupSubscriptionEnabled() && !this.nonGreenlandicCprNumbers.isEmpty()) {
+            List<? extends Registration> result = super.parseData(registrationData, importMetadata);
+            if (this.isSetupSubscriptionEnabled() && !this.nonGreenlandicCprNumbers.isEmpty() && importMetadata.getImportConfiguration().size() == 0) {
                 this.createSubscription(this.nonGreenlandicCprNumbers);
             }
             return result;
@@ -122,11 +131,6 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
     }
 
     @Override
-    protected RegistrationReference createRegistrationReference(URI uri) {
-        return new PersonRegistrationReference(uri);
-    }
-
-    @Override
     protected SessionManager getSessionManager() {
         return this.sessionManager;
     }
@@ -148,20 +152,15 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
 
     @Override
     protected PersonEntity createBasicEntity(PersonDataRecord record) {
-        PersonEntity personEntity = new PersonEntity();
-        personEntity.setPersonnummer(record.getCprNumber());
-        return personEntity;
+        PersonEntity entity = new PersonEntity();
+        entity.setPersonnummer(record.getCprNumber());
+        return entity;
     }
 
     private PersonEntity createBasicEntity(String cprNumber) {
         PersonEntity personEntity = new PersonEntity();
         personEntity.setPersonnummer(cprNumber);
         return personEntity;
-    }
-
-    @Override
-    protected PersonBaseData createDataItem() {
-        return new PersonBaseData();
     }
 
     private void createSubscription(HashSet<String> addCprNumbers) throws DataFordelerException {
@@ -243,6 +242,46 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
         } finally {
             session.close();
         }
+    }
+
+
+    private HashMap<String, Integer> cnts = new HashMap<>();
+
+    protected void parseAlternate(PersonEntity entity, Collection<PersonDataRecord> records, ImportMetadata importMetadata) {
+        OffsetDateTime updateTime = importMetadata.getImportTime();
+        int i = 1;
+        Integer c = cnts.get(entity.getPersonnummer());
+        if (c!=null) {
+            i=c;
+        }
+        for (PersonDataRecord record : records) {
+            //System.out.println("-------------------------");
+            //System.out.println(record.getLine());
+            //System.out.println("cnt: "+i);
+            for (CprBitemporalRecord bitemporalRecord : record.getBitemporalRecords()) {
+                bitemporalRecord.setDafoUpdated(updateTime);
+                bitemporalRecord.setOrigin(record.getOrigin());
+                bitemporalRecord.cnt = i;
+                bitemporalRecord.line = record.getLine();
+                entity.addBitemporalRecord((CprBitemporalPersonRecord) bitemporalRecord, importMetadata.getSession());
+            }
+            i++;
+        }
+        cnts.put(entity.getPersonnummer(), i);
+        /*try {
+            System.out.println("address: "+getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(entity.getAddress()));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }*/
+    }
+
+    public static String json(Object o) {
+        try {
+            return instance.getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

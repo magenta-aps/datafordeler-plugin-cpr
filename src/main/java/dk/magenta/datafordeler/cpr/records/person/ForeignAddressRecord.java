@@ -1,23 +1,22 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
-import org.hibernate.Session;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
+import dk.magenta.datafordeler.cpr.records.person.data.ForeignAddressDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.ForeignAddressEmigrationDataRecord;
 
-import java.lang.reflect.Array;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Record for Person foreign address (type 028).
  */
 public class ForeignAddressRecord extends PersonDataRecord {
 
-    private Bitemporality emigrationTemporality;
-    private Bitemporality foreignAddressTemporality;
+    private CprBitemporality emigrationTemporality;
+    private CprBitemporality foreignAddressTemporality;
 
     public ForeignAddressRecord(String line) throws ParseException {
         super(line);
@@ -36,34 +35,36 @@ public class ForeignAddressRecord extends PersonDataRecord {
 
         OffsetDateTime effectFrom = this.getOffsetDateTime("udrdto");
         boolean effectFromUncertain = this.getMarking("udrdto_umrk");
-        this.emigrationTemporality = new Bitemporality(this.getOffsetDateTime("udr_ts"), null, effectFrom, effectFromUncertain, null, false);
-        this.foreignAddressTemporality = new Bitemporality(this.getOffsetDateTime("udlandadr_ts"), null, effectFrom, effectFromUncertain, null, false);
+        this.emigrationTemporality = new CprBitemporality(this.getOffsetDateTime("udr_ts"), null, effectFrom, effectFromUncertain, null, false);
+        this.foreignAddressTemporality = new CprBitemporality(this.getOffsetDateTime("udlandadr_ts"), null, effectFrom, effectFromUncertain, null, false);
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
-        boolean updated = false;
-        if (bitemporality.equals(this.emigrationTemporality)) {
-            data.setEmigration(
-                    this.getInt("start_mynkod-udrindrejs"),
-                    this.getInt("udr_landekod"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        if (bitemporality.equals(this.foreignAddressTemporality)) {
-            data.setForeignAddress(
-                    this.getInt("udlandadr_mynkod"),
-                    this.get("udlandadr1"),
-                    this.get("udlandadr2"),
-                    this.get("udlandadr3"),
-                    this.get("udlandadr4"),
-                    this.get("udlandadr5"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        return updated;
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
+
+        records.add(new ForeignAddressDataRecord(
+                this.getString("udlandadr1", false),
+                this.getString("udlandadr2", false),
+                this.getString("udlandadr3", false),
+                this.getString("udlandadr4", false),
+                this.getString("udlandadr5", false)
+        ).setAuthority(
+                this.getInt("udlandadr_mynkod")
+        ).setBitemporality(
+                this.foreignAddressTemporality
+        ));
+
+        records.add(new ForeignAddressEmigrationDataRecord(
+                this.getInt("udr_landekod")
+        ).setAuthority(
+                this.getInt("start_mynkod-udrindrejs")
+        ).setBitemporality(
+                this.emigrationTemporality
+        ));
+
+        return records;
     }
 
 
@@ -72,22 +73,4 @@ public class ForeignAddressRecord extends PersonDataRecord {
         return RECORDTYPE_FOREIGN_ADDRESS;
     }
 
-    @Override
-    public List<Bitemporality> getBitemporality() {
-        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
-        if (this.has("udr_ts") || this.has("udr_landekod")) {
-            bitemporalities.add(this.emigrationTemporality);
-        }
-        if (this.has("udlandadr_mynkod") || this.has("udlandadr1")) {
-            bitemporalities.add(this.foreignAddressTemporality);
-        }
-        return bitemporalities;
-    }
-
-    @Override
-    public Set<PersonEffect> getEffects() {
-        HashSet<PersonEffect> effects = new HashSet<>();
-        effects.add(new PersonEffect(null, this.getOffsetDateTime("udrdto"), this.getMarking("udrdto_umrk"), null, false));
-        return effects;
-    }
 }

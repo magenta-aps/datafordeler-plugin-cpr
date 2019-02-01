@@ -6,20 +6,15 @@ import dk.magenta.datafordeler.core.Application;
 import dk.magenta.datafordeler.core.Engine;
 import dk.magenta.datafordeler.core.Pull;
 import dk.magenta.datafordeler.core.database.QueryManager;
-import dk.magenta.datafordeler.core.database.RecordCollection;
-import dk.magenta.datafordeler.core.database.RecordData;
 import dk.magenta.datafordeler.core.database.SessionManager;
-import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.plugin.FtpCommunicator;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
-import dk.magenta.datafordeler.cpr.data.CprEntityManager;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.*;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBirthData;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
 import dk.magenta.datafordeler.cpr.data.road.RoadQuery;
+import dk.magenta.datafordeler.cpr.records.person.data.BirthPlaceDataRecord;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Session;
 import org.junit.After;
@@ -39,19 +34,16 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -126,7 +118,7 @@ public class PullTest {
                 ftpCommunicator.setSslSocketFactory(PullTest.getTrustAllSSLSocketFactory());
                 return ftpCommunicator;
             }
-        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprEntityManager.class));
+        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprRecordEntityManager.class));
 
 
         String username = "test";
@@ -206,8 +198,7 @@ public class PullTest {
 
         Session session = sessionManager.getSessionFactory().openSession();
         try {
-
-            PersonQuery personQuery = new PersonQuery();
+            PersonRecordQuery personQuery = new PersonRecordQuery();
             personQuery.setFornavn("Tester");
             List<PersonEntity> personEntities = QueryManager.getAllEntities(session, personQuery, PersonEntity.class);
             Assert.assertEquals(1, personEntities.size());
@@ -220,20 +211,6 @@ public class PullTest {
             Assert.assertEquals(1, roadEntities.size());
             Assert.assertEquals(RoadEntity.generateUUID(730, 4), roadEntities.get(0).getUUID());
 
-            ResidenceQuery residenceQuery = new ResidenceQuery();
-            residenceQuery.addKommunekode(360);
-            residenceQuery.setVejkode(206);
-            residenceQuery.setHusnummer("44E");
-            List<ResidenceEntity> residenceEntities = QueryManager.getAllEntities(session, residenceQuery, ResidenceEntity.class);
-            Assert.assertEquals(1, residenceEntities.size());
-            Assert.assertEquals(ResidenceEntity.generateUUID(360, 206, "44E", "", ""), residenceEntities.get(0).getUUID());
-
-            /*
-            RecordCollection firstRecordCollection = residenceEntities.get(0).getRegistrations().get(0).getEffects().get(0).getDataItems().get(0).getRecordSet();
-            Assert.assertEquals(1, firstRecordCollection.getRecords().size());
-            RecordData firstRecordData = firstRecordCollection.getRecords().iterator().next();
-            Assert.assertEquals("00203600206044E      200612221200 199109231200000000000000Provstelunden", firstRecordData.getSourceData());
-            */
         } finally {
             session.close();
         }
@@ -255,7 +232,7 @@ public class PullTest {
                 ftpCommunicator.setSslSocketFactory(PullTest.getTrustAllSSLSocketFactory());
                 return ftpCommunicator;
             }
-        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprEntityManager.class));
+        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprRecordEntityManager.class));
 
 
         String username = "test";
@@ -278,9 +255,7 @@ public class PullTest {
         configuration.setPersonRegisterFtpPassword(password);
         configuration.setPersonRegisterDataCharset(CprConfiguration.Charset.UTF_8);
 
-
-
-        ObjectNode config = (ObjectNode) objectMapper.readTree("{\""+CprEntityManager.IMPORTCONFIG_RECORDTYPE+"\": [5]}");
+        ObjectNode config = (ObjectNode) objectMapper.readTree("{\""+ CprRecordEntityManager.IMPORTCONFIG_RECORDTYPE+"\": [5], \"remote\":true}");
         Pull pull = new Pull(engine, plugin, config);
         pull.run();
 
@@ -290,26 +265,19 @@ public class PullTest {
         Session session = sessionManager.getSessionFactory().openSession();
         try {
 
-            PersonQuery personQuery = new PersonQuery();
+            PersonRecordQuery personQuery = new PersonRecordQuery();
             personQuery.setPersonnummer("0101001234");
             List<PersonEntity> personEntities = QueryManager.getAllEntities(session, personQuery, PersonEntity.class);
             Assert.assertEquals(1, personEntities.size());
             PersonEntity personEntity = personEntities.get(0);
             Assert.assertEquals(PersonEntity.generateUUID("0101001234"), personEntity.getUUID());
-
-            System.out.println(
-                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
-                            new PersonOutputWrapper().wrapResult(personEntities.get(0), personQuery)
-                    )
-            );
-            Assert.assertEquals(1, personEntity.getRegistrations().size());
-            Assert.assertTrue(LocalDateTime.parse("1991-09-23T12:00").isEqual(personEntity.getRegistrations().get(0).getRegistrationFrom().toLocalDateTime()));
-            Assert.assertNull(personEntity.getRegistrations().get(0).getRegistrationTo());
-            Assert.assertEquals(1, personEntity.getRegistrations().get(0).getEffects().size());
-            PersonBirthData birthData = personEntity.getRegistrations().get(0).getEffects().get(0).getDataItems().get(0).getBirth();
-            Assert.assertNotNull(birthData);
-            Assert.assertEquals(9510, birthData.getBirthPlaceCode().intValue());
-            Assert.assertEquals(1234, birthData.getBirthAuthorityText().intValue());
+            Set<BirthPlaceDataRecord> birthPlaceDataRecords = personEntity.getBirthPlace();
+            Assert.assertEquals(1, birthPlaceDataRecords.size());
+            BirthPlaceDataRecord birthPlaceDataRecord = birthPlaceDataRecords.iterator().next();
+            Assert.assertTrue(OffsetDateTime.parse("1991-09-23T12:00+02:00").isEqual(birthPlaceDataRecord.getRegistrationFrom()));
+            Assert.assertNull(birthPlaceDataRecord.getRegistrationTo());
+            Assert.assertEquals(9510, birthPlaceDataRecord.getAuthority());
+            Assert.assertEquals(1234, birthPlaceDataRecord.getBirthPlaceCode().intValue());
         } finally {
             session.close();
         }
@@ -346,7 +314,7 @@ public class PullTest {
                 ftpCommunicator.setSslSocketFactory(PullTest.getTrustAllSSLSocketFactory());
                 return ftpCommunicator;
             }
-        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprEntityManager.class));
+        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprRecordEntityManager.class));
 
 
         String username = "test";
@@ -401,7 +369,8 @@ public class PullTest {
             File[] subFiles = localSubFolder.listFiles();
             Assert.assertEquals(1, subFiles.length);
             String contents = FileUtils.readFileToString(subFiles[0]);
-            Assert.assertEquals("06123400OP0101001234                                                            ", contents);
+            Assert.assertEquals("06123400OP0101001234                                                            \r\n" +
+                    "071234560101001234               ", contents);
         } finally {
             session.close();
             localSubFolder.delete();

@@ -1,22 +1,21 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
-import org.hibernate.Session;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
+import dk.magenta.datafordeler.cpr.records.person.data.BirthPlaceDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.BirthPlaceVerificationDataRecord;
 
-import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Record for Person birth (type 025).
  */
 public class BirthRecord extends PersonDataRecord {
 
-    private Bitemporality birthTemporality;
-    private Bitemporality documentTemporality;
+    private CprBitemporality birthTemporality;
+    private CprBitemporality documentTemporality;
 
     public BirthRecord(String line) throws ParseException {
         super(line);
@@ -29,8 +28,8 @@ public class BirthRecord extends PersonDataRecord {
         this.obtain("dok_ts-fødested", 70, 12);
         this.obtain("dok-fødested", 82, 3);
 
-        this.birthTemporality = new Bitemporality(this.getOffsetDateTime("fødested_ts"));
-        this.documentTemporality = new Bitemporality(this.getOffsetDateTime("dok_ts-fødested"));
+        this.birthTemporality = new CprBitemporality(this.getOffsetDateTime("fødested_ts"));
+        this.documentTemporality = new CprBitemporality(this.getOffsetDateTime("dok_ts-fødested"));
     }
 
     @Override
@@ -39,42 +38,28 @@ public class BirthRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, Bitemporality bitemporality, Session session, ImportMetadata importMetadata) {
-        boolean updated = false;
-        if (bitemporality.equals(this.birthTemporality)) {
-            data.setBirth(
-                    this.getInt("start_mynkod-fødested"),
-                    this.getInt("myntxt_mynkod-fødested", true),
-                    this.getString("myntxt-fødested", true),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        if (bitemporality.equals(this.documentTemporality)) {
-            data.setBirthVerification(
-                    this.getInt("dok_mynkod-fødested"),
-                    this.getBoolean("dok-fødested"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        return updated;
-    }
+    public List<CprBitemporalRecord> getBitemporalRecords() {
 
-    @Override
-    public List<Bitemporality> getBitemporality() {
-        ArrayList<Bitemporality> bitemporalities = new ArrayList<>();
-        bitemporalities.add(this.birthTemporality);
-        if (this.documentTemporality != null) {
-            bitemporalities.add(this.documentTemporality);
-        }
-        return bitemporalities;
-    }
+        ArrayList<CprBitemporalRecord> records = new ArrayList<>();
 
-    @Override
-    public Set<PersonEffect> getEffects() {
-        HashSet<PersonEffect> effects = new HashSet<>();
-        effects.add(new PersonEffect(null, null, false, null, false));
-        return effects;
+        records.add(new BirthPlaceDataRecord(
+                this.getInt("myntxt_mynkod-fødested", true),
+                this.getString("myntxt-fødested", true)
+        ).setAuthority(
+                this.getInt("start_mynkod-fødested")
+        ).setBitemporality( // TODO: Monotemporal?
+                this.birthTemporality
+        ));
+
+        records.add(new BirthPlaceVerificationDataRecord(
+                this.getBoolean("dok-fødested")
+                //importMetadata.getImportTime()
+        ).setAuthority(
+                this.getInt("dok_mynkod-fødested")
+        ).setBitemporality(
+                this.documentTemporality
+        ));
+
+        return records;
     }
 }

@@ -29,7 +29,6 @@ public class ImportTest {
     @Autowired
     private CprPlugin plugin;
 
-    @Ignore
     @Test
     public void importTest() {
         CprConfiguration configuration = ((CprConfigurationManager) plugin.getConfigurationManager()).getConfiguration();

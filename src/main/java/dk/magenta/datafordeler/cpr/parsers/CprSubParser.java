@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -21,8 +22,22 @@ public abstract class CprSubParser<T extends Record> {
         return this.log;
     }
 
-    public T parseLine(String line) {
+    /*public T parseLine(String line) {
         return this.parseLine(line.substring(0, 3), line);
+    }*/
+
+    public T parseLine(String line) {
+        int colonIndex = line.indexOf(':');
+        String origin = null;
+        if (colonIndex != -1) {
+            origin = line.substring(2, colonIndex);
+            line = line.substring(colonIndex+1);
+        }
+        T record = this.parseLine(line.substring(0, 3), line);
+        if (origin != null && record != null) {
+            record.setOrigin(origin);
+        }
+        return record;
     }
 
     protected void logType(String recordType) {
@@ -38,30 +53,37 @@ public abstract class CprSubParser<T extends Record> {
     }
 
     // TODO: output an objectInputStream
-    public List<T> parse(List<String> lines, String encoding) {
+    public List<T> parse(LinkedHashMap<String, ArrayList<String>> lineMap, String encoding) {
         ArrayList<T> records = new ArrayList<>();
 
         this.log.info("Reading data");
         int batchSize = 0, batchCount = 0;
 
-        for (String line : lines) {
-            line = line.trim();
-            if (line.length() > 3) {
-                try {
-                    T record = this.parseLine(line);
-                    if (record != null) {
-                        records.add(record);
+        for (String origin : lineMap.keySet()) {
+            List<String> lines = lineMap.get(origin);
+
+            for (String line : lines) {
+                line = line.trim();
+                if (line.length() > 3) {
+                    try {
+                        T record = this.parseLine(line);
+                        if (record != null) {
+                            record.setOrigin(origin);
+                            records.add(record);
+                        } else {
+                            System.out.println("ignoring line "+line);
+                        }
+                    } catch (OutOfMemoryError e) {
+                        System.out.println(line);
                     }
-                } catch (OutOfMemoryError e) {
-                    System.out.println(line);
                 }
-            }
-            batchSize++;
-            if (batchSize >= 100000) {
-                batchCount++;
-                System.gc();
-                this.log.trace("    parsed " + (batchCount * batchSize) + " lines");
-                batchSize = 0;
+                batchSize++;
+                if (batchSize >= 100000) {
+                    batchCount++;
+                    System.gc();
+                    this.log.trace("    parsed " + (batchCount * batchSize) + " lines");
+                    batchSize = 0;
+                }
             }
         }
         int count = records.size();

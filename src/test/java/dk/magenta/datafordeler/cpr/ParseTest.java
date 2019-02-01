@@ -1,18 +1,14 @@
 package dk.magenta.datafordeler.cpr;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.util.Equality;
-import dk.magenta.datafordeler.cpr.data.CprEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
-import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.PersonOutputWrapper;
-import dk.magenta.datafordeler.cpr.data.person.PersonQuery;
+import dk.magenta.datafordeler.cpr.data.person.*;
 import dk.magenta.datafordeler.cpr.data.residence.*;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.data.road.*;
@@ -56,12 +52,6 @@ public class ParseTest {
     private ObjectMapper objectMapper;
 
 
-    private void loadPerson(ImportMetadata importMetadata) throws DataFordelerException, IOException {
-        InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
-        personEntityManager.parseData(testData, importMetadata);
-        testData.close();
-    }
-
     @Before
     @After
     public void cleanup() {
@@ -78,68 +68,6 @@ public class ParseTest {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
         residenceEntityManager.parseData(testData, importMetadata);
         testData.close();
-    }
-
-    @Test
-    public void testPersonIdempotence() throws Exception {
-        Session session = sessionManager.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        ImportMetadata importMetadata = new ImportMetadata();
-        importMetadata.setSession(session);
-        importMetadata.setTransactionInProgress(true);
-        try {
-            loadPerson(importMetadata);
-            List<PersonEntity> entities = QueryManager.getAllEntities(session, PersonEntity.class);
-            JsonNode firstImport = objectMapper.valueToTree(entities);
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(firstImport));
-
-            System.out.println("--------------------------------------------------------");
-            loadPerson(importMetadata);
-            entities = QueryManager.getAllEntities(session, PersonEntity.class);
-            JsonNode secondImport = objectMapper.valueToTree(entities);
-            assertJsonEquality(firstImport, secondImport, true, true);
-
-        } finally {
-            transaction.rollback();
-            session.close();
-        }
-    }
-
-    @Test
-    public void testParsePerson() throws Exception {
-        Session session = sessionManager.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        ImportMetadata importMetadata = new ImportMetadata();
-        importMetadata.setSession(session);
-        importMetadata.setTransactionInProgress(true);
-        PersonQuery query = new PersonQuery();
-        try {
-            ObjectNode importConfiguration = (ObjectNode) objectMapper.readTree("{\""+ CprEntityManager.IMPORTCONFIG_PNR+"\":\"0101008888\"}");
-            importMetadata.setImportConfiguration(importConfiguration);
-            loadPerson(importMetadata);
-
-            query.setFornavn("Tester");
-            List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
-            Assert.assertEquals(0, entities.size());
-
-            importConfiguration.remove(CprEntityManager.IMPORTCONFIG_PNR);
-            loadPerson(importMetadata);
-
-            entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
-            Assert.assertEquals(1, entities.size());
-            PersonEntity entity = entities.get(0);
-            Assert.assertEquals(PersonEntity.generateUUID("0101001234"), entity.getUUID());
-
-            System.out.println(
-                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
-                        new PersonOutputWrapper().wrapResult(entity, query)
-                    )
-            );
-
-        } finally {
-            transaction.rollback();
-            session.close();
-        }
     }
 
     @Test
@@ -182,7 +110,8 @@ public class ParseTest {
             Assert.assertEquals(1, entities.size());
             RoadEntity entity = entities.get(0);
 
-            System.out.println(new RoadOutputWrapper().wrapResult(entity, query));
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new RoadOutputWrapper().wrapResult(entity, query)));
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity));
 
             Assert.assertEquals(RoadEntity.generateUUID(730, 4), entity.getUUID());
             Assert.assertEquals(roadEntityManager.getDomain(), entity.getDomain());
@@ -192,6 +121,9 @@ public class ParseTest {
             RoadRegistration registration1 = entity.getRegistrations().get(0);
             Assert.assertEquals(0, registration1.getSequenceNumber());
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), registration1.getRegistrationFrom()));
+
+            System.out.println(registration1.getRegistrationTo());
+
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2008-05-30T09:11:00+02:00"), registration1.getRegistrationTo()));
             List<RoadEffect> effects1 = registration1.getSortedEffects();
             Assert.assertEquals(2, effects1.size());
@@ -473,7 +405,7 @@ public class ParseTest {
     static {
         ignoreKeys.add("sidstImporteret");
     }
-    private static void assertJsonEquality(JsonNode node1, JsonNode node2, boolean ignoreArrayOrdering, boolean printDifference) {
+    private void assertJsonEquality(JsonNode node1, JsonNode node2, boolean ignoreArrayOrdering, boolean printDifference) {
         try {
             Assert.assertEquals(node1.isNull(), node2.isNull());
             Assert.assertEquals(node1.isArray(), node2.isArray());
@@ -519,7 +451,11 @@ public class ParseTest {
             }
         } catch (AssertionError e) {
             if (printDifference) {
-                System.out.println("\n" + node1 + "\n != \n" + node2 + "\n\n\n");
+                try {
+                    System.out.println("\n" + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node1) + "\n != \n" + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node2) + "\n\n\n");
+                } catch (JsonProcessingException e1) {
+                    System.out.println("\n" + node1.asText() + "\n != \n" + node2.asText() + "\n\n\n");
+                }
             }
             throw e;
         }

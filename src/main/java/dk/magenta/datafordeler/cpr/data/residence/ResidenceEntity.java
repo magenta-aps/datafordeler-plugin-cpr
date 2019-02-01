@@ -1,9 +1,9 @@
 package dk.magenta.datafordeler.cpr.data.residence;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import dk.magenta.datafordeler.core.database.Entity;
 import dk.magenta.datafordeler.core.database.Identification;
 import dk.magenta.datafordeler.cpr.CprPlugin;
+import dk.magenta.datafordeler.cpr.data.CprEntity;
 
 import javax.persistence.Index;
 import javax.persistence.Table;
@@ -17,10 +17,10 @@ import java.util.UUID;
  */
 @javax.persistence.Entity
 @Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_entity",  indexes = {
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_identification", columnList = "identification_id")
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_identification", columnList = "identification_id", unique = true)
 })
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ResidenceEntity extends Entity<ResidenceEntity, ResidenceRegistration> {
+public class ResidenceEntity extends CprEntity<ResidenceEntity, ResidenceRegistration> {
 
     public ResidenceEntity() {
     }

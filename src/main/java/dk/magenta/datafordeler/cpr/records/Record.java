@@ -17,6 +17,8 @@ public abstract class Record extends HashMap<String, String> {
 
     private static Pattern leadingZero = Pattern.compile("^0+");
 
+    private String origin;
+
     private String line;
 
     public Record(String line) throws ParseException {
@@ -29,6 +31,14 @@ public abstract class Record extends HashMap<String, String> {
         if (!this.get("type").equals(thisType)) {
             throw new ParseException("Invalid recordtype "+this.get("type")+" for class "+this.getClass().getName()+", was expecting the input to begin with "+thisType+". Input was "+line+".");
         }
+    }
+
+    public String getOrigin() {
+        return this.origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 
     protected String substr(String line, int position, int length) {
@@ -138,6 +148,36 @@ public abstract class Record extends HashMap<String, String> {
     }
 
 
+    private static DateTimeFormatter yearParser = DateTimeFormatter.ofPattern("uuuu");
+    public Year getYear(String key) {
+        String value = this.get(key);
+        if (value != null && !value.isEmpty() && value.length() >= 4) {
+            value = value.substring(0, 4);
+            try {
+                return Year.parse(value, yearParser);
+            } catch (DateTimeParseException e) {
+            }
+        }
+        return null;
+    }
+
+    private static DateTimeFormatter monthParser = DateTimeFormatter.ofPattern("uuuuMM");
+    public YearMonth getMonth(String key) {
+        String value = this.get(key);
+        if (value != null && !value.isEmpty() && value.length() >= 6) {
+            value = value.substring(0, 6);
+            try {
+                return YearMonth.parse(value, monthParser);
+            } catch (DateTimeParseException e) {
+            }
+            Year year = this.getYear(key);
+            if (year != null) {
+                return YearMonth.of(year.getValue(), 1);
+            }
+        }
+        return null;
+    }
+
     private static DateTimeFormatter[] dateParsers = {
             DateTimeFormatter.BASIC_ISO_DATE,
             DateTimeFormatter.ISO_LOCAL_DATE
@@ -150,6 +190,10 @@ public abstract class Record extends HashMap<String, String> {
                     return LocalDate.parse(value, parser);
                 } catch (DateTimeParseException e) {
                 }
+            }
+            YearMonth yearMonth = this.getMonth(key);
+            if (yearMonth != null) {
+                return LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1);
             }
         }
         return null;
@@ -183,6 +227,9 @@ public abstract class Record extends HashMap<String, String> {
         if (value != null && !value.isEmpty()) {
             if (value.length() == 12 && value.endsWith("99")) {
                 value = value.substring(0, 10) + "00";
+            }
+            if (value.equals("000000000000")) {
+                return null;
             }
             for (DateTimeFormatter parser : datetimeParsers) {
                 try {
@@ -224,6 +271,15 @@ public abstract class Record extends HashMap<String, String> {
     public boolean has(String key) {
         String value = this.getString(key, true);
         return value != null && !value.isEmpty();
+    }
+
+    public static <T> T firstSet(T... times) {
+        for (T time : times) {
+            if (time != null) {
+                return time;
+            }
+        }
+        return null;
     }
 
 }

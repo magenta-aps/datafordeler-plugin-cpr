@@ -1,45 +1,44 @@
 package dk.magenta.datafordeler.cpr.data.residence;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import dk.magenta.datafordeler.core.fapi.BaseQuery;
 import dk.magenta.datafordeler.core.fapi.OutputWrapper;
-import dk.magenta.datafordeler.core.fapi.Query;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.core.util.OffsetDateTimeAdapter;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceEffect;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceRegistration;
-import dk.magenta.datafordeler.cpr.data.residence.data.*;
-import dk.magenta.datafordeler.cpr.records.Bitemporality;
-import dk.magenta.datafordeler.cpr.records.BitemporalityComparator;
+import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
+import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 
 public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
 
     private ObjectMapper objectMapper;
 
     @Override
-    public Object wrapResult(ResidenceEntity input, Query query) {
+    public Object wrapResult(ResidenceEntity input, BaseQuery query) {
         objectMapper = new ObjectMapper();
         ObjectNode root = objectMapper.createObjectNode();
         root.put(ResidenceEntity.IO_FIELD_UUID, input.getUUID().toString());
         root.put(ResidenceEntity.IO_FIELD_DOMAIN, input.getDomain());
-        ArrayNode registreringer = this.getRegistrations(input, null);
+        CprBitemporality overlap = new CprBitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
+        ArrayNode registreringer = this.getRegistrations(input, overlap);
         root.set(ResidenceEntity.IO_FIELD_REGISTRATIONS, registreringer);
         return root;
     }
 
-    public ArrayNode getRegistrations(ResidenceEntity entity, Bitemporality mustOverlap) {
+    public ArrayNode getRegistrations(ResidenceEntity entity, CprBitemporality mustOverlap) {
 
         ArrayNode registrationsNode = objectMapper.createArrayNode();
         //HashMap<Bitemporality, ObjectNode> data = new HashMap<>();
-        ListHashMap<Bitemporality, ResidenceBaseData> data = new ListHashMap<>();
+        ListHashMap<CprBitemporality, ResidenceBaseData> data = new ListHashMap<>();
 
         // Populér map med bitemp -> json
         // Loop over alle registrationBorders
@@ -48,17 +47,17 @@ public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
         for (ResidenceRegistration registration : entity.getRegistrations()) {
             for (ResidenceEffect virkning : registration.getEffects()) {
                 //ObjectNode dataPiece = objectMapper.createObjectNode();
-                Bitemporality bitemporality = new Bitemporality(registration.getRegistrationFrom(), registration.getRegistrationTo(), virkning.getEffectFrom(), virkning.getEffectTo());
+                CprBitemporality bitemporality = new CprBitemporality(registration.getRegistrationFrom(), registration.getRegistrationTo(), virkning.getEffectFrom(), virkning.getEffectTo());
                 for (ResidenceBaseData residenceBaseData : virkning.getDataItems()) {
                     data.add(bitemporality, residenceBaseData);
                 }
             }
         }
 
-        ListHashMap<OffsetDateTime, Bitemporality> startTerminators = new ListHashMap<>();
-        ListHashMap<OffsetDateTime, Bitemporality> endTerminators = new ListHashMap<>();
+        ListHashMap<OffsetDateTime, CprBitemporality> startTerminators = new ListHashMap<>();
+        ListHashMap<OffsetDateTime, CprBitemporality> endTerminators = new ListHashMap<>();
 
-        for (Bitemporality bitemporality : data.keySet()) {
+        for (CprBitemporality bitemporality : data.keySet()) {
             startTerminators.add(bitemporality.registrationFrom, bitemporality);
             endTerminators.add(bitemporality.registrationTo, bitemporality);
         }
@@ -71,12 +70,12 @@ public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
         terminators.sort(Comparator.nullsFirst(OffsetDateTime::compareTo));
         terminators.add(null);
 
-        HashSet<Bitemporality> presentBitemporalities = new HashSet<>();
+        HashSet<CprBitemporality> presentBitemporalities = new HashSet<>();
 
         for (int i = 0; i < terminators.size(); i++) {
             OffsetDateTime t = terminators.get(i);
-            List<Bitemporality> startingHere = startTerminators.get(t);
-            List<Bitemporality> endingHere = (t != null) ? endTerminators.get(t) : null;
+            List<CprBitemporality> startingHere = startTerminators.get(t);
+            List<CprBitemporality> endingHere = (t != null) ? endTerminators.get(t) : null;
             if (startingHere != null) {
                 presentBitemporalities.addAll(startingHere);
             }
@@ -92,10 +91,10 @@ public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
                         registrationNode.put("registreringFra", formatTime(t));
                         registrationNode.put("registreringTil", formatTime(next));
 
-                        ArrayList<Bitemporality> sortedBitemporalities = new ArrayList<>(presentBitemporalities);
-                        sortedBitemporalities.sort(effectComparator);
+                        ArrayList<CprBitemporality> sortedBitemporalities = new ArrayList<>(presentBitemporalities);
+                        sortedBitemporalities.sort(CprBitemporality.effectComparator);
 
-                        for (Bitemporality bitemporality : sortedBitemporalities) {
+                        for (CprBitemporality bitemporality : sortedBitemporalities) {
 
                             ArrayList<ResidenceBaseData> dataItems = data.get(bitemporality);
 
@@ -120,11 +119,6 @@ public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
         return registrationsNode;
     }
 
-    protected static final Comparator<Bitemporality> effectComparator =
-            Comparator.nullsFirst(new BitemporalityComparator(BitemporalityComparator.Type.EFFECT_FROM))
-                    .thenComparing(Comparator.nullsLast(new BitemporalityComparator(BitemporalityComparator.Type.EFFECT_TO)));
-
-
     protected static String formatTime(OffsetDateTime time) {
         return formatTime(time, false);
     }
@@ -146,11 +140,11 @@ public class ResidenceOutputWrapper extends OutputWrapper<ResidenceEntity> {
         ((ArrayNode) output.get(key)).add(value);
     }
 
-    protected ObjectNode createDataNode(Bitemporality bitemporality, OffsetDateTime lastUpdated) {
+    protected ObjectNode createDataNode(CprBitemporality bitemporality, OffsetDateTime lastUpdated) {
         return createDataNode(bitemporality, true, lastUpdated);
     }
 
-    protected ObjectNode createDataNode(Bitemporality bitemporality, boolean includeVirkningTil, OffsetDateTime lastUpdated) {
+    protected ObjectNode createDataNode(CprBitemporality bitemporality, boolean includeVirkningTil, OffsetDateTime lastUpdated) {
         ObjectNode output = objectMapper.createObjectNode();
         if (bitemporality != null) {
             output.put(

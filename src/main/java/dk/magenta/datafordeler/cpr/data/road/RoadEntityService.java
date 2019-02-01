@@ -2,7 +2,6 @@ package dk.magenta.datafordeler.cpr.data.road;
 
 import dk.magenta.datafordeler.core.arearestriction.AreaRestriction;
 import dk.magenta.datafordeler.core.arearestriction.AreaRestrictionType;
-import dk.magenta.datafordeler.core.database.DataItem;
 import dk.magenta.datafordeler.core.exception.AccessDeniedException;
 import dk.magenta.datafordeler.core.exception.AccessRequiredException;
 import dk.magenta.datafordeler.core.exception.InvalidClientInputException;
@@ -14,7 +13,6 @@ import dk.magenta.datafordeler.cpr.CprAccessChecker;
 import dk.magenta.datafordeler.cpr.CprAreaRestrictionDefinition;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.CprRolesDefinition;
-import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,11 +43,6 @@ public class RoadEntityService extends FapiService<RoadEntity, RoadQuery> {
     @Override
     protected Class<RoadEntity> getEntityClass() {
         return RoadEntity.class;
-    }
-
-    @Override
-    protected Class<? extends DataItem> getDataClass() {
-        return RoadBaseData.class;
     }
 
     @Override

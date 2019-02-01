@@ -32,6 +32,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 
 import static org.mockito.Mockito.when;
 
@@ -90,6 +91,9 @@ public class QueryTest {
     private void applyAccess(TestUserDetails testUserDetails) {
         when(dafoUserManager.getFallbackUser()).thenReturn(testUserDetails);
     }
+    private void whitelistLocalhost() {
+        when(dafoUserManager.getIpWhitelist()).thenReturn(Collections.singleton("127.0.0.1"));
+    }
 
     private ResponseEntity<String> restSearch(ParameterMap parameters, String type) {
         HttpHeaders headers = new HttpHeaders();
@@ -108,6 +112,7 @@ public class QueryTest {
 
     @Test
     public void testPersonAccess() throws Exception {
+        whitelistLocalhost();
         ImportMetadata importMetadata = new ImportMetadata();
         Session session = sessionManager.getSessionFactory().openSession();
         importMetadata.setSession(session);
@@ -195,6 +200,7 @@ public class QueryTest {
 
     @Test
     public void testPersonRecordTime() throws Exception {
+        whitelistLocalhost();
         OffsetDateTime now = OffsetDateTime.now();
         ImportMetadata importMetadata = new ImportMetadata();
         Session session = sessionManager.getSessionFactory().openSession();
@@ -218,16 +224,22 @@ public class QueryTest {
         JsonNode jsonBody = objectMapper.readTree(response.getBody());
         JsonNode results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
-        Assert.assertEquals(0, results.size());
+
+        //System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(results));
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals(4, results.get(0).size());
 
         searchParameters = new ParameterMap();
         searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("fornavn", "Tester");
+        searchParameters.add("fmt", "drv");
 
         response = restSearch(searchParameters, "person");
         Assert.assertEquals(200, response.getStatusCode().value());
         jsonBody = objectMapper.readTree(response.getBody());
         results = jsonBody.get("results");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(results));
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(1, results.size());
     }
@@ -235,6 +247,7 @@ public class QueryTest {
 
     @Test
     public void testResidenceAccess() throws Exception {
+        whitelistLocalhost();
         ImportMetadata importMetadata = new ImportMetadata();
         Session session = sessionManager.getSessionFactory().openSession();
         importMetadata.setSession(session);
@@ -300,6 +313,7 @@ public class QueryTest {
 
     @Test
     public void testResidenceRecordTime() throws Exception {
+        whitelistLocalhost();
         OffsetDateTime now = OffsetDateTime.now();
         ImportMetadata importMetadata = new ImportMetadata();
         Session session = sessionManager.getSessionFactory().openSession();
@@ -340,6 +354,7 @@ public class QueryTest {
 
     @Test
     public void testRoadAccess() throws Exception {
+        whitelistLocalhost();
         ImportMetadata importMetadata = new ImportMetadata();
         Session session = sessionManager.getSessionFactory().openSession();
         importMetadata.setSession(session);
@@ -404,6 +419,7 @@ public class QueryTest {
 
     @Test
     public void testRoadRecordTime() throws Exception {
+        whitelistLocalhost();
         OffsetDateTime now = OffsetDateTime.now();
         ImportMetadata importMetadata = new ImportMetadata();
         Session session = sessionManager.getSessionFactory().openSession();
