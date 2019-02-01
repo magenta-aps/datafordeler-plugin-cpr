@@ -1,7 +1,6 @@
 package dk.magenta.datafordeler.cpr.records.person.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.core.database.Bitemporal;
 import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
@@ -9,9 +8,7 @@ import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Storage for data on a Person's name,

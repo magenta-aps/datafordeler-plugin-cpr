@@ -6,18 +6,12 @@ import dk.magenta.datafordeler.core.Application;
 import dk.magenta.datafordeler.core.Engine;
 import dk.magenta.datafordeler.core.Pull;
 import dk.magenta.datafordeler.core.database.QueryManager;
-import dk.magenta.datafordeler.core.database.RecordCollection;
-import dk.magenta.datafordeler.core.database.RecordData;
 import dk.magenta.datafordeler.core.database.SessionManager;
-import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.plugin.FtpCommunicator;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
-import dk.magenta.datafordeler.cpr.data.CprEntityManager;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.*;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBirthData;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntity;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceQuery;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
 import dk.magenta.datafordeler.cpr.data.road.RoadQuery;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthPlaceDataRecord;
@@ -40,17 +34,13 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -128,7 +118,7 @@ public class PullTest {
                 ftpCommunicator.setSslSocketFactory(PullTest.getTrustAllSSLSocketFactory());
                 return ftpCommunicator;
             }
-        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprEntityManager.class));
+        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprRecordEntityManager.class));
 
 
         String username = "test";
@@ -242,7 +232,7 @@ public class PullTest {
                 ftpCommunicator.setSslSocketFactory(PullTest.getTrustAllSSLSocketFactory());
                 return ftpCommunicator;
             }
-        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprEntityManager.class));
+        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprRecordEntityManager.class));
 
 
         String username = "test";
@@ -265,7 +255,7 @@ public class PullTest {
         configuration.setPersonRegisterFtpPassword(password);
         configuration.setPersonRegisterDataCharset(CprConfiguration.Charset.UTF_8);
 
-        ObjectNode config = (ObjectNode) objectMapper.readTree("{\""+CprEntityManager.IMPORTCONFIG_RECORDTYPE+"\": [5], \"remote\":true}");
+        ObjectNode config = (ObjectNode) objectMapper.readTree("{\""+ CprRecordEntityManager.IMPORTCONFIG_RECORDTYPE+"\": [5], \"remote\":true}");
         Pull pull = new Pull(engine, plugin, config);
         pull.run();
 
@@ -275,7 +265,7 @@ public class PullTest {
         Session session = sessionManager.getSessionFactory().openSession();
         try {
 
-            PersonQuery personQuery = new PersonQuery();
+            PersonRecordQuery personQuery = new PersonRecordQuery();
             personQuery.setPersonnummer("0101001234");
             List<PersonEntity> personEntities = QueryManager.getAllEntities(session, personQuery, PersonEntity.class);
             Assert.assertEquals(1, personEntities.size());
@@ -324,7 +314,7 @@ public class PullTest {
                 ftpCommunicator.setSslSocketFactory(PullTest.getTrustAllSSLSocketFactory());
                 return ftpCommunicator;
             }
-        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprEntityManager.class));
+        }).when(cprRegisterManager).getFtpCommunicator(any(URI.class), any(CprRecordEntityManager.class));
 
 
         String username = "test";

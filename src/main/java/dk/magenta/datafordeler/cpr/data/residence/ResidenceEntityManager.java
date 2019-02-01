@@ -2,7 +2,7 @@ package dk.magenta.datafordeler.cpr.data.residence;
 
 import dk.magenta.datafordeler.core.database.RegistrationReference;
 import dk.magenta.datafordeler.core.database.SessionManager;
-import dk.magenta.datafordeler.cpr.data.CprEntityManager;
+import dk.magenta.datafordeler.cpr.data.CprGeoEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonRegistrationReference;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.UUID;
 
 @Component
-public class ResidenceEntityManager extends CprEntityManager<ResidenceRecord, ResidenceEntity, ResidenceRegistration, ResidenceEffect, ResidenceBaseData> {
+public class ResidenceEntityManager extends CprGeoEntityManager<ResidenceRecord, ResidenceEntity, ResidenceRegistration, ResidenceEffect, ResidenceBaseData> {
 
     @Autowired
     private ResidenceEntityService residenceEntityService;

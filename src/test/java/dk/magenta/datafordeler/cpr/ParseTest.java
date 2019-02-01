@@ -3,13 +3,11 @@ package dk.magenta.datafordeler.cpr;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.util.Equality;
-import dk.magenta.datafordeler.cpr.data.CprEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.*;
 import dk.magenta.datafordeler.cpr.data.residence.*;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
@@ -27,8 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
@@ -56,13 +52,6 @@ public class ParseTest {
     private ObjectMapper objectMapper;
 
 
-    private void loadPerson(ImportMetadata importMetadata) throws DataFordelerException, IOException {
-        System.out.println("LOAD PERSON");
-        InputStream testData = ParseTest.class.getResourceAsStream("/persondata.txt");
-        personEntityManager.parseData(testData, importMetadata);
-        testData.close();
-    }
-
     @Before
     @After
     public void cleanup() {
@@ -79,73 +68,6 @@ public class ParseTest {
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
         residenceEntityManager.parseData(testData, importMetadata);
         testData.close();
-    }
-
-    @Test
-    public void testPersonIdempotence() throws Exception {
-        Session session = sessionManager.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        ImportMetadata importMetadata = new ImportMetadata();
-        importMetadata.setSession(session);
-        importMetadata.setTransactionInProgress(true);
-        try {
-            loadPerson(importMetadata);
-            List<PersonEntity> entities = QueryManager.getAllEntities(session, PersonEntity.class);
-            JsonNode firstImport = objectMapper.valueToTree(entities);
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(firstImport));
-
-            System.out.println("--------------------------------------------------------");
-            loadPerson(importMetadata);
-            entities = QueryManager.getAllEntities(session, PersonEntity.class);
-            JsonNode secondImport = objectMapper.valueToTree(entities);
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(secondImport));
-
-            assertJsonEquality(firstImport, secondImport, true, true);
-
-        } finally {
-            transaction.rollback();
-            session.close();
-        }
-    }
-
-    @Test
-    public void testParsePerson() throws Exception {
-        Session session = sessionManager.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        ImportMetadata importMetadata = new ImportMetadata();
-        importMetadata.setSession(session);
-        importMetadata.setTransactionInProgress(true);
-        PersonRecordQuery query = new PersonRecordQuery();
-        try {
-            //ObjectNode importConfiguration = (ObjectNode) objectMapper.readTree("{\""+ CprEntityManager.IMPORTCONFIG_PNR+"\":\"0706852417\"}");
-            ObjectNode importConfiguration = objectMapper.createObjectNode();
-            importMetadata.setImportConfiguration(importConfiguration);
-            loadPerson(importMetadata);
-            List<PersonEntity> entities;
-
-            query.setFornavn("Tester");
-            //List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
-            //Assert.assertEquals(0, entities.size());
-
-            importConfiguration.remove(CprEntityManager.IMPORTCONFIG_PNR);
-            loadPerson(importMetadata);
-
-            entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
-            Assert.assertEquals(1, entities.size());
-            PersonEntity entity = entities.get(0);
-            Assert.assertEquals(PersonEntity.generateUUID("0101001234"), entity.getUUID());
-
-            System.out.println(
-                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(
-                        //new PersonOutputWrapper().wrapResult(entity, query)
-                            entity.getStatus()
-                    )
-            );
-
-        } finally {
-            transaction.rollback();
-            session.close();
-        }
     }
 
     @Test

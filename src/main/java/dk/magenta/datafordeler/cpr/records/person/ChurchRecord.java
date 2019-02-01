@@ -1,19 +1,13 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.person.data.ChurchDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ChurchVerificationDataRecord;
-import org.hibernate.Session;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Record for Person church relation (type 010).
@@ -43,28 +37,6 @@ public class ChurchRecord extends PersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
-        boolean updated = false;
-        if (bitemporality.equals(this.churchTemporality)) {
-            data.setChurch(
-                    this.getInt("start_mynkod-folkekirke"),
-                    this.getChar("fkirk"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        if (bitemporality.equals(this.documentTemporality)) {
-            data.setChurchVerification(
-                    this.getInt("dok_mynkod-folkekirke"),
-                    this.getBoolean("dok-folkekirke"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        return updated;
-    }
-
-    @Override
     public List<CprBitemporalRecord> getBitemporalRecords() {
 
         ArrayList<CprBitemporalRecord> records = new ArrayList<>();
@@ -88,21 +60,4 @@ public class ChurchRecord extends PersonDataRecord {
         return records;
     }
 
-    @Override
-    public List<CprBitemporality> getBitemporality() {
-        ArrayList<CprBitemporality> bitemporalities = new ArrayList<>();
-        bitemporalities.add(this.churchTemporality);
-        if (this.documentTemporality != null) {
-            bitemporalities.add(this.documentTemporality);
-        }
-        return bitemporalities;
-    }
-
-    @Override
-    public Set<PersonEffect> getEffects() {
-        HashSet<PersonEffect> effects = new HashSet<>();
-        effects.add(new PersonEffect(null, this.getOffsetDateTime("start_dt-folkekirke"), this.getBoolean("start_dt-umrk-folkekirke"), null, false));
-        effects.add(new PersonEffect(null, null, false, null, false));
-        return effects;
-    }
 }

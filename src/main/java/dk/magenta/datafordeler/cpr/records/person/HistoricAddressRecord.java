@@ -1,18 +1,15 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.person.data.AddressConameDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.AddressDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.MoveMunicipalityDataRecord;
-import org.hibernate.Session;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Record for Person historic address (type 026).
@@ -64,101 +61,6 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
-        boolean updated = false;
-
-        if (bitemporality.equals(this.addressTemporality)) {
-            data.setAddress(
-                    // int authority,
-                    this.getInt("start_mynkod-personbolig"),
-                    // String bygningsnummer,
-                    this.getString("bnr", true),
-                    // String bynavn,
-                    null,
-                    // String cprKommunekode,
-                    this.getInt("komkod", false),
-                    // String cprKommunenavn,
-                    null,
-                    // String cprVejkode,
-                    this.getInt("vejkod", false),
-                    // String darAdresse,
-                    null,
-                    // String etage,
-                    this.get("etage"),
-                    // String husnummer,
-                    this.getString("husnr", true),
-                    // String postdistrikt,
-                    null,
-                    // String postnummer,
-                    null,
-                    // String sideDoer,
-                    this.get("sidedoer"),
-                    // String adresselinie1,
-                    null,
-                    // String adresselinie2,
-                    null,
-                    // String adresselinie3,
-                    null,
-                    // String adresselinie4,
-                    null,
-                    // String adresselinie5,
-                    null,
-                    // int addressTextType,
-                    0,
-                    // int startAuthority
-                    0,
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-
-        if (bitemporality.equals(this.conameTemporality)) {
-            data.setCoName(
-                    this.get("convn"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        if (bitemporality.equals(this.municipalityTemporality)) {
-            data.setMoveMunicipality(
-                    //int authority,
-                    this.getInt("tilfra_mynkod"),
-                    // LocalDateTime fraflytningsdatoKommune,
-                    this.getDateTime("fraflykomdto"),
-                    // boolean fraflytningsdatoKommuneUsikkerhedsmarkering,
-                    this.getBoolean("fraflykomdt_umrk"),
-                    // int fraflytningskommunekode,
-                    this.getInt("fraflykomkod"),
-                    // LocalDateTime tilflytningsdatoKommune,
-                    this.getDateTime("tilflykomdto"),
-                    // boolean tilflytningsdatoKommuneUsikkerhedsmarkering
-                    this.getBoolean("tilflykomdt_umrk"),
-                    importMetadata.getImportTime()
-            );
-            updated = true;
-        }
-        return updated;
-    }
-
-    @Override
-    public boolean cleanBaseData(PersonBaseData data, CprBitemporality bitemporality, CprBitemporality outdatedTemporality, Session session) {
-        boolean updated = false;
-        if (bitemporality.equals(this.addressTemporality) && outdatedTemporality.equals(this.addressTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
-            data.clearAddress(session);
-            updated = true;
-        }
-        if (bitemporality.equals(this.conameTemporality) && outdatedTemporality.equals(this.conameTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
-            data.clearCoName(session);
-            updated = true;
-        }
-        if (bitemporality.equals(this.municipalityTemporality) && outdatedTemporality.equals(this.municipalityTemporality, CprBitemporality.EXCLUDE_EFFECT_TO)) {
-            data.clearMoveMunicipality(session);
-            updated = true;
-        }
-        return updated;
-    }
-
-    @Override
     public List<CprBitemporalRecord> getBitemporalRecords() {
         ArrayList<CprBitemporalRecord> records = new ArrayList<>();
 
@@ -167,7 +69,7 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
                 this.getInt("vejkod", false),
                 this.getString("bnr", true),
                 this.getString("husnr", true),
-                this.get("etage"),
+                this.getString("etage", false),
                 this.getString("sidedoer", true),
                 "",
                 "",
@@ -187,7 +89,7 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
             convnTs = this.getOffsetDateTime("adr_ts");
         }
         records.add(new AddressConameDataRecord(
-                this.get("convn")
+                this.getString("convn", true)
         ).setAuthority(
                 this.getInt("start_mynkod-personbolig")
         ).setBitemporality(
@@ -226,23 +128,6 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
         }
 
         return records;
-    }
-
-    @Override
-    public List<CprBitemporality> getBitemporality() {
-        return Arrays.asList(
-                this.addressTemporality,
-                this.conameTemporality,
-                this.municipalityTemporality
-        );
-    }
-
-    @Override
-    public Set<PersonEffect> getEffects() {
-        HashSet<PersonEffect> effects = new HashSet<>();
-        effects.add(new PersonEffect(null, this.getOffsetDateTime("tilflydto"), this.getMarking("tilflydto_umrk"), this.getOffsetDateTime("fraflydto"), this.getMarking("fraflydto_umrk")));
-        effects.add(new PersonEffect(null, null, false, null, false));
-        return effects;
     }
 
     public int getMunicipalityCode() {

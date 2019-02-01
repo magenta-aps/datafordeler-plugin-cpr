@@ -1,15 +1,12 @@
 package dk.magenta.datafordeler.cpr.records.person;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
-import dk.magenta.datafordeler.core.io.ImportMetadata;
-import dk.magenta.datafordeler.cpr.data.person.PersonEffect;
-import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.person.data.ProtectionDataRecord;
-import org.hibernate.Session;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Record for Historic Person protection (type 016).
@@ -36,32 +33,8 @@ public class HistoricProtectionRecord extends HistoricPersonDataRecord {
     }
 
     @Override
-    public boolean cleanBaseData(PersonBaseData data, CprBitemporality bitemporality, CprBitemporality outdatedTemporality, Session session) {
-        return false;
-    }
-
-    @Override
     public String getRecordType() {
         return RECORDTYPE_HISTORIC_PROTECTION;
-    }
-
-    @Override
-    public boolean populateBaseData(PersonBaseData data, CprBitemporality bitemporality, Session session, ImportMetadata importMetadata) {
-        /*
-        Keep this off for now
-        if (bitemporality.equals(this.protectionTemporality)) {
-            data.addProtection(
-                    // int authority,
-                    this.getInt("start_mynkod-beskyttelse"),
-                    // int beskyttelsestype,
-                    this.getInt("beskyttype"),
-                    // boolean reportMarking
-                    this.getBoolean("indrap-beskyttelse"),
-                    importMetadata.getImportTime()
-            );
-            return true;
-        }*/
-        return false;
     }
 
     @Override
@@ -84,16 +57,4 @@ public class HistoricProtectionRecord extends HistoricPersonDataRecord {
         return records;
     }
 
-    @Override
-    public List<CprBitemporality> getBitemporality() {
-        //return Collections.singletonList(this.protectionTemporality);
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Set<PersonEffect> getEffects() {
-        HashSet<PersonEffect> effects = new HashSet<>();
-        //effects.add(new PersonEffect(null, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slut_dt-beskyttelse"), false));
-        return effects;
-    }
 }
