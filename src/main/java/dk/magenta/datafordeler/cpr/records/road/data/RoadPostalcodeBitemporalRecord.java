@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.Objects;
 
 @MappedSuperclass
-public abstract class RoadPostalcodeBitemporalRecord extends CprBitemporalPersonRecord<RoadBitemporalRecord> {
+public abstract class RoadPostalcodeBitemporalRecord extends CprBitemporalPersonRecord<RoadPostalcodeBitemporalRecord> {
 
     public static final String TABLE_NAME = "road_postalcode_record";
 
