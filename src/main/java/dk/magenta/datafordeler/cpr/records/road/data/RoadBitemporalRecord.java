@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.Objects;
 
 @MappedSuperclass
-public abstract class RoadBitemporalRecord extends CprBitemporalPersonRecord<RoadBitemporalRecord> {
+public class RoadBitemporalRecord extends CprBitemporalPersonRecord<RoadBitemporalRecord> {
 
     public static final String TABLE_NAME = "road_record";
 
@@ -164,7 +164,29 @@ public abstract class RoadBitemporalRecord extends CprBitemporalPersonRecord<Roa
     }
 
     @Override
+    public boolean hasData() {
+        return stringNonEmpty(this.timestamp) || stringNonEmpty(this.toMunicipalityCode) || stringNonEmpty(this.toRoadCode) ||
+                stringNonEmpty(this.fromMunicipalityCode) || stringNonEmpty(this.fromRoadCode) || stringNonEmpty(this.haenStart) ||
+                stringNonEmpty(this.roadAdddressName) || stringNonEmpty(this.roadName);
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), timestamp, toMunicipalityCode, toRoadCode, fromMunicipalityCode, fromRoadCode, haenStart, roadAdddressName, roadName);
+    }
+
+    @Override
+    public RoadBitemporalRecord clone() {
+        RoadBitemporalRecord clone = new RoadBitemporalRecord();
+        clone.timestamp = this.timestamp;
+        clone.toMunicipalityCode = this.toMunicipalityCode;
+        clone.toRoadCode = this.toRoadCode;
+        clone.fromMunicipalityCode = this.fromMunicipalityCode;
+        clone.fromRoadCode = this.fromRoadCode;
+        clone.haenStart = this.haenStart;
+        clone.roadAdddressName = this.roadAdddressName;
+        clone.roadName = this.roadName;
+        RoadBitemporalRecord.copy(this, clone);
+        return clone;
     }
 }

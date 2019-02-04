@@ -1,7 +1,9 @@
 package dk.magenta.datafordeler.cpr.records.road.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.PersonNumberDataRecord;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -9,7 +11,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.Objects;
 
 @MappedSuperclass
-public abstract class RoadPostalcodeBitemporalRecord extends CprBitemporalPersonRecord<RoadPostalcodeBitemporalRecord> {
+public class RoadPostalcodeBitemporalRecord extends CprBitemporalPersonRecord<RoadPostalcodeBitemporalRecord> {
 
     public static final String TABLE_NAME = "road_postalcode_record";
 
@@ -124,7 +126,26 @@ public abstract class RoadPostalcodeBitemporalRecord extends CprBitemporalPerson
     }
 
     @Override
+    public boolean hasData() {
+        return stringNonEmpty(this.timestamp) || stringNonEmpty(this.toHousenumber) || stringNonEmpty(this.fromHousenumber) ||
+                stringNonEmpty(this.equalUnequal) || stringNonEmpty(this.postalCode) || stringNonEmpty(this.postalDistrict);
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), timestamp, toHousenumber, fromHousenumber, equalUnequal, postalCode, postalDistrict);
+    }
+
+    @Override
+    public RoadPostalcodeBitemporalRecord clone() {
+        RoadPostalcodeBitemporalRecord clone = new RoadPostalcodeBitemporalRecord();
+        clone.timestamp = this.timestamp;
+        clone.toHousenumber = this.toHousenumber;
+        clone.fromHousenumber = this.fromHousenumber;
+        clone.equalUnequal = this.equalUnequal;
+        clone.postalCode = this.postalCode;
+        clone.postalDistrict = this.postalDistrict;
+        RoadPostalcodeBitemporalRecord.copy(this, clone);
+        return clone;
     }
 }

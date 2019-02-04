@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.Objects;
 
 @MappedSuperclass
-public abstract class RoadCityBitemporalRecord extends CprBitemporalPersonRecord<RoadCityBitemporalRecord> {
+public class RoadCityBitemporalRecord extends CprBitemporalPersonRecord<RoadCityBitemporalRecord> {
 
     public static final String TABLE_NAME = "road_city_record";
 
@@ -107,7 +107,25 @@ public abstract class RoadCityBitemporalRecord extends CprBitemporalPersonRecord
     }
 
     @Override
+    public boolean hasData() {
+        return stringNonEmpty(this.timestamp) || stringNonEmpty(this.toHousenumber) || stringNonEmpty(this.fromHousenumber) ||
+                stringNonEmpty(this.equalUnequal) || stringNonEmpty(this.cityName);
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), timestamp, toHousenumber, fromHousenumber, equalUnequal, cityName);
+    }
+
+    @Override
+    public RoadCityBitemporalRecord clone() {
+        RoadCityBitemporalRecord clone = new RoadCityBitemporalRecord();
+        clone.timestamp = this.timestamp;
+        clone.toHousenumber = this.toHousenumber;
+        clone.fromHousenumber = this.fromHousenumber;
+        clone.equalUnequal = this.equalUnequal;
+        clone.cityName = this.cityName;
+        RoadCityBitemporalRecord.copy(this, clone);
+        return clone;
     }
 }
