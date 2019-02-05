@@ -2,20 +2,15 @@ package dk.magenta.datafordeler.cpr.records.road.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.CprPlugin;
-import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
-import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
-import dk.magenta.datafordeler.cpr.records.person.data.PersonNumberDataRecord;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Objects;
 
 @javax.persistence.Entity
 @Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "road_postalcode_record")
-public class RoadPostalcodeBitemporalRecord extends CprBitemporalPersonRecord<RoadPostalcodeBitemporalRecord> {
+public class RoadPostalcodeBitemporalRecord extends CprBitemporalRoadRecord<RoadPostalcodeBitemporalRecord> {
 
     public static final String TABLE_NAME = "road_postalcode_record";
 
