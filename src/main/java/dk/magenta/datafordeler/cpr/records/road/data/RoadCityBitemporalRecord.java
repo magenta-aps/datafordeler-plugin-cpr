@@ -11,7 +11,6 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Objects;
 
-@MappedSuperclass
 @javax.persistence.Entity
 @Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "road_city_record")
 public class RoadCityBitemporalRecord extends CprBitemporalPersonRecord<RoadCityBitemporalRecord> {
