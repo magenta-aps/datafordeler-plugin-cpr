@@ -16,6 +16,13 @@ public class RoadMemoBitemporalRecord extends CprBitemporalPersonRecord<RoadMemo
     public RoadMemoBitemporalRecord() {
     }
 
+    public RoadMemoBitemporalRecord(String timestamp, String haenStart, int noteNumber, String noteLine) {
+        this.timestamp = timestamp;
+        this.haenStart = haenStart;
+        this.noteNumber = noteNumber;
+        this.noteLine = noteLine;
+    }
+
     // Timestamp
     public static final String DB_FIELD_TIMESTAMP = "timestamp";
     public static final String IO_FIELD_TO_TIMESTAMP = "tidsstempel";
@@ -56,12 +63,12 @@ public class RoadMemoBitemporalRecord extends CprBitemporalPersonRecord<RoadMemo
     @Column(name = DB_FIELD_NOTE_NUMBER)
     @JsonProperty(value = IO_FIELD_NOTE_NUMBER)
     @XmlElement(name = IO_FIELD_NOTE_NUMBER)
-    private String noteNumber;
-    public String getNoteNumber() {
+    private int noteNumber;
+    public int getNoteNumber() {
         return noteNumber;
     }
 
-    public void setNoteNumber(String noteNumber) {
+    public void setNoteNumber(int noteNumber) {
         this.noteNumber = noteNumber;
     }
 
@@ -94,7 +101,7 @@ public class RoadMemoBitemporalRecord extends CprBitemporalPersonRecord<RoadMemo
 
     @Override
     public boolean hasData() {
-        return stringNonEmpty(this.timestamp) || stringNonEmpty(this.haenStart) || stringNonEmpty(this.noteNumber) ||
+        return stringNonEmpty(this.timestamp) || stringNonEmpty(this.haenStart) || this.noteNumber!=0 ||
                 stringNonEmpty(this.noteLine);
     }
 

@@ -16,6 +16,18 @@ public class RoadBitemporalRecord extends CprBitemporalPersonRecord<RoadBitempor
     public RoadBitemporalRecord() {
     }
 
+    public RoadBitemporalRecord(String timestamp, int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode,
+                                int fromRoadCode, String haenStart, String roadAdddressName, String roadName) {
+        this.timestamp = timestamp;
+        this.toMunicipalityCode = toMunicipalityCode;
+        this.toRoadCode = toRoadCode;
+        this.fromMunicipalityCode = fromMunicipalityCode;
+        this.fromRoadCode = fromRoadCode;
+        this.haenStart = haenStart;
+        this.roadAdddressName = roadAdddressName;
+        this.roadName = roadName;
+    }
+
 
     // Timestamp
     public static final String DB_FIELD_TIMESTAMP = "timestamp";
@@ -40,13 +52,13 @@ public class RoadBitemporalRecord extends CprBitemporalPersonRecord<RoadBitempor
     @Column(name = DB_FIELD_TO_MUNIPALITY_CODE)
     @JsonProperty(value = IO_FIELD_TO_MUNIPALITY_CODE)
     @XmlElement(name = IO_FIELD_TO_MUNIPALITY_CODE)
-    private String toMunicipalityCode;
+    private int toMunicipalityCode;
 
-    public String getToMunicipalityCode() {
+    public int getToMunicipalityCode() {
         return this.toMunicipalityCode;
     }
 
-    public void setToMunicipalityCode(String toMunicipalityCode) {
+    public void setToMunicipalityCode(int toMunicipalityCode) {
         this.toMunicipalityCode = toMunicipalityCode;
     }
 
@@ -56,13 +68,13 @@ public class RoadBitemporalRecord extends CprBitemporalPersonRecord<RoadBitempor
     @Column(name = DB_FIELD_TO_ROAD_CODE)
     @JsonProperty(value = IO_FIELD_TO_ROAD_CODE)
     @XmlElement(name = IO_FIELD_TO_ROAD_CODE)
-    private String toRoadCode;
+    private int toRoadCode;
 
-    public String getToRoadCode() {
+    public int getToRoadCode() {
         return toRoadCode;
     }
 
-    public void setToRoadCode(String toRoadCode) {
+    public void setToRoadCode(int toRoadCode) {
         this.toRoadCode = toRoadCode;
     }
 
@@ -73,12 +85,12 @@ public class RoadBitemporalRecord extends CprBitemporalPersonRecord<RoadBitempor
     @Column(name = DB_FIELD_FROM_MUNIPALITY_CODE)
     @JsonProperty(value = IO_FIELD_FROM_MUNIPALITY_CODE)
     @XmlElement(name = IO_FIELD_FROM_MUNIPALITY_CODE)
-    private String fromMunicipalityCode;
-    public String getFromMunicipalityCode() {
+    private int fromMunicipalityCode;
+    public int getFromMunicipalityCode() {
         return fromMunicipalityCode;
     }
 
-    public void setFromMunicipalityCode(String fromMunicipalityCode) {
+    public void setFromMunicipalityCode(int fromMunicipalityCode) {
         this.fromMunicipalityCode = fromMunicipalityCode;
     }
 
@@ -88,13 +100,13 @@ public class RoadBitemporalRecord extends CprBitemporalPersonRecord<RoadBitempor
     @Column(name = DB_FIELD_FROM_ROAD_CODE)
     @JsonProperty(value = IO_FIELD_FROM_ROAD_CODE)
     @XmlElement(name = IO_FIELD_FROM_ROAD_CODE)
-    private String fromRoadCode;
+    private int fromRoadCode;
 
-    public String getFromRoadCode() {
+    public int getFromRoadCode() {
         return fromRoadCode;
     }
 
-    public void setFromRoadCode(String fromRoadCode) {
+    public void setFromRoadCode(int fromRoadCode) {
         this.fromRoadCode = fromRoadCode;
     }
 
@@ -165,8 +177,8 @@ public class RoadBitemporalRecord extends CprBitemporalPersonRecord<RoadBitempor
 
     @Override
     public boolean hasData() {
-        return stringNonEmpty(this.timestamp) || stringNonEmpty(this.toMunicipalityCode) || stringNonEmpty(this.toRoadCode) ||
-                stringNonEmpty(this.fromMunicipalityCode) || stringNonEmpty(this.fromRoadCode) || stringNonEmpty(this.haenStart) ||
+        return stringNonEmpty(this.timestamp) || this.toMunicipalityCode!=0 || this.toRoadCode!=0 ||
+                this.fromMunicipalityCode!=0 || this.fromRoadCode!=0 || stringNonEmpty(this.haenStart) ||
                 stringNonEmpty(this.roadAdddressName) || stringNonEmpty(this.roadName);
     }
 

@@ -16,6 +16,14 @@ public class RoadCityBitemporalRecord extends CprBitemporalPersonRecord<RoadCity
     public RoadCityBitemporalRecord() {
     }
 
+    public RoadCityBitemporalRecord(String timestamp, String toHousenumber, String fromHousenumber, boolean equalUnequal, String cityName) {
+        this.timestamp = timestamp;
+        this.toHousenumber = toHousenumber;
+        this.fromHousenumber = fromHousenumber;
+        this.equalUnequal = equalUnequal;
+        this.cityName = cityName;
+    }
+
     // Timestamp
     public static final String DB_FIELD_TIMESTAMP = "timestamp";
     public static final String IO_FIELD_TO_TIMESTAMP = "tidsstempel";
@@ -69,12 +77,12 @@ public class RoadCityBitemporalRecord extends CprBitemporalPersonRecord<RoadCity
     @Column(name = DB_FIELD_EQUAL_UNEQUAL)
     @JsonProperty(value = IO_FIELD_EQUAL_UNEQUAL)
     @XmlElement(name = IO_FIELD_EQUAL_UNEQUAL)
-    private String equalUnequal;
-    public String getEqualUnequal() {
+    private boolean equalUnequal;
+    public boolean getEqualUnequal() {
         return equalUnequal;
     }
 
-    public void setEqualUnequal(String equalUnequal) {
+    public void setEqualUnequal(boolean equalUnequal) {
         this.equalUnequal = equalUnequal;
     }
 
@@ -109,7 +117,7 @@ public class RoadCityBitemporalRecord extends CprBitemporalPersonRecord<RoadCity
     @Override
     public boolean hasData() {
         return stringNonEmpty(this.timestamp) || stringNonEmpty(this.toHousenumber) || stringNonEmpty(this.fromHousenumber) ||
-                stringNonEmpty(this.equalUnequal) || stringNonEmpty(this.cityName);
+                stringNonEmpty(this.cityName);
     }
 
     @Override

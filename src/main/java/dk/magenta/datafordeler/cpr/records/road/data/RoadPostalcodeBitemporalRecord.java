@@ -18,6 +18,14 @@ public class RoadPostalcodeBitemporalRecord extends CprBitemporalPersonRecord<Ro
     public RoadPostalcodeBitemporalRecord() {
     }
 
+    public RoadPostalcodeBitemporalRecord(String timestamp, String toHousenumber, String fromHousenumber, boolean equalUnequal, int postalCode, String postalDistrict) {
+        this.timestamp = timestamp;
+        this.toHousenumber = toHousenumber;
+        this.fromHousenumber = fromHousenumber;
+        this.equalUnequal = equalUnequal;
+        this.postalCode = postalCode;
+        this.postalDistrict = postalDistrict;
+    }
 
     // Timestamp
     public static final String DB_FIELD_TIMESTAMP = "timestamp";
@@ -72,12 +80,12 @@ public class RoadPostalcodeBitemporalRecord extends CprBitemporalPersonRecord<Ro
     @Column(name = DB_FIELD_EQUAL_UNEQUAL)
     @JsonProperty(value = IO_FIELD_EQUAL_UNEQUAL)
     @XmlElement(name = IO_FIELD_EQUAL_UNEQUAL)
-    private String equalUnequal;
-    public String getEqualUnequal() {
+    private boolean equalUnequal;
+    public boolean getEqualUnequal() {
         return equalUnequal;
     }
 
-    public void setEqualUnequal(String equalUnequal) {
+    public void setEqualUnequal(boolean equalUnequal) {
         this.equalUnequal = equalUnequal;
     }
 
@@ -87,12 +95,12 @@ public class RoadPostalcodeBitemporalRecord extends CprBitemporalPersonRecord<Ro
     @Column(name = DB_FIELD_POSTAL_CODE)
     @JsonProperty(value = IO_FIELD_POSTAL_CODE)
     @XmlElement(name = IO_FIELD_POSTAL_CODE)
-    private String postalCode;
-    public String getPostalCode() {
+    private int postalCode;
+    public int getPostalCode() {
         return postalCode;
     }
 
-    public void setPostalCode(String postalCode) {
+    public void setPostalCode(int postalCode) {
         this.postalCode = postalCode;
     }
 
@@ -128,7 +136,7 @@ public class RoadPostalcodeBitemporalRecord extends CprBitemporalPersonRecord<Ro
     @Override
     public boolean hasData() {
         return stringNonEmpty(this.timestamp) || stringNonEmpty(this.toHousenumber) || stringNonEmpty(this.fromHousenumber) ||
-                stringNonEmpty(this.equalUnequal) || stringNonEmpty(this.postalCode) || stringNonEmpty(this.postalDistrict);
+                this.postalCode!=0 || stringNonEmpty(this.postalDistrict);
     }
 
     @Override
