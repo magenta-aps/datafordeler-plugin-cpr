@@ -6,6 +6,7 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import javax.persistence.Column;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @javax.persistence.Entity
@@ -17,7 +18,7 @@ public class RoadCityBitemporalRecord extends CprBitemporalRoadRecord<RoadCityBi
     public RoadCityBitemporalRecord() {
     }
 
-    public RoadCityBitemporalRecord(String timestamp, String toHousenumber, String fromHousenumber, boolean equalUnequal, String cityName) {
+    public RoadCityBitemporalRecord(OffsetDateTime timestamp, String toHousenumber, String fromHousenumber, boolean equalUnequal, String cityName) {
         this.timestamp = timestamp;
         this.toHousenumber = toHousenumber;
         this.fromHousenumber = fromHousenumber;
@@ -31,13 +32,13 @@ public class RoadCityBitemporalRecord extends CprBitemporalRoadRecord<RoadCityBi
     @Column(name = DB_FIELD_TIMESTAMP)
     @JsonProperty(value = IO_FIELD_TO_TIMESTAMP)
     @XmlElement(name = IO_FIELD_TO_TIMESTAMP)
-    private String timestamp;
+    private OffsetDateTime timestamp;
 
-    public String getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return this.timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(OffsetDateTime timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -117,7 +118,7 @@ public class RoadCityBitemporalRecord extends CprBitemporalRoadRecord<RoadCityBi
 
     @Override
     public boolean hasData() {
-        return stringNonEmpty(this.timestamp) || stringNonEmpty(this.toHousenumber) || stringNonEmpty(this.fromHousenumber) ||
+        return this.timestamp!=null || stringNonEmpty(this.toHousenumber) || stringNonEmpty(this.fromHousenumber) ||
                 stringNonEmpty(this.cityName);
     }
 

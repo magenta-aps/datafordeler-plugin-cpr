@@ -33,7 +33,7 @@ public class RoadMemoRecord extends RoadDataRecord {
     @Override
     public List<CprBitemporalRoadRecord> getBitemporalRecords() {
         List<CprBitemporalRoadRecord> records = new ArrayList<>();
-        records.add(new RoadMemoBitemporalRecord(null, null, this.getInt("notatnr"), this.getString("notatlinie", false)));
+        records.add(new RoadMemoBitemporalRecord(this.getOffsetDateTime("timestamp"), this.getOffsetDateTime("haenstart"), this.getInt("notatnr"), this.getString("notatlinie", false)));
 
 
 

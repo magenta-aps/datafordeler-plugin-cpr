@@ -41,7 +41,7 @@ public class RoadPostcodeRecord extends RoadDataRecord {
     @Override
     public List<CprBitemporalRoadRecord> getBitemporalRecords() {
         List<CprBitemporalRoadRecord> records = new ArrayList<>();
-        records.add(new RoadPostalcodeBitemporalRecord(null, this.getString("husnrtil", false),
+        records.add(new RoadPostalcodeBitemporalRecord(this.getOffsetDateTime("timestamp"), this.getString("husnrtil", false),
                 this.getString("husnrfra", false), this.getEven("ligeulige"),
                 this.getInt("postnr"), this.getString("postdisttxt", true)));
         return records;

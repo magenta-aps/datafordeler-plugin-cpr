@@ -6,6 +6,7 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import javax.persistence.Column;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @javax.persistence.Entity
@@ -17,7 +18,7 @@ public class RoadBitemporalRecord extends CprBitemporalRoadRecord<RoadBitemporal
     public RoadBitemporalRecord() {
     }
 
-    public RoadBitemporalRecord(String timestamp, int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode,
+    public RoadBitemporalRecord(OffsetDateTime timestamp, int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode,
                                 int fromRoadCode, String haenStart, String roadAdddressName, String roadName) {
         this.timestamp = timestamp;
         this.toMunicipalityCode = toMunicipalityCode;
@@ -36,13 +37,13 @@ public class RoadBitemporalRecord extends CprBitemporalRoadRecord<RoadBitemporal
     @Column(name = DB_FIELD_TIMESTAMP)
     @JsonProperty(value = IO_FIELD_TO_TIMESTAMP)
     @XmlElement(name = IO_FIELD_TO_TIMESTAMP)
-    private String timestamp;
+    private OffsetDateTime timestamp;
 
-    public String getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return this.timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(OffsetDateTime timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -178,7 +179,7 @@ public class RoadBitemporalRecord extends CprBitemporalRoadRecord<RoadBitemporal
 
     @Override
     public boolean hasData() {
-        return stringNonEmpty(this.timestamp) || this.toMunicipalityCode!=0 || this.toRoadCode!=0 ||
+        return this.timestamp!=null || this.toMunicipalityCode!=0 || this.toRoadCode!=0 ||
                 this.fromMunicipalityCode!=0 || this.fromRoadCode!=0 || stringNonEmpty(this.haenStart) ||
                 stringNonEmpty(this.roadAdddressName) || stringNonEmpty(this.roadName);
     }

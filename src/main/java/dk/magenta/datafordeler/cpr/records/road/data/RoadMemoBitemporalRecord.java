@@ -6,6 +6,7 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import javax.persistence.Column;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @javax.persistence.Entity
@@ -17,7 +18,7 @@ public class RoadMemoBitemporalRecord extends CprBitemporalRoadRecord<RoadMemoBi
     public RoadMemoBitemporalRecord() {
     }
 
-    public RoadMemoBitemporalRecord(String timestamp, String haenStart, int noteNumber, String noteLine) {
+    public RoadMemoBitemporalRecord(OffsetDateTime timestamp, OffsetDateTime haenStart, int noteNumber, String noteLine) {
         this.timestamp = timestamp;
         this.haenStart = haenStart;
         this.noteNumber = noteNumber;
@@ -30,13 +31,13 @@ public class RoadMemoBitemporalRecord extends CprBitemporalRoadRecord<RoadMemoBi
     @Column(name = DB_FIELD_TIMESTAMP)
     @JsonProperty(value = IO_FIELD_TO_TIMESTAMP)
     @XmlElement(name = IO_FIELD_TO_TIMESTAMP)
-    private String timestamp;
+    private OffsetDateTime timestamp;
 
-    public String getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return this.timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(OffsetDateTime timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -47,13 +48,13 @@ public class RoadMemoBitemporalRecord extends CprBitemporalRoadRecord<RoadMemoBi
     @Column(name = DB_FIELD_HAEN_START)
     @JsonProperty(value = IO_FIELD_HAEN_START)
     @XmlElement(name = IO_FIELD_HAEN_START)
-    private String haenStart;
+    private OffsetDateTime haenStart;
 
-    public String getHaenStart() {
+    public OffsetDateTime getHaenStart() {
         return haenStart;
     }
 
-    public void setHaenStart(String haenStart) {
+    public void setHaenStart(OffsetDateTime haenStart) {
         this.haenStart = haenStart;
     }
 
@@ -102,7 +103,7 @@ public class RoadMemoBitemporalRecord extends CprBitemporalRoadRecord<RoadMemoBi
 
     @Override
     public boolean hasData() {
-        return stringNonEmpty(this.timestamp) || stringNonEmpty(this.haenStart) || this.noteNumber!=0 ||
+        return this.timestamp!=null || this.haenStart!=null || this.noteNumber!=0 ||
                 stringNonEmpty(this.noteLine);
     }
 
