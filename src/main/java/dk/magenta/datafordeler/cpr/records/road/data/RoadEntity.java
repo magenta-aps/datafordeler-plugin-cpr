@@ -10,10 +10,10 @@ import dk.magenta.datafordeler.cpr.records.CprMonotemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprNontemporalRecord;
 import org.hibernate.annotations.*;
 
-import javax.persistence.Index;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.persistence.CascadeType;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.*;
@@ -53,54 +53,61 @@ public class RoadEntity extends CprRecordEntity {
         super(uuid, domain);
     }
 
+    public static final String DB_FIELD_MUNIPALITY_CODE = "municipalityCode";
+    public static final String IO_FIELD_MUNIPALITY_CODE = "kommunekode";
+    @Column(name = DB_FIELD_MUNIPALITY_CODE)
+    @JsonProperty(IO_FIELD_MUNIPALITY_CODE)
+    private int municipalityCode;
 
-    public static final String DB_FIELD_ADDRESS_CONAME = "coname";
-    public static final String IO_FIELD_ADDRESS_CONAME = "conavn";
+    public static final String DB_FIELD_ROAD_CODE = "roadcode";
+    public static final String IO_FIELD_ROAD_CODE = "vejkode";
+    @Column(name = DB_FIELD_ROAD_CODE)
+    @JsonProperty(IO_FIELD_ROAD_CODE)
+    private int roadcode;
+
+    public static final String DB_FIELD_ADDRESS_NAME_CODE = "addressname";
+    public static final String IO_FIELD_ADDRESS_NAME_CODE = "adressenavn";
     @OneToMany(mappedBy = RoadBitemporalRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    @JsonProperty(IO_FIELD_ADDRESS_CONAME)
-    Set<RoadBitemporalRecord> coname = new HashSet<>();
+    @JsonProperty(IO_FIELD_ADDRESS_NAME_CODE)
+    Set<RoadBitemporalRecord> name = new HashSet<>();
 
-    public Set<RoadBitemporalRecord> getConame() {
-        return this.coname;
+    public Set<RoadBitemporalRecord> getNames() {
+        return this.name;
     }
 
-    public static final String DB_FIELD_ADDRESS_CONAME2 = "coname2";
-    public static final String IO_FIELD_ADDRESS_CONAME2 = "conavn2";
+    public static final String DB_FIELD_CITY_CODE = "city";
+    public static final String IO_FIELD_CITY_CODE = "by";
     @OneToMany(mappedBy = RoadCityBitemporalRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    @JsonProperty(IO_FIELD_ADDRESS_CONAME2)
-    Set<RoadCityBitemporalRecord> coname2 = new HashSet<>();
+    @JsonProperty(IO_FIELD_CITY_CODE)
+    Set<RoadCityBitemporalRecord> city = new HashSet<>();
 
-    public Set<RoadCityBitemporalRecord> getConame2() {
-        return this.coname2;
+    public Set<RoadCityBitemporalRecord> getCitys() {
+        return this.city;
     }
 
 
 
-    public static final String DB_FIELD_ADDRESS_CONAME3 = "coname3";
-    public static final String IO_FIELD_ADDRESS_CONAME3 = "conavn3";
+    public static final String DB_FIELD_MEMO_CODE = "memo";
+    public static final String IO_FIELD_MEMO_CODE = "note";
     @OneToMany(mappedBy = RoadMemoBitemporalRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    @JsonProperty(IO_FIELD_ADDRESS_CONAME3)
-    Set<RoadMemoBitemporalRecord> coname3 = new HashSet<>();
+    @JsonProperty(IO_FIELD_MEMO_CODE)
+    Set<RoadMemoBitemporalRecord> memo = new HashSet<>();
 
-    public Set<RoadMemoBitemporalRecord> getConame3() {
-        return this.coname3;
+    public Set<RoadMemoBitemporalRecord> getMemos() {
+        return this.memo;
     }
 
 
 
-    public static final String DB_FIELD_ADDRESS_CONAME4 = "coname4";
-    public static final String IO_FIELD_ADDRESS_CONAME4 = "conavn4";
+    public static final String DB_FIELD_POST_CODE = "postcode";
+    public static final String IO_FIELD_POST_CODE = "postnr";
     @OneToMany(mappedBy = RoadPostalcodeBitemporalRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
-    @JsonProperty(IO_FIELD_ADDRESS_CONAME4)
-    Set<RoadPostalcodeBitemporalRecord> coname4 = new HashSet<>();
+    @JsonProperty(IO_FIELD_POST_CODE)
+    Set<RoadPostalcodeBitemporalRecord> postcode = new HashSet<>();
 
-    public Set<RoadPostalcodeBitemporalRecord> getConame4() {
-        return this.coname4;
+    public Set<RoadPostalcodeBitemporalRecord> getPostcodes() {
+        return this.postcode;
     }
-
-
-
-
 
 
 
