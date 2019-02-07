@@ -20,7 +20,7 @@ public class RoadMemoRecord extends RoadDataRecord {
         this.obtain("timestamp", 54, 12);
         this.obtain("notatnr", 12, 2);
         this.obtain("notatlinie", 14, 40);
-        this.obtain("haenstart", 66, 12);
+        this.obtain("haenstart", 68, 12);
 
         this.memoTemporality = new CprBitemporality(this.getOffsetDateTime("timestamp"), null, this.getOffsetDateTime("haenstart"), false, null, false);
     }
