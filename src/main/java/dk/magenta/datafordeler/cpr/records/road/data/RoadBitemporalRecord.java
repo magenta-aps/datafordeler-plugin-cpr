@@ -3,7 +3,8 @@ package dk.magenta.datafordeler.cpr.records.road.data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Objects;
 

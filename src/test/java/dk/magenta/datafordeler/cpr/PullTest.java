@@ -11,10 +11,13 @@ import dk.magenta.datafordeler.core.plugin.FtpCommunicator;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
-import dk.magenta.datafordeler.cpr.data.person.*;
-import dk.magenta.datafordeler.cpr.data.road.RoadEntity;
-import dk.magenta.datafordeler.cpr.data.road.RoadQuery;
+import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
+import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
+import dk.magenta.datafordeler.cpr.data.person.PersonRecordQuery;
+import dk.magenta.datafordeler.cpr.data.person.PersonSubscription;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthPlaceDataRecord;
+import dk.magenta.datafordeler.cpr.records.road.RoadRecordQuery;
+import dk.magenta.datafordeler.cpr.records.road.data.RoadEntity;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Session;
 import org.junit.After;
@@ -204,7 +207,7 @@ public class PullTest {
             Assert.assertEquals(1, personEntities.size());
             Assert.assertEquals(PersonEntity.generateUUID("0101001234"), personEntities.get(0).getUUID());
 
-            RoadQuery roadQuery = new RoadQuery();
+            RoadRecordQuery roadQuery = new RoadRecordQuery();
             roadQuery.addKommunekode(730);
             roadQuery.setVejkode(4);
             List<RoadEntity> roadEntities = QueryManager.getAllEntities(session, roadQuery, RoadEntity.class);

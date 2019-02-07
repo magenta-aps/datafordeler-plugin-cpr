@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
-import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
-import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
-import dk.magenta.datafordeler.cpr.records.CprGeoRecord;
+import dk.magenta.datafordeler.cpr.records.CprDataRecord;
 import dk.magenta.datafordeler.cpr.records.road.data.CprBitemporalRoadRecord;
 
 import java.util.ArrayList;
@@ -16,7 +14,7 @@ import java.util.List;
 /**
  * Superclass for Road records
  */
-public abstract class RoadDataRecord extends CprGeoRecord<RoadEffect, RoadBaseData> {
+public abstract class RoadDataRecord extends CprDataRecord {
 
     public static final String RECORDTYPE_ROAD = "001";
     public static final String RECORDTYPE_ROADCITY = "003";

@@ -5,7 +5,8 @@ import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.road.data.CprBitemporalRoadRecord;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadCityBitemporalRecord;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Record for Road city (type 003).
@@ -31,7 +32,7 @@ public class RoadCityRecord extends RoadDataRecord {
     }
 
     private boolean getEven(String key) {
-        String value = this.get(key);
+        String value = this.getString(key, true);
         return "L".equalsIgnoreCase(value);
     }
 
@@ -41,7 +42,7 @@ public class RoadCityRecord extends RoadDataRecord {
         List<CprBitemporalRoadRecord> records = new ArrayList<>();
 
         records.add(new RoadCityBitemporalRecord(null,
-                this.get("husnrtil"), this.get("husnrfra"), this.getEven("ligeulige"), this.get("bynvn")));
+                this.getString("husnrtil", true), this.getString("husnrfra", true), this.getEven("ligeulige"), this.getString("bynvn", true)));
 
         return records;
     }

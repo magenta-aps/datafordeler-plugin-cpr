@@ -9,12 +9,14 @@ import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.Receipt;
 import dk.magenta.datafordeler.core.io.WrappedInputStream;
 import dk.magenta.datafordeler.core.plugin.*;
-import dk.magenta.datafordeler.core.util.*;
+import dk.magenta.datafordeler.core.util.ItemInputStream;
+import dk.magenta.datafordeler.core.util.LabeledSequenceInputStream;
+import dk.magenta.datafordeler.core.util.ListHashMap;
+import dk.magenta.datafordeler.core.util.Stopwatch;
 import dk.magenta.datafordeler.cpr.CprRegisterManager;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
-import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.CprGeoRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.time.*;
@@ -280,7 +281,7 @@ public abstract class CprGeoEntityManager<T extends CprGeoRecord<V, D>, E extend
                                 E entity = entityCache.get(uuid);
                                 List<T> records = recordMap.get(entity);
                                 session.saveOrUpdate(entity);
-                                this.parseRVD(entity, records, importMetadata);
+//                                this.parseRVD(entity, records, importMetadata);
                             }
 
                             this.checkInterrupt(importMetadata);
@@ -327,7 +328,7 @@ public abstract class CprGeoEntityManager<T extends CprGeoRecord<V, D>, E extend
         return null;
     }
 
-    private void parseRVD(E entity, List<T> records, ImportMetadata importMetadata) throws ImportInterruptedException {
+/*    private void parseRVD(E entity, List<T> records, ImportMetadata importMetadata) throws ImportInterruptedException {
         Session session = importMetadata.getSession();
         ListHashMap<CprBitemporality, T> groups = this.sortIntoGroups(records);
         HashSet<R> entityRegistrations = new HashSet<>();
@@ -423,14 +424,14 @@ public abstract class CprGeoEntityManager<T extends CprGeoRecord<V, D>, E extend
                 e.printStackTrace();
             }
         }
-    }
+    }*/
 
     protected boolean filter(T record, ObjectNode importConfiguration) {
         return record.filter(importConfiguration);
     }
 
 
-    public ListHashMap<CprBitemporality, T> sortIntoGroups(Collection<T> records) {
+    /*public ListHashMap<CprBitemporality, T> sortIntoGroups(Collection<T> records) {
         // Sort the records into groups that share bitemporality
         ListHashMap<CprBitemporality, T> recordGroups = new ListHashMap<>();
         for (T record : records) {
@@ -441,7 +442,7 @@ public abstract class CprGeoEntityManager<T extends CprGeoRecord<V, D>, E extend
             }
         }
         return recordGroups;
-    }
+    }*/
 
     @Override
     public boolean handlesOwnSaves() {

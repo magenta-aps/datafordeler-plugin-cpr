@@ -5,7 +5,8 @@ import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.road.data.CprBitemporalRoadRecord;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadPostalcodeBitemporalRecord;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Record for Road postcodes (type 004).
@@ -33,7 +34,7 @@ public class RoadPostcodeRecord extends RoadDataRecord {
 
 
     private boolean getEven(String key) {
-        String value = this.get(key);
+        String value = this.getString(key, true);
         return "L".equalsIgnoreCase(value);
     }
 

@@ -5,7 +5,8 @@ import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.road.data.CprBitemporalRoadRecord;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadBitemporalRecord;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Record for Road names (type 001).
@@ -38,7 +39,7 @@ public class RoadRecord extends RoadDataRecord {
     public List<CprBitemporalRoadRecord> getBitemporalRecords() {
         List<CprBitemporalRoadRecord> records = new ArrayList<>();
         records.add(new RoadBitemporalRecord(null, this.getInt("tilkomkod"), this.getInt("tilvejkod"),
-                this.getInt("frakomkod"), this.getInt("fravejkod"), null, this.get("vejadrnvn"), this.get("vejnvn")));
+                this.getInt("frakomkod"), this.getInt("fravejkod"), null, this.getString("vejadrnvn", true), this.getString("vejnvn", true)));
         return records;
     }
 

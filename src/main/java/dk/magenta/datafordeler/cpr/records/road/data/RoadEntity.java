@@ -1,19 +1,19 @@
 package dk.magenta.datafordeler.cpr.records.road.data;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.*;
+import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntity;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprMonotemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprNontemporalRecord;
-import org.hibernate.annotations.*;
+import org.hibernate.Session;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.FilterDefs;
+import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
-import javax.persistence.Index;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.*;
@@ -42,6 +42,9 @@ import java.util.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RoadEntity extends CprRecordEntity {
 
+
+    public static final String schema = "road";
+
     public RoadEntity() {
     }
 
@@ -59,11 +62,31 @@ public class RoadEntity extends CprRecordEntity {
     @JsonProperty(IO_FIELD_MUNIPALITY_CODE)
     private int municipalityCode;
 
+    public int getMunicipalityCode() {
+        return municipalityCode;
+    }
+
+    public void setMunicipalityCode(int municipalityCode) {
+        this.municipalityCode = municipalityCode;
+    }
+
+
+
     public static final String DB_FIELD_ROAD_CODE = "roadcode";
     public static final String IO_FIELD_ROAD_CODE = "vejkode";
     @Column(name = DB_FIELD_ROAD_CODE)
     @JsonProperty(IO_FIELD_ROAD_CODE)
     private int roadcode;
+
+    public int getRoadcode() {
+        return roadcode;
+    }
+
+    public void setRoadcode(int roadcode) {
+        this.roadcode = roadcode;
+    }
+
+
 
     public static final String DB_FIELD_ADDRESS_NAME_CODE = "addressname";
     public static final String IO_FIELD_ADDRESS_NAME_CODE = "adressenavn";
@@ -81,7 +104,7 @@ public class RoadEntity extends CprRecordEntity {
     @JsonProperty(IO_FIELD_CITY_CODE)
     Set<RoadCityBitemporalRecord> city = new HashSet<>();
 
-    public Set<RoadCityBitemporalRecord> getCitys() {
+    public Set<RoadCityBitemporalRecord> getCity() {
         return this.city;
     }
 
@@ -93,7 +116,7 @@ public class RoadEntity extends CprRecordEntity {
     @JsonProperty(IO_FIELD_MEMO_CODE)
     Set<RoadMemoBitemporalRecord> memo = new HashSet<>();
 
-    public Set<RoadMemoBitemporalRecord> getMemos() {
+    public Set<RoadMemoBitemporalRecord> getMemo() {
         return this.memo;
     }
 
@@ -105,27 +128,69 @@ public class RoadEntity extends CprRecordEntity {
     @JsonProperty(IO_FIELD_POST_CODE)
     Set<RoadPostalcodeBitemporalRecord> postcode = new HashSet<>();
 
-    public Set<RoadPostalcodeBitemporalRecord> getPostcodes() {
+    public Set<RoadPostalcodeBitemporalRecord> getPostcode() {
         return this.postcode;
     }
 
 
 
-    public static UUID generateUUID(String roadNumber) {
-        String uuidInput = "road:"+roadNumber;
+    public static UUID generateUUID(int municipalityCode, int roadCode) {
+        String uuidInput = "road:"+municipalityCode+":"+roadCode;
         return UUID.nameUUIDFromBytes(uuidInput.getBytes());
     }
 
 
 
-    @JsonIgnore
-    public Set<CprBitemporalRoadRecord> getBitemporalRecords() {
-        HashSet<CprBitemporalRoadRecord> records = new HashSet<>();
-
-        return records;
+    public void addBitemporalRecord(CprBitemporalRoadRecord record, Session session) {
+        boolean added = false;
+        if (record instanceof RoadCityBitemporalRecord) {
+            added = addItem(this, this.city, record, session);
+        }
+        if (record instanceof RoadPostalcodeBitemporalRecord) {
+            added = addItem(this, this.postcode, record, session);
+        }
+        if (record instanceof RoadMemoBitemporalRecord) {
+            added = addItem(this, this.memo, record, session);
+        }
+        if (record instanceof RoadBitemporalRecord) {
+            added = addItem(this, this.name, record, session);
+        }
+        if (added) {
+            record.setEntity(this);
+        }
     }
 
-    @Override
+
+    private static <E extends CprBitemporalRoadRecord> boolean addItem(RoadEntity entity, Set<E> set, CprBitemporalRoadRecord newItem, Session session) {
+
+        if (newItem != null) {
+            //System.out.println("Add "+newItem.cnt+" ("+newItem.getClass().getSimpleName()+")");
+            ArrayList<E> items = new ArrayList<>(set);
+
+            for (E oldItem : items) {
+
+                if (newItem.equalData(oldItem)) {
+                    //System.out.println(newItem.cnt +" matches "+oldItem.cnt);
+
+                    if (
+                            Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
+                                    (Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) || newItem.getRegistrationTo() == null) &&
+                                    Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
+                                    newItem.getEffectTo() == null
+                    ) {
+                        //System.out.println("matching item with insufficient temporality (" + newItem.getBitemporality() + "), not adding");
+                        return false;
+                    }
+                }
+            }
+            //log.info("nonmatching item, adding as new");
+            return set.add((E) newItem);
+        }
+        return false;
+    }
+
+
+        @Override
     public IdentifiedEntity getNewest(Collection<IdentifiedEntity> collection) {
         return null;
     }
