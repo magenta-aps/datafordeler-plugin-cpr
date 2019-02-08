@@ -89,6 +89,7 @@ public class RoadEntity extends CprRecordEntity {
 
     public static final String DB_FIELD_ADDRESS_NAME_CODE = "addressname";
     public static final String IO_FIELD_ADDRESS_NAME_CODE = "adressenavn";
+    @Column(name = DB_FIELD_ADDRESS_NAME_CODE)
     @OneToMany(mappedBy = RoadNameBitemporalRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @JsonProperty(IO_FIELD_ADDRESS_NAME_CODE)
     Set<RoadNameBitemporalRecord> name = new HashSet<>();
@@ -99,6 +100,7 @@ public class RoadEntity extends CprRecordEntity {
 
     public static final String DB_FIELD_CITY_CODE = "city";
     public static final String IO_FIELD_CITY_CODE = "by";
+    @Column(name = DB_FIELD_CITY_CODE)
     @OneToMany(mappedBy = RoadCityBitemporalRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @JsonProperty(IO_FIELD_CITY_CODE)
     Set<RoadCityBitemporalRecord> city = new HashSet<>();
@@ -111,6 +113,7 @@ public class RoadEntity extends CprRecordEntity {
 
     public static final String DB_FIELD_MEMO_CODE = "memo";
     public static final String IO_FIELD_MEMO_CODE = "note";
+    @Column(name = DB_FIELD_MEMO_CODE)
     @OneToMany(mappedBy = RoadMemoBitemporalRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @JsonProperty(IO_FIELD_MEMO_CODE)
     Set<RoadMemoBitemporalRecord> memo = new HashSet<>();
@@ -123,6 +126,7 @@ public class RoadEntity extends CprRecordEntity {
 
     public static final String DB_FIELD_POST_CODE = "postcode";
     public static final String IO_FIELD_POST_CODE = "postnr";
+    @Column(name = DB_FIELD_POST_CODE)
     @OneToMany(mappedBy = RoadPostalcodeBitemporalRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @JsonProperty(IO_FIELD_POST_CODE)
     Set<RoadPostalcodeBitemporalRecord> postcode = new HashSet<>();
