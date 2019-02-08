@@ -7,23 +7,31 @@ import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
+import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.*;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
 import dk.magenta.datafordeler.cpr.records.road.RoadRecordQuery;
+import dk.magenta.datafordeler.cpr.records.road.data.RoadBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadEntity;
+import dk.magenta.datafordeler.cpr.records.road.data.RoadMemoBitemporalRecord;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.json.JSONException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
@@ -58,6 +66,9 @@ public class ParseTest {
     }
 
     private void loadRoad(ImportMetadata importMetadata) throws DataFordelerException, IOException {
+
+        //InputStream testData = new FileInputStream(new File("/home/mmj/Desktop/A370715.txt"));
+
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
         roadEntityManager.parseData(testData, importMetadata);
         testData.close();
@@ -109,71 +120,41 @@ public class ParseTest {
             Assert.assertEquals(1, entities.size());
             RoadEntity entity = entities.get(0);
 
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity));
+            Assert.assertEquals(RoadEntity.generateUUID(730, 4), entity.getUUID());
+            Assert.assertEquals(730, entity.getMunicipalityCode());
+            Assert.assertEquals(4, entity.getRoadcode());
+            Assert.assertEquals(1, entity.getNames().size());
+            Assert.assertEquals(1, entity.getMemo().size());
+            Assert.assertEquals(1, entity.getPostcode().size());
+            Assert.assertEquals(0, entity.getCity().size());
 
-//            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new RoadOutputWrapper().wrapResult(entity, query)));
-//            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity));
-//
-//            Assert.assertEquals(RoadEntity.generateUUID(730, 4), entity.getUUID());
-//            Assert.assertEquals(roadEntityManager.getDomain(), entity.getDomain());
-//            Assert.assertEquals(730, entity.getKommunekode());
-//            Assert.assertEquals(4, entity.getVejkode());
-//            Assert.assertEquals(2, entity.getRegistrations().size());
-//            RoadRegistration registration1 = entity.getRegistrations().get(0);
-//            Assert.assertEquals(0, registration1.getSequenceNumber());
-//            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), registration1.getRegistrationFrom()));
-//
-//            System.out.println(registration1.getRegistrationTo());
-//
-//            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2008-05-30T09:11:00+02:00"), registration1.getRegistrationTo()));
-//            List<RoadEffect> effects1 = registration1.getSortedEffects();
-//            Assert.assertEquals(2, effects1.size());
-//            RoadEffect effect11 = effects1.get(0);
-//
-//            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1900-01-01T12:00:00+01:00"), effect11.getEffectFrom()));
-//            Assert.assertNull(effect11.getEffectTo());
-//            Assert.assertEquals("Aalborggade", effect11.getData().get("adresseringsnavn"));
-//            Assert.assertEquals("Aalborggade", effect11.getData().get("vejnavn"));
-//            Assert.assertFalse(effect11.getEffectFromUncertain());
-//            Assert.assertFalse(effect11.getEffectToUncertain());
-//
-//            RoadEffect effect12 = effects1.get(1);
-//            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1996-03-12T07:42:00+01:00"), effect12.getEffectFrom()));
-//            Assert.assertNull(effect12.getEffectTo());
-//            List<RoadMemoData> memo = (List<RoadMemoData>) effect12.getData().get("memo");
-//            Assert.assertEquals(1, memo.get(0).getMemoNumber());
-//            Assert.assertEquals("HUSNR.1 - BØRNEINSTITUTION -", memo.get(0).getMemoText());
-//            Assert.assertEquals(2, memo.get(1).getMemoNumber());
-//            Assert.assertEquals("HUSNR.2 - EGEDAL -", memo.get(1).getMemoText());
-//            Assert.assertEquals(3, memo.get(2).getMemoNumber());
-//            Assert.assertEquals("HUSNR.3 - KIRKE -", memo.get(2).getMemoText());
-//
-//            RoadRegistration registration2 = entity.getRegistrations().get(1);
-//            Assert.assertEquals(1, registration2.getSequenceNumber());
-//            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2008-05-30T09:11:00+02:00"), registration2.getRegistrationFrom()));
-//            Assert.assertNull(registration2.getRegistrationTo());
-//            List<RoadEffect> effects2 = registration2.getSortedEffects();
-//            Assert.assertEquals(3, effects2.size());
-//            RoadEffect effect21 = effects2.get(0);
-//            Assert.assertNull(effect21.getEffectFrom());
-//            Assert.assertNull(effect21.getEffectTo());
-//            Assert.assertFalse(effect21.getEffectFromUncertain());
-//            Assert.assertFalse(effect21.getEffectToUncertain());
-//            List<RoadPostcodeData> post = (List<RoadPostcodeData>) effect21.getData().get("postcode");
-//            Assert.assertEquals(2, post.size());
-//            Assert.assertEquals("001", post.get(0).getHouseNumberFrom());
-//            Assert.assertEquals("999", post.get(0).getHouseNumberTo());
-//            Assert.assertFalse(post.get(0).isEven());
-//            Assert.assertEquals(8940, post.get(0).getPostCode().getPostnummer());
-//            Assert.assertEquals("Randers SV", post.get(0).getPostCode().getPostdistrikt());
-//            Assert.assertEquals("002", post.get(1).getHouseNumberFrom());
-//            Assert.assertEquals("998", post.get(1).getHouseNumberTo());
-//            Assert.assertTrue(post.get(1).isEven());
-//            Assert.assertEquals(8940, post.get(1).getPostCode().getPostnummer());
-//            Assert.assertEquals("Randers SV", post.get(1).getPostCode().getPostdistrikt());
-//            Assert.assertFalse(effect21.getEffectFromUncertain());
-//            Assert.assertFalse(effect21.getEffectToUncertain());
+            RoadBitemporalRecord roadName = entity.getNames().iterator().next();
 
+            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1900-01-01T12:00+01:00"), roadName.getHaenStart()));
+            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), roadName.getTimestamp()));
+
+            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), roadName.getRegistrationFrom()));
+
+            RoadMemoBitemporalRecord memoRecord = entity.getMemo().iterator().next();
+
+            Assert.assertEquals("HUSNR.1 - BØRNEINSTITUTION -", memoRecord.getNoteLine());
+            //TODO: what about other memos
+
+
+            String jsonResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity);
+
+            JSONAssert.assertEquals(
+                    "{\"names\":[{\"vejensNavn\":\"Aalborggade\"}]}", jsonResponse, JSONCompareMode.LENIENT);
+
+            JSONAssert.assertEquals(
+                    "{\"adressenavn\":[{\"vejensNavn\":\"Aalborggade\"}]}", jsonResponse, JSONCompareMode.LENIENT);
+
+            JSONAssert.assertEquals(
+                    "{\"postnr\":[{\"postnummer\":8940}]}", jsonResponse, JSONCompareMode.LENIENT);
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         } finally {
             transaction.rollback();
             session.close();

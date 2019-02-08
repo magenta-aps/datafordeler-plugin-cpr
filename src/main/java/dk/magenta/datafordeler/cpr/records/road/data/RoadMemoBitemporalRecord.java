@@ -19,6 +19,8 @@ public class RoadMemoBitemporalRecord extends CprBitemporalRoadRecord<RoadMemoBi
     }
 
     public RoadMemoBitemporalRecord(OffsetDateTime timestamp, OffsetDateTime haenStart, int noteNumber, String noteLine) {
+        super.setRegistrationFrom(timestamp);
+        super.setEffectFrom(haenStart);
         this.timestamp = timestamp;
         this.haenStart = haenStart;
         this.noteNumber = noteNumber;

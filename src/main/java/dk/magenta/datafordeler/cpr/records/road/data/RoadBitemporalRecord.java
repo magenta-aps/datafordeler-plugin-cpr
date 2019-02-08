@@ -20,6 +20,8 @@ public class RoadBitemporalRecord extends CprBitemporalRoadRecord<RoadBitemporal
 
     public RoadBitemporalRecord(OffsetDateTime timestamp, int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode,
                                 int fromRoadCode, OffsetDateTime haenStart, String roadAdddressName, String roadName) {
+        super.setRegistrationFrom(timestamp);
+        super.setEffectFrom(haenStart);
         this.timestamp = timestamp;
         this.toMunicipalityCode = toMunicipalityCode;
         this.toRoadCode = toRoadCode;

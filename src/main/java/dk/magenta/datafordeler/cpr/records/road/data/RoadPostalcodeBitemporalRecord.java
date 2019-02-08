@@ -19,6 +19,7 @@ public class RoadPostalcodeBitemporalRecord extends CprBitemporalRoadRecord<Road
     }
 
     public RoadPostalcodeBitemporalRecord(OffsetDateTime timestamp, String toHousenumber, String fromHousenumber, boolean equalUnequal, int postalCode, String postalDistrict) {
+        super.setRegistrationFrom(timestamp);
         this.timestamp = timestamp;
         this.toHousenumber = toHousenumber;
         this.fromHousenumber = fromHousenumber;

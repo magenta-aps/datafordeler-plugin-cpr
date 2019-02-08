@@ -19,6 +19,7 @@ public class RoadCityBitemporalRecord extends CprBitemporalRoadRecord<RoadCityBi
     }
 
     public RoadCityBitemporalRecord(OffsetDateTime timestamp, String toHousenumber, String fromHousenumber, boolean equalUnequal, String cityName) {
+        super.setRegistrationFrom(timestamp);
         this.timestamp = timestamp;
         this.toHousenumber = toHousenumber;
         this.fromHousenumber = fromHousenumber;
