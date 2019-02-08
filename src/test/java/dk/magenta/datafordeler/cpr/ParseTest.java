@@ -66,9 +66,6 @@ public class ParseTest {
     }
 
     private void loadRoad(ImportMetadata importMetadata) throws DataFordelerException, IOException {
-
-        //InputStream testData = new FileInputStream(new File("/home/mmj/Desktop/A370715.txt"));
-
         InputStream testData = ParseTest.class.getResourceAsStream("/roaddata.txt");
         roadEntityManager.parseData(testData, importMetadata);
         testData.close();
@@ -115,6 +112,7 @@ public class ParseTest {
             RoadRecordQuery query = new RoadRecordQuery();
             query.addKommunekode("0730");
             query.setVejkode("0004");
+            query.setEffectTo(OffsetDateTime.MIN);
 
             List<RoadEntity> entities = QueryManager.getAllEntities(session, query, RoadEntity.class);
             Assert.assertEquals(1, entities.size());
