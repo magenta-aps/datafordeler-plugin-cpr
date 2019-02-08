@@ -112,7 +112,6 @@ public class ParseTest {
             RoadRecordQuery query = new RoadRecordQuery();
             query.addKommunekode("0730");
             query.setVejkode("0004");
-            query.setEffectTo(OffsetDateTime.MIN);
 
             List<RoadEntity> entities = QueryManager.getAllEntities(session, query, RoadEntity.class);
             Assert.assertEquals(1, entities.size());
