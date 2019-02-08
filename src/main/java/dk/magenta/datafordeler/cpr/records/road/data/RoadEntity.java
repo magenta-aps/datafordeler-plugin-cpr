@@ -2,7 +2,6 @@ package dk.magenta.datafordeler.cpr.records.road.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.magenta.datafordeler.core.database.*;
-import dk.magenta.datafordeler.core.util.Equality;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntity;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
@@ -90,11 +89,11 @@ public class RoadEntity extends CprRecordEntity {
 
     public static final String DB_FIELD_ADDRESS_NAME_CODE = "addressname";
     public static final String IO_FIELD_ADDRESS_NAME_CODE = "adressenavn";
-    @OneToMany(mappedBy = RoadBitemporalRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = RoadNameBitemporalRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @JsonProperty(IO_FIELD_ADDRESS_NAME_CODE)
-    Set<RoadBitemporalRecord> name = new HashSet<>();
+    Set<RoadNameBitemporalRecord> name = new HashSet<>();
 
-    public Set<RoadBitemporalRecord> getNames() {
+    public Set<RoadNameBitemporalRecord> getNames() {
         return this.name;
     }
 
@@ -152,7 +151,7 @@ public class RoadEntity extends CprRecordEntity {
         if (record instanceof RoadMemoBitemporalRecord) {
             added = addItem(this, this.memo, record, session);
         }
-        if (record instanceof RoadBitemporalRecord) {
+        if (record instanceof RoadNameBitemporalRecord) {
             added = addItem(this, this.name, record, session);
         }
         if (added) {
@@ -164,26 +163,13 @@ public class RoadEntity extends CprRecordEntity {
     private static <E extends CprBitemporalRoadRecord> boolean addItem(RoadEntity entity, Set<E> set, CprBitemporalRoadRecord newItem, Session session) {
 
         if (newItem != null) {
-            //System.out.println("Add "+newItem.cnt+" ("+newItem.getClass().getSimpleName()+")");
             ArrayList<E> items = new ArrayList<>(set);
 
             for (E oldItem : items) {
-
-                if (newItem.equalData(oldItem)) {
-                    //System.out.println(newItem.cnt +" matches "+oldItem.cnt);
-
-                    if (
-                            Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
-                                    (Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) || newItem.getRegistrationTo() == null) &&
-                                    Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
-                                    newItem.getEffectTo() == null
-                    ) {
-                        //System.out.println("matching item with insufficient temporality (" + newItem.getBitemporality() + "), not adding");
-                        return false;
-                    }
+                if (newItem.equals(oldItem)) {
+                    return false;
                 }
             }
-            //log.info("nonmatching item, adding as new");
             return set.add((E) newItem);
         }
         return false;

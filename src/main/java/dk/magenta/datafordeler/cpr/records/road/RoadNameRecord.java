@@ -3,7 +3,7 @@ package dk.magenta.datafordeler.cpr.records.road;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.road.data.CprBitemporalRoadRecord;
-import dk.magenta.datafordeler.cpr.records.road.data.RoadBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.road.data.RoadNameBitemporalRecord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,11 +11,11 @@ import java.util.List;
 /**
  * Record for Road names (type 001).
  */
-public class RoadRecord extends RoadDataRecord {
+public class RoadNameRecord extends RoadDataRecord {
 
     private CprBitemporality roadTemporality;
 
-    public RoadRecord(String line) throws ParseException {
+    public RoadNameRecord(String line) throws ParseException {
         super(line);
         this.obtain("timestamp", 12, 12);
         this.obtain("tilkomkod", 24, 4);
@@ -38,7 +38,7 @@ public class RoadRecord extends RoadDataRecord {
     @Override
     public List<CprBitemporalRoadRecord> getBitemporalRecords() {
         List<CprBitemporalRoadRecord> records = new ArrayList<>();
-        records.add(new RoadBitemporalRecord(this.getOffsetDateTime("timestamp"), this.getInt("tilkomkod"), this.getInt("tilvejkod"),
+        records.add(new RoadNameBitemporalRecord(this.getOffsetDateTime("timestamp"), this.getInt("tilkomkod"), this.getInt("tilvejkod"),
                 this.getInt("frakomkod"), this.getInt("fravejkod"), this.getOffsetDateTime("haenstart"), this.getString("vejadrnvn", true), this.getString("vejnvn", true)));
         return records;
     }

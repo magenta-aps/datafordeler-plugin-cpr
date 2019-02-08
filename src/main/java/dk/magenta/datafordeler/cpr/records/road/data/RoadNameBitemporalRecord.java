@@ -11,15 +11,15 @@ import java.util.Objects;
 
 @javax.persistence.Entity
 @Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "road_record")
-public class RoadBitemporalRecord extends CprBitemporalRoadRecord<RoadBitemporalRecord> {
+public class RoadNameBitemporalRecord extends CprBitemporalRoadRecord<RoadNameBitemporalRecord> {
 
     public static final String TABLE_NAME = "road_record";
 
-    public RoadBitemporalRecord() {
+    public RoadNameBitemporalRecord() {
     }
 
-    public RoadBitemporalRecord(OffsetDateTime timestamp, int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode,
-                                int fromRoadCode, OffsetDateTime haenStart, String roadAdddressName, String roadName) {
+    public RoadNameBitemporalRecord(OffsetDateTime timestamp, int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode,
+                                    int fromRoadCode, OffsetDateTime haenStart, String roadAdddressName, String roadName) {
         super.setRegistrationFrom(timestamp);
         super.setEffectFrom(haenStart);
         this.timestamp = timestamp;
@@ -166,9 +166,9 @@ public class RoadBitemporalRecord extends CprBitemporalRoadRecord<RoadBitemporal
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof RoadBitemporalRecord)) return false;
+        if (!(o instanceof RoadNameBitemporalRecord)) return false;
         if (!super.equals(o)) return false;
-        RoadBitemporalRecord that = (RoadBitemporalRecord) o;
+        RoadNameBitemporalRecord that = (RoadNameBitemporalRecord) o;
         return Objects.equals(timestamp, that.timestamp) &&
                 Objects.equals(toMunicipalityCode, that.toMunicipalityCode) &&
                 Objects.equals(toRoadCode, that.toRoadCode) &&
@@ -192,8 +192,8 @@ public class RoadBitemporalRecord extends CprBitemporalRoadRecord<RoadBitemporal
     }
 
     @Override
-    public RoadBitemporalRecord clone() {
-        RoadBitemporalRecord clone = new RoadBitemporalRecord();
+    public RoadNameBitemporalRecord clone() {
+        RoadNameBitemporalRecord clone = new RoadNameBitemporalRecord();
         clone.timestamp = this.timestamp;
         clone.toMunicipalityCode = this.toMunicipalityCode;
         clone.toRoadCode = this.toRoadCode;
@@ -202,7 +202,7 @@ public class RoadBitemporalRecord extends CprBitemporalRoadRecord<RoadBitemporal
         clone.haenStart = this.haenStart;
         clone.roadAdddressName = this.roadAdddressName;
         clone.roadName = this.roadName;
-        RoadBitemporalRecord.copy(this, clone);
+        RoadNameBitemporalRecord.copy(this, clone);
         return clone;
     }
 }

@@ -13,7 +13,7 @@ import dk.magenta.datafordeler.cpr.data.residence.*;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
 import dk.magenta.datafordeler.cpr.records.road.RoadRecordQuery;
-import dk.magenta.datafordeler.cpr.records.road.data.RoadBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.road.data.RoadNameBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadEntity;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadMemoBitemporalRecord;
 import org.hibernate.Session;
@@ -30,14 +30,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
@@ -124,22 +124,23 @@ public class ParseTest {
             Assert.assertEquals(730, entity.getMunicipalityCode());
             Assert.assertEquals(4, entity.getRoadcode());
             Assert.assertEquals(1, entity.getNames().size());
-            Assert.assertEquals(1, entity.getMemo().size());
-            Assert.assertEquals(1, entity.getPostcode().size());
+            Assert.assertEquals(3, entity.getMemo().size());
+            Assert.assertEquals(2, entity.getPostcode().size());
             Assert.assertEquals(0, entity.getCity().size());
 
-            RoadBitemporalRecord roadName = entity.getNames().iterator().next();
+            RoadNameBitemporalRecord roadName = entity.getNames().iterator().next();
 
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1900-01-01T12:00+01:00"), roadName.getHaenStart()));
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), roadName.getTimestamp()));
 
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), roadName.getRegistrationFrom()));
 
-            RoadMemoBitemporalRecord memoRecord = entity.getMemo().iterator().next();
+            List<RoadMemoBitemporalRecord> memoIterator = entity.getMemo().stream()
+                    .sorted(Comparator.comparing(RoadMemoBitemporalRecord::getNoteLine)).collect(Collectors.toList());
 
-            Assert.assertEquals("HUSNR.1 - BØRNEINSTITUTION -", memoRecord.getNoteLine());
-            //TODO: what about other memos
-
+            Assert.assertEquals("HUSNR.1 - BØRNEINSTITUTION -", memoIterator.get(0).getNoteLine());
+            Assert.assertEquals("HUSNR.2 - EGEDAL -", memoIterator.get(1).getNoteLine());
+            Assert.assertEquals("HUSNR.3 - KIRKE -", memoIterator.get(2).getNoteLine());
 
             String jsonResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity);
 
@@ -148,9 +149,6 @@ public class ParseTest {
 
             JSONAssert.assertEquals(
                     "{\"adressenavn\":[{\"vejensNavn\":\"Aalborggade\"}]}", jsonResponse, JSONCompareMode.LENIENT);
-
-            JSONAssert.assertEquals(
-                    "{\"postnr\":[{\"postnummer\":8940}]}", jsonResponse, JSONCompareMode.LENIENT);
 
 
         } catch (JSONException e) {
