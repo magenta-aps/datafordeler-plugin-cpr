@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.road;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.road.data.CprBitemporalRoadRecord;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadCityBitemporalRecord;
@@ -18,6 +19,7 @@ public class RoadCityRecord extends RoadDataRecord {
 
     public RoadCityRecord(String line) throws ParseException {
         super(line);
+        System.out.println("City record "+line);
         this.obtain("husnrfra", 12, 4);
         this.obtain("husnrtil", 16, 4);
         this.obtain("ligeulige", 20, 1);
@@ -39,11 +41,20 @@ public class RoadCityRecord extends RoadDataRecord {
 
 
     @Override
-    public List<CprBitemporalRoadRecord> getBitemporalRecords() {
-        List<CprBitemporalRoadRecord> records = new ArrayList<>();
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+        List<CprBitemporalRecord> records = new ArrayList<>();
 
-        records.add(new RoadCityBitemporalRecord(this.getOffsetDateTime("timestamp"),
-                this.getString("husnrtil", true), this.getString("husnrfra", true), this.getEven("ligeulige"), this.getString("bynvn", true)));
+        records.add(
+                new RoadCityBitemporalRecord(
+                        this.getString("husnrtil", true),
+                        this.getString("husnrfra", true),
+                        this.getEven("ligeulige"),
+                        this.getString("bynvn",
+                                true)
+                ).setBitemporality(
+                        this.cityTemporality
+                )
+        );
 
         return records;
     }

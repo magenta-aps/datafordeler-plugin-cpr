@@ -18,35 +18,13 @@ public class RoadNameBitemporalRecord extends CprBitemporalRoadRecord<RoadNameBi
     public RoadNameBitemporalRecord() {
     }
 
-    public RoadNameBitemporalRecord(OffsetDateTime timestamp, int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode,
-                                    int fromRoadCode, OffsetDateTime haenStart, String roadAdddressName, String roadName) {
-        super.setRegistrationFrom(timestamp);
-        super.setEffectFrom(haenStart);
-        this.timestamp = timestamp;
+    public RoadNameBitemporalRecord(int toMunicipalityCode, int toRoadCode, int fromMunicipalityCode, int fromRoadCode, String roadAdddressName, String roadName) {
         this.toMunicipalityCode = toMunicipalityCode;
         this.toRoadCode = toRoadCode;
         this.fromMunicipalityCode = fromMunicipalityCode;
         this.fromRoadCode = fromRoadCode;
-        this.haenStart = haenStart;
         this.roadAdddressName = roadAdddressName;
         this.roadName = roadName;
-    }
-
-
-    // Timestamp
-    public static final String DB_FIELD_TIMESTAMP = "timestamp";
-    public static final String IO_FIELD_TO_TIMESTAMP = "tidsstempel";
-    @Column(name = DB_FIELD_TIMESTAMP)
-    @JsonProperty(value = IO_FIELD_TO_TIMESTAMP)
-    @XmlElement(name = IO_FIELD_TO_TIMESTAMP)
-    private OffsetDateTime timestamp;
-
-    public OffsetDateTime getTimestamp() {
-        return this.timestamp;
-    }
-
-    public void setTimestamp(OffsetDateTime timestamp) {
-        this.timestamp = timestamp;
     }
 
 
@@ -114,25 +92,10 @@ public class RoadNameBitemporalRecord extends CprBitemporalRoadRecord<RoadNameBi
         this.fromRoadCode = fromRoadCode;
     }
 
-    // Haenstart
-    public static final String DB_FIELD_HAEN_START = "haenStart";
-    public static final String IO_FIELD_HAEN_START = "haenStart";
-    @Column(name = DB_FIELD_HAEN_START)
-    @JsonProperty(value = IO_FIELD_HAEN_START)
-    @XmlElement(name = IO_FIELD_HAEN_START)
-    private OffsetDateTime haenStart;
-
-    public OffsetDateTime getHaenStart() {
-        return haenStart;
-    }
-
-    public void setHaenStart(OffsetDateTime haenStart) {
-        this.haenStart = haenStart;
-    }
 
     // Vejens adressenavn
     public static final String DB_FIELD_ROM_ROAD_CODE = "roadAdddressName";
-    public static final String IO_FIELD_ROM_ROAD_CODE = "vejensAddressenavn";
+    public static final String IO_FIELD_ROM_ROAD_CODE = "addressenavn";
     @Column(name = DB_FIELD_ROM_ROAD_CODE)
     @JsonProperty(value = IO_FIELD_ROM_ROAD_CODE)
     @XmlElement(name = IO_FIELD_ROM_ROAD_CODE)
@@ -148,7 +111,7 @@ public class RoadNameBitemporalRecord extends CprBitemporalRoadRecord<RoadNameBi
 
     // Vejens navn
     public static final String DB_FIELD_ROADNAME = "roadName";
-    public static final String IO_FIELD_ROADNAME = "vejensNavn";
+    public static final String IO_FIELD_ROADNAME = "vejnavn";
     @Column(name = DB_FIELD_ROADNAME)
     @JsonProperty(value = IO_FIELD_ROADNAME)
     @XmlElement(name = IO_FIELD_ROADNAME)
@@ -169,37 +132,33 @@ public class RoadNameBitemporalRecord extends CprBitemporalRoadRecord<RoadNameBi
         if (!(o instanceof RoadNameBitemporalRecord)) return false;
         if (!super.equals(o)) return false;
         RoadNameBitemporalRecord that = (RoadNameBitemporalRecord) o;
-        return Objects.equals(timestamp, that.timestamp) &&
-                Objects.equals(toMunicipalityCode, that.toMunicipalityCode) &&
+        return Objects.equals(toMunicipalityCode, that.toMunicipalityCode) &&
                 Objects.equals(toRoadCode, that.toRoadCode) &&
                 Objects.equals(fromMunicipalityCode, that.fromMunicipalityCode) &&
                 Objects.equals(fromRoadCode, that.fromRoadCode) &&
-                Objects.equals(haenStart, that.haenStart) &&
                 Objects.equals(roadAdddressName, that.roadAdddressName) &&
                 Objects.equals(roadName, that.roadName);
     }
 
     @Override
     public boolean hasData() {
-        return this.timestamp!=null || this.toMunicipalityCode!=0 || this.toRoadCode!=0 ||
-                this.fromMunicipalityCode!=0 || this.fromRoadCode!=0 || this.haenStart!=null ||
+        return this.toMunicipalityCode!=0 || this.toRoadCode!=0 ||
+                this.fromMunicipalityCode!=0 || this.fromRoadCode!=0 ||
                 stringNonEmpty(this.roadAdddressName) || stringNonEmpty(this.roadName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), timestamp, toMunicipalityCode, toRoadCode, fromMunicipalityCode, fromRoadCode, haenStart, roadAdddressName, roadName);
+        return Objects.hash(super.hashCode(), toMunicipalityCode, toRoadCode, fromMunicipalityCode, fromRoadCode, roadAdddressName, roadName);
     }
 
     @Override
     public RoadNameBitemporalRecord clone() {
         RoadNameBitemporalRecord clone = new RoadNameBitemporalRecord();
-        clone.timestamp = this.timestamp;
         clone.toMunicipalityCode = this.toMunicipalityCode;
         clone.toRoadCode = this.toRoadCode;
         clone.fromMunicipalityCode = this.fromMunicipalityCode;
         clone.fromRoadCode = this.fromRoadCode;
-        clone.haenStart = this.haenStart;
         clone.roadAdddressName = this.roadAdddressName;
         clone.roadName = this.roadName;
         RoadNameBitemporalRecord.copy(this, clone);

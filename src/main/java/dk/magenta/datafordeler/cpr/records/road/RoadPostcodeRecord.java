@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr.records.road;
 
 import dk.magenta.datafordeler.core.exception.ParseException;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
 import dk.magenta.datafordeler.cpr.records.road.data.CprBitemporalRoadRecord;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadPostalcodeBitemporalRecord;
@@ -39,11 +40,19 @@ public class RoadPostcodeRecord extends RoadDataRecord {
     }
 
     @Override
-    public List<CprBitemporalRoadRecord> getBitemporalRecords() {
-        List<CprBitemporalRoadRecord> records = new ArrayList<>();
-        records.add(new RoadPostalcodeBitemporalRecord(this.getOffsetDateTime("timestamp"), this.getString("husnrtil", false),
-                this.getString("husnrfra", false), this.getEven("ligeulige"),
-                this.getInt("postnr"), this.getString("postdisttxt", true)));
+    public List<CprBitemporalRecord> getBitemporalRecords() {
+        List<CprBitemporalRecord> records = new ArrayList<>();
+        records.add(
+                new RoadPostalcodeBitemporalRecord(
+                        this.getString("husnrtil", false),
+                        this.getString("husnrfra", false),
+                        this.getEven("ligeulige"),
+                        this.getInt("postnr"),
+                        this.getString("postdisttxt", true)
+                ).setBitemporality(
+                        this.postcodeTemporality
+                )
+        );
         return records;
     }
 }

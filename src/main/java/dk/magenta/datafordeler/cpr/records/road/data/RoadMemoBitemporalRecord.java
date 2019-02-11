@@ -18,46 +18,9 @@ public class RoadMemoBitemporalRecord extends CprBitemporalRoadRecord<RoadMemoBi
     public RoadMemoBitemporalRecord() {
     }
 
-    public RoadMemoBitemporalRecord(OffsetDateTime timestamp, OffsetDateTime haenStart, int noteNumber, String noteLine) {
-        super.setRegistrationFrom(timestamp);
-        super.setEffectFrom(haenStart);
-        this.timestamp = timestamp;
-        this.haenStart = haenStart;
+    public RoadMemoBitemporalRecord(int noteNumber, String noteLine) {
         this.noteNumber = noteNumber;
         this.noteLine = noteLine;
-    }
-
-    // Timestamp
-    public static final String DB_FIELD_TIMESTAMP = "timestamp";
-    public static final String IO_FIELD_TO_TIMESTAMP = "tidsstempel";
-    @Column(name = DB_FIELD_TIMESTAMP)
-    @JsonProperty(value = IO_FIELD_TO_TIMESTAMP)
-    @XmlElement(name = IO_FIELD_TO_TIMESTAMP)
-    private OffsetDateTime timestamp;
-
-    public OffsetDateTime getTimestamp() {
-        return this.timestamp;
-    }
-
-    public void setTimestamp(OffsetDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-
-    // Haenstart
-    public static final String DB_FIELD_HAEN_START = "haenStart";
-    public static final String IO_FIELD_HAEN_START = "haenStart";
-    @Column(name = DB_FIELD_HAEN_START)
-    @JsonProperty(value = IO_FIELD_HAEN_START)
-    @XmlElement(name = IO_FIELD_HAEN_START)
-    private OffsetDateTime haenStart;
-
-    public OffsetDateTime getHaenStart() {
-        return haenStart;
-    }
-
-    public void setHaenStart(OffsetDateTime haenStart) {
-        this.haenStart = haenStart;
     }
 
 
@@ -97,28 +60,23 @@ public class RoadMemoBitemporalRecord extends CprBitemporalRoadRecord<RoadMemoBi
         if (!(o instanceof RoadMemoBitemporalRecord)) return false;
         if (!super.equals(o)) return false;
         RoadMemoBitemporalRecord that = (RoadMemoBitemporalRecord) o;
-        return Objects.equals(timestamp, that.timestamp) &&
-                Objects.equals(haenStart, that.haenStart) &&
-                Objects.equals(noteNumber, that.noteNumber) &&
+        return Objects.equals(noteNumber, that.noteNumber) &&
                 Objects.equals(noteLine, that.noteLine);
     }
 
     @Override
     public boolean hasData() {
-        return this.timestamp!=null || this.haenStart!=null || this.noteNumber!=0 ||
-                stringNonEmpty(this.noteLine);
+        return this.noteNumber!=0 || stringNonEmpty(this.noteLine);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), timestamp, haenStart, noteNumber, noteLine);
+        return Objects.hash(super.hashCode(), noteNumber, noteLine);
     }
 
     @Override
     public RoadMemoBitemporalRecord clone() {
         RoadMemoBitemporalRecord clone = new RoadMemoBitemporalRecord();
-        clone.timestamp = this.timestamp;
-        clone.haenStart = this.haenStart;
         clone.noteNumber = this.noteNumber;
         clone.noteLine = this.noteLine;
         RoadMemoBitemporalRecord.copy(this, clone);

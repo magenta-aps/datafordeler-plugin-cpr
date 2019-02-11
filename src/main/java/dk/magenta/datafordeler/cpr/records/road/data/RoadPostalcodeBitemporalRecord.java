@@ -18,30 +18,12 @@ public class RoadPostalcodeBitemporalRecord extends CprBitemporalRoadRecord<Road
     public RoadPostalcodeBitemporalRecord() {
     }
 
-    public RoadPostalcodeBitemporalRecord(OffsetDateTime timestamp, String toHousenumber, String fromHousenumber, boolean equalUnequal, int postalCode, String postalDistrict) {
-        super.setRegistrationFrom(timestamp);
-        this.timestamp = timestamp;
+    public RoadPostalcodeBitemporalRecord(String toHousenumber, String fromHousenumber, boolean equalUnequal, int postalCode, String postalDistrict) {
         this.toHousenumber = toHousenumber;
         this.fromHousenumber = fromHousenumber;
         this.equalUnequal = equalUnequal;
         this.postalCode = postalCode;
         this.postalDistrict = postalDistrict;
-    }
-
-    // Timestamp
-    public static final String DB_FIELD_TIMESTAMP = "timestamp";
-    public static final String IO_FIELD_TO_TIMESTAMP = "tidsstempel";
-    @Column(name = DB_FIELD_TIMESTAMP)
-    @JsonProperty(value = IO_FIELD_TO_TIMESTAMP)
-    @XmlElement(name = IO_FIELD_TO_TIMESTAMP)
-    private OffsetDateTime timestamp;
-
-    public OffsetDateTime getTimestamp() {
-        return this.timestamp;
-    }
-
-    public void setTimestamp(OffsetDateTime timestamp) {
-        this.timestamp = timestamp;
     }
 
 
@@ -126,8 +108,7 @@ public class RoadPostalcodeBitemporalRecord extends CprBitemporalRoadRecord<Road
         if (!(o instanceof RoadPostalcodeBitemporalRecord)) return false;
         if (!super.equals(o)) return false;
         RoadPostalcodeBitemporalRecord that = (RoadPostalcodeBitemporalRecord) o;
-        return Objects.equals(timestamp, that.timestamp) &&
-                Objects.equals(toHousenumber, that.toHousenumber) &&
+        return Objects.equals(toHousenumber, that.toHousenumber) &&
                 Objects.equals(fromHousenumber, that.fromHousenumber) &&
                 Objects.equals(equalUnequal, that.equalUnequal) &&
                 Objects.equals(postalCode, that.postalCode) &&
@@ -136,19 +117,18 @@ public class RoadPostalcodeBitemporalRecord extends CprBitemporalRoadRecord<Road
 
     @Override
     public boolean hasData() {
-        return this.timestamp!=null || stringNonEmpty(this.toHousenumber) || stringNonEmpty(this.fromHousenumber) ||
+        return stringNonEmpty(this.toHousenumber) || stringNonEmpty(this.fromHousenumber) ||
                 this.postalCode!=0 || stringNonEmpty(this.postalDistrict);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), timestamp, toHousenumber, fromHousenumber, equalUnequal, postalCode, postalDistrict);
+        return Objects.hash(super.hashCode(), toHousenumber, fromHousenumber, equalUnequal, postalCode, postalDistrict);
     }
 
     @Override
     public RoadPostalcodeBitemporalRecord clone() {
         RoadPostalcodeBitemporalRecord clone = new RoadPostalcodeBitemporalRecord();
-        clone.timestamp = this.timestamp;
         clone.toHousenumber = this.toHousenumber;
         clone.fromHousenumber = this.fromHousenumber;
         clone.equalUnequal = this.equalUnequal;

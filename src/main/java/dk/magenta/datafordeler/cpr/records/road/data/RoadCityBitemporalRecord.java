@@ -18,29 +18,11 @@ public class RoadCityBitemporalRecord extends CprBitemporalRoadRecord<RoadCityBi
     public RoadCityBitemporalRecord() {
     }
 
-    public RoadCityBitemporalRecord(OffsetDateTime timestamp, String toHousenumber, String fromHousenumber, boolean equalUnequal, String cityName) {
-        super.setRegistrationFrom(timestamp);
-        this.timestamp = timestamp;
+    public RoadCityBitemporalRecord(String toHousenumber, String fromHousenumber, boolean equalUnequal, String cityName) {
         this.toHousenumber = toHousenumber;
         this.fromHousenumber = fromHousenumber;
         this.equalUnequal = equalUnequal;
         this.cityName = cityName;
-    }
-
-    // Timestamp
-    public static final String DB_FIELD_TIMESTAMP = "timestamp";
-    public static final String IO_FIELD_TO_TIMESTAMP = "tidsstempel";
-    @Column(name = DB_FIELD_TIMESTAMP)
-    @JsonProperty(value = IO_FIELD_TO_TIMESTAMP)
-    @XmlElement(name = IO_FIELD_TO_TIMESTAMP)
-    private OffsetDateTime timestamp;
-
-    public OffsetDateTime getTimestamp() {
-        return this.timestamp;
-    }
-
-    public void setTimestamp(OffsetDateTime timestamp) {
-        this.timestamp = timestamp;
     }
 
 
@@ -110,8 +92,7 @@ public class RoadCityBitemporalRecord extends CprBitemporalRoadRecord<RoadCityBi
         if (!(o instanceof RoadCityBitemporalRecord)) return false;
         if (!super.equals(o)) return false;
         RoadCityBitemporalRecord that = (RoadCityBitemporalRecord) o;
-        return Objects.equals(timestamp, that.timestamp) &&
-                Objects.equals(toHousenumber, that.toHousenumber) &&
+        return Objects.equals(toHousenumber, that.toHousenumber) &&
                 Objects.equals(fromHousenumber, that.fromHousenumber) &&
                 Objects.equals(equalUnequal, that.equalUnequal) &&
                 Objects.equals(cityName, that.cityName);
@@ -119,19 +100,18 @@ public class RoadCityBitemporalRecord extends CprBitemporalRoadRecord<RoadCityBi
 
     @Override
     public boolean hasData() {
-        return this.timestamp!=null || stringNonEmpty(this.toHousenumber) || stringNonEmpty(this.fromHousenumber) ||
+        return stringNonEmpty(this.toHousenumber) || stringNonEmpty(this.fromHousenumber) ||
                 stringNonEmpty(this.cityName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), timestamp, toHousenumber, fromHousenumber, equalUnequal, cityName);
+        return Objects.hash(super.hashCode(), toHousenumber, fromHousenumber, equalUnequal, cityName);
     }
 
     @Override
     public RoadCityBitemporalRecord clone() {
         RoadCityBitemporalRecord clone = new RoadCityBitemporalRecord();
-        clone.timestamp = this.timestamp;
         clone.toHousenumber = this.toHousenumber;
         clone.fromHousenumber = this.fromHousenumber;
         clone.equalUnequal = this.equalUnequal;

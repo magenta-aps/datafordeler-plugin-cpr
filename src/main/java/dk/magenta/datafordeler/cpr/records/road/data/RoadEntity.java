@@ -85,9 +85,9 @@ public class RoadEntity extends CprRecordEntity {
 
 
 
-    public static final String DB_FIELD_ADDRESS_NAME_CODE = "addressname";
-    public static final String IO_FIELD_ADDRESS_NAME_CODE = "adressenavn";
-    @Column(name = DB_FIELD_ADDRESS_NAME_CODE)
+    public static final String DB_FIELD_NAME_CODE = "name";
+    public static final String IO_FIELD_NAME_CODE = "navn";
+    @Column(name = DB_FIELD_NAME_CODE)
     @OneToMany(mappedBy = RoadNameBitemporalRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
     @Filters({
             @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
@@ -99,12 +99,14 @@ public class RoadEntity extends CprRecordEntity {
             @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
             @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE)
     })
-    @JsonProperty(IO_FIELD_ADDRESS_NAME_CODE)
+    @JsonProperty(IO_FIELD_NAME_CODE)
     Set<RoadNameBitemporalRecord> name = new HashSet<>();
 
-    public Set<RoadNameBitemporalRecord> getNames() {
+    public Set<RoadNameBitemporalRecord> getName() {
         return this.name;
     }
+
+
 
     public static final String DB_FIELD_CITY_CODE = "city";
     public static final String IO_FIELD_CITY_CODE = "by";

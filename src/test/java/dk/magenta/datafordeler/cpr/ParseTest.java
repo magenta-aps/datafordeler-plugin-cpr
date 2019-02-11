@@ -120,16 +120,14 @@ public class ParseTest {
             Assert.assertEquals(RoadEntity.generateUUID(730, 4), entity.getUUID());
             Assert.assertEquals(730, entity.getMunicipalityCode());
             Assert.assertEquals(4, entity.getRoadcode());
-            Assert.assertEquals(1, entity.getNames().size());
+            Assert.assertEquals(1, entity.getName().size());
             Assert.assertEquals(3, entity.getMemo().size());
             Assert.assertEquals(2, entity.getPostcode().size());
             Assert.assertEquals(0, entity.getCity().size());
 
-            RoadNameBitemporalRecord roadName = entity.getNames().iterator().next();
+            RoadNameBitemporalRecord roadName = entity.getName().iterator().next();
 
-            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1900-01-01T12:00+01:00"), roadName.getHaenStart()));
-            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), roadName.getTimestamp()));
-
+            Assert.assertTrue(Equality.equal(OffsetDateTime.parse("1900-01-01T12:00+01:00"), roadName.getEffectFrom()));
             Assert.assertTrue(Equality.equal(OffsetDateTime.parse("2006-12-22T12:00:00+01:00"), roadName.getRegistrationFrom()));
 
             List<RoadMemoBitemporalRecord> memoIterator = entity.getMemo().stream()
@@ -141,11 +139,7 @@ public class ParseTest {
 
             String jsonResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity);
 
-            JSONAssert.assertEquals(
-                    "{\"names\":[{\"vejensNavn\":\"Aalborggade\"}]}", jsonResponse, JSONCompareMode.LENIENT);
-
-            JSONAssert.assertEquals(
-                    "{\"adressenavn\":[{\"vejensNavn\":\"Aalborggade\"}]}", jsonResponse, JSONCompareMode.LENIENT);
+            JSONAssert.assertEquals("{\"navn\":[{\"vejnavn\":\"Aalborggade\"}]}", jsonResponse, JSONCompareMode.LENIENT);
 
 
         } catch (JSONException e) {
