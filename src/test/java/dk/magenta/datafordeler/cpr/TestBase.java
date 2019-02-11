@@ -3,18 +3,84 @@ package dk.magenta.datafordeler.cpr;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dk.magenta.datafordeler.core.database.SessionManager;
+import dk.magenta.datafordeler.core.fapi.ParameterMap;
+import dk.magenta.datafordeler.core.user.DafoUserManager;
 import org.junit.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import static org.mockito.Mockito.when;
+
+@Component
 public abstract class TestBase {
 
-    protected abstract ObjectMapper getObjectMapper();
+    @Autowired
+    private CprPlugin plugin;
+
+    public CprPlugin getPlugin() {
+        return this.plugin;
+    }
+
+    @Autowired
+    private SessionManager sessionManager;
+
+    public SessionManager getSessionManager() {
+        return this.sessionManager;
+    }
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    public ObjectMapper getObjectMapper() {
+        return this.objectMapper;
+    }
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    public TestRestTemplate getRestTemplate() {
+        return this.restTemplate;
+    }
 
     private static HashSet<String> ignoreKeys = new HashSet<String>();
     static {
         ignoreKeys.add("sidstImporteret");
+    }
+
+    @SpyBean
+    private DafoUserManager dafoUserManager;
+
+
+    protected void applyAccess(TestUserDetails testUserDetails) {
+        when(this.dafoUserManager.getFallbackUser()).thenReturn(testUserDetails);
+    }
+    protected void whitelistLocalhost() {
+        when(this.dafoUserManager.getIpWhitelist()).thenReturn(Collections.singleton("127.0.0.1"));
+    }
+
+    protected ResponseEntity<String> restSearch(ParameterMap parameters, String type) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/json");
+        HttpEntity<String> httpEntity = new HttpEntity<String>("", headers);
+        return this.restTemplate.exchange("/cpr/"+type+"/1/rest/search?" + parameters.asUrlParams(), HttpMethod.GET, httpEntity, String.class);
+    }
+
+    protected ResponseEntity<String> uuidSearch(String id, String type) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/json");
+        HttpEntity<String> httpEntity = new HttpEntity<String>("", headers);
+        return this.restTemplate.exchange("/cpr/"+type+"/1/rest/" + id, HttpMethod.GET, httpEntity, String.class);
     }
 
     protected void assertJsonEquality(JsonNode node1, JsonNode node2, boolean ignoreArrayOrdering, boolean printDifference) {
@@ -63,9 +129,8 @@ public abstract class TestBase {
             }
         } catch (AssertionError e) {
             if (printDifference) {
-                ObjectMapper objectMapper = this.getObjectMapper();
                 try {
-                    System.out.println("\n" + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node1) + "\n != \n" + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node2) + "\n\n\n");
+                    System.out.println("\n" + this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node1) + "\n != \n" + this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node2) + "\n\n\n");
                 } catch (JsonProcessingException e1) {
                     System.out.println("\n" + node1.asText() + "\n != \n" + node2.asText() + "\n\n\n");
                 }

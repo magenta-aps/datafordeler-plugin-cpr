@@ -6,6 +6,7 @@ import dk.magenta.datafordeler.core.fapi.BaseQuery;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.fapi.QueryField;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadEntity;
+import dk.magenta.datafordeler.cpr.records.road.data.RoadNameBitemporalRecord;
 
 import java.util.*;
 
@@ -14,8 +15,9 @@ import java.util.*;
  */
 public class RoadRecordQuery extends BaseQuery {
 
-    
+
     public static final String VEJKODE = RoadEntity.IO_FIELD_ROAD_CODE;
+    public static final String VEJNAVN = RoadNameBitemporalRecord.IO_FIELD_ROADNAME;
     public static final String KOMMUNEKODE = RoadEntity.IO_FIELD_MUNIPALITY_CODE;
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = VEJKODE)
@@ -28,8 +30,8 @@ public class RoadRecordQuery extends BaseQuery {
     public void addVejkode(String vejkode) {
         this.vejkoder.add(vejkode);
         if (vejkode != null) {
-                this.increaseDataParamCount();
-            }
+            this.increaseDataParamCount();
+        }
     }
 
     public void setVejkode(String vejkode) {
@@ -40,6 +42,31 @@ public class RoadRecordQuery extends BaseQuery {
     public void setVejkode(int vejkode) {
         this.setVejkode(Integer.toString(vejkode));
     }
+
+
+
+
+    @QueryField(type = QueryField.FieldType.STRING, queryName = VEJKODE)
+    private List<String> vejnavne = new ArrayList<>();
+
+    public Collection<String> getVejnavne() {
+        return this.vejnavne;
+    }
+
+    public void addVejnavn(String vejnavn) {
+        this.vejnavne.add(vejnavn);
+        if (vejnavn != null) {
+            this.increaseDataParamCount();
+        }
+    }
+
+    public void setVejnavn(String vejnavn) {
+        this.vejnavne.clear();
+        this.addVejnavn(vejnavn);
+    }
+
+
+
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = KOMMUNEKODE)
     private List<String> kommunekoder = new ArrayList<>();
@@ -83,6 +110,11 @@ public class RoadRecordQuery extends BaseQuery {
                 this.addVejkode(vejkode);
             }
         }
+        if (parameters.containsKey(VEJNAVN)) {
+            for (String vejnavn : parameters.get(VEJNAVN)) {
+                this.addVejnavn(vejnavn);
+            }
+        }
         if (parameters.containsKey(KOMMUNEKODE)) {
             for (String kommunekode : parameters.get(KOMMUNEKODE)) {
                 this.addKommunekode(kommunekode);
@@ -99,7 +131,10 @@ public class RoadRecordQuery extends BaseQuery {
         if (!this.getVejkoder().isEmpty()) {
             lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + RoadEntity.DB_FIELD_ROAD_CODE, this.getVejkoder(), Integer.class);
         }
-        if (this.getKommunekoder() != null) {
+        if (!this.getVejnavne().isEmpty()) {
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + RoadEntity.DB_FIELD_NAME_CODE + LookupDefinition.separator + RoadNameBitemporalRecord.DB_FIELD_ROADNAME, this.getVejnavne(), String.class);
+        }
+        if (!this.getKommunekoder().isEmpty()) {
             lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + RoadEntity.DB_FIELD_MUNIPALITY_CODE, this.getKommunekoder(), Integer.class);
         }
         /*if (!this.getKommunekodeRestriction().isEmpty()) {

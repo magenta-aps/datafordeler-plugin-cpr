@@ -6,7 +6,6 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import javax.persistence.Column;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
-import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @javax.persistence.Entity
@@ -94,11 +93,11 @@ public class RoadNameBitemporalRecord extends CprBitemporalRoadRecord<RoadNameBi
 
 
     // Vejens adressenavn
-    public static final String DB_FIELD_ROM_ROAD_CODE = "roadAdddressName";
-    public static final String IO_FIELD_ROM_ROAD_CODE = "addressenavn";
-    @Column(name = DB_FIELD_ROM_ROAD_CODE)
-    @JsonProperty(value = IO_FIELD_ROM_ROAD_CODE)
-    @XmlElement(name = IO_FIELD_ROM_ROAD_CODE)
+    public static final String DB_FIELD_ADDRESS_NAME = "roadAdddressName";
+    public static final String IO_FIELD_ADDRESS_NAME = "addressenavn";
+    @Column(name = DB_FIELD_ADDRESS_NAME)
+    @JsonProperty(value = IO_FIELD_ADDRESS_NAME)
+    @XmlElement(name = IO_FIELD_ADDRESS_NAME)
     private String roadAdddressName;
 
     public String getRoadAdddressName() {

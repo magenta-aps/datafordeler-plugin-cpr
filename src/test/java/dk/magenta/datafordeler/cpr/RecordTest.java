@@ -71,7 +71,7 @@ public class RecordTest {
     }
 
     private void loadPerson(String resource, ImportMetadata importMetadata) throws DataFordelerException, IOException {
-        InputStream testData = ParseTest.class.getResourceAsStream(resource);
+        InputStream testData = RecordTest.class.getResourceAsStream(resource);
         personEntityManager.parseData(testData, importMetadata);
         testData.close();
     }

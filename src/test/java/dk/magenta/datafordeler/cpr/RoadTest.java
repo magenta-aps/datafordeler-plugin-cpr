@@ -1,15 +1,12 @@
 package dk.magenta.datafordeler.cpr;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.magenta.datafordeler.core.Application;
 import dk.magenta.datafordeler.core.database.QueryManager;
-import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
+import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.util.Equality;
-import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
-import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
 import dk.magenta.datafordeler.cpr.records.road.RoadRecordQuery;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadEntity;
@@ -27,14 +24,17 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -43,24 +43,7 @@ import java.util.stream.Collectors;
 public class RoadTest extends TestBase {
 
     @Autowired
-    private SessionManager sessionManager;
-
-    @Autowired
-    private PersonEntityManager personEntityManager;
-
-    @Autowired
     private RoadEntityManager roadEntityManager;
-
-    @Autowired
-    private ResidenceEntityManager residenceEntityManager;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Override
-    protected ObjectMapper getObjectMapper() {
-        return this.objectMapper;
-    }
 
     @Before
     @After
@@ -76,7 +59,7 @@ public class RoadTest extends TestBase {
 
     @Test
     public void testRoadIdempotence() throws IOException, DataFordelerException {
-        Session session = sessionManager.getSessionFactory().openSession();
+        Session session = this.getSessionManager().getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         ImportMetadata importMetadata = new ImportMetadata();
         importMetadata.setSession(session);
@@ -84,11 +67,11 @@ public class RoadTest extends TestBase {
         try {
             loadRoad(importMetadata);
             List<RoadEntity> entities = QueryManager.getAllEntities(session, RoadEntity.class);
-            JsonNode firstImport = objectMapper.valueToTree(entities);
+            JsonNode firstImport = this.getObjectMapper().valueToTree(entities);
 
             loadRoad(importMetadata);
             entities = QueryManager.getAllEntities(session, RoadEntity.class);
-            JsonNode secondImport = objectMapper.valueToTree(entities);
+            JsonNode secondImport = this.getObjectMapper().valueToTree(entities);
             assertJsonEquality(firstImport, secondImport, true, true);
         } finally {
             transaction.rollback();
@@ -98,7 +81,7 @@ public class RoadTest extends TestBase {
 
     @Test
     public void testParseRoad() throws IOException, DataFordelerException {
-        Session session = sessionManager.getSessionFactory().openSession();
+        Session session = this.getSessionManager().getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         ImportMetadata importMetadata = new ImportMetadata();
         importMetadata.setSession(session);
@@ -134,7 +117,7 @@ public class RoadTest extends TestBase {
             Assert.assertEquals("HUSNR.2 - EGEDAL -", memoIterator.get(1).getNoteLine());
             Assert.assertEquals("HUSNR.3 - KIRKE -", memoIterator.get(2).getNoteLine());
 
-            String jsonResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity);
+            String jsonResponse = this.getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(entity);
 
             JSONAssert.assertEquals("{\"navn\":[{\"vejnavn\":\"Aalborggade\"}]}", jsonResponse, JSONCompareMode.LENIENT);
 
@@ -146,4 +129,115 @@ public class RoadTest extends TestBase {
             session.close();
         }
     }
+
+
+    @Test
+    public void testRoadAccess() throws Exception {
+
+        UUID expectedUuid = UUID.nameUUIDFromBytes(("road:"+955+":"+1).getBytes());
+
+
+        whitelistLocalhost();
+        ImportMetadata importMetadata = new ImportMetadata();
+        Session session = this.getSessionManager().getSessionFactory().openSession();
+        importMetadata.setSession(session);
+        Transaction transaction = session.beginTransaction();
+        importMetadata.setTransactionInProgress(true);
+        loadRoad(importMetadata);
+        transaction.commit();
+        session.close();
+
+        TestUserDetails testUserDetails = new TestUserDetails();
+
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("vejnavn", "TestVej");
+        ResponseEntity<String> response = restSearch(searchParameters, "road");
+        Assert.assertEquals(403, response.getStatusCode().value());
+
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = this.getObjectMapper().readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals(expectedUuid.toString(), results.get(0).get("uuid").asText());
+
+        testUserDetails.giveAccess(
+                this.getPlugin().getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+                ).getRestriction(
+                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_SERMERSOOQ
+                )
+        );
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = this.getObjectMapper().readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
+
+        testUserDetails.giveAccess(
+                this.getPlugin().getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
+                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
+                ).getRestriction(
+                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_KUJALLEQ
+                )
+        );
+        this.applyAccess(testUserDetails);
+
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = this.getObjectMapper().readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals(expectedUuid.toString(), results.get(0).get("uuid").asText());
+
+    }
+
+    @Test
+    public void testRoadRecordTime() throws Exception {
+        whitelistLocalhost();
+        OffsetDateTime now = OffsetDateTime.now();
+        ImportMetadata importMetadata = new ImportMetadata();
+        Session session = this.getSessionManager().getSessionFactory().openSession();
+        importMetadata.setSession(session);
+        Transaction transaction = session.beginTransaction();
+        importMetadata.setTransactionInProgress(true);
+        loadRoad(importMetadata);
+        transaction.commit();
+        session.close();
+
+        TestUserDetails testUserDetails = new TestUserDetails();
+        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
+        this.applyAccess(testUserDetails);
+
+        ParameterMap searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+        ResponseEntity<String> response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        JsonNode jsonBody = this.getObjectMapper().readTree(response.getBody());
+        JsonNode results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(0, results.size());
+
+        searchParameters = new ParameterMap();
+        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+        response = restSearch(searchParameters, "road");
+        Assert.assertEquals(200, response.getStatusCode().value());
+        jsonBody = this.getObjectMapper().readTree(response.getBody());
+        results = jsonBody.get("results");
+        Assert.assertTrue(results.isArray());
+        Assert.assertEquals(9, results.size());
+    }
+
 }
