@@ -137,9 +137,6 @@ public class RoadRecordQuery extends BaseQuery {
         if (!this.getKommunekoder().isEmpty()) {
             lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + RoadEntity.DB_FIELD_MUNIPALITY_CODE, this.getKommunekoder(), Integer.class);
         }
-        /*if (!this.getKommunekodeRestriction().isEmpty()) {
-            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_ADDRESS + LookupDefinition.separator + AddressDataRecord.DB_FIELD_MUNICIPALITY_CODE, this.getKommunekodeRestriction(), Integer.class);
-        }*/
         return lookupDefinition;
     }
 

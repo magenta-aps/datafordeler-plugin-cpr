@@ -145,59 +145,11 @@ public class PullTest {
         configuration.setPersonRegisterDataCharset(CprConfiguration.Charset.UTF_8);
 
 
-
-        InputStream roadContents = this.getClass().getResourceAsStream("/roaddata.txt");
-        File roadFile = File.createTempFile("roaddata", "txt");
-        roadFile.createNewFile();
-        FileUtils.copyInputStreamToFile(roadContents, roadFile);
-        roadContents.close();
-
-        FtpService roadFtp = new FtpService();
-        int roadPort = 2102;
-        roadFtp.startServer(username, password, roadPort, Collections.singletonList(roadFile));
-
-        configuration.setRoadRegisterType(CprConfiguration.RegisterType.REMOTE_FTP);
-        configuration.setRoadRegisterFtpAddress("ftps://localhost:" + roadPort);
-        configuration.setRoadRegisterFtpUsername(username);
-        configuration.setRoadRegisterFtpPassword(password);
-        configuration.setRoadRegisterDataCharset(CprConfiguration.Charset.UTF_8);
-
-
-
-        InputStream residenceContents = this.getClass().getResourceAsStream("/roaddata.txt");
-        File residenceFile = File.createTempFile("residencedata", "txt");
-        residenceFile.createNewFile();
-        FileUtils.copyInputStreamToFile(residenceContents, residenceFile);
-        residenceContents.close();
-
-        FtpService residenceFtp = new FtpService();
-        int residencePort = 2103;
-        residenceFtp.startServer(username, password, residencePort, Collections.singletonList(residenceFile));
-
-        configuration.setResidenceRegisterType(CprConfiguration.RegisterType.REMOTE_FTP);
-        configuration.setResidenceRegisterFtpAddress("ftps://localhost:" + residencePort);
-        configuration.setResidenceRegisterFtpUsername(username);
-        configuration.setResidenceRegisterFtpPassword(password);
-        configuration.setResidenceRegisterDataCharset(CprConfiguration.Charset.UTF_8);
-
-
-
-
         Pull pull = new Pull(engine, plugin);
         pull.run();
 
-
-
         personFtp.stopServer();
         personFile.delete();
-
-        roadFtp.stopServer();
-        roadFile.delete();
-
-        residenceFtp.stopServer();
-        residenceFile.delete();
-
-
 
         Session session = sessionManager.getSessionFactory().openSession();
         try {
@@ -206,18 +158,9 @@ public class PullTest {
             List<PersonEntity> personEntities = QueryManager.getAllEntities(session, personQuery, PersonEntity.class);
             Assert.assertEquals(1, personEntities.size());
             Assert.assertEquals(PersonEntity.generateUUID("0101001234"), personEntities.get(0).getUUID());
-
-            RoadRecordQuery roadQuery = new RoadRecordQuery();
-            roadQuery.addKommunekode(730);
-            roadQuery.setVejkode(4);
-            List<RoadEntity> roadEntities = QueryManager.getAllEntities(session, roadQuery, RoadEntity.class);
-            Assert.assertEquals(1, roadEntities.size());
-            Assert.assertEquals(RoadEntity.generateUUID(730, 4), roadEntities.get(0).getUUID());
-
         } finally {
             session.close();
         }
-
     }
 
     @Test

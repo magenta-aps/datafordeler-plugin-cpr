@@ -2,13 +2,17 @@ package dk.magenta.datafordeler.cpr;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dk.magenta.datafordeler.core.Application;
+import dk.magenta.datafordeler.core.Pull;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
+import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.data.residence.*;
 import dk.magenta.datafordeler.cpr.data.residence.data.ResidenceBaseData;
+import org.apache.commons.io.FileUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.After;
@@ -17,18 +21,22 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = TestConfig.class)
+@ContextConfiguration(classes = Application.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ResidenceTest extends TestBase {
 
     @Autowired
@@ -122,72 +130,6 @@ public class ResidenceTest extends TestBase {
 
 
     @Test
-    public void testResidenceAccess() throws Exception {
-        whitelistLocalhost();
-        ImportMetadata importMetadata = new ImportMetadata();
-        Session session = this.getSessionManager().getSessionFactory().openSession();
-        importMetadata.setSession(session);
-        Transaction transaction = session.beginTransaction();
-        importMetadata.setTransactionInProgress(true);
-        loadResidence(importMetadata);
-        transaction.commit();
-        session.close();
-
-        TestUserDetails testUserDetails = new TestUserDetails();
-
-        ParameterMap searchParameters = new ParameterMap();
-        searchParameters.add("vejkode", "001");
-        searchParameters.add("husnummer", "1");
-        ResponseEntity<String> response = restSearch(searchParameters, "residence");
-        Assert.assertEquals(403, response.getStatusCode().value());
-
-        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
-        this.applyAccess(testUserDetails);
-
-        response = restSearch(searchParameters, "residence");
-        Assert.assertEquals(200, response.getStatusCode().value());
-        JsonNode jsonBody = this.getObjectMapper().readTree(response.getBody());
-        JsonNode results = jsonBody.get("results");
-        Assert.assertTrue(results.isArray());
-        Assert.assertEquals(1, results.size());
-        Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("uuid").asText());
-
-        testUserDetails.giveAccess(
-                this.getPlugin().getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
-                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
-                ).getRestriction(
-                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_SERMERSOOQ
-                )
-        );
-        this.applyAccess(testUserDetails);
-
-        response = restSearch(searchParameters, "residence");
-        Assert.assertEquals(200, response.getStatusCode().value());
-        jsonBody = this.getObjectMapper().readTree(response.getBody());
-        results = jsonBody.get("results");
-        Assert.assertTrue(results.isArray());
-        Assert.assertEquals(0, results.size());
-
-        testUserDetails.giveAccess(
-                this.getPlugin().getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
-                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
-                ).getRestriction(
-                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_KUJALLEQ
-                )
-        );
-        this.applyAccess(testUserDetails);
-
-        response = restSearch(searchParameters, "residence");
-        Assert.assertEquals(200, response.getStatusCode().value());
-        jsonBody = this.getObjectMapper().readTree(response.getBody());
-        results = jsonBody.get("results");
-        Assert.assertTrue(results.isArray());
-        Assert.assertEquals(1, results.size());
-        Assert.assertEquals("1d4631ad-c49e-3c28-9de9-325be326b17a", results.get(0).get("uuid").asText());
-    }
-
-
-    @Test
     public void testResidenceRecordTime() throws Exception {
         whitelistLocalhost();
         OffsetDateTime now = OffsetDateTime.now();
@@ -227,4 +169,49 @@ public class ResidenceTest extends TestBase {
         Assert.assertEquals(2, results.size());
     }
 
+
+    @Test
+    public void pull() throws Exception {
+
+        String username = "test";
+        String password = "test";
+        int port = 2101;
+
+        CprConfiguration configuration = this.getConfiguration();
+
+        InputStream residenceContents = this.getClass().getResourceAsStream("/roaddata.txt");
+        File residenceFile = File.createTempFile("residencedata", "txt");
+        residenceFile.createNewFile();
+        FileUtils.copyInputStreamToFile(residenceContents, residenceFile);
+        residenceContents.close();
+
+        this.startFtp(username, password, port, Collections.singletonList(residenceFile));
+
+        configuration.setPersonRegisterType(CprConfiguration.RegisterType.DISABLED);
+        configuration.setRoadRegisterType(CprConfiguration.RegisterType.DISABLED);
+        configuration.setResidenceRegisterType(CprConfiguration.RegisterType.REMOTE_FTP);
+        configuration.setResidenceRegisterFtpAddress("ftps://localhost:" + port);
+        configuration.setResidenceRegisterFtpUsername(username);
+        configuration.setResidenceRegisterFtpPassword(password);
+        configuration.setResidenceRegisterDataCharset(CprConfiguration.Charset.UTF_8);
+
+
+        Pull pull = new Pull(this.getEngine(), this.getPlugin());
+        pull.run();
+
+        this.stopFtp();
+        residenceFile.delete();
+
+        Session session = this.getSessionManager().getSessionFactory().openSession();
+        try {
+            ResidenceQuery roadQuery = new ResidenceQuery();
+            roadQuery.addKommunekode(730);
+            roadQuery.setVejkode(4);
+            List<ResidenceEntity> roadEntities = QueryManager.getAllEntities(session, roadQuery, ResidenceEntity.class);
+            Assert.assertEquals(1, roadEntities.size());
+            Assert.assertEquals(ResidenceEntity.generateUUID(360, 206, "44E", null, null), roadEntities.get(0).getUUID());
+        } finally {
+            session.close();
+        }
+    }
 }

@@ -3,10 +3,17 @@ package dk.magenta.datafordeler.cpr;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dk.magenta.datafordeler.core.Engine;
 import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
+import dk.magenta.datafordeler.core.plugin.FtpCommunicator;
 import dk.magenta.datafordeler.core.user.DafoUserManager;
+import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
+import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 import org.junit.Assert;
+import org.junit.Before;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -16,10 +23,23 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.io.File;
+import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 @Component
@@ -30,6 +50,40 @@ public abstract class TestBase {
 
     public CprPlugin getPlugin() {
         return this.plugin;
+    }
+
+    @Autowired
+    private Engine engine;
+
+    public Engine getEngine() {
+        return this.engine;
+    }
+
+    @SpyBean
+    private CprConfigurationManager configurationManager;
+
+    private CprConfiguration configuration;
+
+    @Before
+    public void setupConfiguration() {
+        this.configuration = ((CprConfigurationManager) this.plugin.getConfigurationManager()).getConfiguration();
+        when(this.configurationManager.getConfiguration()).thenReturn(this.configuration);
+    }
+
+    public CprConfiguration getConfiguration() {
+        return this.configuration;
+    }
+
+    @SpyBean
+    private CprRegisterManager registerManager;
+
+    @Before
+    public void setupRegisterManager() {
+        this.registerManager.setProxyString(null);
+    }
+
+    public CprRegisterManager getRegisterManager() {
+        return this.registerManager;
     }
 
     @Autowired
@@ -137,5 +191,51 @@ public abstract class TestBase {
             }
             throw e;
         }
+    }
+
+
+
+    private static SSLSocketFactory getTrustAllSSLSocketFactory() {
+        TrustManager[] trustManager = new TrustManager[] { new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        } };
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustManager, new SecureRandom());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+        return sslContext.getSocketFactory();
+    }
+
+
+    private FtpService ftpService;
+
+    protected void startFtp(String username, String password, int port, List<File> files) throws Exception {
+        if (this.ftpService != null) {
+            this.stopFtp();
+        }
+        doAnswer((Answer<FtpCommunicator>) invocation -> {
+            FtpCommunicator ftpCommunicator = (FtpCommunicator) invocation.callRealMethod();
+            ftpCommunicator.setSslSocketFactory(getTrustAllSSLSocketFactory());
+            return ftpCommunicator;
+        }).when(this.registerManager).getFtpCommunicator(any(URI.class), any(CprRecordEntityManager.class));
+
+        this.ftpService = new FtpService();
+        this.ftpService.startServer(username, password, port, files);
+    }
+
+    protected void stopFtp() {
+        this.ftpService.stopServer();
+        this.ftpService = null;
     }
 }

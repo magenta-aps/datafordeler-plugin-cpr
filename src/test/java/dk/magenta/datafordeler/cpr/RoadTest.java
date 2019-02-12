@@ -1,17 +1,21 @@
 package dk.magenta.datafordeler.cpr;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.Application;
+import dk.magenta.datafordeler.core.Pull;
 import dk.magenta.datafordeler.core.database.QueryManager;
 import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.fapi.ParameterMap;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.util.Equality;
+import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
 import dk.magenta.datafordeler.cpr.records.road.RoadRecordQuery;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadEntity;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadMemoBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadNameBitemporalRecord;
+import org.apache.commons.io.FileUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.json.JSONException;
@@ -28,13 +32,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -130,76 +135,6 @@ public class RoadTest extends TestBase {
         }
     }
 
-
-    @Test
-    public void testRoadAccess() throws Exception {
-
-        UUID expectedUuid = UUID.nameUUIDFromBytes(("road:"+955+":"+1).getBytes());
-
-
-        whitelistLocalhost();
-        ImportMetadata importMetadata = new ImportMetadata();
-        Session session = this.getSessionManager().getSessionFactory().openSession();
-        importMetadata.setSession(session);
-        Transaction transaction = session.beginTransaction();
-        importMetadata.setTransactionInProgress(true);
-        loadRoad(importMetadata);
-        transaction.commit();
-        session.close();
-
-        TestUserDetails testUserDetails = new TestUserDetails();
-
-        ParameterMap searchParameters = new ParameterMap();
-        searchParameters.add("vejnavn", "TestVej");
-        ResponseEntity<String> response = restSearch(searchParameters, "road");
-        Assert.assertEquals(403, response.getStatusCode().value());
-
-        testUserDetails.giveAccess(CprRolesDefinition.READ_CPR_ROLE);
-        this.applyAccess(testUserDetails);
-
-        response = restSearch(searchParameters, "road");
-        Assert.assertEquals(200, response.getStatusCode().value());
-        JsonNode jsonBody = this.getObjectMapper().readTree(response.getBody());
-        JsonNode results = jsonBody.get("results");
-        Assert.assertTrue(results.isArray());
-        Assert.assertEquals(1, results.size());
-        Assert.assertEquals(expectedUuid.toString(), results.get(0).get("uuid").asText());
-
-        testUserDetails.giveAccess(
-                this.getPlugin().getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
-                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
-                ).getRestriction(
-                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_SERMERSOOQ
-                )
-        );
-        this.applyAccess(testUserDetails);
-
-        response = restSearch(searchParameters, "road");
-        Assert.assertEquals(200, response.getStatusCode().value());
-        jsonBody = this.getObjectMapper().readTree(response.getBody());
-        results = jsonBody.get("results");
-        Assert.assertTrue(results.isArray());
-        Assert.assertEquals(0, results.size());
-
-        testUserDetails.giveAccess(
-                this.getPlugin().getAreaRestrictionDefinition().getAreaRestrictionTypeByName(
-                        CprAreaRestrictionDefinition.RESTRICTIONTYPE_KOMMUNEKODER
-                ).getRestriction(
-                        CprAreaRestrictionDefinition.RESTRICTION_KOMMUNE_KUJALLEQ
-                )
-        );
-        this.applyAccess(testUserDetails);
-
-        response = restSearch(searchParameters, "road");
-        Assert.assertEquals(200, response.getStatusCode().value());
-        jsonBody = this.getObjectMapper().readTree(response.getBody());
-        results = jsonBody.get("results");
-        Assert.assertTrue(results.isArray());
-        Assert.assertEquals(1, results.size());
-        Assert.assertEquals(expectedUuid.toString(), results.get(0).get("uuid").asText());
-
-    }
-
     @Test
     public void testRoadRecordTime() throws Exception {
         whitelistLocalhost();
@@ -226,7 +161,15 @@ public class RoadTest extends TestBase {
         JsonNode jsonBody = this.getObjectMapper().readTree(response.getBody());
         JsonNode results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
-        Assert.assertEquals(0, results.size());
+        Assert.assertEquals(9, results.size());
+
+        for (int i=0; i<results.size(); i++) {
+            ObjectNode roadNode = (ObjectNode) results.get(i);
+            Assert.assertEquals(0, roadNode.get("navn").size());
+            Assert.assertEquals(0, roadNode.get("by").size());
+            Assert.assertEquals(0, roadNode.get("note").size());
+            Assert.assertEquals(0, roadNode.get("postnr").size());
+        }
 
         searchParameters = new ParameterMap();
         searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
@@ -235,9 +178,60 @@ public class RoadTest extends TestBase {
         response = restSearch(searchParameters, "road");
         Assert.assertEquals(200, response.getStatusCode().value());
         jsonBody = this.getObjectMapper().readTree(response.getBody());
+        System.out.println(getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonBody));
         results = jsonBody.get("results");
         Assert.assertTrue(results.isArray());
         Assert.assertEquals(9, results.size());
+
+
+        for (int i=0; i<results.size(); i++) {
+            ObjectNode roadNode = (ObjectNode) results.get(i);
+            Assert.assertTrue(roadNode.get("navn").size() > 0);
+        }
+    }
+
+    @Test
+    public void pull() throws Exception {
+
+        String username = "test";
+        String password = "test";
+        int port = 2101;
+
+        CprConfiguration configuration = this.getConfiguration();
+
+        InputStream roadContents = this.getClass().getResourceAsStream("/roaddata.txt");
+        File roadFile = File.createTempFile("roaddata", "txt");
+        roadFile.createNewFile();
+        FileUtils.copyInputStreamToFile(roadContents, roadFile);
+        roadContents.close();
+
+        this.startFtp(username, password, port, Collections.singletonList(roadFile));
+
+        configuration.setPersonRegisterType(CprConfiguration.RegisterType.DISABLED);
+        configuration.setRoadRegisterType(CprConfiguration.RegisterType.REMOTE_FTP);
+        configuration.setResidenceRegisterType(CprConfiguration.RegisterType.DISABLED);
+        configuration.setRoadRegisterFtpAddress("ftps://localhost:" + port);
+        configuration.setRoadRegisterFtpUsername(username);
+        configuration.setRoadRegisterFtpPassword(password);
+        configuration.setRoadRegisterDataCharset(CprConfiguration.Charset.UTF_8);
+
+        Pull pull = new Pull(this.getEngine(), this.getPlugin());
+        pull.run();
+
+        this.stopFtp();
+        roadFile.delete();
+
+        Session session = this.getSessionManager().getSessionFactory().openSession();
+        try {
+            RoadRecordQuery roadQuery = new RoadRecordQuery();
+            roadQuery.addKommunekode(730);
+            roadQuery.setVejkode(4);
+            List<RoadEntity> roadEntities = QueryManager.getAllEntities(session, roadQuery, RoadEntity.class);
+            Assert.assertEquals(1, roadEntities.size());
+            Assert.assertEquals(RoadEntity.generateUUID(730, 4), roadEntities.get(0).getUUID());
+        } finally {
+            session.close();
+        }
     }
 
 }
