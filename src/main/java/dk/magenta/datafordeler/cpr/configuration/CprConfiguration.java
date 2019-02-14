@@ -210,8 +210,8 @@ public class CprConfiguration implements Configuration {
         return this.personRegisterFtpUsername;
     }
 
-    public String getPersonRegisterFtpPassword() {
-        return this.personRegisterFtpPassword;
+    public String getPersonRegisterFtpPassword() throws GeneralSecurityException, IOException {
+        return Encryption.decrypt(this.personRegisterPasswordEncryptionFile, this.personRegisterPasswordEncrypted);
     }
 
     public String getPersonRegisterLocalFile() {
@@ -263,8 +263,8 @@ public class CprConfiguration implements Configuration {
         return this.roadRegisterFtpUsername;
     }
 
-    public String getRoadRegisterFtpPassword() {
-        return this.roadRegisterFtpPassword;
+    public String getRoadRegisterFtpPassword() throws GeneralSecurityException, IOException {
+        return Encryption.decrypt(this.roadRegisterPasswordEncryptionFile, this.roadRegisterPasswordEncrypted);
     }
 
     public String getRoadRegisterLocalFile() {
@@ -313,8 +313,8 @@ public class CprConfiguration implements Configuration {
         return this.residenceRegisterFtpUsername;
     }
 
-    public String getResidenceRegisterFtpPassword() {
-        return this.residenceRegisterFtpPassword;
+    public String getResidenceRegisterFtpPassword() throws GeneralSecurityException, IOException {
+        return Encryption.decrypt(this.residenceRegisterPasswordEncryptionFile, this.residenceRegisterPasswordEncrypted);
     }
 
     public String getResidenceRegisterLocalFile() {
@@ -399,7 +399,7 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
-    public String getRegisterFtpPassword(EntityManager entityManager) {
+    public String getRegisterFtpPassword(EntityManager entityManager) throws GeneralSecurityException, IOException {
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterFtpPassword();
         }

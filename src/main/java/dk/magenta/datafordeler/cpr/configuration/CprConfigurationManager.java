@@ -26,11 +26,6 @@ public class CprConfigurationManager extends ConfigurationManager<CprConfigurati
     public void init() {
         // Very important to call init() on ConfigurationManager, or the config will not be loaded
         super.init();
-
-        CprConfiguration configuration = this.getConfiguration();
-        configuration.encryptPersonRegisterPassword();
-        configuration.encryptRoadRegisterPassword();
-        configuration.encryptResidenceRegisterPassword();
     }
 
     @Override
@@ -63,7 +58,4 @@ public class CprConfigurationManager extends ConfigurationManager<CprConfigurati
         configuration.setResidenceRegisterPasswordEncryptionFile(encryptionFile);
         return configuration;
     }
-
-
-
 }
