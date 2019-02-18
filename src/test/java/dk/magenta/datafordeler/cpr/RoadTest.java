@@ -94,6 +94,7 @@ public class RoadTest extends TestBase {
         try {
             loadRoad(importMetadata);
 
+            //Search for road and munipiality-code
             RoadRecordQuery query = new RoadRecordQuery();
             query.addKommunekode("0730");
             query.setVejkode("0004");
@@ -122,9 +123,33 @@ public class RoadTest extends TestBase {
             Assert.assertEquals("HUSNR.2 - EGEDAL -", memoIterator.get(1).getNoteLine());
             Assert.assertEquals("HUSNR.3 - KIRKE -", memoIterator.get(2).getNoteLine());
 
+            //Validate jsonresponse
             String jsonResponse = this.getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(entity);
-
             JSONAssert.assertEquals("{\"navn\":[{\"vejnavn\":\"Aalborggade\"}]}", jsonResponse, JSONCompareMode.LENIENT);
+
+
+            //Search for road-name
+            query = new RoadRecordQuery();
+            query.setVejnavn("Adelgade");
+            entities = QueryManager.getAllEntities(session, query, RoadEntity.class);
+            Assert.assertEquals(2, entities.size());
+
+            entity = entities.get(0);
+            Assert.assertEquals(RoadEntity.generateUUID(730, 15), entity.getUUID());
+            Assert.assertEquals(730, entity.getMunicipalityCode());
+            Assert.assertEquals(15, entity.getRoadcode());
+
+            entity = entities.get(1);
+            Assert.assertEquals(RoadEntity.generateUUID(730, 16), entity.getUUID());
+            Assert.assertEquals(730, entity.getMunicipalityCode());
+            Assert.assertEquals(16, entity.getRoadcode());
+
+
+            //Search for road-name with asterix
+            query = new RoadRecordQuery();
+            query.setVejnavn("*gade");
+            entities = QueryManager.getAllEntities(session, query, RoadEntity.class);
+            Assert.assertEquals(3, entities.size());
 
 
         } catch (JSONException e) {
