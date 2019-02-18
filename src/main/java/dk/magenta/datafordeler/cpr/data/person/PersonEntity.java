@@ -815,7 +815,6 @@ public class PersonEntity extends CprRecordEntity {
     private static Logger log = LogManager.getLogger(PersonEntity.class.getCanonicalName());
     private static <E extends CprBitemporalPersonRecord> boolean addItem(PersonEntity entity, Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
 
-
         /*
         * Technical
         * */
@@ -828,21 +827,14 @@ public class PersonEntity extends CprRecordEntity {
             recentTechnicalCorrectionRecords.add(newItem.getEffectFrom(), newItem);
         }
 
-
-
-
-        //log.info("Add "+newItem.getClass().getSimpleName()+"("+newItem.getAuthority()+") at "+newItem.getBitemporality()+" to set with "+set.size()+" preexisting entries");
         if (newItem != null) {
-            //System.out.println("Add "+newItem.cnt+" ("+newItem.getClass().getSimpleName()+")");
             E correctedRecord = null;
             E correctingRecord = null;
             ArrayList<E> items = new ArrayList<>(set);
 
-            //items.sort(Comparator.comparing(CprNontemporalRecord::getOriginDate));
             items.sort(Comparator.comparing(CprNontemporalRecord::getCnt));
 
             for (E oldItem : items) {
-
                 /*
                 * Items with correction marking specify that an older record should be corrected with new data and/or effect time
                 * The incoming item itself is not the corrected data, but another record with the same origin will hold it
@@ -850,7 +842,6 @@ public class PersonEntity extends CprRecordEntity {
                 * and set registrationTo on the corrected record
                 * */
                 if (newItem.isCorrection() && newItem.hasData()) {
-
                     // Annkor: K
                     if (
                             Objects.equals(newItem.getOrigin(), oldItem.getOrigin()) &&
@@ -859,12 +850,10 @@ public class PersonEntity extends CprRecordEntity {
                                     correctingRecord == null
                             ) {
                         // The new record with corrected data is the first record with the same origin that shares registration
-                        //System.out.println("    Corrector: "+oldItem.cnt+"  "+oldItem.getRegistrationFrom()+" - "+oldItem.getRegistrationTo());
                         correctingRecord = oldItem;
                     } else if (newItem.equalData(oldItem) && !Objects.equals(newItem.getOrigin(), oldItem.getOrigin())/* && oldItem.getCorrector() == null*/) {
                         // The old record that is being corrected has equal data with the correction marking and shares registration
                         correctedRecord = oldItem;
-                        //System.out.println("    Corrected: "+oldItem.cnt+"  "+oldItem.getRegistrationFrom()+" - "+oldItem.getRegistrationTo());
                     }
                 }
 
@@ -879,8 +868,6 @@ public class PersonEntity extends CprRecordEntity {
                 }
 
                 else if (newItem.equalData(oldItem)) {
-                    //System.out.println(newItem.cnt +" matches "+oldItem.cnt);
-
                     /*
                      * Historic item matching prior current item. This means we have the prior item ended, and should set registrationTo
                      * The new item is added without change
@@ -900,7 +887,6 @@ public class PersonEntity extends CprRecordEntity {
 
                     /*
                     * Special case for addresses: Municipality codes may have changed without us getting a change record (AnnKor: Æ)
-                    *
                     * */
                     } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
                         if (newItem instanceof AddressDataRecord) {
@@ -911,7 +897,6 @@ public class PersonEntity extends CprRecordEntity {
                                 return set.add((E) newItem);
                             }
                         } else {
-                            //System.out.println(newItem.cnt + " matches and has same bitemporality as " + oldItem.cnt + ", not adding");
                             return false;
                         }
 
@@ -924,14 +909,10 @@ public class PersonEntity extends CprRecordEntity {
                             Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
                             newItem.getEffectTo() == null
                             ) {
-                        //System.out.println("matching item with insufficient temporality (" + newItem.getBitemporality() + "), not adding");
                         return false;
                     }
                 }
             }
-
-
-
 
             /*
             * Items with only registrationFrom, with no historical record, come in and replace older items of the same type
@@ -987,7 +968,6 @@ public class PersonEntity extends CprRecordEntity {
                     for (CprBitemporalPersonRecord olderRecord : corrections) {
                         if (olderRecord.getClass() == newItem.getClass() && olderRecord.isTechnicalCorrection() && olderRecord.getOrigin().equals(newItem.getOrigin())) {
                             //if (olderRecord.getEffectFrom() != null && olderRecord.getEffectFrom().equals(newItem.getEffectFrom())) {
-                            // System.out.println(newItem.cnt+" corrects "+olderRecord.cnt);
                             newItem.setCorrectionof(olderRecord);
                             olderRecord.setEntity(entity);
                             session.saveOrUpdate(olderRecord);
@@ -1002,7 +982,6 @@ public class PersonEntity extends CprRecordEntity {
             if (newItem.isCorrection()) {
                 if (correctedRecord != null && correctingRecord != null && correctedRecord != correctingRecord) {
                     //if (correctedRecord.getCorrector() == null) {
-                        // System.out.println(correctingRecord.cnt+" corrects "+correctedRecord.cnt);
                         correctedRecord.setRegistrationTo(newItem.getRegistrationFrom());
                         correctingRecord.setCorrectionof(correctedRecord);
                         session.saveOrUpdate(correctingRecord);
