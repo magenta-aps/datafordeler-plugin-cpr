@@ -39,7 +39,7 @@ public class RoadParser extends CprSubParser<RoadDataRecord> {
                 // TODO: Add one of these for each type...
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("ParseException", e);
         }
         return null;
     }
