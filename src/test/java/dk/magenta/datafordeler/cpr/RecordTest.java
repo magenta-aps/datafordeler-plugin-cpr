@@ -17,7 +17,6 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonRecordQuery;
 import dk.magenta.datafordeler.cpr.records.output.PersonRecordOutputWrapper;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,7 +71,7 @@ public class RecordTest {
     }
 
     private void loadPerson(String resource, ImportMetadata importMetadata) throws DataFordelerException, IOException {
-        InputStream testData = ParseTest.class.getResourceAsStream(resource);
+        InputStream testData = RecordTest.class.getResourceAsStream(resource);
         personEntityManager.parseData(testData, importMetadata);
         testData.close();
     }

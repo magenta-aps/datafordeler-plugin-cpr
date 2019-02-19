@@ -57,10 +57,10 @@ public class ResidenceRecord extends CprGeoRecord<ResidenceEffect, ResidenceBase
                 break;
             }
         }
-        if (effect == null) {
+        /*if (effect == null) {
             effect = this.createEffect(effectFrom, effectFromUncertain, effectTo, effectToUncertain);
             data.put(effect, this.createEmptyBaseData());
-        }
+        }*/
         return data.get(effect);
     }
 

@@ -29,7 +29,7 @@ public class RoadParser extends CprSubParser<RoadDataRecord> {
         try {
             switch (recordType) {
                 case RoadDataRecord.RECORDTYPE_ROAD:
-                    return new RoadRecord(line);
+                    return new RoadNameRecord(line);
                 case RoadDataRecord.RECORDTYPE_ROADMEMO:
                     return new RoadMemoRecord(line);
                 case RoadDataRecord.RECORDTYPE_ROADPOSTCODE:
@@ -39,7 +39,7 @@ public class RoadParser extends CprSubParser<RoadDataRecord> {
                 // TODO: Add one of these for each type...
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("ParseException", e);
         }
         return null;
     }
