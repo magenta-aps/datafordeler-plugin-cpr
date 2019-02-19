@@ -8,6 +8,9 @@ import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
+/*import dk.magenta.datafordeler.cpr.parsers.PersonParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;*/
 
 import javax.persistence.*;
 import java.io.File;
@@ -19,6 +22,8 @@ import java.security.GeneralSecurityException;
 @javax.persistence.Entity
 @Table(name="cpr_config")
 public class CprConfiguration implements Configuration {
+
+    //private Logger log = LogManager.getLogger(PersonParser.class);
 
     public enum Charset {
         US_ASCII(0),
@@ -517,8 +522,8 @@ public class CprConfiguration implements Configuration {
         this.personRegisterFtpUsername = personRegisterFtpUsername;
     }
 
-    public void setPersonRegisterFtpPassword(String personRegisterFtpPassword) {
-        this.personRegisterFtpPassword = personRegisterFtpPassword;
+    public void setPersonRegisterFtpPassword(String personRegisterFtpPassword) throws GeneralSecurityException, IOException {
+        this.personRegisterPasswordEncrypted = Encryption.encrypt(this.personRegisterPasswordEncryptionFile, personRegisterFtpPassword);
     }
 
     public void setPersonRegisterLocalFile(String personRegisterLocalFile) {
@@ -545,8 +550,8 @@ public class CprConfiguration implements Configuration {
         this.roadRegisterFtpUsername = roadRegisterFtpUsername;
     }
 
-    public void setRoadRegisterFtpPassword(String roadRegisterFtpPassword) {
-        this.roadRegisterFtpPassword = roadRegisterFtpPassword;
+    public void setRoadRegisterFtpPassword(String roadRegisterFtpPassword) throws GeneralSecurityException, IOException {
+        this.roadRegisterPasswordEncrypted = Encryption.encrypt(this.roadRegisterPasswordEncryptionFile, roadRegisterFtpPassword);
     }
 
     public void setRoadRegisterLocalFile(String roadRegisterLocalFile) {
@@ -573,8 +578,8 @@ public class CprConfiguration implements Configuration {
         this.residenceRegisterFtpUsername = residenceRegisterFtpUsername;
     }
 
-    public void setResidenceRegisterFtpPassword(String residenceRegisterFtpPassword) {
-        this.residenceRegisterFtpPassword = residenceRegisterFtpPassword;
+    public void setResidenceRegisterFtpPassword(String residenceRegisterFtpPassword) throws GeneralSecurityException, IOException {
+        this.residenceRegisterPasswordEncrypted = Encryption.encrypt(this.residenceRegisterPasswordEncryptionFile, residenceRegisterFtpPassword);
     }
 
     public void setResidenceRegisterLocalFile(String residenceRegisterLocalFile) {

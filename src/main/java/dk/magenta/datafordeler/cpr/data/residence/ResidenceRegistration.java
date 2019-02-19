@@ -14,8 +14,8 @@ import java.time.OffsetDateTime;
 @javax.persistence.Entity
 @Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_registration", indexes = {
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_entity", columnList = "entity_id"),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_registration_from", columnList = "registrationFrom"),
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_registration_to", columnList = "registrationTo")
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_registration_from", columnList = ResidenceRegistration.DB_FIELD_REGISTRATION_FROM),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_residence_registration_to", columnList = ResidenceRegistration.DB_FIELD_REGISTRATION_TO)
 })
 public class ResidenceRegistration extends CprRegistration<ResidenceEntity, ResidenceRegistration, ResidenceEffect> {
 
