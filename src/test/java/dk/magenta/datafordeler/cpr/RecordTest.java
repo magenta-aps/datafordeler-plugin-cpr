@@ -84,13 +84,12 @@ public class RecordTest {
         this.loadPerson("/persondata.txt", importMetadata);
         try {
 
-
             PersonRecordQuery query = new PersonRecordQuery();
             OffsetDateTime time = OffsetDateTime.now();
-            query.setRegistrationFrom(time);
-            query.setRegistrationTo(time);
-            query.setEffectFrom(time);
-            query.setEffectTo(time);
+            query.setRegistrationFromBefore(time);
+            query.setRegistrationToAfter(time);
+            query.setEffectFromBefore(time);
+            query.setEffectToAfter(time);
             query.applyFilters(session);
 
             query.addKommunekode(956);
@@ -111,8 +110,8 @@ public class RecordTest {
             Assert.assertEquals(0, QueryManager.getAllEntities(session, query, PersonEntity.class).size());
 
             time = OffsetDateTime.parse("2000-01-01T00:00:00Z");
-            query.setEffectFrom(time);
-            query.setEffectTo(time);
+            query.setEffectFromBefore(time);
+            query.setEffectToAfter(time);
             query.applyFilters(session);
 
             query.setEfternavn("Testersen");

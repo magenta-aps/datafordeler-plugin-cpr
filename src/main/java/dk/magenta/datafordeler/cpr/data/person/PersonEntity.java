@@ -714,6 +714,27 @@ public class PersonEntity extends CprRecordEntity {
         return this.protection;
     }
 
+
+    public static final String DB_FIELD_GUARDIAN = "guardian";
+    public static final String IO_FIELD_GUARDIAN = "værgemål";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTFROM_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTFROM_BEFORE),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECTTO_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECTTO_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECTTO_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONFROM_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONFROM_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATIONTO_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATIONTO_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
+    })
+    @JsonProperty(IO_FIELD_GUARDIAN)
+    Set<GuardianDataRecord> guardian = new HashSet<>();
+
+
+
     public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session) {
         boolean added = false;
         if (record instanceof AddressConameDataRecord) {
@@ -804,9 +825,12 @@ public class PersonEntity extends CprRecordEntity {
         if (record instanceof ProtectionDataRecord) {
             added = addItem(this, this.protection, record, session);
         }
+        if (record instanceof GuardianDataRecord) {
+            added = addItem(this, this.guardian, record, session);
+        }
         if (added) {
             record.setEntity(this);
-        }
+        } else System.out.println(record.getClass().getCanonicalName());
 
     }
 
