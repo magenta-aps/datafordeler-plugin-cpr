@@ -61,6 +61,17 @@ public class CivilStatusDataRecord extends CprBitemporalPersonRecord<CivilStatus
     }
 
 
+    /*
+        U = Ugift
+        G = Gift
+        F = Fraskilt
+        E = Enke/enkemand
+        P = Registreret partnerskab
+        O = Ophævet partnerskab
+        L = Længestlevende partner
+        D = Død
+    * */
+
     public static final String DB_FIELD_CIVIL_STATUS = "civilStatus";
     public static final String IO_FIELD_CIVIL_STATUS = "civilstand";
     @Column(name = DB_FIELD_CIVIL_STATUS)

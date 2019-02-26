@@ -36,6 +36,12 @@ public class ProtectionDataRecord extends CprBitemporalPersonRecord<ProtectionDa
         this.deletionDate = deletionDate;
     }
 
+    /*
+    0001 = Navne- og adressebeskyttelse
+    0002 = Lokalvejviserbeskyttelse
+    0003 = Markedsføringsbeskyttelse
+    * */
+
     public static final String DB_FIELD_TYPE = "protectionType";
     public static final String IO_FIELD_TYPE = "beskyttelsestype";
     @Column(name = DB_FIELD_TYPE)

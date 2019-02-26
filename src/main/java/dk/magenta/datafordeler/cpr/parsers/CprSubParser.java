@@ -71,8 +71,6 @@ public abstract class CprSubParser<T extends Record> {
                         if (record != null) {
                             record.setOrigin(origin);
                             records.add(record);
-                        } else {
-                            System.out.println("ignoring line "+line);
                         }
                     } catch (OutOfMemoryError e) {
                         log.error("OutOfMemoryError", e);
