@@ -830,7 +830,7 @@ public class PersonEntity extends CprRecordEntity {
         }
         if (added) {
             record.setEntity(this);
-        } else System.out.println(record.getClass().getCanonicalName());
+        }
 
     }
 
