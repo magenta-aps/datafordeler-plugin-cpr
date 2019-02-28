@@ -733,6 +733,9 @@ public class PersonEntity extends CprRecordEntity {
     @JsonProperty(IO_FIELD_GUARDIAN)
     Set<GuardianDataRecord> guardian = new HashSet<>();
 
+    public Set<GuardianDataRecord> getGuardian() {
+        return this.guardian;
+    }
 
 
     public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session) {

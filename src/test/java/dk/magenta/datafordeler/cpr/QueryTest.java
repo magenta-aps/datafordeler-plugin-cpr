@@ -229,7 +229,7 @@ public class QueryTest {
         Assert.assertEquals(4, results.get(0).size());
 
         searchParameters = new ParameterMap();
-        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("registreringFraFør", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         searchParameters.add("fornavn", "Tester");
         searchParameters.add("fmt", "drv");
