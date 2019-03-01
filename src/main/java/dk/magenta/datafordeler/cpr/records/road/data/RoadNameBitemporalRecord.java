@@ -12,7 +12,7 @@ import java.util.Objects;
 @Table(name=CprPlugin.DEBUG_TABLE_PREFIX + RoadNameBitemporalRecord.TABLE_NAME)
 public class RoadNameBitemporalRecord extends CprBitemporalRoadRecord<RoadNameBitemporalRecord> {
 
-    public static final String TABLE_NAME = "cpr_road_record";
+    public static final String TABLE_NAME = "cpr_road_name_record";
 
     public RoadNameBitemporalRecord() {
     }
