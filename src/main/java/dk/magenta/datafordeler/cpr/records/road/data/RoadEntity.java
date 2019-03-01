@@ -23,7 +23,7 @@ import java.util.*;
  * described in {@link dk.magenta.datafordeler.core.database.Entity}
  */
 @javax.persistence.Entity
-@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "road_entity", indexes = {
+@Table(name=CprPlugin.DEBUG_TABLE_PREFIX + RoadEntity.TABLE_NAME, indexes = {
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "road_identification", columnList = RoadEntity.DB_FIELD_IDENTIFICATION, unique = true)
 })
 @FilterDefs({
@@ -41,6 +41,8 @@ import java.util.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RoadEntity extends CprRecordEntity {
 
+
+    public static final String TABLE_NAME = "cpr_road_entity";
 
     public static final String schema = "road";
 
