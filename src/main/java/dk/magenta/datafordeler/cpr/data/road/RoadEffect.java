@@ -14,7 +14,7 @@ import java.time.temporal.TemporalAccessor;
  * @see dk.magenta.datafordeler.core.database.Entity
  */
 @javax.persistence.Entity
-@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_effect", indexes = {
+@Table(name= "cpr_road_effect", indexes = {
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_effect_registration", columnList = "registration_id"),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_effect_from", columnList = "effectFrom"),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_effect_to", columnList = "effectTo")

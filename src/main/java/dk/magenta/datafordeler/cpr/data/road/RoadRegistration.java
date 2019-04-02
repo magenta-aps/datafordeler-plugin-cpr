@@ -12,7 +12,7 @@ import java.time.OffsetDateTime;
  * @see dk.magenta.datafordeler.core.database.Entity
  */
 @javax.persistence.Entity
-@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_registration", indexes = {
+@Table(name= "cpr_road_registration", indexes = {
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_entity", columnList = "entity_id"),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_registration_from", columnList = "registrationFrom"),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_registration_to", columnList = "registrationTo")

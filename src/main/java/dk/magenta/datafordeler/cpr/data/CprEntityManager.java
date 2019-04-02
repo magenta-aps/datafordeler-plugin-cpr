@@ -239,7 +239,7 @@ public abstract class CprEntityManager<T extends CprDataRecord, E extends Entity
                     // Parse chunk into a set of records
                     timer.start(TASK_PARSE);
                     List<T> chunkRecords = parser.parse(dataChunks, charset);
-                    log.debug("Batch parsed into " + chunkRecords.size() + " records");
+                    log.info("Batch parsed into " + chunkRecords.size() + " records");
                     timer.measure(TASK_PARSE);
 
                     if (!chunkRecords.isEmpty()) {

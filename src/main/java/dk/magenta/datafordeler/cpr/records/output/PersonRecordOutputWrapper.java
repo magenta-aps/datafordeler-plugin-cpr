@@ -115,6 +115,7 @@ public class PersonRecordOutputWrapper extends CprRecordOutputWrapper<PersonEnti
         container.addBitemporal(PersonEntity.IO_FIELD_PNR, record.getPersonNumber(), true);
         container.addBitemporal(PersonEntity.IO_FIELD_POSITION, record.getPosition(), true);
         container.addBitemporal(PersonEntity.IO_FIELD_STATUS, record.getStatus(), true);
+        container.addBitemporal(PersonEntity.IO_FIELD_GUARDIAN, record.getGuardian(), true);
         container.addBitemporal(PersonEntity.IO_FIELD_PROTECTION, record.getProtection());
     }
 

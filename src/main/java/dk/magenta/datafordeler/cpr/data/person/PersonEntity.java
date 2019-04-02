@@ -591,6 +591,24 @@ public class PersonEntity extends CprEntity<PersonEntity, PersonRegistration> {
     public Set<ProtectionDataRecord> getProtection() {
         return this.protection;
     }
+	
+	public static final String DB_FIELD_GUARDIAN = "guardian";
+    public static final String IO_FIELD_GUARDIAN = "værgemål";
+    @OneToMany(mappedBy = CprBitemporalPersonRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @Filters({
+            @Filter(name = Bitemporal.FILTER_EFFECT_AFTER, condition = Bitemporal.FILTERLOGIC_EFFECT_AFTER),
+            @Filter(name = Bitemporal.FILTER_EFFECT_BEFORE, condition = Bitemporal.FILTERLOGIC_EFFECT_BEFORE),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_AFTER, condition = Monotemporal.FILTERLOGIC_REGISTRATION_AFTER),
+            @Filter(name = Monotemporal.FILTER_REGISTRATION_BEFORE, condition = Monotemporal.FILTERLOGIC_REGISTRATION_BEFORE),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_AFTER, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_AFTER),
+            @Filter(name = Nontemporal.FILTER_LASTUPDATED_BEFORE, condition = Nontemporal.FILTERLOGIC_LASTUPDATED_BEFORE)
+    })
+    @JsonProperty(IO_FIELD_GUARDIAN)
+    Set<GuardianDataRecord> guardian = new HashSet<>();
+
+    public Set<GuardianDataRecord> getGuardian() {
+        return this.guardian;
+    }
 
     public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session) {
         boolean added = false;

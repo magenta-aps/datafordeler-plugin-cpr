@@ -20,7 +20,7 @@ import static dk.magenta.datafordeler.cpr.data.road.data.RoadCoreData.DB_FIELD_R
  * referenced by {@link dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData}
  */
 @Entity
-@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_core", indexes = {
+@Table(name= "cpr_road_core", indexes = {
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_name", columnList = DB_FIELD_ROAD_NAME),
 })
 public class RoadCoreData extends DetailData {

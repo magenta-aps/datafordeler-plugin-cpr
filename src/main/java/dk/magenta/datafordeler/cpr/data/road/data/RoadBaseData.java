@@ -21,7 +21,7 @@ import java.util.*;
  * Base class for Road data, linking to Effects and delegating storage to referred classes
  */
 @Entity
-@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_data", indexes = {
+@Table(name= "cpr_road_data", indexes = {
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_lastUpdated", columnList = DataItem.DB_FIELD_LAST_UPDATED),
         @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_core", columnList = RoadBaseData.DB_FIELD_CORE + DatabaseEntry.REF)
 })

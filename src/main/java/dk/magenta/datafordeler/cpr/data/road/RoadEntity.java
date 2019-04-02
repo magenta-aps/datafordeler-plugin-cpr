@@ -23,7 +23,7 @@ import static dk.magenta.datafordeler.cpr.data.road.RoadEntity.DB_FIELD_ROADCODE
  */
 @javax.persistence.Entity
 @Table(
-    name= CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_entity",
+    name= "cpr_road_entity",
     indexes = {
             @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_identification", columnList = "identification_id", unique = true),
             @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_road_municipality_code", columnList = DB_FIELD_MUNICIPALITYCODE),
