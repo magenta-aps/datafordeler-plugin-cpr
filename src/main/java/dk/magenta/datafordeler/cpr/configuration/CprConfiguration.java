@@ -517,8 +517,8 @@ public class CprConfiguration implements Configuration {
         this.personRegisterFtpUsername = personRegisterFtpUsername;
     }
 
-    public void setPersonRegisterFtpPassword(String personRegisterFtpPassword) {
-        this.personRegisterFtpPassword = personRegisterFtpPassword;
+    public void setPersonRegisterFtpPassword(String personRegisterFtpPassword) throws GeneralSecurityException, IOException {
+        this.personRegisterPasswordEncrypted = Encryption.encrypt(this.personRegisterPasswordEncryptionFile, personRegisterFtpPassword);
     }
 
     public void setPersonRegisterLocalFile(String personRegisterLocalFile) {
@@ -545,8 +545,8 @@ public class CprConfiguration implements Configuration {
         this.roadRegisterFtpUsername = roadRegisterFtpUsername;
     }
 
-    public void setRoadRegisterFtpPassword(String roadRegisterFtpPassword) {
-        this.roadRegisterFtpPassword = roadRegisterFtpPassword;
+    public void setRoadRegisterFtpPassword(String roadRegisterFtpPassword) throws GeneralSecurityException, IOException {
+        this.roadRegisterPasswordEncrypted = Encryption.encrypt(this.roadRegisterPasswordEncryptionFile, roadRegisterFtpPassword);
     }
 
     public void setRoadRegisterLocalFile(String roadRegisterLocalFile) {
@@ -573,8 +573,8 @@ public class CprConfiguration implements Configuration {
         this.residenceRegisterFtpUsername = residenceRegisterFtpUsername;
     }
 
-    public void setResidenceRegisterFtpPassword(String residenceRegisterFtpPassword) {
-        this.residenceRegisterFtpPassword = residenceRegisterFtpPassword;
+    public void setResidenceRegisterFtpPassword(String residenceRegisterFtpPassword) throws GeneralSecurityException, IOException {
+        this.residenceRegisterPasswordEncrypted = Encryption.encrypt(this.residenceRegisterPasswordEncryptionFile, residenceRegisterFtpPassword);
     }
 
     public void setResidenceRegisterLocalFile(String residenceRegisterLocalFile) {

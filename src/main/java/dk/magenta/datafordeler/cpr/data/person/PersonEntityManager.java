@@ -10,10 +10,9 @@ import dk.magenta.datafordeler.cpr.data.person.data.PersonBaseData;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
-import dk.magenta.datafordeler.cpr.records.person.AddressRecord;
-import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
-import dk.magenta.datafordeler.cpr.records.person.ForeignAddressRecord;
-import dk.magenta.datafordeler.cpr.records.person.PersonDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.*;
+import dk.magenta.datafordeler.cpr.records.person.data.BirthTimeDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.ParentDataRecord;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -94,6 +94,16 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
 
     private HashSet<String> nonGreenlandicCprNumbers = new HashSet<>();
 
+    private HashSet<String> nonGreenlandicFatherCprNumbers = new HashSet<>();
+
+    /**
+     * Parse the file of persons.
+     * If the file contains any fathers that is unknown to DAFO add it
+     * @param registrationData
+     * @param importMetadata
+     * @return
+     * @throws DataFordelerException
+     */
     @Override
     public List<PersonRegistration> parseData(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
         try {
@@ -101,12 +111,36 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
             if (this.isSetupSubscriptionEnabled() && !this.nonGreenlandicCprNumbers.isEmpty() && (importMetadata.getImportConfiguration() == null || importMetadata.getImportConfiguration().size() == 0)) {
                 this.createSubscription(this.nonGreenlandicCprNumbers);
             }
+            if (this.isSetupSubscriptionEnabled() && !this.nonGreenlandicFatherCprNumbers.isEmpty() && importMetadata.getImportConfiguration().size() == 0) {
+                try(Session session = sessionManager.getSessionFactory().openSession()) {
+                    PersonRecordQuery personQuery = new PersonRecordQuery();
+                    for(String fatherCpr : nonGreenlandicFatherCprNumbers) {
+                        personQuery.addPersonnummer(fatherCpr);
+                    }
+
+                    personQuery.applyFilters(session);
+                    List<PersonEntity> personEntities = QueryManager.getAllEntities(session, personQuery, PersonEntity.class);
+
+                    for(PersonEntity person : personEntities) {
+                        nonGreenlandicFatherCprNumbers.remove(person.getPersonnummer());
+                    }
+                }
+                this.createSubscription(this.nonGreenlandicFatherCprNumbers);
+            }
             return result;
         } finally {
             this.nonGreenlandicCprNumbers.clear();
+            this.nonGreenlandicFatherCprNumbers.clear();
         }
     }
 
+    /**
+     * Handle parsing if records from cpr
+     * If a person is leaving Greenland they should be added.
+     * If a person is under 18 years old, and has a father with no connection to Greenland they should be added.
+     * @param record
+     * @param importMetadata
+     */
     @Override
     protected void handleRecord(PersonDataRecord record, ImportMetadata importMetadata) {
         super.handleRecord(record, importMetadata);
@@ -119,6 +153,25 @@ public class PersonEntityManager extends CprEntityManager<PersonDataRecord, Pers
             } else if (record instanceof ForeignAddressRecord) {
                 ForeignAddressRecord foreignAddressRecord = (ForeignAddressRecord) record;
                 this.nonGreenlandicCprNumbers.add(foreignAddressRecord.getCprNumber());
+            } else if(record instanceof PersonRecord) {
+
+                PersonRecord person = (PersonRecord)record;
+                List<CprBitemporalRecord> bitemporalRecords = person.getBitemporalRecords();
+
+                ParentDataRecord father = (ParentDataRecord)bitemporalRecords.stream().
+                        filter(bitemporalCprRecord -> bitemporalCprRecord instanceof ParentDataRecord && !((ParentDataRecord) bitemporalCprRecord).isMother()).
+                        findAny().get();
+
+                BirthTimeDataRecord birthTime = (BirthTimeDataRecord)bitemporalRecords.stream().
+                        filter(bitemporalCprRecord -> bitemporalCprRecord instanceof BirthTimeDataRecord).
+                        findAny().get();
+
+                if(birthTime != null && father != null && birthTime.getBirthDatetime().isAfter(LocalDateTime.now().minusYears(18))) {
+                    if (!father.getCprNumber().isEmpty() && !father.getCprNumber().equals("0000000000")) {
+                        log.debug("fatherAdd "+father.getCprNumber());
+                        nonGreenlandicFatherCprNumbers.add(father.getCprNumber());
+                    }
+                }
             }
         }
     }
