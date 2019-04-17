@@ -136,6 +136,7 @@ public abstract class CprBitemporalRecord<E extends CprRecordEntity, S extends C
         return this;
     }
 
+    @JsonIgnore
     public boolean isCorrection() {
         return this.correction;
     }
