@@ -20,6 +20,10 @@ public class PersonRecordQuery extends BaseQuery {
     public static final String FORNAVNE = "fornavn";
     public static final String EFTERNAVN = "efternavn";
     public static final String KOMMUNEKODE = "cprKommunekode";
+    public static final String VEJKODE = "cprVejkode";
+    public static final String DOOR = "doer";
+    public static final String FLOOR = "floor";
+    public static final String HOUSENO = "houseno";
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = PERSONNUMMER)
     private List<String> personnumre = new ArrayList<>();
@@ -90,6 +94,74 @@ public class PersonRecordQuery extends BaseQuery {
     }
 
 
+    @QueryField(type = QueryField.FieldType.STRING, queryName = VEJKODE)
+    private List<String> vejkoder = new ArrayList<>();
+
+    public Collection<String> getVejkoder() {
+        return this.vejkoder;
+    }
+
+    public void addVejkode(String vejkode) {
+        this.vejkoder.add(vejkode);
+    }
+
+    public void addVejkode(int vejkode) {
+        this.addVejkode(String.format("%03d", vejkode));
+    }
+
+    public void clearVejkode() {
+        this.vejkoder.clear();
+    }
+
+
+    @QueryField(type = QueryField.FieldType.STRING, queryName = DOOR)
+    private List<String> doors = new ArrayList<>();
+
+    public Collection<String> getDoors() {
+        return this.doors;
+    }
+
+    public void addDoor(String door) {
+        this.doors.add(door);
+    }
+
+    public void clearDoor() {
+        this.doors.clear();
+    }
+
+
+    @QueryField(type = QueryField.FieldType.STRING, queryName = FLOOR)
+    private List<String> floors = new ArrayList<>();
+
+    public Collection<String> getFloors() {
+        return this.floors;
+    }
+
+    public void addFloor(String floor) {
+        this.floors.add(floor);
+    }
+
+    public void clearFloor() {
+        this.floors.clear();
+    }
+
+
+    @QueryField(type = QueryField.FieldType.STRING, queryName = HOUSENO)
+    private List<String> houseNos = new ArrayList<>();
+
+    public Collection<String> getHouseNos() {
+        return this.houseNos;
+    }
+
+    public void addHouseNo(String houseNo) {
+        this.houseNos.add(houseNo);
+    }
+
+    public void clearHouseNo() {
+        this.houseNos.clear();
+    }
+
+
     @Override
     public Map<String, Object> getSearchParameters() {
         HashMap<String, Object> map = new HashMap<>();
@@ -131,6 +203,18 @@ public class PersonRecordQuery extends BaseQuery {
         }
         if (!this.getKommunekoder().isEmpty()) {
             lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_ADDRESS + LookupDefinition.separator + AddressDataRecord.DB_FIELD_MUNICIPALITY_CODE, this.getKommunekoder(), Integer.class);
+        }
+        if (!this.getVejkoder().isEmpty()) {
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_ADDRESS + LookupDefinition.separator + AddressDataRecord.DB_FIELD_ROAD_CODE, this.getVejkoder(), Integer.class);
+        }
+        if (!this.getDoors().isEmpty()) {
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_ADDRESS + LookupDefinition.separator + AddressDataRecord.DB_FIELD_DOOR, this.getDoors(), String.class);
+        }
+        if (!this.getFloors().isEmpty()) {
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_ADDRESS + LookupDefinition.separator + AddressDataRecord.DB_FIELD_FLOOR, this.getFloors(), String.class);
+        }
+        if (!this.getHouseNos().isEmpty()) {
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_ADDRESS + LookupDefinition.separator + AddressDataRecord.DB_FIELD_HOUSENUMBER, this.getHouseNos(), String.class);
         }
         if (!this.getKommunekodeRestriction().isEmpty()) {
             lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_ADDRESS + LookupDefinition.separator + AddressDataRecord.DB_FIELD_MUNICIPALITY_CODE, this.getKommunekodeRestriction(), Integer.class);
