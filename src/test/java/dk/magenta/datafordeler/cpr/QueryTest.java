@@ -15,6 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -38,6 +40,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class QueryTest {
 
     @Autowired
@@ -64,9 +67,16 @@ public class QueryTest {
     @Autowired
     private SessionManager sessionManager;
 
+    @Before
+    public void initialize() throws Exception {
+        QueryManager.clearCaches();
+    }
+
     @After
     public void cleanup() {
         QueryManager.clearCaches();
+        residenceEntityManager = new ResidenceEntityManager();
+        personEntityManager = new PersonEntityManager();
     }
 
     public void loadPerson(ImportMetadata importMetadata) throws Exception {
