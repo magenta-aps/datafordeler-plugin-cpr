@@ -173,7 +173,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                         filter(bitemporalCprRecord -> bitemporalCprRecord instanceof BirthTimeDataRecord).
                         findAny().get();
 
-                if (birthTime != null && father != null && birthTime.getBirthDatetime().isAfter(LocalDateTime.now().minusYears(18))) {
+                if (birthTime != null && father != null && birthTime.getBirthDatetime() != null && birthTime.getBirthDatetime().isAfter(LocalDateTime.now().minusYears(18))) {
                     if (!father.getCprNumber().isEmpty() && !father.getCprNumber().equals("0000000000")) {
                         log.debug("fatherAdd " + father.getCprNumber());
                         nonGreenlandicFatherCprNumbers.add(father.getCprNumber());
