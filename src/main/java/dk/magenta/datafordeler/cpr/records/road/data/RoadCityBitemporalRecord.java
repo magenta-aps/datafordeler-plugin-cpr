@@ -10,10 +10,10 @@ import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @javax.persistence.Entity
-@Table(name= CprPlugin.DEBUG_TABLE_PREFIX + "road_city_record")
+@Table(name=CprPlugin.DEBUG_TABLE_PREFIX + RoadCityBitemporalRecord.TABLE_NAME)
 public class RoadCityBitemporalRecord extends CprBitemporalRoadRecord<RoadCityBitemporalRecord> {
 
-    public static final String TABLE_NAME = "road_city_record";
+    public static final String TABLE_NAME = "cpr_road_city_record";
 
     public RoadCityBitemporalRecord() {
     }
