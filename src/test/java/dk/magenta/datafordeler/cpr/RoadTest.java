@@ -29,6 +29,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class RoadTest extends TestBase {
 
     @Autowired
@@ -178,8 +180,8 @@ public class RoadTest extends TestBase {
         this.applyAccess(testUserDetails);
 
         ParameterMap searchParameters = new ParameterMap();
-        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("registreringFra", "2011-06-17T14:06:19.196");
+        searchParameters.add("recordAfter", "2011-06-17T14:06:19.196");
 
         ResponseEntity<String> response = restSearch(searchParameters, "road");
         Assert.assertEquals(200, response.getStatusCode().value());
@@ -197,8 +199,8 @@ public class RoadTest extends TestBase {
         }
 
         searchParameters = new ParameterMap();
-        searchParameters.add("registreringFraFør", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("registreringFraFør", "2011-06-17T14:06:19.196");
+        searchParameters.add("recordAfter", "2011-06-17T14:06:19.196");
 
         response = restSearch(searchParameters, "road");
         Assert.assertEquals(200, response.getStatusCode().value());
