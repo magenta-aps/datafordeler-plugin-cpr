@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -70,11 +71,9 @@ public abstract class CprSubParser<T extends Record> {
                         if (record != null) {
                             record.setOrigin(origin);
                             records.add(record);
-                        } else {
-                            System.out.println("ignoring line "+line);
                         }
                     } catch (OutOfMemoryError e) {
-                        System.out.println(line);
+                        log.error("OutOfMemoryError", e);
                     }
                 }
                 batchSize++;

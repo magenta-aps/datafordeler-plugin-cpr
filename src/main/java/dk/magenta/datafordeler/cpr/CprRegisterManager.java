@@ -25,6 +25,7 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,16 +137,20 @@ public class CprRegisterManager extends RegisterManager {
 
     public FtpCommunicator getFtpCommunicator(URI eventInterface, EntityManager cprEntityManager) throws DataStreamException {
         CprConfiguration configuration = this.configurationManager.getConfiguration();
-        return new FtpCommunicator(
-                configuration.getRegisterFtpUsername(cprEntityManager),
-                configuration.getRegisterFtpPassword(cprEntityManager),
-                eventInterface != null && "ftps".equals(eventInterface.getScheme()),
-                this.proxyString,
-                this.localCopyFolder,
-                true,
-                false,
-                false
-        );
+        try {
+            return new FtpCommunicator(
+                    configuration.getRegisterFtpUsername(cprEntityManager),
+                    configuration.getRegisterFtpPassword(cprEntityManager),
+                    eventInterface != null && "ftps".equals(eventInterface.getScheme()),
+                    this.proxyString,
+                    this.localCopyFolder,
+                    true,
+                    false,
+                    false
+            );
+        } catch (GeneralSecurityException | IOException e) {
+            throw new DataStreamException(e);
+        }
     }
 
     public void setProxyString(String proxyString) {

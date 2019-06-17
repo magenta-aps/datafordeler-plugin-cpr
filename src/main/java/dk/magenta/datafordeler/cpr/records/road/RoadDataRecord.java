@@ -4,20 +4,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
-import dk.magenta.datafordeler.cpr.data.road.RoadEffect;
-import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
-import dk.magenta.datafordeler.cpr.records.CprGeoRecord;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
+import dk.magenta.datafordeler.cpr.records.CprDataRecord;
+import dk.magenta.datafordeler.cpr.records.road.data.CprBitemporalRoadRecord;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 /**
  * Superclass for Road records
  */
-public abstract class RoadDataRecord extends CprGeoRecord<RoadEffect, RoadBaseData> {
+public abstract class RoadDataRecord extends CprDataRecord {
 
     public static final String RECORDTYPE_ROAD = "001";
     public static final String RECORDTYPE_ROADCITY = "003";
@@ -31,31 +29,6 @@ public abstract class RoadDataRecord extends CprGeoRecord<RoadEffect, RoadBaseDa
         this.obtain("vejkod", 8, 4);
     }
 
-
-
-
-    protected RoadBaseData getBaseDataItem(HashMap<RoadEffect, RoadBaseData> data) {
-        return this.getBaseDataItem(data, null, false, null, false);
-    }
-
-    protected RoadBaseData getBaseDataItem(HashMap<RoadEffect, RoadBaseData> data, OffsetDateTime effectFrom, boolean effectFromUncertain) {
-        return this.getBaseDataItem(data, effectFrom, effectFromUncertain, null, false);
-    }
-
-    protected RoadBaseData getBaseDataItem(HashMap<RoadEffect, RoadBaseData> data, OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
-        RoadEffect effect = null;
-        for (RoadEffect e : data.keySet()) {
-            if (e.compareRange(effectFrom, effectFromUncertain, effectTo, effectToUncertain)) {
-                effect = e;
-                break;
-            }
-        }
-        if (effect == null) {
-            effect = this.createEffect(effectFrom, effectFromUncertain, effectTo, effectToUncertain);
-            data.put(effect, this.createEmptyBaseData());
-        }
-        return data.get(effect);
-    }
 
     public boolean filter(ObjectNode importConfiguration) {
         if (importConfiguration != null && importConfiguration.size() > 0) {
@@ -89,11 +62,6 @@ public abstract class RoadDataRecord extends CprGeoRecord<RoadEffect, RoadBaseDa
     }
 
 
-
-
-
-
-
     public int getMunicipalityCode() {
         return this.getInt("komkod");
     }
@@ -102,20 +70,6 @@ public abstract class RoadDataRecord extends CprGeoRecord<RoadEffect, RoadBaseDa
         return this.getInt("vejkod");
     }
 
-    public HashSet<OffsetDateTime> getRegistrationTimestamps() {
-        return new HashSet<>();
-    }
-
-    protected RoadBaseData createEmptyBaseData() {
-        return new RoadBaseData();
-    }
-
-    @Override
-    protected RoadEffect createEffect(OffsetDateTime effectFrom, boolean effectFromUncertain, OffsetDateTime effectTo, boolean effectToUncertain) {
-        RoadEffect effect = new RoadEffect(null, effectFrom, effectTo);
-        effect.setEffectFromUncertain(effectFromUncertain);
-        effect.setEffectToUncertain(effectToUncertain);
-        return effect;
-    }
+    public abstract List<CprBitemporalRecord> getBitemporalRecords();
 
 }

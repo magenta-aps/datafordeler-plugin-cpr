@@ -15,8 +15,6 @@ import org.apache.ftpserver.usermanager.impl.WritePermission;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.List;
 

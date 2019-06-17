@@ -54,6 +54,7 @@ public abstract class CprNontemporalRecord<E extends CprRecordEntity, S extends 
 
     @Column(length = 1024)
     //@Transient
+    @JsonIgnore
     public String line;
 
 
@@ -71,6 +72,7 @@ public abstract class CprNontemporalRecord<E extends CprRecordEntity, S extends 
     @ManyToOne(fetch = FetchType.LAZY)
     private S correctionof;
 
+    @JsonIgnore
     public S getCorrectionof() {
         return this.correctionof;
     }

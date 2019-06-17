@@ -90,7 +90,6 @@ public class PersonRecordOutputWrapper extends CprRecordOutputWrapper<PersonEnti
 
     @Override
     public Object wrapResult(PersonEntity record, BaseQuery query, Mode mode) {
-        System.out.println(this.getObjectMapper());
         CprBitemporality mustContain = new CprBitemporality(query.getRegistrationFrom(), query.getRegistrationTo(), query.getEffectFrom(), query.getEffectTo());
         return this.getNode(record, mustContain, mode);
     }
@@ -127,6 +126,7 @@ public class PersonRecordOutputWrapper extends CprRecordOutputWrapper<PersonEnti
         container.addBitemporal(PersonEntity.IO_FIELD_PNR, record.getPersonNumber(), true);
         container.addBitemporal(PersonEntity.IO_FIELD_POSITION, record.getPosition(), true);
         container.addBitemporal(PersonEntity.IO_FIELD_STATUS, record.getStatus(), true);
+        container.addBitemporal(PersonEntity.IO_FIELD_GUARDIAN, record.getGuardian(), true);
         container.addBitemporal(PersonEntity.IO_FIELD_PROTECTION, record.getProtection());
     }
 

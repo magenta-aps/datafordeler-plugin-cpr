@@ -17,7 +17,6 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonRecordQuery;
 import dk.magenta.datafordeler.cpr.records.output.PersonRecordOutputWrapper;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,7 +71,7 @@ public class RecordTest {
     }
 
     private void loadPerson(String resource, ImportMetadata importMetadata) throws DataFordelerException, IOException {
-        InputStream testData = ParseTest.class.getResourceAsStream(resource);
+        InputStream testData = RecordTest.class.getResourceAsStream(resource);
         personEntityManager.parseData(testData, importMetadata);
         testData.close();
     }
@@ -85,13 +84,12 @@ public class RecordTest {
         this.loadPerson("/persondata.txt", importMetadata);
         try {
 
-
             PersonRecordQuery query = new PersonRecordQuery();
             OffsetDateTime time = OffsetDateTime.now();
-            query.setRegistrationFrom(time);
-            query.setRegistrationTo(time);
-            query.setEffectFrom(time);
-            query.setEffectTo(time);
+            query.setRegistrationFromBefore(time);
+            query.setRegistrationToAfter(time);
+            query.setEffectFromBefore(time);
+            query.setEffectToAfter(time);
             query.applyFilters(session);
 
             query.addKommunekode(956);
@@ -112,8 +110,8 @@ public class RecordTest {
             Assert.assertEquals(0, QueryManager.getAllEntities(session, query, PersonEntity.class).size());
 
             time = OffsetDateTime.parse("2000-01-01T00:00:00Z");
-            query.setEffectFrom(time);
-            query.setEffectTo(time);
+            query.setEffectFromBefore(time);
+            query.setEffectToAfter(time);
             query.applyFilters(session);
 
             query.setEfternavn("Testersen");
@@ -123,6 +121,63 @@ public class RecordTest {
             session.close();
         }
     }
+
+
+    @Test
+    public void testPersonAddressSearch() throws DataFordelerException, IOException {
+        Session session = sessionManager.getSessionFactory().openSession();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        this.loadPerson("/persondata.txt", importMetadata);
+        try {
+
+            PersonRecordQuery query = new PersonRecordQuery();
+            OffsetDateTime time = OffsetDateTime.now();
+            query.setRegistrationFromBefore(time);
+            query.setRegistrationToAfter(time);
+            query.setEffectFromBefore(time);
+            query.setEffectToAfter(time);
+            query.applyFilters(session);
+
+            query.addVejkode(2);
+            Assert.assertEquals(0, QueryManager.getAllEntities(session, query, PersonEntity.class).size());
+            query.clearVejkode();
+
+            query.addVejkode(111);
+            Assert.assertEquals(1, QueryManager.getAllEntities(session, query, PersonEntity.class).size());
+            query.clearVejkode();
+
+            query.addHouseNo("2");
+            Assert.assertEquals(0, QueryManager.getAllEntities(session, query, PersonEntity.class).size());
+            query.clearHouseNo();
+
+            query.addHouseNo("3");
+            Assert.assertEquals(1, QueryManager.getAllEntities(session, query, PersonEntity.class).size());
+            query.clearHouseNo();
+
+            query.addFloor("01");
+            Assert.assertEquals(0, QueryManager.getAllEntities(session, query, PersonEntity.class).size());
+            query.clearFloor();
+
+            query.addFloor("02");
+            Assert.assertEquals(1, QueryManager.getAllEntities(session, query, PersonEntity.class).size());
+            query.clearFloor();
+
+            query.addDoor("3");
+            Assert.assertEquals(0, QueryManager.getAllEntities(session, query, PersonEntity.class).size());
+            query.clearDoor();
+
+            query.addDoor("4");
+            Assert.assertEquals(1, QueryManager.getAllEntities(session, query, PersonEntity.class).size());
+            query.clearDoor();
+
+        } finally {
+            session.close();
+        }
+    }
+
+
+
 
     @Test
     public void testUpdatePerson() throws IOException, DataFordelerException {

@@ -3,19 +3,27 @@ package dk.magenta.datafordeler.cpr.configuration;
 import dk.magenta.datafordeler.core.configuration.Configuration;
 import dk.magenta.datafordeler.core.exception.ConfigurationException;
 import dk.magenta.datafordeler.core.plugin.EntityManager;
+import dk.magenta.datafordeler.core.util.Encryption;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.residence.ResidenceEntityManager;
 import dk.magenta.datafordeler.cpr.data.road.RoadEntityManager;
+/*import dk.magenta.datafordeler.cpr.parsers.PersonParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;*/
 
 import javax.persistence.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.GeneralSecurityException;
 
 @javax.persistence.Entity
 @Table(name="cpr_config")
 public class CprConfiguration implements Configuration {
+
+    //private Logger log = LogManager.getLogger(PersonParser.class);
 
     public enum Charset {
         US_ASCII(0),
@@ -89,6 +97,15 @@ public class CprConfiguration implements Configuration {
     @Enumerated(EnumType.ORDINAL)
     private Charset personRegisterDataCharset = Charset.ISO_8859_1;
 
+    @Column
+    private byte[] personRegisterPasswordEncrypted;
+
+    @Transient
+    private File personRegisterPasswordEncryptionFile;
+
+    public void setPersonRegisterPasswordEncryptionFile(File personRegisterPasswordEncryptionFile) {
+        this.personRegisterPasswordEncryptionFile = personRegisterPasswordEncryptionFile;
+    }
 
 
     @Column
@@ -120,6 +137,15 @@ public class CprConfiguration implements Configuration {
     @Enumerated(EnumType.ORDINAL)
     private Charset roadRegisterDataCharset = Charset.ISO_8859_1;
 
+    @Column
+    private byte[] roadRegisterPasswordEncrypted;
+
+    @Transient
+    private File roadRegisterPasswordEncryptionFile;
+
+    public void setRoadRegisterPasswordEncryptionFile(File roadRegisterPasswordEncryptionFile) {
+        this.roadRegisterPasswordEncryptionFile = roadRegisterPasswordEncryptionFile;
+    }
 
 
     @Column
@@ -152,6 +178,15 @@ public class CprConfiguration implements Configuration {
     private Charset residenceRegisterDataCharset = Charset.ISO_8859_1;
 
 
+    @Column
+    private byte[] residenceRegisterPasswordEncrypted;
+
+    @Transient
+    private File residenceRegisterPasswordEncryptionFile;
+
+    public void setResidenceRegisterPasswordEncryptionFile(File residenceRegisterPasswordEncryptionFile) {
+        this.residenceRegisterPasswordEncryptionFile = residenceRegisterPasswordEncryptionFile;
+    }
 
 
 
@@ -180,8 +215,8 @@ public class CprConfiguration implements Configuration {
         return this.personRegisterFtpUsername;
     }
 
-    public String getPersonRegisterFtpPassword() {
-        return this.personRegisterFtpPassword;
+    public String getPersonRegisterFtpPassword() throws GeneralSecurityException, IOException {
+        return Encryption.decrypt(this.personRegisterPasswordEncryptionFile, this.personRegisterPasswordEncrypted);
     }
 
     public String getPersonRegisterLocalFile() {
@@ -233,8 +268,8 @@ public class CprConfiguration implements Configuration {
         return this.roadRegisterFtpUsername;
     }
 
-    public String getRoadRegisterFtpPassword() {
-        return this.roadRegisterFtpPassword;
+    public String getRoadRegisterFtpPassword() throws GeneralSecurityException, IOException {
+        return Encryption.decrypt(this.roadRegisterPasswordEncryptionFile, this.roadRegisterPasswordEncrypted);
     }
 
     public String getRoadRegisterLocalFile() {
@@ -283,8 +318,8 @@ public class CprConfiguration implements Configuration {
         return this.residenceRegisterFtpUsername;
     }
 
-    public String getResidenceRegisterFtpPassword() {
-        return this.residenceRegisterFtpPassword;
+    public String getResidenceRegisterFtpPassword() throws GeneralSecurityException, IOException {
+        return Encryption.decrypt(this.residenceRegisterPasswordEncryptionFile, this.residenceRegisterPasswordEncrypted);
     }
 
     public String getResidenceRegisterLocalFile() {
@@ -369,7 +404,7 @@ public class CprConfiguration implements Configuration {
         return null;
     }
 
-    public String getRegisterFtpPassword(EntityManager entityManager) {
+    public String getRegisterFtpPassword(EntityManager entityManager) throws GeneralSecurityException, IOException {
         if (entityManager instanceof PersonEntityManager) {
             return this.getPersonRegisterFtpPassword();
         }
@@ -487,8 +522,8 @@ public class CprConfiguration implements Configuration {
         this.personRegisterFtpUsername = personRegisterFtpUsername;
     }
 
-    public void setPersonRegisterFtpPassword(String personRegisterFtpPassword) {
-        this.personRegisterFtpPassword = personRegisterFtpPassword;
+    public void setPersonRegisterFtpPassword(String personRegisterFtpPassword) throws GeneralSecurityException, IOException {
+        this.personRegisterPasswordEncrypted = Encryption.encrypt(this.personRegisterPasswordEncryptionFile, personRegisterFtpPassword);
     }
 
     public void setPersonRegisterLocalFile(String personRegisterLocalFile) {
@@ -515,8 +550,8 @@ public class CprConfiguration implements Configuration {
         this.roadRegisterFtpUsername = roadRegisterFtpUsername;
     }
 
-    public void setRoadRegisterFtpPassword(String roadRegisterFtpPassword) {
-        this.roadRegisterFtpPassword = roadRegisterFtpPassword;
+    public void setRoadRegisterFtpPassword(String roadRegisterFtpPassword) throws GeneralSecurityException, IOException {
+        this.roadRegisterPasswordEncrypted = Encryption.encrypt(this.roadRegisterPasswordEncryptionFile, roadRegisterFtpPassword);
     }
 
     public void setRoadRegisterLocalFile(String roadRegisterLocalFile) {
@@ -543,8 +578,8 @@ public class CprConfiguration implements Configuration {
         this.residenceRegisterFtpUsername = residenceRegisterFtpUsername;
     }
 
-    public void setResidenceRegisterFtpPassword(String residenceRegisterFtpPassword) {
-        this.residenceRegisterFtpPassword = residenceRegisterFtpPassword;
+    public void setResidenceRegisterFtpPassword(String residenceRegisterFtpPassword) throws GeneralSecurityException, IOException {
+        this.residenceRegisterPasswordEncrypted = Encryption.encrypt(this.residenceRegisterPasswordEncryptionFile, residenceRegisterFtpPassword);
     }
 
     public void setResidenceRegisterLocalFile(String residenceRegisterLocalFile) {
@@ -553,5 +588,59 @@ public class CprConfiguration implements Configuration {
 
     public void setResidenceRegisterDataCharset(Charset residenceRegisterDataCharset) {
         this.residenceRegisterDataCharset = residenceRegisterDataCharset;
+    }
+
+
+
+
+
+    public boolean encryptPersonRegisterPassword() {
+        if (
+                this.personRegisterPasswordEncryptionFile != null &&
+                !(this.personRegisterFtpPassword == null || this.personRegisterFtpPassword.isEmpty()) &&
+                (this.personRegisterPasswordEncrypted == null || this.personRegisterPasswordEncrypted.length == 0)
+                ) {
+            try {
+                this.personRegisterPasswordEncrypted = Encryption.encrypt(this.personRegisterPasswordEncryptionFile, this.personRegisterFtpPassword);
+                return true;
+            } catch (GeneralSecurityException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+
+    public boolean encryptRoadRegisterPassword() {
+        if (
+                this.roadRegisterPasswordEncryptionFile != null &&
+                !(this.roadRegisterFtpPassword == null || this.roadRegisterFtpPassword.isEmpty()) &&
+                (this.roadRegisterPasswordEncrypted == null || this.roadRegisterPasswordEncrypted.length == 0)
+                ) {
+            try {
+                this.roadRegisterPasswordEncrypted = Encryption.encrypt(this.roadRegisterPasswordEncryptionFile, this.roadRegisterFtpPassword);
+                return true;
+            } catch (GeneralSecurityException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+
+    public boolean encryptResidenceRegisterPassword() {
+        if (
+                this.residenceRegisterPasswordEncryptionFile != null &&
+                !(this.residenceRegisterFtpPassword == null || this.residenceRegisterFtpPassword.isEmpty()) &&
+                (this.residenceRegisterPasswordEncrypted == null || this.residenceRegisterPasswordEncrypted.length == 0)
+                ) {
+            try {
+                this.residenceRegisterPasswordEncrypted = Encryption.encrypt(this.residenceRegisterPasswordEncryptionFile, this.residenceRegisterFtpPassword);
+                return true;
+            } catch (GeneralSecurityException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
     }
 }

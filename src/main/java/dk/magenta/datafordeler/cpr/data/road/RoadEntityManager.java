@@ -1,23 +1,30 @@
 package dk.magenta.datafordeler.cpr.data.road;
 
-import dk.magenta.datafordeler.core.database.RegistrationReference;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import dk.magenta.datafordeler.core.database.SessionManager;
-import dk.magenta.datafordeler.cpr.data.CprGeoEntityManager;
-import dk.magenta.datafordeler.cpr.data.road.data.RoadBaseData;
+import dk.magenta.datafordeler.core.io.ImportMetadata;
+import dk.magenta.datafordeler.core.io.Receipt;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.parsers.RoadParser;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.road.RoadDataRecord;
+import dk.magenta.datafordeler.cpr.records.road.data.CprBitemporalRoadRecord;
+import dk.magenta.datafordeler.cpr.records.road.data.RoadEntity;
+import dk.magenta.datafordeler.cpr.records.service.RoadEntityRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.UUID;
 
-@Component("cprRoadEntityMananger")
-public class RoadEntityManager extends CprGeoEntityManager<RoadDataRecord, RoadEntity, RoadRegistration, RoadEffect, RoadBaseData> {
-
+@Component
+public class RoadEntityManager extends CprRecordEntityManager<RoadDataRecord, RoadEntity> {
+    
     @Autowired
-    private RoadEntityService roadEntityService;
+    private RoadEntityRecordService roadEntityService;
 
     @Autowired
     private RoadParser roadParser;
@@ -25,11 +32,11 @@ public class RoadEntityManager extends CprGeoEntityManager<RoadDataRecord, RoadE
     @Autowired
     private SessionManager sessionManager;
 
+    private static RoadEntityManager instance;
+
     public RoadEntityManager() {
-        this.managedEntityClass = RoadEntity.class;
-        this.managedEntityReferenceClass = RoadEntityReference.class;
-        this.managedRegistrationClass = RoadRegistration.class;
         this.managedRegistrationReferenceClass = RoadRegistrationReference.class;
+        instance = this;
     }
 
     @Override
@@ -38,7 +45,7 @@ public class RoadEntityManager extends CprGeoEntityManager<RoadDataRecord, RoadE
     }
 
     @Override
-    public RoadEntityService getEntityService() {
+    public RoadEntityRecordService getEntityService() {
         return this.roadEntityService;
     }
 
@@ -53,9 +60,10 @@ public class RoadEntityManager extends CprGeoEntityManager<RoadDataRecord, RoadE
     }
 
     @Override
-    protected RegistrationReference createRegistrationReference(URI uri) {
-        return new RoadRegistrationReference(uri);
+    protected URI getReceiptEndpoint(Receipt receipt) {
+        return null;
     }
+
 
     @Override
     protected SessionManager getSessionManager() {
@@ -79,15 +87,31 @@ public class RoadEntityManager extends CprGeoEntityManager<RoadDataRecord, RoadE
 
     @Override
     protected RoadEntity createBasicEntity(RoadDataRecord record) {
-        RoadEntity roadEntity = new RoadEntity();
-        roadEntity.setKommunekode(record.getMunicipalityCode());
-        roadEntity.setVejkode(record.getRoadCode());
-        return roadEntity;
+        RoadEntity entity = new RoadEntity();
+        entity.setRoadcode(record.getRoadCode());
+        entity.setMunicipalityCode(record.getMunicipalityCode());
+        return entity;
     }
 
-    @Override
-    protected RoadBaseData createDataItem() {
-        return new RoadBaseData();
+    protected void parseAlternate(RoadEntity entity, Collection<RoadDataRecord> records, ImportMetadata importMetadata) {
+        OffsetDateTime updateTime = importMetadata.getImportTime();
+        for (RoadDataRecord record : records) {
+            for (CprBitemporalRecord bitemporalRecord : record.getBitemporalRecords()) {
+                bitemporalRecord.setDafoUpdated(updateTime);
+                bitemporalRecord.setOrigin(record.getOrigin());
+                bitemporalRecord.line = record.getLine();
+                entity.addBitemporalRecord((CprBitemporalRoadRecord) bitemporalRecord, importMetadata.getSession());
+            }
+        }
+    }
+
+    public static String json(Object o) {
+        try {
+            return instance.getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
