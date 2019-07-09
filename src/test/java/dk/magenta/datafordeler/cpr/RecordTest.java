@@ -16,6 +16,7 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonRecordQuery;
 import dk.magenta.datafordeler.cpr.records.output.PersonRecordOutputWrapper;
+import dk.magenta.datafordeler.cpr.records.person.data.ChurchVerificationDataRecord;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Test;
@@ -225,6 +226,96 @@ public class RecordTest {
         }
     }
 
+    /**
+     * Test that when new addresses is added to a person the former added adresses is bitemporally closed
+     * @throws IOException
+     * @throws DataFordelerException
+     */
+    @Test
+    public void testPersonAddressCloseLastActive() throws IOException, DataFordelerException {
+        Session session = sessionManager.getSessionFactory().openSession();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        this.loadPerson("/overwrite_cpr_import.txt", importMetadata);
+        try {
+            PersonRecordQuery query = new PersonRecordQuery();
+            query.setPersonnummer("0101010123");
+            OffsetDateTime time = OffsetDateTime.now();
+            query.setEffectToAfter(time);
+            query.setRegistrationToAfter(time);
+            query.applyFilters(session);
+            List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
+            PersonEntity personEntity = entities.get(0);
+            Assert.assertEquals(1, personEntity.getAddress().size());
+            Assert.assertEquals("F", personEntity.getAddress().iterator().next().getBuildingNumber());
+        } finally {
+            session.close();
+        }
+    }
+
+    /**
+     * Test that when new addresses is added to a person the former added adresses is bitemporally closed
+     * @throws IOException
+     * @throws DataFordelerException
+     */
+    @Test
+    public void testCivilstatePersonCloseLastActive() throws IOException, DataFordelerException {
+        Session session = sessionManager.getSessionFactory().openSession();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        this.loadPerson("/overwrite_civilstate.txt", importMetadata);
+
+        try {
+            PersonRecordQuery query = new PersonRecordQuery();
+            query.setPersonnummer("0101010123");
+            OffsetDateTime time = OffsetDateTime.now();
+            query.setEffectToAfter(time);
+            query.setRegistrationToAfter(time);
+            query.applyFilters(session);
+
+            List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
+            PersonEntity personEntity = entities.get(0);
+            Assert.assertEquals(1, personEntity.getCivilstatus().size());
+            Assert.assertEquals("0101010124", personEntity.getCivilstatus().iterator().next().getSpouseCpr());
+
+
+        } finally {
+            session.close();
+        }
+    }
+
+    /**
+     * Test that when new addresses is added to a person the former added adresses is bitemporally closed
+     * @throws IOException
+     * @throws DataFordelerException
+     */
+    @Test
+    public void testBirthPersonCloseLastActive() throws IOException, DataFordelerException {
+        Session session = sessionManager.getSessionFactory().openSession();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        this.loadPerson("/overwrite_birth_import.txt", importMetadata);
+
+        try {
+            PersonRecordQuery query = new PersonRecordQuery();
+            query.setPersonnummer("0101010123");
+            OffsetDateTime time = OffsetDateTime.now();
+
+            query.setEffectToAfter(time);
+            query.setRegistrationToAfter(time);
+            query.applyFilters(session);
+
+            List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
+            PersonEntity personEntity = entities.get(0);
+            Assert.assertEquals(1, personEntity.getFather().size());
+            Assert.assertEquals(1, personEntity.getMother().size());
+            Assert.assertEquals("0101900125", personEntity.getFather().iterator().next().getCprNumber());
+            Assert.assertEquals("Bo", personEntity.getFather().iterator().next().getName());
+            Assert.assertEquals("0101900124", personEntity.getMother().iterator().next().getCprNumber());
+        } finally {
+            session.close();
+        }
+    }
 
     @Test
     public void testPersonIdempotence() throws Exception {
