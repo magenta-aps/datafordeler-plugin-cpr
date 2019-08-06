@@ -32,9 +32,7 @@ public class CprDirectLookup {
 
 
     private CprConfiguration getConfiguration() {
-        CprConfiguration configuration = configurationManager.getConfiguration();
-        configuration.setDirectPasswordPasswordEncryptionFile(new File("local/cpr/keyfile.json"));
-        return configuration;
+        return configurationManager.getConfiguration();
     }
 
     private boolean login() throws IOException, GeneralSecurityException {
