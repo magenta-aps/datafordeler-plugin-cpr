@@ -513,7 +513,7 @@ public class CprConfiguration implements Configuration {
         return this.directUsername;
     }
 
-    public String getDirectPassword() {
+    public String getDirectPassword() throws GeneralSecurityException, IOException {
         return Encryption.decrypt(this.directPasswordPasswordEncryptionFile, this.directPasswordEncrypted);
     }
 
@@ -658,7 +658,7 @@ public class CprConfiguration implements Configuration {
         this.directUsername = directUsername;
     }
 
-    public void setDirectPassword(String directPassword) {
+    public void setDirectPassword(String directPassword) throws GeneralSecurityException, IOException {
         this.directPasswordEncrypted = Encryption.encrypt(this.directPasswordPasswordEncryptionFile, directPassword);
     }
 
