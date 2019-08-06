@@ -191,6 +191,37 @@ public class CprConfiguration implements Configuration {
 
 
 
+    @Column
+    private String directTransactionCode = "OFF4";
+
+    @Column
+    private int directCustomerNumber = 0;
+
+    @Column
+    private String directUsername = "";
+
+    @Column
+    private byte[] directPasswordEncrypted;
+
+    @Transient
+    private File directPasswordPasswordEncryptionFile;
+
+    public void setDirectPasswordPasswordEncryptionFile(File directPasswordPasswordEncryptionFile) {
+        this.directPasswordPasswordEncryptionFile = directPasswordPasswordEncryptionFile;
+    }
+
+    @Column
+    private String directHost = "direkte.cpr.dk";
+
+    @Column
+    private short directPort = 5000;
+
+
+
+
+
+
+
     public String getPersonRegisterPullCronSchedule() {
         return this.personRegisterPullCronSchedule;
     }
@@ -470,6 +501,31 @@ public class CprConfiguration implements Configuration {
     }
 
 
+    public String getDirectTransactionCode() {
+        return this.directTransactionCode;
+    }
+
+    public int getDirectCustomerNumber() {
+        return this.directCustomerNumber;
+    }
+
+    public String getDirectUsername() {
+        return this.directUsername;
+    }
+
+    public String getDirectPassword() {
+        return Encryption.decrypt(this.directPasswordPasswordEncryptionFile, this.directPasswordEncrypted);
+    }
+
+    public String getDirectHost() {
+        return this.directHost;
+    }
+
+    public short getDirectPort() {
+        return this.directPort;
+    }
+
+
 
     private String formatCharset(Charset charset) {
         if (charset != null) {
@@ -590,7 +646,29 @@ public class CprConfiguration implements Configuration {
         this.residenceRegisterDataCharset = residenceRegisterDataCharset;
     }
 
+    public void setDirectTransactionCode(String directTransactionCode) {
+        this.directTransactionCode = directTransactionCode;
+    }
 
+    public void setDirectCustomerNumber(int directCustomerNumber) {
+        this.directCustomerNumber = directCustomerNumber;
+    }
+
+    public void setDirectUsername(String directUsername) {
+        this.directUsername = directUsername;
+    }
+
+    public void setDirectPassword(String directPassword) {
+        this.directPasswordEncrypted = Encryption.encrypt(this.directPasswordPasswordEncryptionFile, directPassword);
+    }
+
+    public void setDirectHost(String directHost) {
+        this.directHost = directHost;
+    }
+
+    public void setDirectPort(short directPort) {
+        this.directPort = directPort;
+    }
 
 
 
@@ -643,4 +721,5 @@ public class CprConfiguration implements Configuration {
         }
         return false;
     }
+
 }
