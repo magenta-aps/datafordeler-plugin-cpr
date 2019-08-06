@@ -7,9 +7,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,6 +30,10 @@ public class CprDirectLookup {
 
     private Logger log = LogManager.getLogger(CprDirectLookup.class.getCanonicalName());
 
+    @PostConstruct
+    public void init() {
+        this.socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+    }
 
     private CprConfiguration getConfiguration() {
         return configurationManager.getConfiguration();
@@ -39,10 +43,9 @@ public class CprDirectLookup {
         CprConfiguration configuration = this.getConfiguration();
 
         String transactionCode = configuration.getDirectTransactionCode();
-        String customerNumber = String.format("%4d", configuration.getDirectCustomerNumber());
+        String customerNumber = String.format("%04d", configuration.getDirectCustomerNumber());
         String username = String.format("%-8.8s", configuration.getDirectUsername());
         String password = String.format("%-8.8s", configuration.getDirectPassword());
-
 
         log.info("Logging in to CPR Direkte with customerNumber "+customerNumber);
 
@@ -95,14 +98,13 @@ public class CprDirectLookup {
             String request = String.format("%-39.39s",
                     configuration.getDirectTransactionCode() +
                             "," +
-                            configuration.getDirectCustomerNumber() +
+                            String.format("%04d", configuration.getDirectCustomerNumber()) +
                             dataType +
                             this.authToken +
                             configuration.getDirectUsername() +
                             "00" +
                             pnr
             ); // must be 39 bytes
-            System.out.println("Sending request:\n" + request);
 
             String response = this.request(request);
 
@@ -140,8 +142,6 @@ public class CprDirectLookup {
 
         InputStream is = client.getInputStream();
 
-        System.out.println("Reading response from CPR:");
-
         byte[] response = new byte[4096];
         int totalResponseLength = 0;
         int responseLength;
@@ -168,19 +168,12 @@ public class CprDirectLookup {
         int errorCode = Integer.parseInt(
                 response.substring(startErrorResponse, startErrorResponse + 2)
         );
-        System.out.println("Error number: " + errorCode);
 
         if (errorCode != 0) {
             // extended reason code available after standard error code
-            System.out.println("Reason code: " + Integer.parseInt(
-                    response.substring(startErrorResponse + 2, startErrorResponse + 6)
-            ));
-
-            String errorText;
-            if (!(errorText = response.substring(startDataSection, response.length()).trim()).equals("")) {
-                System.out.println("Error message: " + errorText);
-                // Log text
-            }
+            int reasonCode = Integer.parseInt(response.substring(startErrorResponse + 2, startErrorResponse + 6));
+            String reasonText = response.substring(startDataSection).trim();
+            log.info("Error reasonCode: "+reasonCode+", reasonText: "+reasonText);
         }
 
         return errorCode;
