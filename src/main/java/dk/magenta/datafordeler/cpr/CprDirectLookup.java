@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
 
 @Component
 public class CprDirectLookup {
@@ -36,7 +37,7 @@ public class CprDirectLookup {
         return configuration;
     }
 
-    private boolean login() throws IOException {
+    private boolean login() throws IOException, GeneralSecurityException {
         CprConfiguration configuration = this.getConfiguration();
 
         String transactionCode = configuration.getDirectTransactionCode();
