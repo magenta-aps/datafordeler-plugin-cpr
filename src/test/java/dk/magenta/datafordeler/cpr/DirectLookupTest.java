@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-
 public class DirectLookupTest {
 
     @Autowired
@@ -39,9 +38,6 @@ public class DirectLookupTest {
         when(configurationManager.getConfiguration()).thenReturn(configuration);
         configuration.setDirectHost("direkte-demo.cpr.dk");
         configuration.setDirectUsername("some user");
-        configuration.setDirectPasswordPasswordEncryptionFile(
-                new File("local/cpr/keyfile.json")
-        );
         configuration.setDirectPassword("nice try");
         configuration.setDirectCustomerNumber(0);
 
