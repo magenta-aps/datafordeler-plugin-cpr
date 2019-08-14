@@ -28,9 +28,6 @@ public abstract class Record extends HashMap<String, String> {
         this.line = line;
         this.obtain("type", 1, 3, false);
         String thisType = this.getRecordType();
-        if (!this.get("type").equals(thisType)) {
-            throw new ParseException("Invalid recordtype "+this.get("type")+" for class "+this.getClass().getName()+", was expecting the input to begin with "+thisType+". Input was "+line+".");
-        }
     }
 
     public String getOrigin() {
@@ -113,11 +110,21 @@ public abstract class Record extends HashMap<String, String> {
     }
 
     public int getInt(String key) {
-        return this.getInt(key, false);
+        return this.getInt(key, false, null);
     }
 
-    public int getInt(String key, boolean lenient) {
+    public int getInt(String key, Integer fallback) {
+        return this.getInt(key, false, fallback);
+    }
+    public int getInt(String key,  boolean lenient) {
+        return this.getInt(key, lenient, null);
+    }
+
+    public int getInt(String key, boolean lenient, Integer fallback) {
         String value = this.get(key);
+        if (value == null && fallback != null) {
+            return fallback;
+        }
         if (lenient) {
             value = value.replaceAll("[^\\d]", "");
         }
@@ -142,9 +149,19 @@ public abstract class Record extends HashMap<String, String> {
             return 0;
         }
     }
-
     public boolean getBoolean(String key) {
-        String value = this.get(key).toLowerCase();
+        return this.getBoolean(key, null);
+    }
+
+    public boolean getBoolean(String key, Boolean fallback) {
+        String value = this.get(key);
+        if (value == null) {
+            System.out.println(key + " is null");
+            if (fallback != null) {
+                return fallback;
+            }
+        }
+        value = value.toLowerCase();
         return value.equals("1") || value.equals("yes") || value.equals("true") || value.equals("ja") || value.equals("y") || value.equals("*");
     }
 

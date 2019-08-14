@@ -3,10 +3,10 @@ package dk.magenta.datafordeler.cpr.direct;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
+import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
+import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.Mapping;
-import dk.magenta.datafordeler.cpr.records.person.PersonRecord;
-import dk.magenta.datafordeler.cpr.records.person.data.PersonCoreDataRecord;
-import dk.magenta.datafordeler.cpr.records.person.data.PersonStatusDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 
 @Component
 public class CprDirectLookup {
@@ -95,7 +96,6 @@ public class CprDirectLookup {
         CprConfiguration configuration = this.getConfiguration(); // TODO: Cache configuration?
 
         for (int attempt = 0; attempt<3; attempt++) {
-
 
             String dataType = "06"; // "00" can also be used if no DATA section is required
 
@@ -184,52 +184,108 @@ public class CprDirectLookup {
         return errorCode;
     }
 
-    public void parseResponse(String response) throws Exception {
+    public PersonEntity parseResponse(String response) throws Exception {
         // dataType determines what records we received, and allows us to parse appropriately
         int dataType = Integer.parseInt(response.substring(5, 6));
 
         switch (dataType) {
             case 0:
-                // only header record is present, see output of response above
                 System.out.println("Only header record present. End.");
                 break;
             case 6:
-                /* one or more data records are present, so we need to determine which based on
-                   record numbers. Can also be hardcoded based on which records you have agreed
-                   to receive from CPR system */
                 ListHashMap<RecordType, String> records = this.getAvailableRecords(response);
 
                 if (records.size() == 0) {
                     System.out.println("No records found in response.");
-                    return;
+                    return null;
                 }
 
-                System.out.println("records: "+records);
-
-                int startOfRecord;
-
+                String pnr = null;
+                ArrayList<PersonDataRecord> parsedRecords = new ArrayList<>();
                 for (RecordType recordType : records.keySet()) {
                     for (String line : records.get(recordType)) {
+                        PersonDataRecord parsedRecord = null;
                         switch (recordType) {
                             case PERSON_INFO:
-                                PersonRecord personRecord = new PersonRecord(line, personRecordMapping);
-
-                                System.out.println("personRecord: "+personRecord);
-                                /*
-                                * Create record instances
-                                * Create entity
-                                * from instances, obtain data records
-                                * add to entity while ignoring historical data
-                                * */
-
+                                parsedRecord = new PersonRecord(line, personRecordMapping);
+                                break;
+                            case CURRENT_ADDR:
+                                parsedRecord = new AddressRecord(line, addressRecordMapping);
+                                break;
+                            case PROTECTION:
+                                parsedRecord = new ProtectionRecord(line, protectionRecordMapping);
+                                break;
+                            case PLAIN_ADDR:
+                                // TODO?
+                                break;
+                            case FOREIGN_ADDR:
+                                parsedRecord = new ForeignAddressRecord(line, foreignAddressRecordMapping);
+                                break;
+                            case CONTACT_ADDR:
+                                // TODO?
+                                break;
+                            case DISAPPEARANCE:
+                                break;
+                            case NAME:
+                                parsedRecord = new NameRecord(line, nameRecordMapping);
+                                break;
+                            case BIRTHPLACE:
+                                parsedRecord = new BirthRecord(line, birthRecordMapping);
+                                break;
+                            case CITIZENSHIP:
+                                parsedRecord = new CitizenshipRecord(line, citizenshipRecordMapping);
+                                break;
+                            case CHURCH:
+                                parsedRecord = new ChurchRecord(line, churchRecordMapping);
+                                break;
+                            case CIVILSTATUS:
+                                parsedRecord = new CivilStatusRecord(line, civilstatusRecordMapping);
+                                break;
+                            case SEPARATION:
+                                break;
+                            case CHILDREN:
+                                break;
+                            case PARENTS:
+                                parsedRecord = new PersonRecord(line, parentRecordMapping);
+                                break;
+                            case CUSTODY:
+                                break;
+                            case UNMANAGE:
+                                parsedRecord = new GuardianRecord(line, guardianRecordMapping);
+                                break;
+                            case MUNICIPAL_RELATION:
+                                break;
+                            case CREDIT_WARNING:
+                                break;
+                            case UNMANAGE_EXTRA:
+                                break;
+                            default:
+                                System.out.println("Not parsing record type "+recordType);
+                                break;
+                        }
+                        if (parsedRecord != null) {
+                            if (pnr == null) {
+                                pnr = parsedRecord.getCprNumber();
+                            }
+                            parsedRecords.add(parsedRecord);
                         }
                     }
                 }
 
-                break;
+                if (pnr != null) {
+                    PersonEntity entity = new PersonEntity(PersonEntity.generateUUID(pnr), "Direct lookup");
+                    entity.setPersonnummer(pnr);
+                    for (PersonDataRecord r : parsedRecords) {
+                        for (CprBitemporalRecord bitemporalRecord : r.getBitemporalRecords()) {
+                            entity.addBitemporalRecord((CprBitemporalPersonRecord) bitemporalRecord, null, false);
+                        }
+                    }
+                    return entity;
+                }
             default:
                 System.err.println("Unrecognized record data type: " + dataType);
         }
+        return null;
     }
 
     private static Mapping personRecordMapping = new Mapping();
@@ -247,6 +303,135 @@ public class CprDirectLookup {
         personRecordMapping.add("slut_dt_umrk-person", 72, 1);
         personRecordMapping.add("stilling", 73, 34);
     }
+
+    private static Mapping addressRecordMapping = new Mapping();
+    static {
+        addressRecordMapping.add("komkod", 14, 4);
+        addressRecordMapping.add("vejkod", 18, 4);
+        addressRecordMapping.add("husnr", 22, 4);
+        addressRecordMapping.add("etage", 26, 2);
+        addressRecordMapping.add("sidedoer", 28, 4);
+        addressRecordMapping.add("bnr", 32, 4);
+        addressRecordMapping.add("convn", 36, 34);
+        addressRecordMapping.add("tilflydto", 70, 12);
+        addressRecordMapping.add("tilflydto_umrk", 82, 1);
+        addressRecordMapping.add("tilflykomdto", 83, 12);
+        addressRecordMapping.add("tilflykomdt_umrk", 95, 1);
+        addressRecordMapping.add("fraflykomkod", 96, 4);
+        addressRecordMapping.add("fraflykomdto", 100, 12);
+        addressRecordMapping.add("fraflykomdt_umrk", 112, 1);
+        addressRecordMapping.add("start_mynkod-adrtxt", 113, 4);
+        addressRecordMapping.add("adr1-supladr", 117, 34);
+        addressRecordMapping.add("adr2-supladr", 151, 34);
+        addressRecordMapping.add("adr3-supladr", 185, 34);
+        addressRecordMapping.add("adr4-supladr", 219, 34);
+        addressRecordMapping.add("adr5-supladr", 253, 34);
+        addressRecordMapping.add("start_dt-adrtxt", 287, 10);
+        addressRecordMapping.add("slet_dt-adtxt", 297, 10);
+    }
+
+    private static Mapping protectionRecordMapping = new Mapping();
+    static {
+        protectionRecordMapping.add("beskyttype", 14, 4);
+        protectionRecordMapping.add("start_dt-beskyttelse", 18, 10);
+        protectionRecordMapping.add("slut_dt-beskyttelse", 28, 10);
+    }
+
+    private static Mapping foreignAddressRecordMapping = new Mapping();
+    static {
+        foreignAddressRecordMapping.add("udr_landekod", 14, 4);
+        foreignAddressRecordMapping.add("udrdto", 18, 12);
+        foreignAddressRecordMapping.add("udrdto_umrk", 30, 1);
+        foreignAddressRecordMapping.add("udlandadr1", 31, 34);
+        foreignAddressRecordMapping.add("udlandadr2", 65, 34);
+        foreignAddressRecordMapping.add("udlandadr3", 99, 34);
+        foreignAddressRecordMapping.add("udlandadr4", 133, 34);
+        foreignAddressRecordMapping.add("udlandadr5", 167, 34);
+    }
+
+    private static Mapping nameRecordMapping = new Mapping();
+    static {
+        nameRecordMapping.add("fornvn", 14, 50);
+        nameRecordMapping.add("fornvn_mrk", 64, 1);
+        nameRecordMapping.add("melnvn", 65, 40);
+        nameRecordMapping.add("melnvn_mrk", 105, 1);
+        nameRecordMapping.add("efternvn", 106, 40);
+        nameRecordMapping.add("efternvn_mrk", 146, 1);
+        nameRecordMapping.add("nvnhaenstart", 147, 12);
+        nameRecordMapping.add("haenstart_umrk-navne", 159, 1);
+        nameRecordMapping.add("adrnvn", 160, 34);
+    }
+
+    private static Mapping birthRecordMapping = new Mapping();
+    static {
+        birthRecordMapping.add("start_mynkod-fødested", 14, 4);
+        birthRecordMapping.add("myntxt-fødested", 18, 20);
+    }
+
+    public static final Mapping citizenshipRecordMapping = new Mapping();
+    static {
+        citizenshipRecordMapping.add("landekod", 14, 4);
+        citizenshipRecordMapping.add("haenstart-statsborgerskab", 18, 12);
+        citizenshipRecordMapping.add("haenstart_umrk-statsborgerskab", 30, 1);
+    }
+
+    public static final Mapping churchRecordMapping = new Mapping();
+    static {
+        churchRecordMapping.add("fkirk", 14, 1);
+        churchRecordMapping.add("start_dt-folkekirke", 15, 10);
+        churchRecordMapping.add("start_dt-umrk-folkekirke", 25, 1);
+    }
+
+    public static final Mapping civilstatusRecordMapping = new Mapping();
+    static {
+        civilstatusRecordMapping.add("civst", 14, 1);
+        civilstatusRecordMapping.add("aegtepnr", 15, 10);
+        civilstatusRecordMapping.add("aegtefoed_dt", 25, 10);
+        civilstatusRecordMapping.add("aegtefoeddt_umrk", 35, 1);
+        civilstatusRecordMapping.add("aegtenvn", 36, 34);
+        civilstatusRecordMapping.add("aegtenvn_mrk", 70, 1);
+        civilstatusRecordMapping.add("haenstart-civilstand", 71, 12);
+        civilstatusRecordMapping.add("haenstart_umrk-civilstand", 83, 1);
+        civilstatusRecordMapping.add("sep_henvis_ts", 84, 12);
+    }
+
+    public static final Mapping parentRecordMapping = new Mapping();
+    static {
+        parentRecordMapping.add("mor_dt", 14, 10);
+        parentRecordMapping.add("mor_dt_umrk", 24, 1);
+        parentRecordMapping.add("pnrmor", 25, 10);
+        parentRecordMapping.add("mor_foed_dt", 35, 10);
+        parentRecordMapping.add("mor_foed_dt_umrk", 45, 1);
+        parentRecordMapping.add("mornvn", 46, 34);
+        parentRecordMapping.add("mornvn_mrk", 80, 1);
+        parentRecordMapping.add("far_dt", 81, 10);
+        parentRecordMapping.add("far_dt_umrk", 91, 1);
+        parentRecordMapping.add("pnrfar", 92, 10);
+        parentRecordMapping.add("far_foed_dt", 102, 10);
+        parentRecordMapping.add("far_foed_dt_umrk", 112, 1);
+        parentRecordMapping.add("farnvn", 113, 34);
+        parentRecordMapping.add("farnvn_mrk", 147, 1);
+    }
+
+
+    public static final Mapping guardianRecordMapping = new Mapping();
+    static {
+        guardianRecordMapping.add("start_dt-umyndig", 14, 10);
+        guardianRecordMapping.add("start_dt_umrk-umyndig", 24, 1);
+        guardianRecordMapping.add("slet_dt-umyndig", 25, 10);
+        guardianRecordMapping.add("umyn_reltyp", 35, 4);
+        guardianRecordMapping.add("relpnr", 39, 10);
+        guardianRecordMapping.add("start_dt-relpnr_pnr", 49, 10);
+        guardianRecordMapping.add("reladrsat_relpnr_txt", 59, 34);
+        guardianRecordMapping.add("start_dt-relpnr_txt", 93, 10);
+        guardianRecordMapping.add("reltxt1", 103, 34);
+        guardianRecordMapping.add("reltxt2", 137, 34);
+        guardianRecordMapping.add("reltxt3", 171, 34);
+        guardianRecordMapping.add("reltxt4", 205, 34);
+        guardianRecordMapping.add("reltxt5", 239, 34);
+    }
+
+
 
     private ListHashMap<RecordType, String> getAvailableRecords(String response) throws Exception {
         ListHashMap<RecordType, String> records = new ListHashMap<>();

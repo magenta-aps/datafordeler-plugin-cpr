@@ -738,98 +738,98 @@ public class PersonEntity extends CprRecordEntity {
     }
 
 
-    public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session) {
+    public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session, boolean compareExisting) {
         boolean added = false;
         if (record instanceof AddressConameDataRecord) {
-            added = addItem(this, this.coname, record, session);
+            added = addItem(this, this.coname, record, session, compareExisting);
         }
         if (record instanceof AddressDataRecord) {
-            added = addItem(this, this.address, record, session);
+            added = addItem(this, this.address, record, session, compareExisting);
         }
         if (record instanceof AddressNameDataRecord) {
-            added = addItem(this, this.addressName, record, session);
+            added = addItem(this, this.addressName, record, session, compareExisting);
         }
         if (record instanceof BirthPlaceDataRecord) {
-            added = addItem(this, this.birthPlace, record, session);
+            added = addItem(this, this.birthPlace, record, session, compareExisting);
         }
         if (record instanceof BirthPlaceVerificationDataRecord) {
-            added = addItem(this, this.birthPlaceVerification, record, session);
+            added = addItem(this, this.birthPlaceVerification, record, session, compareExisting);
         }
         if (record instanceof BirthTimeDataRecord) {
-            added = addItem(this, this.birthTime, record, session);
+            added = addItem(this, this.birthTime, record, session, compareExisting);
         }
         if (record instanceof ChurchDataRecord) {
-            added = addItem(this, this.churchRelation, record, session);
+            added = addItem(this, this.churchRelation, record, session, compareExisting);
         }
         if (record instanceof ChurchVerificationDataRecord) {
-            added = addItem(this, this.churchRelationVerification, record, session);
+            added = addItem(this, this.churchRelationVerification, record, session, compareExisting);
         }
         if (record instanceof CitizenshipDataRecord) {
-            added = addItem(this, this.citizenship, record, session);
+            added = addItem(this, this.citizenship, record, session, compareExisting);
         }
         if (record instanceof CitizenshipVerificationDataRecord) {
-            added = addItem(this, this.citizenshipVerification, record, session);
+            added = addItem(this, this.citizenshipVerification, record, session, compareExisting);
         }
         if (record instanceof CivilStatusDataRecord) {
-            added = addItem(this, this.civilstatus, record, session);
+            added = addItem(this, this.civilstatus, record, session, compareExisting);
         }
         if (record instanceof CivilStatusAuthorityTextDataRecord) {
-            added = addItem(this, this.civilstatusAuthorityText, record, session);
+            added = addItem(this, this.civilstatusAuthorityText, record, session, compareExisting);
         }
         if (record instanceof CivilStatusVerificationDataRecord) {
-            added = addItem(this, this.civilstatusVerification, record, session);
+            added = addItem(this, this.civilstatusVerification, record, session, compareExisting);
         }
         if (record instanceof ForeignAddressDataRecord) {
-            added = addItem(this, this.foreignAddress, record, session);
+            added = addItem(this, this.foreignAddress, record, session, compareExisting);
         }
         if (record instanceof ForeignAddressEmigrationDataRecord) {
-            added = addItem(this, this.emigration, record, session);
+            added = addItem(this, this.emigration, record, session, compareExisting);
         }
         if (record instanceof MoveMunicipalityDataRecord) {
-            added = addItem(this, this.municipalityMove, record, session);
+            added = addItem(this, this.municipalityMove, record, session, compareExisting);
         }
         if (record instanceof NameAuthorityTextDataRecord) {
-            added = addItem(this, this.nameAuthorityText, record, session);
+            added = addItem(this, this.nameAuthorityText, record, session, compareExisting);
         }
         if (record instanceof NameDataRecord) {
-            added = addItem(this, this.name, record, session);
+            added = addItem(this, this.name, record, session, compareExisting);
         }
         if (record instanceof NameVerificationDataRecord) {
-            added = addItem(this, this.nameVerification, record, session);
+            added = addItem(this, this.nameVerification, record, session, compareExisting);
         }
         if (record instanceof ParentDataRecord) {
             ParentDataRecord pRecord = (ParentDataRecord) record;
             if (pRecord.isMother()) {
-                added = addItem(this, this.mother, pRecord, session);
+                added = addItem(this, this.mother, pRecord, session, compareExisting);
             } else {
-                added = addItem(this, this.father, pRecord, session);
+                added = addItem(this, this.father, pRecord, session, compareExisting);
             }
         }
         if (record instanceof ParentVerificationDataRecord) {
             ParentVerificationDataRecord pRecord = (ParentVerificationDataRecord) record;
             if (pRecord.isMother()) {
-                added = addItem(this, this.motherVerification, pRecord, session);
+                added = addItem(this, this.motherVerification, pRecord, session, compareExisting);
             } else {
-                added = addItem(this, this.fatherVerification, pRecord, session);
+                added = addItem(this, this.fatherVerification, pRecord, session, compareExisting);
             }
         }
         if (record instanceof PersonCoreDataRecord) {
-            added = addItem(this, this.core, record, session);
+            added = addItem(this, this.core, record, session, compareExisting);
         }
         if (record instanceof PersonNumberDataRecord) {
-            added = addItem(this, this.personNumber, record, session);
+            added = addItem(this, this.personNumber, record, session, compareExisting);
         }
         if (record instanceof PersonPositionDataRecord) {
-            added = addItem(this, this.position, record, session);
+            added = addItem(this, this.position, record, session, compareExisting);
         }
         if (record instanceof PersonStatusDataRecord) {
-            added = addItem(this, this.status, record, session);
+            added = addItem(this, this.status, record, session, compareExisting);
         }
         if (record instanceof ProtectionDataRecord) {
-            added = addItem(this, this.protection, record, session);
+            added = addItem(this, this.protection, record, session, compareExisting);
         }
         if (record instanceof GuardianDataRecord) {
-            added = addItem(this, this.guardian, record, session);
+            added = addItem(this, this.guardian, record, session, compareExisting);
         }
         if (added) {
             record.setEntity(this);
@@ -840,7 +840,7 @@ public class PersonEntity extends CprRecordEntity {
     private static FixedQueueMap<PersonEntity, ListHashMap<OffsetDateTime, CprBitemporalPersonRecord>> recentTechnicalCorrections = new FixedQueueMap<>(10);
 
     private static Logger log = LogManager.getLogger(PersonEntity.class.getCanonicalName());
-    private static <E extends CprBitemporalPersonRecord> boolean addItem(PersonEntity entity, Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
+    private static <E extends CprBitemporalPersonRecord> boolean addItem(PersonEntity entity, Set<E> set, CprBitemporalPersonRecord newItem, Session session, boolean compareExisting) {
 
         /*
         * Technical
@@ -855,6 +855,11 @@ public class PersonEntity extends CprRecordEntity {
         }
 
         if (newItem != null) {
+
+            if (!compareExisting) {
+                return set.add((E) newItem);
+            }
+
             E correctedRecord = null;
             E correctingRecord = null;
             ArrayList<E> items = new ArrayList<>(set);

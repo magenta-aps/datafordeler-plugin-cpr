@@ -25,6 +25,40 @@ public class PersonRecord extends PersonDataRecord {
 
     private boolean hasPnrGaeld = false;
 
+    public PersonRecord(String line) throws ParseException {
+        this(line, traditionalMapping);
+    }
+
+    public PersonRecord(String line, Mapping mapping) throws ParseException {
+        super(line);
+        this.obtain(mapping);
+
+        OffsetDateTime statusEffectTime = this.getOffsetDateTime("statushaenstart");
+        if (statusEffectTime == null) {
+            statusEffectTime = this.getOffsetDateTime("status_ts");
+        }
+        if (this.has("status_ts")) {
+            this.statusTemporality = new CprBitemporality(this.getOffsetDateTime("status_ts"), null, statusEffectTime, this.getBoolean("statusdto_umrk"), null, false);
+        }
+        if (this.has("pnrmor")) {
+            this.motherTemporality = new CprBitemporality(this.getOffsetDateTime("mor_ts"), null, this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false);
+            this.motherVerificationTemporality = new CprBitemporality(this.getOffsetDateTime("mor_dok_ts"));
+        }
+        if (this.has("pnrfar")) {
+            this.fatherTemporality = new CprBitemporality(this.getOffsetDateTime("far_ts"), null, this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false);
+            this.fatherVerificationTemporality = new CprBitemporality(this.getOffsetDateTime("far_dok_ts"));
+        }
+        if (this.has("stilling")) {
+            this.positionTemporality = new CprBitemporality(this.getOffsetDateTime("stilling_ts"));
+        }
+        if (this.has("start_ts-person")) {
+            this.birthTemporality = new CprBitemporality(this.getOffsetDateTime("start_ts-person"), null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
+        }
+        if (this.has("pnrgaeld")) {
+            this.hasPnrGaeld = !this.getString("pnrgaeld", false).trim().isEmpty();
+        }
+    }
+
     public static final Mapping traditionalMapping = new Mapping();
     static {
         traditionalMapping.add("pnrgaeld", 14, 10);
@@ -72,34 +106,10 @@ public class PersonRecord extends PersonDataRecord {
         traditionalMapping.add("far_dok", 364, 3);
     }
 
-    public PersonRecord(String line) throws ParseException {
-        this(line, traditionalMapping);
-    }
-
-    public PersonRecord(String line, Mapping mapping) throws ParseException {
-        super(line);
-        this.obtain(mapping);
-
-        OffsetDateTime statusEffectTime = this.getOffsetDateTime("statushaenstart");
-        if (statusEffectTime == null) {
-            statusEffectTime = this.getOffsetDateTime("status_ts");
-        }
-        this.statusTemporality = new CprBitemporality(this.getOffsetDateTime("status_ts"), null, statusEffectTime, this.getBoolean("statusdto_umrk"), null, false);
-        this.motherTemporality = new CprBitemporality(this.getOffsetDateTime("mor_ts"), null, this.getOffsetDateTime("mor_dt"), this.getBoolean("mor_dt_umrk"), null, false);
-        this.fatherTemporality = new CprBitemporality(this.getOffsetDateTime("far_ts"), null, this.getOffsetDateTime("far_dt"), this.getBoolean("far_dt_umrk"), null, false);
-        this.motherVerificationTemporality = new CprBitemporality(this.getOffsetDateTime("mor_dok_ts"));
-        this.fatherVerificationTemporality = new CprBitemporality(this.getOffsetDateTime("far_dok_ts"));
-        this.positionTemporality = new CprBitemporality(this.getOffsetDateTime("stilling_ts"));
-        this.birthTemporality = new CprBitemporality(this.getOffsetDateTime("start_ts-person"), null, this.getOffsetDateTime("start_dt-person"), this.getBoolean("start_dt_umrk-person"), this.getOffsetDateTime("slut_dt-person"), this.getBoolean("slut_dt_umrk-person"));
-
-        this.hasPnrGaeld = !this.getString("pnrgaeld", false).trim().isEmpty();
-    }
-
     @Override
     public String getRecordType() {
         return RECORDTYPE_PERSON;
     }
-
 
     @Override
     public List<CprBitemporalRecord> getBitemporalRecords() {
@@ -112,81 +122,97 @@ public class PersonRecord extends PersonDataRecord {
             ));
         }
 
-        records.add(new PersonStatusDataRecord(
-                this.getInt("status", true)
-        ).setBitemporality(
-                this.statusTemporality
-        ));
+        if (this.has("status")) {
+            records.add(new PersonStatusDataRecord(
+                    this.getInt("status", true)
+            ).setBitemporality(
+                    this.statusTemporality
+            ));
+        }
 
-        records.add(new ParentDataRecord(
-                true,
-                this.getString("pnrmor", false),
-                this.getDate("mor_foed_dt"),
-                this.getBoolean("mor_foed_dt_umrk"),
-                this.getString("mornvn", true),
-                this.getBoolean("mornvn_mrk")
-        ).setAuthority(
-                this.getInt("mor_mynkod")
-        ).setBitemporality(
-                this.motherTemporality
-        ));
+        if (this.has("pnrmor")) {
+            records.add(new ParentDataRecord(
+                    true,
+                    this.getString("pnrmor", false),
+                    this.getDate("mor_foed_dt"),
+                    this.getBoolean("mor_foed_dt_umrk"),
+                    this.getString("mornvn", true),
+                    this.getBoolean("mornvn_mrk")
+            ).setAuthority(
+                    this.getInt("mor_mynkod")
+            ).setBitemporality(
+                    this.motherTemporality
+            ));
+        }
 
-        records.add(new ParentVerificationDataRecord(
-                this.getBoolean("mor_dok"),
-                true
-        ).setAuthority(
-                this.getInt("mor_dok_mynkod")
-        ).setBitemporality(
-                this.motherVerificationTemporality
-        ));
+        if (this.has("mor_dok")) {
+            records.add(new ParentVerificationDataRecord(
+                    this.getBoolean("mor_dok"),
+                    true
+            ).setAuthority(
+                    this.getInt("mor_dok_mynkod")
+            ).setBitemporality(
+                    this.motherVerificationTemporality
+            ));
+        }
 
-        records.add(new ParentDataRecord(
-                false,
-                this.getString("pnrfar", false),
-                this.getDate("far_foed_dt"),
-                this.getBoolean("far_foed_dt_umrk"),
-                this.getString("farnvn", false),
-                this.getBoolean("farnvn_mrk")
-        ).setAuthority(
-                this.getInt("far_mynkod")
-        ).setBitemporality(
-                this.fatherTemporality
-        ));
+        if (this.has("pnrfar")) {
+            records.add(new ParentDataRecord(
+                    false,
+                    this.getString("pnrfar", false),
+                    this.getDate("far_foed_dt"),
+                    this.getBoolean("far_foed_dt_umrk"),
+                    this.getString("farnvn", false),
+                    this.getBoolean("farnvn_mrk")
+            ).setAuthority(
+                    this.getInt("far_mynkod")
+            ).setBitemporality(
+                    this.fatherTemporality
+            ));
+        }
 
-        records.add(new ParentVerificationDataRecord(
-                this.getBoolean("far_dok"),
-                false
-        ).setAuthority(
-                this.getInt("far_dok_mynkod")
-        ).setBitemporality(
-                this.fatherVerificationTemporality
-        ));
+        if (this.has("far_dok")) {
+            records.add(new ParentVerificationDataRecord(
+                    this.getBoolean("far_dok"),
+                    false
+            ).setAuthority(
+                    this.getInt("far_dok_mynkod")
+            ).setBitemporality(
+                    this.fatherVerificationTemporality
+            ));
+        }
 
-        records.add(new PersonPositionDataRecord(
-                this.getString("stilling", true)
-        ).setAuthority(
-                this.getInt("stilling_mynkod")
-        ).setBitemporality(
-                this.positionTemporality
-        ));
+        if (this.has("stilling")) {
+            records.add(new PersonPositionDataRecord(
+                    this.getString("stilling", true)
+            ).setAuthority(
+                    this.getInt("stilling_mynkod")
+            ).setBitemporality(
+                    this.positionTemporality
+            ));
+        }
 
-        records.add(new BirthTimeDataRecord(
-                this.getDateTime("foed_dt", "foed_tm"),
-                this.getBoolean("foed_dt_umrk"),
-                this.getInt("foedsekvens")
-        ).setAuthority(
-                this.getInt("start_mynkod-person")
-        ).setBitemporality(
-                this.birthTemporality
-        ));
+        if (this.has("foed_dt")) {
+            records.add(new BirthTimeDataRecord(
+                    this.getDateTime("foed_dt", "foed_tm"),
+                    this.getBoolean("foed_dt_umrk"),
+                    this.getInt("foedsekvens")
+            ).setAuthority(
+                    this.getInt("start_mynkod-person")
+            ).setBitemporality(
+                    this.birthTemporality
+            ));
+        }
 
-        records.add(new PersonCoreDataRecord(
-                this.getString("koen", true)
-        ).setAuthority(
-                this.getInt("start_mynkod-person")
-        ).setBitemporality(
-                this.birthTemporality
-        ));
+        if (this.has("koen")) {
+            records.add(new PersonCoreDataRecord(
+                    this.getString("koen", true)
+            ).setAuthority(
+                    this.getInt("start_mynkod-person")
+            ).setBitemporality(
+                    this.birthTemporality
+            ));
+        }
 
         return records;
     }

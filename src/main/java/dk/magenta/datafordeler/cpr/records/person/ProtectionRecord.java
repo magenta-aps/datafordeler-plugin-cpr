@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.records.person;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
+import dk.magenta.datafordeler.cpr.records.Mapping;
 import dk.magenta.datafordeler.cpr.records.person.data.ProtectionDataRecord;
 
 import java.util.ArrayList;
@@ -16,15 +17,24 @@ public class ProtectionRecord extends PersonDataRecord {
     private CprBitemporality protectionTemporality;
 
     public ProtectionRecord(String line) throws ParseException {
+        this(line, traditionalMapping);
+    }
+
+    public ProtectionRecord(String line, Mapping mapping) throws ParseException {
         super(line);
-        this.obtain("beskyttype",14,4);
-        this.obtain("start_mynkod-beskyttelse",18,4);
-        this.obtain("start_ts-beskyttelse",22,12	);
-        this.obtain("start_dt-beskyttelse",34,10	);
-        this.obtain("indrap-beskyttelse",44	,3);
-        this.obtain("slet_dt-beskyttelse",47,10);
+        this.obtain(mapping);
 
         this.protectionTemporality = new CprBitemporality(this.getOffsetDateTime("start_ts-beskyttelse"), null, this.getOffsetDateTime("start_dt-beskyttelse"), false, this.getOffsetDateTime("slet_dt-beskyttelse"), false);
+    }
+
+    public static final Mapping traditionalMapping = new Mapping();
+    static {
+        traditionalMapping.add("beskyttype",14,4);
+        traditionalMapping.add("start_mynkod-beskyttelse",18,4);
+        traditionalMapping.add("start_ts-beskyttelse",22,12	);
+        traditionalMapping.add("start_dt-beskyttelse",34,10	);
+        traditionalMapping.add("indrap-beskyttelse",44	,3);
+        traditionalMapping.add("slet_dt-beskyttelse",47,10);
     }
 
     @Override
