@@ -15,7 +15,10 @@ import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthTimeDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ParentDataRecord;
 import dk.magenta.datafordeler.cpr.records.service.PersonEntityRecordService;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -220,11 +223,13 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         this.createSubscription(addCprNumbers, new HashSet<>());
     }
 
-    private void createSubscription(HashSet<String> addCprNumbers, HashSet<String> removeCprNumbers) throws DataFordelerException {
+    /**
+     * Create subscribtions by adding them to the table of subscribtions
+     * @param addCprNumbers
+     * @param removeCprNumbers
+     */
+    private void createSubscription(HashSet<String> addCprNumbers, HashSet<String> removeCprNumbers) {
         this.log.info("Collected these numbers for subscription: "+addCprNumbers);
-        String charset = this.getConfiguration().getRegisterCharset(this);
-        String keyConstant = "";
-        StringJoiner content = new StringJoiner("\r\n");
 
         Session session = sessionManager.getSessionFactory().openSession();
         try {
@@ -237,49 +242,12 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             addCprNumbers.removeAll(removeCprNumbers);
             addCprNumbers.removeAll(map.keySet());
 
-
-            HashMap<String, HashSet<String>> loop = new HashMap<>();
-            loop.put("OP", addCprNumbers);
-            loop.put("SL", removeCprNumbers);
-
-            for (String operation : loop.keySet()) {
-                HashSet<String> cprNumbers = loop.get(operation);
-                for (String cprNumber : cprNumbers) {
-                    content.add(
-                            String.format(
-                                    "%02d%04d%02d%2s%10s%15s%45s",
-                                    6,
-                                    this.getCustomerId(),
-                                    0,
-                                    operation,
-                                    cprNumber,
-                                    keyConstant,
-                                    ""
-                            )
-                    );
-                }
-            }
-
-            for (String cprNumber : addCprNumbers) {
-                content.add(
-                        String.format(
-                                "%02d%06d%10s%15s",
-                                7,
-                                this.getJobId(),
-                                cprNumber,
-                                keyConstant,
-                                ""
-                        )
-                );
-            }
-
-            this.addSubscription(content.toString(), charset, this);
-
             session.beginTransaction();
             try {
                 for (String add : addCprNumbers) {
                     PersonSubscription newSubscription = new PersonSubscription();
                     newSubscription.setPersonNumber(add);
+                    newSubscription.setAssignment(PersonSubscriptionAssignementStatus.CreatedInTable);
                     session.save(newSubscription);
                 }
                 for (String remove : removeCprNumbers) {
@@ -297,6 +265,61 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         }
     }
 
+    /**
+     * Create the subscribtion-file from the table of subscribtions, and upload them to FTP-server
+     * @throws DataFordelerException
+     */
+    public void createSubscriptionFile() throws DataFordelerException {
+        String charset = this.getConfiguration().getRegisterCharset(this);
+
+        Transaction transaction = null;
+        try(Session session = sessionManager.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            Criteria criteria = session.createCriteria(PersonSubscription.class);
+            criteria.add(Restrictions.eq(PersonSubscription.DB_FIELD_CPR_ASSIGNMENT_STATUS, PersonSubscriptionAssignementStatus.CreatedInTable));
+            List<PersonSubscription> subscribtionList = criteria.list();
+
+            for(PersonSubscription subscription : subscribtionList) {
+                subscription.setAssignment(PersonSubscriptionAssignementStatus.UploadedToCpr);
+            }
+
+            StringJoiner content = new StringJoiner("\r\n");
+
+            for (PersonSubscription subscribtion : subscribtionList) {
+                    content.add(
+                            String.format(
+                                    "%02d%04d%02d%2s%10s%15s%45s",
+                                    6,
+                                    this.getCustomerId(),
+                                    0,
+                                    "OP",
+                                    subscribtion.getPersonNumber(),
+                                    "",
+                                    ""
+                            )
+                    );
+            }
+
+            for (PersonSubscription subscribtion : subscribtionList) {
+                content.add(
+                        String.format(
+                                "%02d%06d%10s%15s",
+                                7,
+                                this.getJobId(),
+                                subscribtion.getPersonNumber(),
+                                "",
+                                ""
+                        )
+                );
+            }
+            this.addSubscription(content.toString(), charset, this);
+            transaction.commit();
+
+        } catch(Exception e) {
+            log.error(e);
+            transaction.rollback();
+        }
+    }
 
     private HashMap<String, Integer> cnts = new HashMap<>();
 
