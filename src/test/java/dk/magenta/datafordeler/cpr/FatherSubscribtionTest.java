@@ -181,8 +181,6 @@ public class FatherSubscribtionTest {
             //One should not be added to subscribtion becrause the child is more than 18 years old.
             //One person should not be added becrause the father allready exists as a person.
             Assert.assertEquals(3, subscriptions.size());
-            File[] subFiles = localSubFolder.listFiles();
-            Assert.assertEquals(1, subFiles.length);
         } finally {
             session.close();
             localSubFolder.delete();

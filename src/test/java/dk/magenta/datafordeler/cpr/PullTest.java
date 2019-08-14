@@ -245,10 +245,10 @@ public class PullTest {
             }
         }).when(personEntityManager).getLastUpdated(any(Session.class));
 
-        File localSubFolder = File.createTempFile("foo", "bar");
-        localSubFolder.delete();
-        localSubFolder.mkdirs();
-        when(personEntityManager.getLocalSubscriptionFolder()).thenReturn(localSubFolder.getAbsolutePath());
+        File localCacheSubFolder = File.createTempFile("foo", "bar");
+        localCacheSubFolder.delete();
+        localCacheSubFolder.mkdirs();
+        when(personEntityManager.getLocalSubscriptionFolder()).thenReturn(localCacheSubFolder.getAbsolutePath());
 
         CprRegisterManager registerManager = (CprRegisterManager) plugin.getRegisterManager();
         registerManager.setProxyString(null);
@@ -300,25 +300,31 @@ public class PullTest {
         FileUtils.copyInputStreamToFile(personContents, personFile);
         personContents.close();
 
-        personFtp = new FtpService();
-        personFtp.startServer(username, password, personPort, Collections.singletonList(personFile));
-
-        pull.run();
-
-        personFtp.stopServer();
-        personFile.delete();
 
         Session session = sessionManager.getSessionFactory().openSession();
         try {
             List<PersonSubscription> subscriptions = QueryManager.getAllItems(session, PersonSubscription.class);
             Assert.assertEquals(1, subscriptions.size());
-            File[] subFiles = localSubFolder.listFiles();
+        } finally {
+            session.close();
+        }
+
+        personFtp.startServer(username, password, personPort, Collections.EMPTY_LIST);
+        File localSubFolder = File.createTempFile("foo", "bar");
+
+        try {
+            personEntityManager.createSubscriptionFile();
+
+            when(personEntityManager.getLocalSubscriptionFolder()).thenReturn(localSubFolder.getAbsolutePath());
+
+            File[] subFiles = personFtp.getTempDir().listFiles();
             Assert.assertEquals(1, subFiles.length);
             String contents = FileUtils.readFileToString(subFiles[0]);
             Assert.assertEquals("06123400OP0101001234                                                            \r\n" +
                     "071234560101001234               ", contents);
+
+            personFtp.stopServer();
         } finally {
-            session.close();
             localSubFolder.delete();
         }
     }
