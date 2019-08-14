@@ -1,7 +1,12 @@
-package dk.magenta.datafordeler.cpr;
+package dk.magenta.datafordeler.cpr.direct;
 
+import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
+import dk.magenta.datafordeler.cpr.records.Mapping;
+import dk.magenta.datafordeler.cpr.records.person.PersonRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.PersonCoreDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.PersonStatusDataRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,5 +183,163 @@ public class CprDirectLookup {
 
         return errorCode;
     }
+
+    public void parseResponse(String response) throws Exception {
+        // dataType determines what records we received, and allows us to parse appropriately
+        int dataType = Integer.parseInt(response.substring(5, 6));
+
+        switch (dataType) {
+            case 0:
+                // only header record is present, see output of response above
+                System.out.println("Only header record present. End.");
+                break;
+            case 6:
+                /* one or more data records are present, so we need to determine which based on
+                   record numbers. Can also be hardcoded based on which records you have agreed
+                   to receive from CPR system */
+                ListHashMap<RecordType, String> records = this.getAvailableRecords(response);
+
+                if (records.size() == 0) {
+                    System.out.println("No records found in response.");
+                    return;
+                }
+
+                System.out.println("records: "+records);
+
+                int startOfRecord;
+
+                for (RecordType recordType : records.keySet()) {
+                    for (String line : records.get(recordType)) {
+                        switch (recordType) {
+                            case PERSON_INFO:
+                                PersonRecord personRecord = new PersonRecord(line, personRecordMapping);
+
+                                System.out.println("personRecord: "+personRecord);
+                                /*
+                                * Create record instances
+                                * Create entity
+                                * from instances, obtain data records
+                                * add to entity while ignoring historical data
+                                * */
+
+                        }
+                    }
+                }
+
+                break;
+            default:
+                System.err.println("Unrecognized record data type: " + dataType);
+        }
+    }
+
+    private static Mapping personRecordMapping = new Mapping();
+    static {
+        personRecordMapping.add("pnrgaeld", 14, 10);
+        personRecordMapping.add("status", 24, 2);
+        personRecordMapping.add("statushaenstart", 26, 12);
+        personRecordMapping.add("statusdto_umrk", 38, 1);
+        personRecordMapping.add("koen", 39, 1);
+        personRecordMapping.add("foed_dt", 40, 10);
+        personRecordMapping.add("foed_dt_umrk", 50, 1);
+        personRecordMapping.add("start_dt-person", 51, 10);
+        personRecordMapping.add("start_dt_umrk-person", 61, 1);
+        personRecordMapping.add("slut_dt-person", 62, 10);
+        personRecordMapping.add("slut_dt_umrk-person", 72, 1);
+        personRecordMapping.add("stilling", 73, 34);
+    }
+
+    private ListHashMap<RecordType, String> getAvailableRecords(String response) throws Exception {
+        ListHashMap<RecordType, String> records = new ListHashMap<>();
+        int start = 28; // start of DATA section in response
+
+        // programmatically find out which records are included in the response, and where they begin
+        while (start < response.length()) {
+            // record type is always 3 characters in length
+            String recordType = response.substring(start, start + 3);
+            boolean foundRecord = false;
+
+            for (RecordType rec : RecordType.values()) {
+                if (recordType.equals(rec.getValue())) {
+                    int end = start + rec.getLength();
+                    records.add(rec, response.substring(start, end));
+                    start = end;
+                    foundRecord = true;
+                    break;
+                }
+            }
+
+            if (!foundRecord) {
+                start += recordType.length(); // avoid infinite loops
+            }
+        }
+        return records;
+    }
+
+    private enum RecordType {
+        START("000", 35),
+        PERSON_INFO("001", 106),
+        CURRENT_ADDR("002", 306), // assume type 'A' record
+        PLAIN_ADDR("003", 249),
+        PROTECTION("004", 37),
+        FOREIGN_ADDR("005", 200),
+        CONTACT_ADDR("006", 203),
+
+        DISAPPEARANCE("007", 26),
+        NAME("008", 193),
+        BIRTHPLACE("009",37),
+        CITIZENSHIP("010", 30),
+        CHURCH("011", 25),
+        CIVILSTATUS("012",95),
+        SEPARATION("013", 36),
+        CHILDREN("014", 23),
+        PARENTS("015", 147),
+        CUSTODY("016", 58),
+        UNMANAGE("017", 272),
+        MUNICIPAL_RELATION("018", 60),
+        CREDIT_WARNING("050", 29), // NB: credit warning record first in production 1/1/2017
+        UNMANAGE_EXTRA("052", 287),
+        END("999", 21);
+
+        private String value;
+        private int recordLength;
+
+        /**
+         * Constructor for RecordType enums.
+         *
+         * @param value        The record number as defined in PNR specification.
+         * @param recordLength The length of the record as defined in PNR specification.
+         */
+        RecordType(String value, int recordLength) {
+            this.value = value;
+            this.recordLength = recordLength;
+        }
+
+        /**
+         * Returns the record number for this enum.
+         *
+         * @return Returns the record number of this enum as a String value.
+         */
+        public String getValue() {
+            return this.value;
+        }
+
+        /**
+         * Returns the length of this record type. as an integer.
+         *
+         * @return Integer value containing length of this record type.
+         */
+        public int getLength() {
+            return this.recordLength;
+        }
+    }
+
+    private static String substr(String s, int start, int length) {
+        return s.substring(start, start + length);
+    }
+
+    private static int substrInt(String s, int start, int length) {
+        return Integer.parseInt(substr(s, start, length));
+    }
+
 
 }
