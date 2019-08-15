@@ -1,5 +1,7 @@
 package dk.magenta.datafordeler.cpr.direct;
 
+import dk.magenta.datafordeler.core.exception.DataStreamException;
+import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 
@@ -45,13 +48,18 @@ public class CprDirectLookup {
         return configurationManager.getConfiguration();
     }
 
-    private boolean login() throws IOException, GeneralSecurityException {
+    private void login() throws DataStreamException {
         CprConfiguration configuration = this.getConfiguration();
 
         String transactionCode = configuration.getDirectTransactionCode();
         String customerNumber = String.format("%04d", configuration.getDirectCustomerNumber());
         String username = String.format("%-8.8s", configuration.getDirectUsername());
-        String password = String.format("%-8.8s", configuration.getDirectPassword());
+        String password = null;
+        try {
+            password = String.format("%-8.8s", configuration.getDirectPassword());
+        } catch (GeneralSecurityException | IOException e) {
+            throw new DataStreamException("Failed decrypting stored password from database", e);
+        }
 
         log.info("Logging in to CPR Direkte with customerNumber "+customerNumber);
 
@@ -69,37 +77,39 @@ public class CprDirectLookup {
                         password
                 )); // record should always be 35 bytes
 
-        String response = this.request(requestBody);
+        String response = null;
+        try {
+            response = this.request(requestBody);
+        } catch (IOException e) {
+            throw new DataStreamException("Failed connecting to CPR Direct", e);
+        }
 
         // error code in response starts at position 22 in response
         int errorCode = Integer.parseInt(response.substring(22, 24));
 
         if (errorCode != 0) {
-            log.info("Login failed with error code: " + errorCode + ", errorText: "+response);
-            return false;
+            throw new DataStreamException("Login failed with error code: " + errorCode + ", errorText: "+response);
         }
 
         // parse out token, used for authentication on subsequent requests
         this.authToken = response.substring(6, 14);
-
-        return true;
     }
 
-    public String lookup(String pnr) throws Exception {
+    public PersonEntity getPerson(String pnr) throws DataStreamException {
+        String rawData = this.lookup(pnr);
+        return this.parseResponse(rawData);
+    }
+
+    public String lookup(String pnr) throws DataStreamException {
 
         if (this.authToken == null) {
-            if (!this.login()) {
-                throw new Exception("Login failed");
-            }
+            this.login();
         }
 
         CprConfiguration configuration = this.getConfiguration(); // TODO: Cache configuration?
 
         for (int attempt = 0; attempt<3; attempt++) {
-
-            String dataType = "06"; // "00" can also be used if no DATA section is required
-
-            // build lookup request
+            String dataType = "06";
             String request = String.format("%-39.39s",
                     configuration.getDirectTransactionCode() +
                             "," +
@@ -111,7 +121,12 @@ public class CprDirectLookup {
                             pnr
             ); // must be 39 bytes
 
-            String response = this.request(request);
+            String response = null;
+            try {
+                response = this.request(request);
+            } catch (IOException e) {
+                throw new DataStreamException("Failed lookup at CPR Direct", e);
+            }
 
             int errorCode = this.parseErrorCode(response);
             if (errorCode == 0) {
@@ -119,16 +134,13 @@ public class CprDirectLookup {
                 return response;
             } else if (errorCode == ERR_TOKEN_EXPIRED) {
                 // Login and try again
-                if (!this.login()) {
-                    // If login failed, bail
-                    return null;
-                }
+                this.login();
             } else {
                 // Some other error, bail
-                return null;
+                throw new DataStreamException("Got statuscode "+errorCode+" from CPR Direct");
             }
         }
-        return null;
+        throw new DataStreamException("Failed lookup for CPR Direct: 3 attempts unsuccessful");
     }
 
     private SSLSocket getSocket() throws IOException {
@@ -155,15 +167,12 @@ public class CprDirectLookup {
             totalResponseLength += responseLength;
         }
 
-        client.close(); // CPR closes socket, so do we
+        client.close();
 
         byte[] baCompleteResponse = new byte[totalResponseLength];
         System.arraycopy(response, 0, baCompleteResponse, 0, totalResponseLength);
 
-        String responseString = new String(baCompleteResponse, Charset.forName("ISO-8859-1"));
-        System.out.println("Response: " + responseString);
-
-        return responseString;
+        return new String(baCompleteResponse, StandardCharsets.ISO_8859_1);
     }
 
     private int parseErrorCode(String response) {
@@ -184,20 +193,18 @@ public class CprDirectLookup {
         return errorCode;
     }
 
-    public PersonEntity parseResponse(String response) throws Exception {
+    public PersonEntity parseResponse(String response) throws DataStreamException {
         // dataType determines what records we received, and allows us to parse appropriately
         int dataType = Integer.parseInt(response.substring(5, 6));
 
         switch (dataType) {
             case 0:
-                System.out.println("Only header record present. End.");
-                break;
+                throw new DataStreamException("Only header record present.");
             case 6:
                 ListHashMap<RecordType, String> records = this.getAvailableRecords(response);
 
                 if (records.size() == 0) {
-                    System.out.println("No records found in response.");
-                    return null;
+                    throw new DataStreamException("No records found in response.");
                 }
 
                 String pnr = null;
@@ -205,67 +212,77 @@ public class CprDirectLookup {
                 for (RecordType recordType : records.keySet()) {
                     for (String line : records.get(recordType)) {
                         PersonDataRecord parsedRecord = null;
-                        switch (recordType) {
-                            case PERSON_INFO:
-                                parsedRecord = new PersonRecord(line, personRecordMapping);
-                                break;
-                            case CURRENT_ADDR:
-                                parsedRecord = new AddressRecord(line, addressRecordMapping);
-                                break;
-                            case PROTECTION:
-                                parsedRecord = new ProtectionRecord(line, protectionRecordMapping);
-                                break;
-                            case PLAIN_ADDR:
-                                // TODO?
-                                break;
-                            case FOREIGN_ADDR:
-                                parsedRecord = new ForeignAddressRecord(line, foreignAddressRecordMapping);
-                                break;
-                            case CONTACT_ADDR:
-                                // TODO?
-                                break;
-                            case DISAPPEARANCE:
-                                break;
-                            case NAME:
-                                parsedRecord = new NameRecord(line, nameRecordMapping);
-                                break;
-                            case BIRTHPLACE:
-                                parsedRecord = new BirthRecord(line, birthRecordMapping);
-                                break;
-                            case CITIZENSHIP:
-                                parsedRecord = new CitizenshipRecord(line, citizenshipRecordMapping);
-                                break;
-                            case CHURCH:
-                                parsedRecord = new ChurchRecord(line, churchRecordMapping);
-                                break;
-                            case CIVILSTATUS:
-                                parsedRecord = new CivilStatusRecord(line, civilstatusRecordMapping);
-                                break;
-                            case SEPARATION:
-                                break;
-                            case CHILDREN:
-                                break;
-                            case PARENTS:
-                                parsedRecord = new PersonRecord(line, parentRecordMapping);
-                                break;
-                            case CUSTODY:
-                                break;
-                            case UNMANAGE:
-                                parsedRecord = new GuardianRecord(line, guardianRecordMapping);
-                                break;
-                            case MUNICIPAL_RELATION:
-                                break;
-                            case CREDIT_WARNING:
-                                break;
-                            case UNMANAGE_EXTRA:
-                                break;
-                            default:
-                                System.out.println("Not parsing record type "+recordType);
-                                break;
+                        try {
+                            switch (recordType) {
+                                case PERSON_INFO:
+                                    parsedRecord = new PersonRecord(line, personRecordMapping);
+                                    break;
+                                case CURRENT_ADDR:
+                                    parsedRecord = new AddressRecord(line, addressRecordMapping);
+                                    break;
+                                case PROTECTION:
+                                    parsedRecord = new ProtectionRecord(line, protectionRecordMapping);
+                                    break;
+                                case PLAIN_ADDR:
+                                    // TODO?
+                                    break;
+                                case FOREIGN_ADDR:
+                                    parsedRecord = new ForeignAddressRecord(line, foreignAddressRecordMapping);
+                                    break;
+                                case CONTACT_ADDR:
+                                    // TODO?
+                                    break;
+                                case DISAPPEARANCE:
+                                    break;
+                                case NAME:
+                                    parsedRecord = new NameRecord(line, nameRecordMapping);
+                                    break;
+                                case BIRTHPLACE:
+                                    parsedRecord = new BirthRecord(line, birthRecordMapping);
+                                    break;
+                                case CITIZENSHIP:
+                                    parsedRecord = new CitizenshipRecord(line, citizenshipRecordMapping);
+                                    break;
+                                case CHURCH:
+                                    parsedRecord = new ChurchRecord(line, churchRecordMapping);
+                                    break;
+                                case CIVILSTATUS:
+                                    parsedRecord = new CivilStatusRecord(line, civilstatusRecordMapping);
+                                    break;
+                                case SEPARATION:
+                                    break;
+                                case CHILDREN:
+                                    break;
+                                case PARENTS:
+                                    parsedRecord = new PersonRecord(line, parentRecordMapping);
+                                    break;
+                                case CUSTODY:
+                                    break;
+                                case UNMANAGE:
+                                    parsedRecord = new GuardianRecord(line, guardianRecordMapping);
+                                    break;
+                                case MUNICIPAL_RELATION:
+                                    break;
+                                case CREDIT_WARNING:
+                                    break;
+                                case UNMANAGE_EXTRA:
+                                    break;
+                                default:
+                                    System.out.println("Not parsing record type " + recordType);
+                                    break;
+                            }
+                        } catch (ParseException e) {
+                            throw new DataStreamException("Failed parsing record of type "+recordType, e);
                         }
                         if (parsedRecord != null) {
                             if (pnr == null) {
                                 pnr = parsedRecord.getCprNumber();
+                            } else {
+                                System.out.println("------------------------");
+                                System.out.println(parsedRecord.getClass().getSimpleName());
+                                for (Object key : parsedRecord.keySet()) {
+                                    System.out.println("    "+key+" = "+parsedRecord.get((String) key));
+                                }
                             }
                             parsedRecords.add(parsedRecord);
                         }
@@ -283,9 +300,8 @@ public class CprDirectLookup {
                     return entity;
                 }
             default:
-                System.err.println("Unrecognized record data type: " + dataType);
+                throw new DataStreamException("Unrecognized record data type: " + dataType);
         }
-        return null;
     }
 
     private static Mapping personRecordMapping = new Mapping();
@@ -334,7 +350,7 @@ public class CprDirectLookup {
     static {
         protectionRecordMapping.add("beskyttype", 14, 4);
         protectionRecordMapping.add("start_dt-beskyttelse", 18, 10);
-        protectionRecordMapping.add("slut_dt-beskyttelse", 28, 10);
+        protectionRecordMapping.add("slet_dt-beskyttelse", 28, 10);
     }
 
     private static Mapping foreignAddressRecordMapping = new Mapping();
@@ -433,7 +449,7 @@ public class CprDirectLookup {
 
 
 
-    private ListHashMap<RecordType, String> getAvailableRecords(String response) throws Exception {
+    private ListHashMap<RecordType, String> getAvailableRecords(String response) {
         ListHashMap<RecordType, String> records = new ListHashMap<>();
         int start = 28; // start of DATA section in response
 
@@ -525,6 +541,4 @@ public class CprDirectLookup {
     private static int substrInt(String s, int start, int length) {
         return Integer.parseInt(substr(s, start, length));
     }
-
-
 }

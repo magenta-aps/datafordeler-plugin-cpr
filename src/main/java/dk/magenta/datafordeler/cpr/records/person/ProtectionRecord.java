@@ -31,9 +31,9 @@ public class ProtectionRecord extends PersonDataRecord {
     static {
         traditionalMapping.add("beskyttype",14,4);
         traditionalMapping.add("start_mynkod-beskyttelse",18,4);
-        traditionalMapping.add("start_ts-beskyttelse",22,12	);
-        traditionalMapping.add("start_dt-beskyttelse",34,10	);
-        traditionalMapping.add("indrap-beskyttelse",44	,3);
+        traditionalMapping.add("start_ts-beskyttelse",22,12);
+        traditionalMapping.add("start_dt-beskyttelse",34,10);
+        traditionalMapping.add("indrap-beskyttelse",44,3);
         traditionalMapping.add("slet_dt-beskyttelse",47,10);
     }
 
@@ -49,7 +49,7 @@ public class ProtectionRecord extends PersonDataRecord {
 
         records.add(new ProtectionDataRecord(
                 this.getInt("beskyttype"),
-                this.getBoolean("indrap-beskyttelse"),
+                this.getBoolean("indrap-beskyttelse", false),
                 this.getDate("slet_dt-beskyttelse")
         ).setAuthority(
                 this.getInt("start_mynkod-beskyttelse")
@@ -58,7 +58,7 @@ public class ProtectionRecord extends PersonDataRecord {
                         this.getOffsetDateTime("start_ts-beskyttelse"),
                         null,
                         this.getOffsetDateTime("start_dt-beskyttelse"), false,
-                        this.getOffsetDateTime("slut_dt-beskyttelse"), false
+                        this.getOffsetDateTime("slet_dt-beskyttelse"), false
                 )
         ));
 

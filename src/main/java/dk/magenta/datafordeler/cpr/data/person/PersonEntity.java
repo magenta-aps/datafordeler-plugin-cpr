@@ -737,6 +737,9 @@ public class PersonEntity extends CprRecordEntity {
         return this.guardian;
     }
 
+    public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session) {
+        this.addBitemporalRecord(record, session, true);
+    }
 
     public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session, boolean compareExisting) {
         boolean added = false;
