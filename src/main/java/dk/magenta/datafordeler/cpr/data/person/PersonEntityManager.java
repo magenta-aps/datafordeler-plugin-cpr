@@ -15,19 +15,25 @@ import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthTimeDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ParentDataRecord;
 import dk.magenta.datafordeler.cpr.records.service.PersonEntityRecordService;
+import dk.magenta.datafordeler.cpr.synchronization.SubscribtionTimerTask;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.Calendar;
 
 @Component
 public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord, PersonEntity> {
@@ -53,6 +59,22 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
 
     @Autowired
     private SessionManager sessionManager;
+
+    Timer timer = new Timer();
+
+    /**
+     * Run bean initialization. Make the application upload subscribtions every morning at 6.
+     */
+    @PostConstruct
+    public void init() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 6);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date time = calendar.getTime();
+        timer.schedule(new SubscribtionTimerTask(), time, 1000 * 60 * 60 * 24);
+    }
+
 
     private static PersonEntityManager instance;
 
@@ -267,9 +289,8 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
 
     /**
      * Create the subscribtion-file from the table of subscribtions, and upload them to FTP-server
-     * @throws DataFordelerException
      */
-    public void createSubscriptionFile() throws DataFordelerException {
+    public void createSubscriptionFile() {
         String charset = this.getConfiguration().getRegisterCharset(this);
 
         Transaction transaction = null;
@@ -278,6 +299,30 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             Criteria criteria = session.createCriteria(PersonSubscription.class);
             criteria.add(Restrictions.eq(PersonSubscription.DB_FIELD_CPR_ASSIGNMENT_STATUS, PersonSubscriptionAssignementStatus.CreatedInTable));
             List<PersonSubscription> subscribtionList = criteria.list();
+            // If there if no subscribtion to upload create a file for debug purposes
+            if(subscribtionList.size()==0) {
+                File localNonsubscriptionFolder = new File(this.getLocalSubscriptionFolder());
+                if (!localNonsubscriptionFolder.exists()) {
+                    localNonsubscriptionFolder.mkdirs();
+                }
+                LocalDate subscriptionDate = LocalDate.now();
+                String filename = "empty" + String.format(
+                        "d%02d%02d%02d",
+                        subscriptionDate.getYear() % 100,
+                        subscriptionDate.getMonthValue(),
+                        subscriptionDate.getDayOfMonth()
+                ) +
+                        "." +
+                        String.format("i%06d", this.getJobId());
+
+
+                File subscriptionFile = new File(
+                        localSubscriptionFolder,
+                        filename
+                );
+                subscriptionFile.createNewFile();
+                return;
+            }
 
             for(PersonSubscription subscription : subscribtionList) {
                 subscription.setAssignment(PersonSubscriptionAssignementStatus.UploadedToCpr);
