@@ -854,6 +854,9 @@ public class PersonEntity extends CprRecordEntity {
             recentTechnicalCorrectionRecords = new ListHashMap<>();
             recentTechnicalCorrections.put(entity, recentTechnicalCorrectionRecords);
         }
+        if (newItem.isTechnicalCorrection()) {
+            recentTechnicalCorrectionRecords.add(newItem.getEffectFrom(), newItem);
+        }
 
         if (newItem != null) {
 
