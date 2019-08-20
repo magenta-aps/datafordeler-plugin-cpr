@@ -62,8 +62,6 @@ public class CprDirectLookup {
             throw new DataStreamException("Failed decrypting stored password from database", e);
         }
 
-        log.info("Logging in to CPR Direkte with customerNumber "+customerNumber);
-
         String LOGON_SUBSCRIPTION_TYPE = "9"; // constant in LOGON record
         String LOGON_DATA_TYPE = "0"; // constant in LOGON record
 
