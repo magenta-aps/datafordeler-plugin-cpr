@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 
 @Component
@@ -277,12 +278,6 @@ public class CprDirectLookup {
                         if (parsedRecord != null) {
                             if (pnr == null) {
                                 pnr = parsedRecord.getCprNumber();
-                            } else {
-                                System.out.println("------------------------");
-                                System.out.println(parsedRecord.getClass().getSimpleName());
-                                for (Object key : parsedRecord.keySet()) {
-                                    System.out.println("    "+key+" = "+parsedRecord.get((String) key));
-                                }
                             }
                             parsedRecords.add(parsedRecord);
                         }
@@ -294,6 +289,7 @@ public class CprDirectLookup {
                     entity.setPersonnummer(pnr);
                     for (PersonDataRecord r : parsedRecords) {
                         for (CprBitemporalRecord bitemporalRecord : r.getBitemporalRecords()) {
+                            bitemporalRecord.setDafoUpdated(OffsetDateTime.now());
                             entity.addBitemporalRecord((CprBitemporalPersonRecord) bitemporalRecord, null, false);
                         }
                     }
