@@ -266,9 +266,6 @@ public class CprDirectLookup {
                                     break;
                                 case UNMANAGE_EXTRA:
                                     break;
-                                default:
-                                    System.out.println("Not parsing record type " + recordType);
-                                    break;
                             }
                         } catch (ParseException e) {
                             throw new DataStreamException("Failed parsing record of type "+recordType, e);
