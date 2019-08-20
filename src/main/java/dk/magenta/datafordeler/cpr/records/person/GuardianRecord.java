@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.records.person;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
+import dk.magenta.datafordeler.cpr.records.Mapping;
 import dk.magenta.datafordeler.cpr.records.person.data.GuardianDataRecord;
 
 import java.util.ArrayList;
@@ -16,25 +17,12 @@ public class GuardianRecord extends PersonDataRecord {
     private CprBitemporality temporality;
 
     public GuardianRecord(String line) throws ParseException {
+        this(line, traditionalMapping);
+    }
+
+     public GuardianRecord(String line, Mapping mapping) throws ParseException {
         super(line);
-        this.obtain("start_mynkod-umyndig", 14, 4);
-        this.obtain("start_dt-umyndig", 18, 10);
-        this.obtain("start_dt_umrk-umyndig", 28, 1);
-        this.obtain("slet_dt-umyndig", 29, 10);
-        this.obtain("umyn_reltyp", 39, 4);
-        this.obtain("reltyp-relpnr_pnr", 43, 4);
-        this.obtain("start_mynkod-relpnr_pnr", 47, 4);
-        this.obtain("relpnr", 51, 10);
-        this.obtain("start_dt-relpnr_pnr", 61, 10);
-        this.obtain("reltyp-relpnr_txt", 71, 4);
-        this.obtain("start_mynkod-relpnr_txt", 75, 4);
-        this.obtain("reladrsat_relpnr_txt", 79, 34);
-        this.obtain("start_dt-relpnr_txt", 113, 10);
-        this.obtain("reltxt1", 123, 34);
-        this.obtain("reltxt2", 157, 34);
-        this.obtain("reltxt3", 191, 34);
-        this.obtain("reltxt4", 225, 34);
-        this.obtain("reltxt5", 259, 34);
+        this.obtain(mapping);
 
         this.temporality = new CprBitemporality(
                 this.getOffsetDateTime("start_dt-umyndig"),
@@ -44,6 +32,33 @@ public class GuardianRecord extends PersonDataRecord {
                 this.getOffsetDateTime("slet_dt-umyndig"),
                 false
         );
+    }
+
+    public static final Mapping traditionalMapping = new Mapping();
+    static {
+        traditionalMapping.add("start_mynkod-umyndig", 14, 4);
+        traditionalMapping.add("start_dt-umyndig", 18, 10);
+        traditionalMapping.add("start_dt_umrk-umyndig", 28, 1);
+        traditionalMapping.add("slet_dt-umyndig", 29, 10);
+        traditionalMapping.add("umyn_reltyp", 39, 4);
+        traditionalMapping.add("reltyp-relpnr_pnr", 43, 4);
+        traditionalMapping.add("start_mynkod-relpnr_pnr", 47, 4);
+        traditionalMapping.add("relpnr", 51, 10);
+        traditionalMapping.add("start_dt-relpnr_pnr", 61, 10);
+        traditionalMapping.add("reltyp-relpnr_txt", 71, 4);
+        traditionalMapping.add("start_mynkod-relpnr_txt", 75, 4);
+        traditionalMapping.add("reladrsat_relpnr_txt", 79, 34);
+        traditionalMapping.add("start_dt-relpnr_txt", 113, 10);
+        traditionalMapping.add("reltxt1", 123, 34);
+        traditionalMapping.add("reltxt2", 157, 34);
+        traditionalMapping.add("reltxt3", 191, 34);
+        traditionalMapping.add("reltxt4", 225, 34);
+        traditionalMapping.add("reltxt5", 259, 34);
+    }
+
+    @Override
+    public String getRecordType() {
+        return RECORDTYPE_GUARDIANSHIP;
     }
 
     @Override
@@ -73,12 +88,6 @@ public class GuardianRecord extends PersonDataRecord {
         ));
 
         return records;
-    }
-
-
-    @Override
-    public String getRecordType() {
-        return RECORDTYPE_GUARDIANSHIP;
     }
 
 }
