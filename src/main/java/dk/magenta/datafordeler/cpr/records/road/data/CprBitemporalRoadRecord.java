@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @MappedSuperclass
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public abstract class CprBitemporalRoadRecord<S extends CprBitemporalRoadRecord<S>> extends CprBitemporalRecord<RoadEntity, S> {
 
     public static final String DB_FIELD_ENTITY = CprBitemporalRecord.DB_FIELD_ENTITY;
