@@ -136,19 +136,6 @@
                 </configuration>
                 <version>3.1.2</version>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>OSGiCprPluginProvider</Bundle-SymbolicName>
-                        <Export-Package>dk.magenta.datafordeler.cpr</Export-Package>
-                        <Bundle-Vendor>Magenta</Bundle-Vendor>
-                    </instructions>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
     
