@@ -15,16 +15,25 @@ import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthTimeDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ParentDataRecord;
 import dk.magenta.datafordeler.cpr.records.service.PersonEntityRecordService;
+import dk.magenta.datafordeler.cpr.synchronization.SubscribtionTimerTask;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.Calendar;
 
 @Component
 public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord, PersonEntity> {
@@ -50,6 +59,22 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
 
     @Autowired
     private SessionManager sessionManager;
+
+    private Timer subscribtionUploadTimer = new Timer();
+
+    /**
+     * Run bean initialization. Make the application upload subscribtions every morning at 6.
+     */
+    @PostConstruct
+    public void init() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date time = calendar.getTime();
+        subscribtionUploadTimer.schedule(new SubscribtionTimerTask(this), time, 1000 * 60 * 60 * 24);
+    }
+
 
     private static PersonEntityManager instance;
 
@@ -220,11 +245,13 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         this.createSubscription(addCprNumbers, new HashSet<>());
     }
 
-    private void createSubscription(HashSet<String> addCprNumbers, HashSet<String> removeCprNumbers) throws DataFordelerException {
+    /**
+     * Create subscribtions by adding them to the table of subscribtions
+     * @param addCprNumbers
+     * @param removeCprNumbers
+     */
+    private void createSubscription(HashSet<String> addCprNumbers, HashSet<String> removeCprNumbers) {
         this.log.info("Collected these numbers for subscription: "+addCprNumbers);
-        String charset = this.getConfiguration().getRegisterCharset(this);
-        String keyConstant = "";
-        StringJoiner content = new StringJoiner("\r\n");
 
         Session session = sessionManager.getSessionFactory().openSession();
         try {
@@ -237,49 +264,12 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             addCprNumbers.removeAll(removeCprNumbers);
             addCprNumbers.removeAll(map.keySet());
 
-
-            HashMap<String, HashSet<String>> loop = new HashMap<>();
-            loop.put("OP", addCprNumbers);
-            loop.put("SL", removeCprNumbers);
-
-            for (String operation : loop.keySet()) {
-                HashSet<String> cprNumbers = loop.get(operation);
-                for (String cprNumber : cprNumbers) {
-                    content.add(
-                            String.format(
-                                    "%02d%04d%02d%2s%10s%15s%45s",
-                                    6,
-                                    this.getCustomerId(),
-                                    0,
-                                    operation,
-                                    cprNumber,
-                                    keyConstant,
-                                    ""
-                            )
-                    );
-                }
-            }
-
-            for (String cprNumber : addCprNumbers) {
-                content.add(
-                        String.format(
-                                "%02d%06d%10s%15s",
-                                7,
-                                this.getJobId(),
-                                cprNumber,
-                                keyConstant,
-                                ""
-                        )
-                );
-            }
-
-            this.addSubscription(content.toString(), charset, this);
-
             session.beginTransaction();
             try {
                 for (String add : addCprNumbers) {
                     PersonSubscription newSubscription = new PersonSubscription();
                     newSubscription.setPersonNumber(add);
+                    newSubscription.setAssignment(PersonSubscriptionAssignementStatus.CreatedInTable);
                     session.save(newSubscription);
                 }
                 for (String remove : removeCprNumbers) {
@@ -297,6 +287,65 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         }
     }
 
+    /**
+     * Create the subscribtion-file from the table of subscribtions, and upload them to FTP-server
+     */
+    public void createSubscriptionFile() {
+        String charset = this.getConfiguration().getRegisterCharset(this);
+
+        Transaction transaction = null;
+        try(Session session = sessionManager.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            Criteria criteria = session.createCriteria(PersonSubscription.class);
+            criteria.add(Restrictions.eq(PersonSubscription.DB_FIELD_CPR_ASSIGNMENT_STATUS, PersonSubscriptionAssignementStatus.CreatedInTable));
+            List<PersonSubscription> subscribtionList = criteria.list();
+            // If there if no subscribtion to upload just log
+            if(subscribtionList.size()==0) {
+                log.info("There is found nu subscribtions for upload");
+                return;
+            }
+
+            for(PersonSubscription subscription : subscribtionList) {
+                subscription.setAssignment(PersonSubscriptionAssignementStatus.UploadedToCpr);
+            }
+
+            StringJoiner content = new StringJoiner("\r\n");
+
+            for (PersonSubscription subscribtion : subscribtionList) {
+                    content.add(
+                            String.format(
+                                    "%02d%04d%02d%2s%10s%15s%45s",
+                                    6,
+                                    this.getCustomerId(),
+                                    0,
+                                    "OP",
+                                    subscribtion.getPersonNumber(),
+                                    "",
+                                    ""
+                            )
+                    );
+            }
+
+            for (PersonSubscription subscribtion : subscribtionList) {
+                content.add(
+                        String.format(
+                                "%02d%06d%10s%15s",
+                                7,
+                                this.getJobId(),
+                                subscribtion.getPersonNumber(),
+                                "",
+                                ""
+                        )
+                );
+            }
+            this.addSubscription(content.toString(), charset, this);
+            transaction.commit();
+
+        } catch(Exception e) {
+            log.error(e);
+            transaction.rollback();
+        }
+    }
 
     private HashMap<String, Integer> cnts = new HashMap<>();
 
