@@ -60,7 +60,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
     @Autowired
     private SessionManager sessionManager;
 
-    Timer timer = new Timer();
+    private Timer subscribtionUploadTimer = new Timer();
 
     /**
      * Run bean initialization. Make the application upload subscribtions every morning at 6.
@@ -68,11 +68,11 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
     @PostConstruct
     public void init() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 6);
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         Date time = calendar.getTime();
-        timer.schedule(new SubscribtionTimerTask(), time, 1000 * 60 * 60 * 24);
+        subscribtionUploadTimer.schedule(new SubscribtionTimerTask(this), time, 1000 * 60 * 60 * 24);
     }
 
 
@@ -299,28 +299,9 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             Criteria criteria = session.createCriteria(PersonSubscription.class);
             criteria.add(Restrictions.eq(PersonSubscription.DB_FIELD_CPR_ASSIGNMENT_STATUS, PersonSubscriptionAssignementStatus.CreatedInTable));
             List<PersonSubscription> subscribtionList = criteria.list();
-            // If there if no subscribtion to upload create a file for debug purposes
+            // If there if no subscribtion to upload just log
             if(subscribtionList.size()==0) {
-                File localNonsubscriptionFolder = new File(this.getLocalSubscriptionFolder());
-                if (!localNonsubscriptionFolder.exists()) {
-                    localNonsubscriptionFolder.mkdirs();
-                }
-                LocalDate subscriptionDate = LocalDate.now();
-                String filename = "empty" + String.format(
-                        "d%02d%02d%02d",
-                        subscriptionDate.getYear() % 100,
-                        subscriptionDate.getMonthValue(),
-                        subscriptionDate.getDayOfMonth()
-                ) +
-                        "." +
-                        String.format("i%06d", this.getJobId());
-
-
-                File subscriptionFile = new File(
-                        localSubscriptionFolder,
-                        filename
-                );
-                subscriptionFile.createNewFile();
+                log.info("There is found nu subscribtions for upload");
                 return;
             }
 
