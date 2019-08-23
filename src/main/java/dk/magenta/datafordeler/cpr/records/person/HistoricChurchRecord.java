@@ -14,9 +14,6 @@ import java.util.List;
  */
 public class HistoricChurchRecord extends HistoricPersonDataRecord {
 
-    private CprBitemporality churchTemporality;
-    private CprBitemporality documentTemporality;
-
     public HistoricChurchRecord(String line) throws ParseException {
         super(line);
         this.obtain("start_mynkod-folkekirke", 14, 4);
@@ -29,13 +26,6 @@ public class HistoricChurchRecord extends HistoricPersonDataRecord {
         this.obtain("dok_mynkod-folkekirke", 53, 4);
         this.obtain("dok_ts-folkekirke", 57, 12);
         this.obtain("dok-folkekirke", 69, 3);
-
-        this.churchTemporality = new CprBitemporality(
-                this.getOffsetDateTime("fkirk_ts"), null,
-                this.getOffsetDateTime("start_dt-folkekirke"), this.getBoolean("start_dt-umrk-folkekirke"),
-                this.getOffsetDateTime("slut_dt-folkekirke"), this.getBoolean("slut_dt-umrk-folkekirke")
-        );
-        this.documentTemporality = new CprBitemporality(this.getOffsetDateTime("dok_ts-folkekirke"));
     }
 
     @Override
@@ -52,8 +42,12 @@ public class HistoricChurchRecord extends HistoricPersonDataRecord {
                 this.getChar("fkirk")
         ).setAuthority(
                 this.getInt("start_mynkod-folkekirke", true)
-        ).setBitemporality( // TODO: Monotemporal?
-                this.churchTemporality // TODO: mangler registrationTo
+        ).setBitemporality(
+                new CprBitemporality(
+                        this.getOffsetDateTime("fkirk_ts"), null,
+                        this.getOffsetDateTime("start_dt-folkekirke"), this.getBoolean("start_dt-umrk-folkekirke"),
+                        this.getOffsetDateTime("slut_dt-folkekirke"), this.getBoolean("slut_dt-umrk-folkekirke")
+                )
         ).setHistoric());
 
         if (this.hasAny("dok-folkekirke", "dok_mynkod-folkekirke")) {
@@ -62,7 +56,9 @@ public class HistoricChurchRecord extends HistoricPersonDataRecord {
             ).setAuthority(
                     this.getInt("dok_mynkod-folkekirke")
             ).setBitemporality(
-                    this.documentTemporality
+                    new CprBitemporality(
+                            this.getOffsetDateTime("dok_ts-folkekirke")
+                    )
             ).setHistoric());
         }
 

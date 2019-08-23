@@ -13,6 +13,7 @@ import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthTimeDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.ChurchVerificationDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ParentDataRecord;
 import dk.magenta.datafordeler.cpr.records.service.PersonEntityRecordService;
 import org.hibernate.Session;
@@ -315,6 +316,9 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                 bitemporalRecord.setDafoUpdated(updateTime);
                 bitemporalRecord.setOrigin(record.getOrigin());
                 bitemporalRecord.cnt = i;
+                if (bitemporalRecord instanceof ChurchVerificationDataRecord) {
+                    System.out.println(bitemporalRecord.cnt+" "+bitemporalRecord.getAuthority());
+                }
                 bitemporalRecord.line = record.getLine();
                 entity.addBitemporalRecord((CprBitemporalPersonRecord) bitemporalRecord, importMetadata.getSession());
             }

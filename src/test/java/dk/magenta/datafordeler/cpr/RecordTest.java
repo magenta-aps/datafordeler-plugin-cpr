@@ -202,6 +202,8 @@ public class RecordTest {
             List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
             PersonEntity personEntity = entities.get(0);
 
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(personEntity.getChurchRelationVerification()));
+
             Assert.assertEquals(0, personEntity.getConame().size());
             Assert.assertEquals(1, personEntity.getAddress().size());
             Assert.assertEquals(2, personEntity.getAddressName().size());
