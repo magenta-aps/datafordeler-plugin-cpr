@@ -58,14 +58,16 @@ public class CitizenshipRecord extends PersonDataRecord {
                 this.citizenshipTemporality
         ));
 
-        if (this.has("dok-statsborgerskab")) {
-            records.add(new CitizenshipVerificationDataRecord(
-                    this.getBoolean("dok-statsborgerskab")
-            ).setAuthority(
-                    this.getInt("dok_mynkod-statsborgerskab")
-            ).setBitemporality(
-                    this.documentTemporality
-            ));
+        if (this.hasAny("dok-statsborgerskab", "dok_mynkod-statsborgerskab")) {
+            if (this.has("dok-statsborgerskab")) {
+                records.add(new CitizenshipVerificationDataRecord(
+                        this.getBoolean("dok-statsborgerskab")
+                ).setAuthority(
+                        this.getInt("dok_mynkod-statsborgerskab")
+                ).setBitemporality(
+                        this.documentTemporality
+                ));
+            }
         }
 
         return records;

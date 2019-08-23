@@ -17,7 +17,6 @@ import java.util.List;
 public class HistoricNameRecord extends HistoricPersonDataRecord {
 
     private CprBitemporality nameTemporality;
-    private CprBitemporality addressNameTemporality;
     private CprBitemporality documentNameTemporality;
     private CprBitemporality officiaryTemporality;
 
@@ -50,7 +49,6 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
         OffsetDateTime effectTo = this.getOffsetDateTime("nvnhaenslut");
         boolean effectToUncertain = this.getMarking("haenslut_umrk-navne");
         this.nameTemporality = new CprBitemporality(this.getOffsetDateTime("nvn_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
-        this.addressNameTemporality = new CprBitemporality(this.getOffsetDateTime("adrnvn_ts"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
         this.documentNameTemporality = new CprBitemporality(this.getOffsetDateTime("dok_ts-navne"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
         this.officiaryTemporality = new CprBitemporality(this.getOffsetDateTime("myntxt_ts-navne"), null, effectFrom, effectFromUncertain, effectTo, effectToUncertain);
     }
@@ -66,8 +64,6 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
 
         ArrayList<CprBitemporalRecord> records = new ArrayList<>();
         Character annkor = this.getChar("annkor");
-        boolean corrected = Character.valueOf('K').equals(annkor);
-        boolean undo = Character.valueOf('A').equals(annkor);
         records.add(new NameDataRecord(
                 null,
                 this.getString("fornvn", true),
@@ -85,25 +81,29 @@ public class HistoricNameRecord extends HistoricPersonDataRecord {
         ).setHistoric(
         ).setAnnKor(annkor));
 
-        records.add(new NameVerificationDataRecord(
-                this.getBoolean("dok-navne"),
-                null
-        ).setAuthority(
-                this.getInt("dok_mynkod-navne")
-        ).setBitemporality(
-                this.documentNameTemporality
-        ).setHistoric(
-        ).setAnnKor(annkor));
+        if (this.hasAny("dok-navne", "dok_mynkod-navne")) {
+            records.add(new NameVerificationDataRecord(
+                    this.getBoolean("dok-navne"),
+                    null
+            ).setAuthority(
+                    this.getInt("dok_mynkod-navne")
+            ).setBitemporality(
+                    this.documentNameTemporality
+            ).setHistoric(
+            ).setAnnKor(annkor));
+        }
 
-        records.add(new NameAuthorityTextDataRecord(
-                this.getString("myntxt-navne", true),
-                null
-        ).setAuthority(
-                this.getInt("myntxt_mynkod-navne")
-        ).setBitemporality(
-                this.officiaryTemporality
-        ).setHistoric(
-        ).setAnnKor(annkor));
+        if (this.hasAny("myntxt-navne", "myntxt_mynkod-navne")) {
+            records.add(new NameAuthorityTextDataRecord(
+                    this.getString("myntxt-navne", true),
+                    null
+            ).setAuthority(
+                    this.getInt("myntxt_mynkod-navne")
+            ).setBitemporality(
+                    this.officiaryTemporality
+            ).setHistoric(
+            ).setAnnKor(annkor));
+        }
 
         return records;
     }

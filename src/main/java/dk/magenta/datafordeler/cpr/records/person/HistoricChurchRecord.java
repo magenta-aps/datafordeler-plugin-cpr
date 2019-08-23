@@ -56,13 +56,15 @@ public class HistoricChurchRecord extends HistoricPersonDataRecord {
                 this.churchTemporality // TODO: mangler registrationTo
         ).setHistoric());
 
-        records.add(new ChurchVerificationDataRecord(
-                this.getBoolean("dok-folkekirke")
-        ).setAuthority(
-                this.getInt("dok_mynkod-folkekirke")
-        ).setBitemporality(
-                this.documentTemporality
-        ).setHistoric());
+        if (this.hasAny("dok-folkekirke", "dok_mynkod-folkekirke")) {
+            records.add(new ChurchVerificationDataRecord(
+                    this.getBoolean("dok-folkekirke")
+            ).setAuthority(
+                    this.getInt("dok_mynkod-folkekirke")
+            ).setBitemporality(
+                    this.documentTemporality
+            ).setHistoric());
+        }
 
         return records;
     }

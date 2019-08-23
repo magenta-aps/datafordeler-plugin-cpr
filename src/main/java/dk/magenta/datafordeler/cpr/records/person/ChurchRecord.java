@@ -58,14 +58,16 @@ public class ChurchRecord extends PersonDataRecord {
                 this.churchTemporality
         ));
 
-        if (this.has("dok-folkekirke")) {
-            records.add(new ChurchVerificationDataRecord(
-                    this.getBoolean("dok-folkekirke")
-            ).setAuthority(
-                    this.getInt("dok_mynkod-folkekirke")
-            ).setBitemporality(
-                    this.documentTemporality
-            ));
+        if (this.hasAny("dok-folkekirke", "dok_mynkod-folkekirke")) {
+            if (this.has("dok-folkekirke")) {
+                records.add(new ChurchVerificationDataRecord(
+                        this.getBoolean("dok-folkekirke")
+                ).setAuthority(
+                        this.getInt("dok_mynkod-folkekirke")
+                ).setBitemporality(
+                        this.documentTemporality
+                ));
+            }
         }
 
         return records;

@@ -296,6 +296,24 @@ public abstract class Record extends HashMap<String, String> {
         return value != null && !value.isEmpty();
     }
 
+    public boolean hasAll(String... keys) {
+        for (String key : keys) {
+                if (!this.has(key)) {
+                        return false;
+                    }
+            }
+        return true;
+    }
+
+    public boolean hasAny(String... keys) {
+        for (String key : keys) {
+                if (this.has(key)) {
+                        return true;
+                    }
+            }
+        return false;
+    }
+
     public static <T> T firstSet(T... times) {
         for (T time : times) {
             if (time != null) {

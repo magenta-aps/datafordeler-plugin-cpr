@@ -22,7 +22,6 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
 
     public HistoricAddressRecord(String line) throws ParseException {
         super(line);
-        //System.out.println(line);
         this.obtain("annkor", 14, 1);
         this.obtain("start_mynkod-personbolig", 15, 4);
         this.obtain("adr_ts", 19, 12);
@@ -46,10 +45,7 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
         this.obtain("fraflykomdto", 158, 12);
         this.obtain("fraflykomdt_umrk", 170, 1);
 
-
         this.addressTemporality = new CprBitemporality(this.getOffsetDateTime("adr_ts"), null, this.getOffsetDateTime("tilflydto"), this.getBoolean("tilflydto_umrk"), this.getOffsetDateTime("fraflydto"), this.getBoolean("fraflydto_umrk"));
-
-        //System.out.println(this.addressTemporality);
 
         this.conameTemporality = new CprBitemporality(this.getOffsetDateTime("convn_ts"));
         this.municipalityTemporality = new CprBitemporality(this.getOffsetDateTime("tilfra_ts"));
@@ -84,40 +80,44 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
                 this.addressTemporality
         ));
 
-        OffsetDateTime convnTs = this.getOffsetDateTime("convn_ts");
-        if (convnTs == null) {
-            convnTs = this.getOffsetDateTime("adr_ts");
-        }
-        records.add(new AddressConameDataRecord(
-                this.getString("convn", true)
-        ).setAuthority(
-                this.getInt("start_mynkod-personbolig")
-        ).setBitemporality(
-                convnTs,
-                null,
-                this.getOffsetDateTime("tilflydto"),
-                this.getBoolean("tilflydto_umrk"),
-                this.getOffsetDateTime("fraflydto"),
-                this.getBoolean("fraflydto_umrk")
-        ));
-
-        if (this.getInt("tilfra_mynkod") != 0) {
-            records.add(new MoveMunicipalityDataRecord(
-                    this.getDateTime("fraflykomdto"),
-                    this.getBoolean("fraflykomdt_umrk"),
-                    this.getInt("fraflykomkod"),
-                    this.getDateTime("tilflykomdto"),
-                    this.getBoolean("tilflykomdt_umrk")
+        if (this.hasAny("convn", "convn_ts")) {
+            OffsetDateTime convnTs = this.getOffsetDateTime("convn_ts");
+            if (convnTs == null) {
+                convnTs = this.getOffsetDateTime("adr_ts");
+            }
+            records.add(new AddressConameDataRecord(
+                    this.getString("convn", true)
             ).setAuthority(
-                    this.getInt("tilfra_mynkod")
+                    this.getInt("start_mynkod-personbolig")
             ).setBitemporality(
-                    this.getOffsetDateTime("tilfra_ts"),
+                    convnTs,
                     null,
                     this.getOffsetDateTime("tilflydto"),
                     this.getBoolean("tilflydto_umrk"),
                     this.getOffsetDateTime("fraflydto"),
                     this.getBoolean("fraflydto_umrk")
             ));
+        }
+
+        if (this.hasAny("fraflykomdto", "fraflykomdt_umrk", "fraflykomkod", "tilflykomdto")) {
+            if (this.getInt("tilfra_mynkod") != 0) {
+                records.add(new MoveMunicipalityDataRecord(
+                        this.getDateTime("fraflykomdto"),
+                        this.getBoolean("fraflykomdt_umrk"),
+                        this.getInt("fraflykomkod"),
+                        this.getDateTime("tilflykomdto"),
+                        this.getBoolean("tilflykomdt_umrk")
+                ).setAuthority(
+                        this.getInt("tilfra_mynkod")
+                ).setBitemporality(
+                        this.getOffsetDateTime("tilfra_ts"),
+                        null,
+                        this.getOffsetDateTime("tilflydto"),
+                        this.getBoolean("tilflydto_umrk"),
+                        this.getOffsetDateTime("fraflydto"),
+                        this.getBoolean("fraflydto_umrk")
+                ));
+            }
         }
 
         Character annkor = this.getChar("annkor");
