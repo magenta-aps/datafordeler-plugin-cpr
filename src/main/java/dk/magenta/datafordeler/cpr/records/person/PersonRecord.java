@@ -3,6 +3,7 @@ package dk.magenta.datafordeler.cpr.records.person;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprBitemporality;
+import dk.magenta.datafordeler.cpr.records.Mapping;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
 
 import java.time.OffsetDateTime;
