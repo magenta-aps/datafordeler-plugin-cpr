@@ -196,20 +196,17 @@ public class RecordTest {
         ImportMetadata importMetadata = new ImportMetadata();
         importMetadata.setSession(session);
         this.loadPerson("/persondata.txt", importMetadata);
-        //this.loadPerson("/persondata2.txt", importMetadata);
+        this.loadPerson("/persondata2.txt", importMetadata);
         try {
             PersonRecordQuery query = new PersonRecordQuery();
             query.setPersonnummer("0101001234");
             List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
             PersonEntity personEntity = entities.get(0);
-
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(personEntity));
-
-            Assert.assertEquals(1, personEntity.getConame().size());
+            Assert.assertEquals(0, personEntity.getConame().size());
             Assert.assertEquals(1, personEntity.getAddress().size());
             Assert.assertEquals(2, personEntity.getAddressName().size());
             Assert.assertEquals(1, personEntity.getBirthPlace().size());
-            Assert.assertEquals(1, personEntity.getBirthPlaceVerification().size());
+            Assert.assertEquals(0, personEntity.getBirthPlaceVerification().size());
             Assert.assertEquals(1, personEntity.getBirthTime().size());
             Assert.assertEquals(4, personEntity.getChurchRelation().size());
             Assert.assertEquals(3, personEntity.getChurchRelationVerification().size());
@@ -218,16 +215,16 @@ public class RecordTest {
             Assert.assertEquals(0, personEntity.getCivilstatusVerification().size());
             Assert.assertEquals(1, personEntity.getForeignAddress().size());
             Assert.assertEquals(1, personEntity.getEmigration().size());
-            Assert.assertEquals(1, personEntity.getMunicipalityMove().size());
+            Assert.assertEquals(0, personEntity.getMunicipalityMove().size());
             Assert.assertEquals(4, personEntity.getName().size());
-            Assert.assertEquals(4, personEntity.getNameAuthorityText().size());
+            Assert.assertEquals(3, personEntity.getNameAuthorityText().size());
             Assert.assertEquals(4, personEntity.getNameVerification().size());
             Assert.assertEquals(1, personEntity.getMother().size());
             Assert.assertEquals(1, personEntity.getMotherVerification().size());
             Assert.assertEquals(1, personEntity.getFather().size());
             Assert.assertEquals(1, personEntity.getFatherVerification().size());
             Assert.assertEquals(1, personEntity.getCore().size());
-            Assert.assertEquals(1, personEntity.getPosition().size());
+            Assert.assertEquals(0, personEntity.getPosition().size());
             Assert.assertEquals(3, personEntity.getStatus().size());
             Assert.assertEquals(3, personEntity.getProtection().size());
 

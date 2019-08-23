@@ -58,8 +58,6 @@ public class HistoricForeignAddressRecord extends HistoricPersonDataRecord {
 
         ArrayList<CprBitemporalRecord> records = new ArrayList<>();
         Character annkor = this.getChar("annkor");
-        boolean corrected = Character.valueOf('K').equals(annkor);
-        boolean undo = Character.valueOf('A').equals(annkor);
         records.add(new ForeignAddressDataRecord(
                 this.getString("udlandadr1", false),
                 this.getString("udlandadr2", false),

@@ -46,6 +46,12 @@ public abstract class Record extends HashMap<String, String> {
         this.obtain(key, position, length, false);
     }
 
+    protected void obtain(Mapping mapping) {
+        for (String key : mapping.keySet()) {
+            this.obtain(key, mapping.get(key).getLeft(), mapping.get(key).getRight());
+        }
+    }
+
     protected void obtain(String key, int position, int length, boolean truncateLeadingZeroes) {
         String value = this.substr(this.line, position, length);
         if (truncateLeadingZeroes) {
@@ -150,7 +156,6 @@ public abstract class Record extends HashMap<String, String> {
     public boolean getBoolean(String key, Boolean fallback) {
         String value = this.get(key);
         if (value == null) {
-            System.out.println(key + " is null");
             if (fallback != null) {
                 return fallback;
             }
@@ -288,6 +293,24 @@ public abstract class Record extends HashMap<String, String> {
     public boolean has(String key) {
         String value = this.getString(key, true);
         return value != null && !value.isEmpty();
+    }
+
+    public boolean hasAll(String... keys) {
+        for (String key : keys) {
+                if (!this.has(key)) {
+                        return false;
+                    }
+            }
+        return true;
+    }
+
+    public boolean hasAny(String... keys) {
+        for (String key : keys) {
+                if (this.has(key)) {
+                        return true;
+                    }
+            }
+        return false;
     }
 
     public static <T> T firstSet(T... times) {

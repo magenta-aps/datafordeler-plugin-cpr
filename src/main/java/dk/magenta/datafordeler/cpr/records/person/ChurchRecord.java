@@ -15,8 +15,6 @@ import java.util.List;
  */
 public class ChurchRecord extends PersonDataRecord {
 
-    private CprBitemporality churchTemporality;
-    private CprBitemporality documentTemporality;
 
     public ChurchRecord(String line) throws ParseException {
         this(line, traditionalMapping);
@@ -24,8 +22,6 @@ public class ChurchRecord extends PersonDataRecord {
     public ChurchRecord(String line, Mapping mapping) throws ParseException {
         super(line);
         this.obtain(mapping);
-        this.churchTemporality = new CprBitemporality(this.getOffsetDateTime("fkirk_ts"), null, this.getOffsetDateTime("start_dt-folkekirke"), this.getBoolean("start_dt-umrk-folkekirke"), null, false);
-        this.documentTemporality = new CprBitemporality(this.getOffsetDateTime("dok_ts-folkekirke"));
     }
 
     public static final Mapping traditionalMapping = new Mapping();
@@ -55,16 +51,24 @@ public class ChurchRecord extends PersonDataRecord {
         ).setAuthority(
                 this.getInt("start_mynkod-folkekirke", true, 0)
         ).setBitemporality(
-                this.churchTemporality
+                new CprBitemporality(
+                        this.getOffsetDateTime("fkirk_ts"),
+                        null,
+                        this.getOffsetDateTime("start_dt-folkekirke"), this.getBoolean("start_dt-umrk-folkekirke"),
+                        null, false
+                )
         ));
 
-        if (this.has("dok-folkekirke")) {
+
+        if (this.hasAny("dok-folkekirke", "dok_mynkod-folkekirke")) {
             records.add(new ChurchVerificationDataRecord(
                     this.getBoolean("dok-folkekirke")
             ).setAuthority(
                     this.getInt("dok_mynkod-folkekirke")
             ).setBitemporality(
-                    this.documentTemporality
+                    new CprBitemporality(
+                            this.getOffsetDateTime("dok_ts-folkekirke")
+                    )
             ));
         }
 

@@ -78,26 +78,30 @@ public class CivilStatusRecord extends PersonDataRecord {
                 this.civilTemporality
         ));
 
-        if (this.has("dok-civilstand")) {
-            records.add(new CivilStatusVerificationDataRecord(
-                    this.getBoolean("dok-civilstand"),
-                    null
-            ).setAuthority(
-                    this.getInt("dok_mynkod-civilstand")
-            ).setBitemporality(
-                    this.documentTemporality
-            ));
+        if (this.hasAny("dok-civilstand", "dok_mynkod-civilstand")) {
+            if (this.has("dok-civilstand")) {
+                records.add(new CivilStatusVerificationDataRecord(
+                        this.getBoolean("dok-civilstand"),
+                        null
+                ).setAuthority(
+                        this.getInt("dok_mynkod-civilstand")
+                ).setBitemporality(
+                        this.documentTemporality
+                ));
+            }
         }
 
-        if (this.has("myntxt-civilstand")) {
-            records.add(new CivilStatusAuthorityTextDataRecord(
-                    this.getString("myntxt-civilstand", true),
-                    null
-            ).setAuthority(
-                    this.getInt("myntxt_mynkod-civilstand")
-            ).setBitemporality(
-                    this.officiaryTemporality
-            ));
+        if (this.hasAny("myntxt-civilstand", "myntxt_mynkod-civilstand")) {
+            if (this.has("myntxt-civilstand")) {
+                records.add(new CivilStatusAuthorityTextDataRecord(
+                        this.getString("myntxt-civilstand", true),
+                        null
+                ).setAuthority(
+                        this.getInt("myntxt_mynkod-civilstand")
+                ).setBitemporality(
+                        this.officiaryTemporality
+                ));
+            }
         }
 
         return records;
