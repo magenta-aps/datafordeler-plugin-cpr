@@ -46,12 +46,6 @@ public abstract class Record extends HashMap<String, String> {
         this.obtain(key, position, length, false);
     }
 
-    protected void obtain(Mapping mapping) {
-        for (String key : mapping.keySet()) {
-            this.obtain(key, mapping.get(key).getLeft(), mapping.get(key).getRight());
-        }
-    }
-
     protected void obtain(String key, int position, int length, boolean truncateLeadingZeroes) {
         String value = this.substr(this.line, position, length);
         if (truncateLeadingZeroes) {

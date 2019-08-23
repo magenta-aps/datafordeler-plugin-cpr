@@ -192,11 +192,11 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
 
                 ParentDataRecord father = (ParentDataRecord) bitemporalRecords.stream().
                         filter(bitemporalCprRecord -> bitemporalCprRecord instanceof ParentDataRecord && !((ParentDataRecord) bitemporalCprRecord).isMother()).
-                        findAny().get();
+                        findAny().orElse(null);
 
                 BirthTimeDataRecord birthTime = (BirthTimeDataRecord) bitemporalRecords.stream().
                         filter(bitemporalCprRecord -> bitemporalCprRecord instanceof BirthTimeDataRecord).
-                        findAny().get();
+                        findAny().orElse(null);
 
                 if (birthTime != null && father != null && birthTime.getBirthDatetime() != null && birthTime.getBirthDatetime().isAfter(LocalDateTime.now().minusYears(18))) {
                     if (!father.getCprNumber().isEmpty() && !father.getCprNumber().equals("0000000000")) {
