@@ -922,28 +922,25 @@ public class PersonEntity extends CprRecordEntity {
                         return set.add((E) newItem);
 
 
-                    //Special case for addresses: Municipality codes may have changed without us getting a change record (AnnKor: Æ)
-                    } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
-                        if (newItem instanceof AddressDataRecord) {
-                            AddressDataRecord addressDataRecord = (AddressDataRecord) newItem;
-                            if (!addressDataRecord.equalDataWithMunicipalityChange(oldItem, false)) {
-                                oldItem.setReplacedby(newItem);
-                                oldItem.setRegistrationTo(newItem.getRegistrationFrom());
-                                return set.add((E) newItem);
-                            }
-                        } else {
-                            return false;
-                        }
+                    } else if (
+                                newItem.getBitemporality().equals(oldItem.getBitemporality()) &&
+                                                (newItem instanceof AddressDataRecord) &&
+                                                !((AddressDataRecord) newItem).equalDataWithMunicipalityChange(oldItem, false)
+                                        ) {
+                        // Special case for addresses: Municipality codes may have changed without us getting a change record (AnnKor: Æ)
+                        oldItem.setReplacedby(newItem);
+                        oldItem.setRegistrationTo(newItem.getRegistrationFrom());
+                        return set.add((E) newItem);
 
-                        /*
-                        * We see a record that is a near-repeat of a prior record. No need to add it
-                        * */
                     } else if (
                             Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
                             (Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) || newItem.getRegistrationTo() == null) &&
                             Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
                             newItem.getEffectTo() == null
                             ) {
+                        /*
+                         * We see a record that is a near-repeat of a prior record. No need to add it
+                         * */
                         return false;
                     }
                 }

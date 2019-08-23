@@ -92,7 +92,7 @@ public class NameRecord extends PersonDataRecord {
                 this.nameTemporality
         ));
 
-        if (this.has("adrnvn")) {
+        if (this.hasAny("adrnvn", "adrnvn_mynkod")) {
             records.add(new AddressNameDataRecord(
                     this.getString("adrnvn", true),
                     this.getBoolean("indrap-navne", false)
@@ -103,7 +103,7 @@ public class NameRecord extends PersonDataRecord {
             ));
         }
 
-        if (this.has("dok-navne")) {
+        if (this.hasAny("dok-navne", "dok_mynkod-navne")) {
             records.add(new NameVerificationDataRecord(
                     this.getBoolean("dok-navne"),
                     null
@@ -114,7 +114,7 @@ public class NameRecord extends PersonDataRecord {
             ));
         }
 
-        if (this.has("myntxt-navne")) {
+        if (this.hasAny("myntxt-navne", "myntxt_mynkod-navne")) {
             records.add(new NameAuthorityTextDataRecord(
                     this.getString("myntxt-navne", true),
                     null
