@@ -365,9 +365,6 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                 bitemporalRecord.setDafoUpdated(updateTime);
                 bitemporalRecord.setOrigin(record.getOrigin());
                 bitemporalRecord.cnt = i;
-                if (bitemporalRecord instanceof ChurchVerificationDataRecord) {
-                    System.out.println(bitemporalRecord.cnt+" "+bitemporalRecord.getAuthority());
-                }
                 bitemporalRecord.line = record.getLine();
                 entity.addBitemporalRecord((CprBitemporalPersonRecord) bitemporalRecord, importMetadata.getSession());
             }

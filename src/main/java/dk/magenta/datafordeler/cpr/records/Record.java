@@ -156,7 +156,6 @@ public abstract class Record extends HashMap<String, String> {
     public boolean getBoolean(String key, Boolean fallback) {
         String value = this.get(key);
         if (value == null) {
-            System.out.println(key + " is null");
             if (fallback != null) {
                 return fallback;
             }
