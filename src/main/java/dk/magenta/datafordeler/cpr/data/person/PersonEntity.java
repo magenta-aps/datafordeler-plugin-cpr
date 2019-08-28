@@ -859,6 +859,7 @@ public class PersonEntity extends CprRecordEntity {
             added = addItem(this, this.guardian, record, session, compareExisting);
         }
         if (record instanceof PersonEventDataRecord) {
+            //PersonEventDataRecord should be added separately
             added = addItem(this, this.event, record, session, compareExisting);
         }
         if (added) {
