@@ -238,16 +238,16 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         return personEntity;
     }
 
-    public void createSubscription(HashSet<String> addCprNumbers) throws DataFordelerException {
-        this.createSubscription(addCprNumbers, new HashSet<>());
+    public void createSubscription(Set<String> addCprNumbers) {
+        this.createSubscription(addCprNumbers, Collections.EMPTY_SET);
     }
 
     /**
-     * Create subscribtions by adding them to the table of subscribtions
+     * Create subscriptions by adding them to the table of subscriptions
      * @param addCprNumbers
      * @param removeCprNumbers
      */
-    public void createSubscription(HashSet<String> addCprNumbers, HashSet<String> removeCprNumbers) {
+    public void createSubscription(Set<String> addCprNumbers, Set<String> removeCprNumbers) {
         this.log.info("Collected these numbers for subscription: "+addCprNumbers);
 
         Session session = sessionManager.getSessionFactory().openSession();
@@ -278,6 +278,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                 session.getTransaction().commit();
             } catch (Exception e) {
                 session.getTransaction().rollback();
+                log.warn(e);
             }
         } finally {
             session.close();
