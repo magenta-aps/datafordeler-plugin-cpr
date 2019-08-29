@@ -20,16 +20,13 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -269,7 +266,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                 for (String add : addCprNumbers) {
                     PersonSubscription newSubscription = new PersonSubscription();
                     newSubscription.setPersonNumber(add);
-                    newSubscription.setAssignment(PersonSubscriptionAssignementStatus.CreatedInTable);
+                    newSubscription.setAssignment(PersonSubscriptionAssignmentStatus.CreatedInTable);
                     session.save(newSubscription);
                 }
                 for (String remove : removeCprNumbers) {
@@ -288,7 +285,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
     }
 
     /**
-     * Create the subscribtion-file from the table of subscribtions, and upload them to FTP-server
+     * Create the subscription-file from the table of subscriptions, and upload them to FTP-server
      */
     public void createSubscriptionFile() {
         String charset = this.getConfiguration().getRegisterCharset(this);
@@ -297,21 +294,21 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         try(Session session = sessionManager.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             Criteria criteria = session.createCriteria(PersonSubscription.class);
-            criteria.add(Restrictions.eq(PersonSubscription.DB_FIELD_CPR_ASSIGNMENT_STATUS, PersonSubscriptionAssignementStatus.CreatedInTable));
+            criteria.add(Restrictions.eq(PersonSubscription.DB_FIELD_CPR_ASSIGNMENT_STATUS, PersonSubscriptionAssignmentStatus.CreatedInTable));
             List<PersonSubscription> subscriptionList = criteria.list();
-            // If there if no subscribtion to upload just log
+            // If there if no subscription to upload just log
             if (subscriptionList.size()==0) {
-                log.info("There is found nu subscribtions for upload");
+                log.info("There is found nu subscriptions for upload");
                 return;
             }
 
             for (PersonSubscription subscription : subscriptionList) {
-                subscription.setAssignment(PersonSubscriptionAssignementStatus.UploadedToCpr);
+                subscription.setAssignment(PersonSubscriptionAssignmentStatus.UploadedToCpr);
             }
 
             StringJoiner content = new StringJoiner("\r\n");
 
-            for (PersonSubscription subscribtion : subscriptionList) {
+            for (PersonSubscription subscription : subscriptionList) {
                     content.add(
                             String.format(
                                     "%02d%04d%02d%2s%10s%15s%45s",
@@ -319,20 +316,20 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                                     this.getCustomerId(),
                                     0,
                                     "OP",
-                                    subscribtion.getPersonNumber(),
+                                    subscription.getPersonNumber(),
                                     "",
                                     ""
                             )
                     );
             }
 
-            for (PersonSubscription subscribtion : subscriptionList) {
+            for (PersonSubscription subscription : subscriptionList) {
                 content.add(
                         String.format(
                                 "%02d%06d%10s%15s",
                                 7,
                                 this.getJobId(),
-                                subscribtion.getPersonNumber(),
+                                subscription.getPersonNumber(),
                                 "",
                                 ""
                         )
