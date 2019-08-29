@@ -854,9 +854,6 @@ public class PersonEntity extends CprRecordEntity {
             recentTechnicalCorrectionRecords = new ListHashMap<>();
             recentTechnicalCorrections.put(entity, recentTechnicalCorrectionRecords);
         }
-        if (newItem.isTechnicalCorrection()) {
-            recentTechnicalCorrectionRecords.add(newItem.getEffectFrom(), newItem);
-        }
 
         if (newItem != null) {
 
@@ -921,7 +918,7 @@ public class PersonEntity extends CprRecordEntity {
                         session.saveOrUpdate(oldItem);
                         return set.add((E) newItem);
 
-
+                        
                     } else if (
                                 newItem.getBitemporality().equals(oldItem.getBitemporality()) &&
                                                 (newItem instanceof AddressDataRecord) &&

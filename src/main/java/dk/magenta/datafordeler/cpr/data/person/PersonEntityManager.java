@@ -242,7 +242,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         return personEntity;
     }
 
-    private void createSubscription(HashSet<String> addCprNumbers) throws DataFordelerException {
+    public void createSubscription(HashSet<String> addCprNumbers) throws DataFordelerException {
         this.createSubscription(addCprNumbers, new HashSet<>());
     }
 
@@ -251,7 +251,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
      * @param addCprNumbers
      * @param removeCprNumbers
      */
-    private void createSubscription(HashSet<String> addCprNumbers, HashSet<String> removeCprNumbers) {
+    public void createSubscription(HashSet<String> addCprNumbers, HashSet<String> removeCprNumbers) {
         this.log.info("Collected these numbers for subscription: "+addCprNumbers);
 
         Session session = sessionManager.getSessionFactory().openSession();
@@ -299,20 +299,20 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             transaction = session.beginTransaction();
             Criteria criteria = session.createCriteria(PersonSubscription.class);
             criteria.add(Restrictions.eq(PersonSubscription.DB_FIELD_CPR_ASSIGNMENT_STATUS, PersonSubscriptionAssignementStatus.CreatedInTable));
-            List<PersonSubscription> subscribtionList = criteria.list();
+            List<PersonSubscription> subscriptionList = criteria.list();
             // If there if no subscribtion to upload just log
-            if(subscribtionList.size()==0) {
+            if (subscriptionList.size()==0) {
                 log.info("There is found nu subscribtions for upload");
                 return;
             }
 
-            for(PersonSubscription subscription : subscribtionList) {
+            for (PersonSubscription subscription : subscriptionList) {
                 subscription.setAssignment(PersonSubscriptionAssignementStatus.UploadedToCpr);
             }
 
             StringJoiner content = new StringJoiner("\r\n");
 
-            for (PersonSubscription subscribtion : subscribtionList) {
+            for (PersonSubscription subscribtion : subscriptionList) {
                     content.add(
                             String.format(
                                     "%02d%04d%02d%2s%10s%15s%45s",
@@ -327,7 +327,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                     );
             }
 
-            for (PersonSubscription subscribtion : subscribtionList) {
+            for (PersonSubscription subscribtion : subscriptionList) {
                 content.add(
                         String.format(
                                 "%02d%06d%10s%15s",
