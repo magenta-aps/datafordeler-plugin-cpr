@@ -13,24 +13,21 @@ import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthTimeDataRecord;
-import dk.magenta.datafordeler.cpr.records.person.data.ChurchVerificationDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ParentDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.PersonEventDataRecord;
 import dk.magenta.datafordeler.cpr.records.service.PersonEntityRecordService;
 import dk.magenta.datafordeler.cpr.synchronization.SubscribtionTimerTask;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -358,9 +355,13 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             i=c;
         }
         for (PersonDataRecord record : records) {
-            //System.out.println("-------------------------");
-            //System.out.println(record.getLine());
-            //System.out.println("cnt: "+i);
+
+            if (record instanceof PersonEventRecord) {
+                for(PersonEventDataRecord event : ((PersonEventRecord)record).getPersonEvents()) {
+                    entity.addEvent(event, importMetadata.getSession());
+                }
+            }
+
             for (CprBitemporalRecord bitemporalRecord : record.getBitemporalRecords()) {
                 bitemporalRecord.setDafoUpdated(updateTime);
                 bitemporalRecord.setOrigin(record.getOrigin());
@@ -371,11 +372,6 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             i++;
         }
         cnts.put(entity.getPersonnummer(), i);
-        /*try {
-            System.out.println("address: "+getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(entity.getAddress()));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public static String json(Object o) {

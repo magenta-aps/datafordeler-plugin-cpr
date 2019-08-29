@@ -2,29 +2,28 @@ package dk.magenta.datafordeler.cpr.records.person.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dk.magenta.datafordeler.core.database.DatabaseEntry;
+import dk.magenta.datafordeler.core.database.*;
 import dk.magenta.datafordeler.cpr.CprPlugin;
-import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
-import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
+import dk.magenta.datafordeler.cpr.data.CprRecordEntity;
+import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.Collection;
 
 /**
- * Storage for data on a Person's parentage,
- * referenced by {@link dk.magenta.datafordeler.cpr.records.person.data.PersonEventDataRecord}
+ * Storage for data on a Person's eventhistory
+ * referenced by {@link dk.magenta.datafordeler.cpr.records.person.data}
  */
 @Entity
-@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonEventDataRecord.TABLE_NAME, indexes = {
-        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + PersonEventDataRecord.TABLE_NAME + CprBitemporalPersonRecord.DB_FIELD_ENTITY, columnList = CprBitemporalPersonRecord.DB_FIELD_ENTITY + DatabaseEntry.REF)})
-public class PersonEventDataRecord extends CprBitemporalPersonRecord<PersonEventDataRecord> {
-
-    public static final String TABLE_NAME = "cpr_person_event_record";
+@Table(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_event_record", indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + "cpr_person_event_record" + PersonEventDataRecord.DB_FIELD_ENTITY, columnList = PersonEventDataRecord.DB_FIELD_ENTITY + DatabaseEntry.REF)
+})
+public class PersonEventDataRecord extends CprRecordEntity {
 
     public PersonEventDataRecord() {
     }
@@ -35,6 +34,26 @@ public class PersonEventDataRecord extends CprBitemporalPersonRecord<PersonEvent
         this.derived = derived;
     }
 
+
+    public static final String DB_FIELD_ENTITY = "entity";
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = PersonEventDataRecord.DB_FIELD_ENTITY + DatabaseEntry.REF)
+    @JsonIgnore
+    @XmlTransient
+    private PersonEntity entity;
+
+    public PersonEntity getEntity() {
+        return this.entity;
+    }
+
+    public void setEntity(PersonEntity entity) {
+        this.entity = entity;
+    }
+
+    public void setEntity(IdentifiedEntity entity) {
+        this.entity = (PersonEntity) entity;
+    }
 
 
 
@@ -58,46 +77,26 @@ public class PersonEventDataRecord extends CprBitemporalPersonRecord<PersonEvent
     @XmlTransient
     private String derived;
 
-    @Transient
-    private OffsetDateTime effectFrom;
 
-    @Transient
-    private OffsetDateTime effectFromUncertain;
+    public static final String DB_FIELD_IDENTIFICATION = "identification";
 
-    @Transient
-    private OffsetDateTime effectTo;
+    @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name = DB_FIELD_IDENTIFICATION)
+    public Identification identification;
 
-    @Transient
-    private OffsetDateTime effectToUncertain;
 
-    /*@Transient
-    private OffsetDateTime historic;*/
-
-    @Override
-    public boolean equalData(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equalData(o)) return false;
-        PersonEventDataRecord that = (PersonEventDataRecord) o;
-        return timestamp == that.timestamp;
+    public void setIdentification(Identification identification) {
+        this.identification = identification;
     }
 
-    @Override
-    public boolean hasData() {
-        return this.timestamp != null;
+    @JsonProperty(value = "id")
+    public Long getId() {
+        return super.getId();
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), timestamp);
-    }
 
     @Override
-    public PersonEventDataRecord clone() {
-        PersonEventDataRecord clone = new PersonEventDataRecord();
-        clone.timestamp = this.timestamp;
-        clone.event = this.event;
-        clone.derived = this.derived;
-        return clone;
+    public IdentifiedEntity getNewest(Collection<IdentifiedEntity> collection) {
+        return null;
     }
 }
