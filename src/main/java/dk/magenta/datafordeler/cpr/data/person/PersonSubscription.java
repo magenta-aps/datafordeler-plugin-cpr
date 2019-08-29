@@ -31,7 +31,7 @@ public class PersonSubscription extends DatabaseEntry {
 
     @Column(name = DB_FIELD_CPR_ASSIGNMENT_STATUS)
     @Enumerated(EnumType.ORDINAL)
-    private PersonSubscriptionAssignementStatus personAssignmentStatus;
+    private PersonSubscriptionAssignmentStatus personAssignmentStatus;
 
     public String getPersonNumber() {
         return this.personNumber;
@@ -50,11 +50,11 @@ public class PersonSubscription extends DatabaseEntry {
         this.reason = reason;
     }
 
-    public PersonSubscriptionAssignementStatus getAssignment() {
+    public PersonSubscriptionAssignmentStatus getAssignment() {
         return personAssignmentStatus;
     }
 
-    public void setAssignment(PersonSubscriptionAssignementStatus personAssignmentStatus) {
+    public void setAssignment(PersonSubscriptionAssignmentStatus personAssignmentStatus) {
         this.personAssignmentStatus = personAssignmentStatus;
     }
 }

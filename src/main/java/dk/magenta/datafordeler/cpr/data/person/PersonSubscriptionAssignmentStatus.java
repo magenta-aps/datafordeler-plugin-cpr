@@ -1,6 +1,6 @@
 package dk.magenta.datafordeler.cpr.data.person;
 
-public enum PersonSubscriptionAssignementStatus {
+public enum PersonSubscriptionAssignmentStatus {
 
     CreatedInTable, UploadedToCpr
 }
