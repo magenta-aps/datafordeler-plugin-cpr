@@ -77,18 +77,6 @@ public class PersonEventDataRecord extends CprRecordEntity {
     @XmlTransient
     private String derived;
 
-
-    public static final String DB_FIELD_IDENTIFICATION = "identification";
-
-    @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = DB_FIELD_IDENTIFICATION)
-    public Identification identification;
-
-
-    public void setIdentification(Identification identification) {
-        this.identification = identification;
-    }
-
     @JsonProperty(value = "id")
     public Long getId() {
         return super.getId();
