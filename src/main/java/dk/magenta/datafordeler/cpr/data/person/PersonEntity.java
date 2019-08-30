@@ -903,7 +903,7 @@ public class PersonEntity extends CprRecordEntity {
                             ) {
                         // The new record with corrected data is the first record with the same origin that shares registration
                         correctingRecord = oldItem;
-                    } else if (newItem.equalData(oldItem) && !Objects.equals(newItem.getOrigin(), oldItem.getOrigin())/* && oldItem.getCorrector() == null*/) {
+                    } else if (newItem.equalData(oldItem) && !Objects.equals(newItem.getOrigin(), oldItem.getOrigin())) {
                         // The old record that is being corrected has equal data with the correction marking and shares registration
                         correctedRecord = oldItem;
                     }
@@ -927,13 +927,14 @@ public class PersonEntity extends CprRecordEntity {
                     if (
                             newItem.isHistoric() && !oldItem.isHistoric() &&
                             //Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
-                            Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null &&
-                            !Equality.equal(newItem.getEffectFrom(), newItem.getEffectTo())
+                            Equality.equalDate(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null &&
+                            !Equality.equalDate(newItem.getEffectFrom(), newItem.getEffectTo())
                             && oldItem.getReplacedby() == null
                             ) {
                         //I would expect that this case is wrong, why let a historic overwrite an nonhistoric
                         oldItem.setReplacedby(newItem);
                         oldItem.setRegistrationTo(newItem.getRegistrationFrom());
+                        newItem.setSameAs(oldItem);
                         session.saveOrUpdate(oldItem);
                         return set.add((E) newItem);
 
@@ -949,8 +950,8 @@ public class PersonEntity extends CprRecordEntity {
                         return set.add((E) newItem);
 
                     } else if (
-                            Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
-                                    Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) &&
+                            Equality.equalDate(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
+                                    Equality.equalDate(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) &&
                                     Equality.equalDate(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
                                     Equality.equalDate(newItem.getEffectTo(), oldItem.getEffectTo())
                             ) {
