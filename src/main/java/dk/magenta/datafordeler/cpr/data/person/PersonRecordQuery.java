@@ -24,6 +24,7 @@ public class PersonRecordQuery extends BaseQuery {
     public static final String DOOR = "doer";
     public static final String FLOOR = "floor";
     public static final String HOUSENO = "houseno";
+    public static final String BUILDINGNO = "buildingno";
 
     @QueryField(type = QueryField.FieldType.STRING, queryName = PERSONNUMMER)
     private List<String> personnumre = new ArrayList<>();
@@ -162,6 +163,22 @@ public class PersonRecordQuery extends BaseQuery {
     }
 
 
+    @QueryField(type = QueryField.FieldType.STRING, queryName = BUILDINGNO)
+    private List<String> buildingNos = new ArrayList<>();
+
+    public Collection<String> getBuildingNos() {
+        return this.buildingNos;
+    }
+
+    public void addBuildingNo(String houseNo) {
+        this.buildingNos.add(houseNo);
+    }
+
+    public void clearBuildingNo() {
+        this.buildingNos.clear();
+    }
+
+
     @Override
     public Map<String, Object> getSearchParameters() {
         HashMap<String, Object> map = new HashMap<>();
@@ -215,6 +232,9 @@ public class PersonRecordQuery extends BaseQuery {
         }
         if (!this.getHouseNos().isEmpty()) {
             lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_ADDRESS + LookupDefinition.separator + AddressDataRecord.DB_FIELD_HOUSENUMBER, this.getHouseNos(), String.class);
+        }
+        if (!this.getBuildingNos().isEmpty()) {
+            lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_ADDRESS + LookupDefinition.separator + AddressDataRecord.DB_FIELD_BUILDING_NUMBER, this.getBuildingNos(), String.class);
         }
         if (!this.getKommunekodeRestriction().isEmpty()) {
             lookupDefinition.put(LookupDefinition.entityref + LookupDefinition.separator + PersonEntity.DB_FIELD_ADDRESS + LookupDefinition.separator + AddressDataRecord.DB_FIELD_MUNICIPALITY_CODE, this.getKommunekodeRestriction(), Integer.class);
