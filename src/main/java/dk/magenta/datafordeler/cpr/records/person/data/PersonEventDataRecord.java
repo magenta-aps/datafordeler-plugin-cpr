@@ -56,7 +56,13 @@ public class PersonEventDataRecord extends CprRecordEntity {
     }
 
 
+    public String getEvent() {
+        return event;
+    }
 
+    public OffsetDateTime getTimestamp() {
+        return timestamp;
+    }
 
     public static final String DB_FIELD_TIMESTAMP = "timestamp";
     @Column(name = DB_FIELD_TIMESTAMP)
