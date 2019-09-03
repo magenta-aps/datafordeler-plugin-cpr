@@ -85,6 +85,10 @@ public class FtpService {
         }
     }
 
+    public File getTempDir() {
+        return tempDir;
+    }
+
     public void stopServer() {
         if (this.server != null) {
             this.server.stop();

@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * An Entity representing a person. Bitemporal data is structured as
@@ -737,99 +738,102 @@ public class PersonEntity extends CprRecordEntity {
         return this.guardian;
     }
 
-
     public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session) {
+        this.addBitemporalRecord(record, session, true);
+    }
+
+    public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session, boolean compareExisting) {
         boolean added = false;
         if (record instanceof AddressConameDataRecord) {
-            added = addItem(this, this.coname, record, session);
+            added = addItem(this, this.coname, record, session, compareExisting);
         }
         if (record instanceof AddressDataRecord) {
-            added = addItem(this, this.address, record, session);
+            added = addItem(this, this.address, record, session, compareExisting);
         }
         if (record instanceof AddressNameDataRecord) {
-            added = addItem(this, this.addressName, record, session);
+            added = addItem(this, this.addressName, record, session, compareExisting);
         }
         if (record instanceof BirthPlaceDataRecord) {
-            added = addItem(this, this.birthPlace, record, session);
+            added = addItem(this, this.birthPlace, record, session, compareExisting);
         }
         if (record instanceof BirthPlaceVerificationDataRecord) {
-            added = addItem(this, this.birthPlaceVerification, record, session);
+            added = addItem(this, this.birthPlaceVerification, record, session, compareExisting);
         }
         if (record instanceof BirthTimeDataRecord) {
-            added = addItem(this, this.birthTime, record, session);
+            added = addItem(this, this.birthTime, record, session, compareExisting);
         }
         if (record instanceof ChurchDataRecord) {
-            added = addItem(this, this.churchRelation, record, session);
+            added = addItem(this, this.churchRelation, record, session, compareExisting);
         }
         if (record instanceof ChurchVerificationDataRecord) {
-            added = addItem(this, this.churchRelationVerification, record, session);
+            added = addItem(this, this.churchRelationVerification, record, session, compareExisting);
         }
         if (record instanceof CitizenshipDataRecord) {
-            added = addItem(this, this.citizenship, record, session);
+            added = addItem(this, this.citizenship, record, session, compareExisting);
         }
         if (record instanceof CitizenshipVerificationDataRecord) {
-            added = addItem(this, this.citizenshipVerification, record, session);
+            added = addItem(this, this.citizenshipVerification, record, session, compareExisting);
         }
         if (record instanceof CivilStatusDataRecord) {
-            added = addItem(this, this.civilstatus, record, session);
+            added = addItem(this, this.civilstatus, record, session, compareExisting);
         }
         if (record instanceof CivilStatusAuthorityTextDataRecord) {
-            added = addItem(this, this.civilstatusAuthorityText, record, session);
+            added = addItem(this, this.civilstatusAuthorityText, record, session, compareExisting);
         }
         if (record instanceof CivilStatusVerificationDataRecord) {
-            added = addItem(this, this.civilstatusVerification, record, session);
+            added = addItem(this, this.civilstatusVerification, record, session, compareExisting);
         }
         if (record instanceof ForeignAddressDataRecord) {
-            added = addItem(this, this.foreignAddress, record, session);
+            added = addItem(this, this.foreignAddress, record, session, compareExisting);
         }
         if (record instanceof ForeignAddressEmigrationDataRecord) {
-            added = addItem(this, this.emigration, record, session);
+            added = addItem(this, this.emigration, record, session, compareExisting);
         }
         if (record instanceof MoveMunicipalityDataRecord) {
-            added = addItem(this, this.municipalityMove, record, session);
+            added = addItem(this, this.municipalityMove, record, session, compareExisting);
         }
         if (record instanceof NameAuthorityTextDataRecord) {
-            added = addItem(this, this.nameAuthorityText, record, session);
+            added = addItem(this, this.nameAuthorityText, record, session, compareExisting);
         }
         if (record instanceof NameDataRecord) {
-            added = addItem(this, this.name, record, session);
+            added = addItem(this, this.name, record, session, compareExisting);
         }
         if (record instanceof NameVerificationDataRecord) {
-            added = addItem(this, this.nameVerification, record, session);
+            added = addItem(this, this.nameVerification, record, session, compareExisting);
         }
         if (record instanceof ParentDataRecord) {
             ParentDataRecord pRecord = (ParentDataRecord) record;
             if (pRecord.isMother()) {
-                added = addItem(this, this.mother, pRecord, session);
+                added = addItem(this, this.mother, pRecord, session, compareExisting);
             } else {
-                added = addItem(this, this.father, pRecord, session);
+                added = addItem(this, this.father, pRecord, session, compareExisting);
             }
         }
         if (record instanceof ParentVerificationDataRecord) {
             ParentVerificationDataRecord pRecord = (ParentVerificationDataRecord) record;
             if (pRecord.isMother()) {
-                added = addItem(this, this.motherVerification, pRecord, session);
+                added = addItem(this, this.motherVerification, pRecord, session, compareExisting);
             } else {
-                added = addItem(this, this.fatherVerification, pRecord, session);
+                added = addItem(this, this.fatherVerification, pRecord, session, compareExisting);
             }
         }
         if (record instanceof PersonCoreDataRecord) {
-            added = addItem(this, this.core, record, session);
+            added = addItem(this, this.core, record, session, compareExisting);
         }
         if (record instanceof PersonNumberDataRecord) {
-            added = addItem(this, this.personNumber, record, session);
+            added = addItem(this, this.personNumber, record, session, compareExisting);
         }
         if (record instanceof PersonPositionDataRecord) {
-            added = addItem(this, this.position, record, session);
+            added = addItem(this, this.position, record, session, compareExisting);
         }
         if (record instanceof PersonStatusDataRecord) {
-            added = addItem(this, this.status, record, session);
+            added = addItem(this, this.status, record, session, compareExisting);
         }
         if (record instanceof ProtectionDataRecord) {
-            added = addItem(this, this.protection, record, session);
+            added = addItem(this, this.protection, record, session, compareExisting);
         }
         if (record instanceof GuardianDataRecord) {
-            added = addItem(this, this.guardian, record, session);
+            added = addItem(this, this.guardian, record, session, compareExisting);
         }
         if (added) {
             record.setEntity(this);
@@ -840,7 +844,7 @@ public class PersonEntity extends CprRecordEntity {
     private static FixedQueueMap<PersonEntity, ListHashMap<OffsetDateTime, CprBitemporalPersonRecord>> recentTechnicalCorrections = new FixedQueueMap<>(10);
 
     private static Logger log = LogManager.getLogger(PersonEntity.class.getCanonicalName());
-    private static <E extends CprBitemporalPersonRecord> boolean addItem(PersonEntity entity, Set<E> set, CprBitemporalPersonRecord newItem, Session session) {
+    private static <E extends CprBitemporalPersonRecord> boolean addItem(PersonEntity entity, Set<E> set, CprBitemporalPersonRecord newItem, Session session, boolean compareExisting) {
 
         /*
         * Technical
@@ -850,11 +854,13 @@ public class PersonEntity extends CprRecordEntity {
             recentTechnicalCorrectionRecords = new ListHashMap<>();
             recentTechnicalCorrections.put(entity, recentTechnicalCorrectionRecords);
         }
-        if (newItem.isTechnicalCorrection()) {
-            recentTechnicalCorrectionRecords.add(newItem.getEffectFrom(), newItem);
-        }
 
         if (newItem != null) {
+
+            if (!compareExisting) {
+                return set.add((E) newItem);
+            }
+
             E correctedRecord = null;
             E correctingRecord = null;
             ArrayList<E> items = new ArrayList<>(set);
@@ -906,36 +912,32 @@ public class PersonEntity extends CprRecordEntity {
                             !Equality.equal(newItem.getEffectFrom(), newItem.getEffectTo())
                             && oldItem.getReplacedby() == null
                             ) {
+                        //I would expect that this case is wrong, why let a historic overwrite an nonhistoric
                         oldItem.setReplacedby(newItem);
                         oldItem.setRegistrationTo(newItem.getRegistrationFrom());
                         session.saveOrUpdate(oldItem);
                         return set.add((E) newItem);
 
+                        
+                    } else if (
+                                newItem.getBitemporality().equals(oldItem.getBitemporality()) &&
+                                                (newItem instanceof AddressDataRecord) &&
+                                                !((AddressDataRecord) newItem).equalDataWithMunicipalityChange(oldItem, false)
+                                        ) {
+                        // Special case for addresses: Municipality codes may have changed without us getting a change record (AnnKor: Æ)
+                        oldItem.setReplacedby(newItem);
+                        oldItem.setRegistrationTo(newItem.getRegistrationFrom());
+                        return set.add((E) newItem);
 
-                    /*
-                    * Special case for addresses: Municipality codes may have changed without us getting a change record (AnnKor: Æ)
-                    * */
-                    } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
-                        if (newItem instanceof AddressDataRecord) {
-                            AddressDataRecord addressDataRecord = (AddressDataRecord) newItem;
-                            if (!addressDataRecord.equalDataWithMunicipalityChange(oldItem, false)) {
-                                oldItem.setReplacedby(newItem);
-                                oldItem.setRegistrationTo(newItem.getRegistrationFrom());
-                                return set.add((E) newItem);
-                            }
-                        } else {
-                            return false;
-                        }
-
-                        /*
-                        * We see a record that is a near-repeat of a prior record. No need to add it
-                        * */
                     } else if (
                             Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
                             (Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) || newItem.getRegistrationTo() == null) &&
                             Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
                             newItem.getEffectTo() == null
                             ) {
+                        /*
+                         * We see a record that is a near-repeat of a prior record. No need to add it
+                         * */
                         return false;
                     }
                 }
@@ -1016,6 +1018,14 @@ public class PersonEntity extends CprRecordEntity {
                 }
             } else {
                 //log.info("nonmatching item, adding as new");
+                boolean hasAnyUnclosed = items.stream().anyMatch(item -> item.getRegistrationTo() == null && item.getEffectTo() == null);
+
+                //Does this person allready have a recordtype which is of same type, and which is unclosed, then close the old one
+                if(hasAnyUnclosed && newItem.getRegistrationTo()==null && newItem.getEffectTo()==null) {
+                    correctedRecord = items.stream().filter(i -> i.getRegistrationTo() == null && i.getEffectTo() == null).findAny().get();
+                    correctedRecord.setRegistrationTo(newItem.getRegistrationFrom());
+                }
+
                 return set.add((E) newItem);
             }
         }

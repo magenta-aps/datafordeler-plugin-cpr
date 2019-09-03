@@ -24,6 +24,7 @@ import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -48,6 +49,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode= DirtiesContext.ClassMode.BEFORE_CLASS)
 public class FatherSubscribtionTest {
 
     @Autowired
@@ -181,8 +183,6 @@ public class FatherSubscribtionTest {
             //One should not be added to subscribtion becrause the child is more than 18 years old.
             //One person should not be added becrause the father allready exists as a person.
             Assert.assertEquals(3, subscriptions.size());
-            File[] subFiles = localSubFolder.listFiles();
-            Assert.assertEquals(1, subFiles.length);
         } finally {
             session.close();
             localSubFolder.delete();
