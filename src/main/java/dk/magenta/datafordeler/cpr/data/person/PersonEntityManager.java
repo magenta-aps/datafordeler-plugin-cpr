@@ -239,16 +239,16 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         return personEntity;
     }
 
-    private void createSubscription(HashSet<String> addCprNumbers) throws DataFordelerException {
-        this.createSubscription(addCprNumbers, new HashSet<>());
+    public void createSubscription(Set<String> addCprNumbers) {
+        this.createSubscription(addCprNumbers, Collections.EMPTY_SET);
     }
 
     /**
-     * Create subscribtions by adding them to the table of subscribtions
+     * Create subscriptions by adding them to the table of subscriptions
      * @param addCprNumbers
      * @param removeCprNumbers
      */
-    private void createSubscription(HashSet<String> addCprNumbers, HashSet<String> removeCprNumbers) {
+    public void createSubscription(Set<String> addCprNumbers, Set<String> removeCprNumbers) {
         this.log.info("Collected these numbers for subscription: "+addCprNumbers);
 
         Session session = sessionManager.getSessionFactory().openSession();
@@ -267,7 +267,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                 for (String add : addCprNumbers) {
                     PersonSubscription newSubscription = new PersonSubscription();
                     newSubscription.setPersonNumber(add);
-                    newSubscription.setAssignment(PersonSubscriptionAssignementStatus.CreatedInTable);
+                    newSubscription.setAssignment(PersonSubscriptionAssignmentStatus.CreatedInTable);
                     session.save(newSubscription);
                 }
                 for (String remove : removeCprNumbers) {
@@ -279,6 +279,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                 session.getTransaction().commit();
             } catch (Exception e) {
                 session.getTransaction().rollback();
+                log.warn(e);
             }
         } finally {
             session.close();
@@ -286,7 +287,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
     }
 
     /**
-     * Create the subscribtion-file from the table of subscribtions, and upload them to FTP-server
+     * Create the subscription-file from the table of subscriptions, and upload them to FTP-server
      */
     public void createSubscriptionFile() {
         String charset = this.getConfiguration().getRegisterCharset(this);
@@ -295,21 +296,21 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         try(Session session = sessionManager.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             Criteria criteria = session.createCriteria(PersonSubscription.class);
-            criteria.add(Restrictions.eq(PersonSubscription.DB_FIELD_CPR_ASSIGNMENT_STATUS, PersonSubscriptionAssignementStatus.CreatedInTable));
-            List<PersonSubscription> subscribtionList = criteria.list();
-            // If there if no subscribtion to upload just log
-            if(subscribtionList.size()==0) {
-                log.info("There is found nu subscribtions for upload");
+            criteria.add(Restrictions.eq(PersonSubscription.DB_FIELD_CPR_ASSIGNMENT_STATUS, PersonSubscriptionAssignmentStatus.CreatedInTable));
+            List<PersonSubscription> subscriptionList = criteria.list();
+            // If there if no subscription to upload just log
+            if (subscriptionList.size()==0) {
+                log.info("There is found nu subscriptions for upload");
                 return;
             }
 
-            for(PersonSubscription subscription : subscribtionList) {
-                subscription.setAssignment(PersonSubscriptionAssignementStatus.UploadedToCpr);
+            for (PersonSubscription subscription : subscriptionList) {
+                subscription.setAssignment(PersonSubscriptionAssignmentStatus.UploadedToCpr);
             }
 
             StringJoiner content = new StringJoiner("\r\n");
 
-            for (PersonSubscription subscribtion : subscribtionList) {
+            for (PersonSubscription subscription : subscriptionList) {
                     content.add(
                             String.format(
                                     "%02d%04d%02d%2s%10s%15s%45s",
@@ -317,20 +318,20 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                                     this.getCustomerId(),
                                     0,
                                     "OP",
-                                    subscribtion.getPersonNumber(),
+                                    subscription.getPersonNumber(),
                                     "",
                                     ""
                             )
                     );
             }
 
-            for (PersonSubscription subscribtion : subscribtionList) {
+            for (PersonSubscription subscription : subscriptionList) {
                 content.add(
                         String.format(
                                 "%02d%06d%10s%15s",
                                 7,
                                 this.getJobId(),
-                                subscribtion.getPersonNumber(),
+                                subscription.getPersonNumber(),
                                 "",
                                 ""
                         )
