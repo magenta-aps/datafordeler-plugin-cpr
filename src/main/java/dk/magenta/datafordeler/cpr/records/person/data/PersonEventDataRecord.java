@@ -28,9 +28,9 @@ public class PersonEventDataRecord extends CprRecordEntity {
     public PersonEventDataRecord() {
     }
 
-    public PersonEventDataRecord(OffsetDateTime timestamp, String event, String derived) {
+    public PersonEventDataRecord(OffsetDateTime timestamp, String eventId, String derived) {
         this.timestamp = timestamp;
-        this.event = event;
+        this.eventId = eventId;
         this.derived = derived;
     }
 
@@ -56,8 +56,8 @@ public class PersonEventDataRecord extends CprRecordEntity {
     }
 
 
-    public String getEvent() {
-        return event;
+    public String getEventId() {
+        return eventId;
     }
 
     public OffsetDateTime getTimestamp() {
@@ -71,11 +71,11 @@ public class PersonEventDataRecord extends CprRecordEntity {
     private OffsetDateTime timestamp;
 
 
-    public static final String DB_FIELD_EVENT = "event";
+    public static final String DB_FIELD_EVENT = "eventId";
     @Column(name = DB_FIELD_EVENT)
     @JsonIgnore
     @XmlTransient
-    private String event;
+    private String eventId;
 
     public static final String DB_FIELD_DERIVED = "derived";
     @Column(name = DB_FIELD_DERIVED)
