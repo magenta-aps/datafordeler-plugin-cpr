@@ -951,10 +951,10 @@ public class PersonEntity extends CprRecordEntity {
 
                     } else if (
                             Equality.equalDate(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
-                                    Equality.equalDate(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) &&
+                                    (Equality.equalDate(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) || newItem.getRegistrationTo() == null) &&
                                     Equality.equalDate(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
-                                    Equality.equalDate(newItem.getEffectTo(), oldItem.getEffectTo())
-                            ) {
+                                    newItem.getEffectTo() == null
+                    ) {
                         /*
                          * We see a record that is a near-repeat of a prior record. No need to add it
                          * */
