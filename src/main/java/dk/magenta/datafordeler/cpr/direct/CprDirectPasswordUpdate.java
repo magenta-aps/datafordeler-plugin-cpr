@@ -1,13 +1,30 @@
 package dk.magenta.datafordeler.cpr.direct;
 
+import dk.magenta.datafordeler.core.AbstractTask;
+import dk.magenta.datafordeler.core.Engine;
+import dk.magenta.datafordeler.core.Pull;
 import dk.magenta.datafordeler.core.command.Worker;
+import dk.magenta.datafordeler.core.plugin.RegisterManager;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
+import org.quartz.JobDataMap;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 
 public class CprDirectPasswordUpdate extends Worker implements Runnable {
+
+
+    public static class Task extends AbstractTask<CprDirectPasswordUpdate> {
+        public static final String DATA_CONFIGURATIONMANAGER = "configurationManager";
+
+        @Override
+        protected CprDirectPasswordUpdate createWorker(JobDataMap dataMap) {
+            CprConfigurationManager configurationManager = (CprConfigurationManager) dataMap.get(DATA_CONFIGURATIONMANAGER);
+            return new CprDirectPasswordUpdate(configurationManager);
+        }
+    }
+
 
     private CprConfigurationManager configurationManager;
     private SecureRandom random = new SecureRandom();
