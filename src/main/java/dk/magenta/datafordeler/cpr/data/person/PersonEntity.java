@@ -738,6 +738,22 @@ public class PersonEntity extends CprRecordEntity {
         return this.guardian;
     }
 
+    public static final String DB_FIELD_EVENT = "event";
+    public static final String IO_FIELD_EVENT = "event";
+    @OneToMany(mappedBy = PersonEventDataRecord.DB_FIELD_ENTITY, cascade = CascadeType.ALL)
+    @JsonProperty(IO_FIELD_EVENT)
+    Set<PersonEventDataRecord> event = new HashSet<>();
+
+    public Set<PersonEventDataRecord> getEvent() {
+        return this.event;
+    }
+
+    public void addEvent(PersonEventDataRecord record, Session session) {
+        this.event.add(record);
+        record.setEntity(this);
+    }
+
+
     public void addBitemporalRecord(CprBitemporalPersonRecord record, Session session) {
         this.addBitemporalRecord(record, session, true);
     }
@@ -854,6 +870,9 @@ public class PersonEntity extends CprRecordEntity {
             recentTechnicalCorrectionRecords = new ListHashMap<>();
             recentTechnicalCorrections.put(entity, recentTechnicalCorrectionRecords);
         }
+        if (newItem.isTechnicalCorrection()) {
+            recentTechnicalCorrectionRecords.add(newItem.getEffectFrom(), newItem);
+        }
 
         if (newItem != null) {
 
@@ -884,7 +903,7 @@ public class PersonEntity extends CprRecordEntity {
                             ) {
                         // The new record with corrected data is the first record with the same origin that shares registration
                         correctingRecord = oldItem;
-                    } else if (newItem.equalData(oldItem) && !Objects.equals(newItem.getOrigin(), oldItem.getOrigin())/* && oldItem.getCorrector() == null*/) {
+                    } else if (newItem.equalData(oldItem) && !Objects.equals(newItem.getOrigin(), oldItem.getOrigin())) {
                         // The old record that is being corrected has equal data with the correction marking and shares registration
                         correctedRecord = oldItem;
                     }
@@ -908,17 +927,18 @@ public class PersonEntity extends CprRecordEntity {
                     if (
                             newItem.isHistoric() && !oldItem.isHistoric() &&
                             //Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
-                            Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null &&
-                            !Equality.equal(newItem.getEffectFrom(), newItem.getEffectTo())
+                            Equality.equalDate(newItem.getEffectFrom(), oldItem.getEffectFrom()) && oldItem.getEffectTo() == null &&
+                            !Equality.equalDate(newItem.getEffectFrom(), newItem.getEffectTo())
                             && oldItem.getReplacedby() == null
                             ) {
                         //I would expect that this case is wrong, why let a historic overwrite an nonhistoric
                         oldItem.setReplacedby(newItem);
                         oldItem.setRegistrationTo(newItem.getRegistrationFrom());
+                        newItem.setSameAs(oldItem);
                         session.saveOrUpdate(oldItem);
                         return set.add((E) newItem);
 
-                        
+
                     } else if (
                                 newItem.getBitemporality().equals(oldItem.getBitemporality()) &&
                                                 (newItem instanceof AddressDataRecord) &&
@@ -930,11 +950,11 @@ public class PersonEntity extends CprRecordEntity {
                         return set.add((E) newItem);
 
                     } else if (
-                            Equality.equal(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
-                            (Equality.equal(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) || newItem.getRegistrationTo() == null) &&
-                            Equality.equal(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
-                            newItem.getEffectTo() == null
-                            ) {
+                            Equality.equalDate(newItem.getRegistrationFrom(), oldItem.getRegistrationFrom()) &&
+                                    (Equality.equalDate(newItem.getRegistrationTo(), oldItem.getRegistrationTo()) || newItem.getRegistrationTo() == null) &&
+                                    Equality.equalDate(newItem.getEffectFrom(), oldItem.getEffectFrom()) &&
+                                    newItem.getEffectTo() == null
+                    ) {
                         /*
                          * We see a record that is a near-repeat of a prior record. No need to add it
                          * */

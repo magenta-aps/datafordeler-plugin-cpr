@@ -13,8 +13,8 @@ import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthTimeDataRecord;
-import dk.magenta.datafordeler.cpr.records.person.data.ChurchVerificationDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ParentDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.PersonEventDataRecord;
 import dk.magenta.datafordeler.cpr.records.service.PersonEntityRecordService;
 import dk.magenta.datafordeler.cpr.synchronization.SubscribtionTimerTask;
 import org.hibernate.Criteria;
@@ -356,9 +356,13 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             i=c;
         }
         for (PersonDataRecord record : records) {
-            //System.out.println("-------------------------");
-            //System.out.println(record.getLine());
-            //System.out.println("cnt: "+i);
+
+            if (record instanceof PersonEventRecord) {
+                for(PersonEventDataRecord event : ((PersonEventRecord)record).getPersonEvents()) {
+                    entity.addEvent(event, importMetadata.getSession());
+                }
+            }
+
             for (CprBitemporalRecord bitemporalRecord : record.getBitemporalRecords()) {
                 bitemporalRecord.setDafoUpdated(updateTime);
                 bitemporalRecord.setOrigin(record.getOrigin());
@@ -369,11 +373,6 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             i++;
         }
         cnts.put(entity.getPersonnummer(), i);
-        /*try {
-            System.out.println("address: "+getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(entity.getAddress()));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public static String json(Object o) {

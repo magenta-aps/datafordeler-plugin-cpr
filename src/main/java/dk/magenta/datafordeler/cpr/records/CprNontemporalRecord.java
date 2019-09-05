@@ -78,25 +78,23 @@ public abstract class CprNontemporalRecord<E extends CprRecordEntity, S extends 
     }
 
     public void setCorrectionof(S correctionof) {
-        /*if (correctionof != null && correctionof.getCorrector() != null && correctionof.getCorrector() != this) {
-            System.out.println("Tried to point "+this.cnt+" to "+correctionof.cnt+", but "+correctionof.cnt+" already has "+correctionof.getCorrector().cnt+" pointing to it");
-        }*/
         this.correctionof = correctionof;
-        //correctionof.setCorrector((S) this);
     }
 
-/*
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = DB_FIELD_CORRECTION_OF)
-    @JsonIgnore
-    private S corrector;
 
-    public S getCorrector() {
-        return this.corrector;
+    public static final String DB_FIELD_SAME_AS = "sameas";
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private S sameas;
+
+    public S getSameAs() {
+        return this.sameas;
     }
 
-    public void setCorrector(S corrector) {
-        this.corrector = corrector;
-    }*/
+    public void setSameAs(S sameas) {
+        this.sameas = sameas;
+    }
+
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "replacedby")
     private S replaces;
