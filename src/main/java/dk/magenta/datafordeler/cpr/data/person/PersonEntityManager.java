@@ -251,6 +251,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
     public void createSubscription(Set<String> addCprNumbers, Set<String> removeCprNumbers) {
         this.log.info("Collected these numbers for subscription: "+addCprNumbers);
 
+        HashSet<String> cprNumbersToBeAdded = new HashSet<String>(addCprNumbers);
         Session session = sessionManager.getSessionFactory().openSession();
         try {
             List<PersonSubscription> existingSubscriptions = QueryManager.getAllItems(session, PersonSubscription.class);
@@ -259,12 +260,12 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                 map.put(subscription.getPersonNumber(), subscription);
             }
 
-            addCprNumbers.removeAll(removeCprNumbers);
-            addCprNumbers.removeAll(map.keySet());
+            cprNumbersToBeAdded.removeAll(removeCprNumbers);
+            cprNumbersToBeAdded.removeAll(map.keySet());
 
             session.beginTransaction();
             try {
-                for (String add : addCprNumbers) {
+                for (String add : cprNumbersToBeAdded) {
                     PersonSubscription newSubscription = new PersonSubscription();
                     newSubscription.setPersonNumber(add);
                     newSubscription.setAssignment(PersonSubscriptionAssignmentStatus.CreatedInTable);

@@ -189,5 +189,13 @@ public class FatherSubscribtionTest {
         }
     }
 
+    /**
+     * Validate that subscribtion can handle collections that is unmodifiable
+     * @throws Exception
+     */
+    @Test
+    public void testSubscriptionCreatin() throws Exception {
+        personEntityManager.createSubscription(Collections.singleton("1111111111"), Collections.singleton("1111111111"));
+    }
 
 }
