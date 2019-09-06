@@ -100,25 +100,22 @@ public class AddressRecord extends PersonDataRecord {
                 false
         ));
 
-
-        if (this.hasAny("convn", "convn_ts")) {
-            OffsetDateTime convnTs = this.getOffsetDateTime("convn_ts");
-            if (convnTs == null) {
-                convnTs = this.getOffsetDateTime("adr_ts");
-            }
-            records.add(new AddressConameDataRecord(
-                    this.getString("convn", false)
-            ).setAuthority(
-                    this.getInt("start_mynkod-personbolig")
-            ).setBitemporality(
-                    convnTs,
-                    null,
-                    this.getOffsetDateTime("tilflydto"),
-                    this.getBoolean("tilflydto_umrk"),
-                    null,
-                    false
-            ));
+        OffsetDateTime convnTs = this.getOffsetDateTime("convn_ts");
+        if (convnTs == null) {
+            convnTs = this.getOffsetDateTime("adr_ts");
         }
+        records.add(new AddressConameDataRecord(
+                this.getString("convn", false)
+        ).setAuthority(
+                this.getInt("start_mynkod-personbolig")
+        ).setBitemporality(
+                convnTs,
+                null,
+                this.getOffsetDateTime("tilflydto"),
+                this.getBoolean("tilflydto_umrk"),
+                null,
+                false
+        ));
 
         if (this.hasAny("fraflykomdto", "fraflykomdt_umrk", "fraflykomkod", "tilflykomdto")) {
             records.add(new MoveMunicipalityDataRecord(
