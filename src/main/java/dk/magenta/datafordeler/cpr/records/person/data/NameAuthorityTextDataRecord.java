@@ -34,7 +34,10 @@ public class NameAuthorityTextDataRecord extends AuthorityTextDataRecord<NameAut
         super(text, correctionMarking);
     }
 
-
+    @Override
+    public boolean updateBitemporalityByCloning() {
+        return true;
+    }
 
     @Override
     public NameAuthorityTextDataRecord clone() {

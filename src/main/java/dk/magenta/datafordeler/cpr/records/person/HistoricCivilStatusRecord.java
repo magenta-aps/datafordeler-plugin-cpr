@@ -52,8 +52,6 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
 
         ArrayList<CprBitemporalRecord> records = new ArrayList<>();
         Character annkor = this.getChar("annkor");
-        boolean corrected = Character.valueOf('K').equals(annkor);
-        boolean undo = Character.valueOf('A').equals(annkor);
         records.add(new CivilStatusDataRecord(
                 null,
                 this.getString("civst", true),
@@ -69,25 +67,29 @@ public class HistoricCivilStatusRecord extends HistoricPersonDataRecord {
         ).setHistoric(
         ).setAnnKor(annkor));
 
-        records.add(new CivilStatusVerificationDataRecord(
-                this.getBoolean("dok-civilstand"),
-                null
-        ).setAuthority(
-                this.getInt("dok_mynkod-civilstand")
-        ).setBitemporality(
-                this.documentTemporality
-        ).setHistoric(
-        ).setAnnKor(annkor));
+        if (this.hasAny("dok-civilstand", "dok_mynkod-civilstand")) {
+            records.add(new CivilStatusVerificationDataRecord(
+                    this.getBoolean("dok-civilstand"),
+                    null
+            ).setAuthority(
+                    this.getInt("dok_mynkod-civilstand")
+            ).setBitemporality(
+                    this.documentTemporality
+            ).setHistoric(
+            ).setAnnKor(annkor));
+        }
 
-        records.add(new CivilStatusAuthorityTextDataRecord(
-                this.getString("myntxt-civilstand", true),
-                null
-        ).setAuthority(
-                this.getInt("myntxt_mynkod-civilstand")
-        ).setBitemporality(
-                this.officiaryTemporality
-        ).setHistoric(
-        ).setAnnKor(annkor));
+        if (this.hasAny("myntxt-civilstand", "myntxt_mynkod-civilstand")) {
+            records.add(new CivilStatusAuthorityTextDataRecord(
+                    this.getString("myntxt-civilstand", true),
+                    null
+            ).setAuthority(
+                    this.getInt("myntxt_mynkod-civilstand")
+            ).setBitemporality(
+                    this.officiaryTemporality
+            ).setHistoric(
+            ).setAnnKor(annkor));
+        }
 
         return records;
     }

@@ -19,7 +19,6 @@ public class RoadCityRecord extends RoadDataRecord {
 
     public RoadCityRecord(String line) throws ParseException {
         super(line);
-        System.out.println("City record "+line);
         this.obtain("husnrfra", 12, 4);
         this.obtain("husnrtil", 16, 4);
         this.obtain("ligeulige", 20, 1);
