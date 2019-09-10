@@ -80,24 +80,22 @@ public class HistoricAddressRecord extends HistoricPersonDataRecord {
                 this.addressTemporality
         ));
 
-        if (this.hasAny("convn", "convn_ts")) {
-            OffsetDateTime convnTs = this.getOffsetDateTime("convn_ts");
-            if (convnTs == null) {
-                convnTs = this.getOffsetDateTime("adr_ts");
-            }
-            records.add(new AddressConameDataRecord(
-                    this.getString("convn", true)
-            ).setAuthority(
-                    this.getInt("start_mynkod-personbolig")
-            ).setBitemporality(
-                    convnTs,
-                    null,
-                    this.getOffsetDateTime("tilflydto"),
-                    this.getBoolean("tilflydto_umrk"),
-                    this.getOffsetDateTime("fraflydto"),
-                    this.getBoolean("fraflydto_umrk")
-            ));
+        OffsetDateTime convnTs = this.getOffsetDateTime("convn_ts");
+        if (convnTs == null) {
+            convnTs = this.getOffsetDateTime("adr_ts");
         }
+        records.add(new AddressConameDataRecord(
+                this.getString("convn", true)
+        ).setAuthority(
+                this.getInt("start_mynkod-personbolig")
+        ).setBitemporality(
+                convnTs,
+                null,
+                this.getOffsetDateTime("tilflydto"),
+                this.getBoolean("tilflydto_umrk"),
+                this.getOffsetDateTime("fraflydto"),
+                this.getBoolean("fraflydto_umrk")
+        ));
 
         if (this.hasAny("fraflykomdto", "fraflykomdt_umrk", "fraflykomkod", "tilflykomdto")) {
             if (this.getInt("tilfra_mynkod") != 0) {
