@@ -1,5 +1,6 @@
 package dk.magenta.datafordeler.cpr.direct;
 
+import dk.magenta.datafordeler.core.exception.ConfigurationException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.ListHashMap;
@@ -49,7 +50,14 @@ public class CprDirectLookup {
         return configurationManager.getConfiguration();
     }
 
-    private void login() throws DataStreamException {
+    public void login() throws DataStreamException {
+        try {
+            this.login(null);
+        } catch (ConfigurationException e) {
+            log.error(e); // This can't happen
+        }
+    }
+    public void login(String newPassword) throws DataStreamException, ConfigurationException {
         CprConfiguration configuration = this.getConfiguration();
 
         String transactionCode = configuration.getDirectTransactionCode();
@@ -62,21 +70,28 @@ public class CprDirectLookup {
             throw new DataStreamException("Failed decrypting stored password from database", e);
         }
 
+        if (newPassword == null) {
+            newPassword = "";
+        } else if (newPassword.length() != 8) {
+            throw new ConfigurationException("Invalid new password; must be exactly 8 characters");
+        }
+
         String LOGON_SUBSCRIPTION_TYPE = "9"; // constant in LOGON record
         String LOGON_DATA_TYPE = "0"; // constant in LOGON record
 
         // build logon request - a mix of constants and user-specified information
         String requestBody = String.format("%-35.35s",
-                String.format("%s,%s%s%s%s%s",
+                String.format("%s,%s%s%s%s%s%s",
                         transactionCode,
                         customerNumber,
                         LOGON_SUBSCRIPTION_TYPE,
                         LOGON_DATA_TYPE,
                         username,
-                        password
+                        password,
+                        newPassword
                 )); // record should always be 35 bytes
 
-        String response = null;
+        String response;
         try {
             response = this.request(requestBody);
         } catch (IOException e) {

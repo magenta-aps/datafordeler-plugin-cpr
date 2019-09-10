@@ -4,6 +4,8 @@ import dk.magenta.datafordeler.core.AbstractTask;
 import dk.magenta.datafordeler.core.Engine;
 import dk.magenta.datafordeler.core.Pull;
 import dk.magenta.datafordeler.core.command.Worker;
+import dk.magenta.datafordeler.core.exception.ConfigurationException;
+import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.core.plugin.RegisterManager;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import org.quartz.JobDataMap;
@@ -13,24 +15,27 @@ import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 
 public class CprDirectPasswordUpdate extends Worker implements Runnable {
-
-
+    
     public static class Task extends AbstractTask<CprDirectPasswordUpdate> {
         public static final String DATA_CONFIGURATIONMANAGER = "configurationManager";
+        public static final String DATA_DIRECTLOOKUP = "directLookup";
 
         @Override
         protected CprDirectPasswordUpdate createWorker(JobDataMap dataMap) {
             CprConfigurationManager configurationManager = (CprConfigurationManager) dataMap.get(DATA_CONFIGURATIONMANAGER);
-            return new CprDirectPasswordUpdate(configurationManager);
+            CprDirectLookup directLookup = (CprDirectLookup) dataMap.get(DATA_DIRECTLOOKUP);
+            return new CprDirectPasswordUpdate(configurationManager, directLookup);
         }
     }
 
 
     private CprConfigurationManager configurationManager;
+    private CprDirectLookup directLookup;
     private SecureRandom random = new SecureRandom();
 
-    public CprDirectPasswordUpdate(CprConfigurationManager configurationManager) {
+    public CprDirectPasswordUpdate(CprConfigurationManager configurationManager, CprDirectLookup directLookup) {
         this.configurationManager = configurationManager;
+        this.directLookup = directLookup;
     }
 
     private static final String ALPHA_UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -60,13 +65,15 @@ public class CprDirectPasswordUpdate extends Worker implements Runnable {
     @Override
     public void run() {
         try {
+            // Make sure we can access the local password storage
             String oldPassword = this.configurationManager.getConfiguration().getDirectPassword();
+            // Generate a new password
             String newPassword = this.generatePassword(8);
             // Update remote pw
-
+            directLookup.login(newPassword);
             // If success, update local pw
-            //this.configurationManager.setDirectPassword(newPassword);
-        } catch (GeneralSecurityException | IOException e) {
+            this.configurationManager.setDirectPassword(newPassword);
+        } catch (GeneralSecurityException | IOException | ConfigurationException | DataStreamException e) {
             e.printStackTrace();
         }
     }
