@@ -14,6 +14,7 @@ import dk.magenta.datafordeler.cpr.records.CprMonotemporalRecord;
 import dk.magenta.datafordeler.cpr.records.CprNontemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.CprBitemporalPersonRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -877,7 +878,13 @@ public class PersonEntity extends CprRecordEntity {
         if (newItem != null) {
 
             if (!compareExisting) {
+                //Special case for direct lookup
                 return set.add((E) newItem);
+            }
+
+            if (newItem.line == null || set.stream().anyMatch(item -> StringUtils.equals(newItem.line, item.line))) {
+                //If this specific line with excatcly the same information has allready been read it should be ignored
+                return false;
             }
 
             E correctedRecord = null;
