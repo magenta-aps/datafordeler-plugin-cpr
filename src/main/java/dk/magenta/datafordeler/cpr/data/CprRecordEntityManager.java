@@ -36,7 +36,7 @@ public abstract class CprRecordEntityManager<T extends CprDataRecord, E extends 
     private ObjectMapper objectMapper;
 
     @Autowired
-    CprConfigurationManager cprConfigurationManager;
+    private CprConfigurationManager cprConfigurationManager;
 
     @Autowired
     Stopwatch timer;
@@ -57,6 +57,10 @@ public abstract class CprRecordEntityManager<T extends CprDataRecord, E extends 
     public CprRecordEntityManager() {
         this.commonFetcher = new HttpCommunicator();
         this.handledURISubstrings = new ArrayList<>();
+    }
+
+    public CprConfigurationManager getCprConfigurationManager() {
+        return this.cprConfigurationManager;
     }
 
     @Override
