@@ -8,6 +8,8 @@ import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.Receipt;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
+import dk.magenta.datafordeler.cpr.direct.CprDirectLookup;
+import dk.magenta.datafordeler.cpr.direct.CprDirectPasswordUpdate;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
@@ -21,6 +23,8 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -48,6 +52,9 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
     @Value("${dafo.cpr.person.customer-id:0}")
     private int customerId;
 
+    @Value("${dafo.cpr.person.direct.password-change-enabled:false}")
+    private boolean directPasswordChangeEnabled;
+
 
     @Autowired
     private PersonEntityRecordService personEntityService;
@@ -57,6 +64,9 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
 
     @Autowired
     private SessionManager sessionManager;
+
+    @Autowired
+    private CprDirectLookup directLookup;
 
     private Timer subscribtionUploadTimer = new Timer();
 
@@ -383,6 +393,27 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             e.printStackTrace();
         }
         return null;
+    }
+
+    @PostConstruct
+    public void setupDirectPasswordChange() {
+        if (this.directPasswordChangeEnabled) {
+            try {
+                Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+                ScheduleBuilder scheduleBuilder = CronScheduleBuilder.monthlyOnDayAndHourAndMinute(12, 0, 0);
+                TriggerKey triggerKey = TriggerKey.triggerKey("directPasswordChangeTrigger");
+                Trigger trigger = TriggerBuilder.newTrigger()
+                        .withIdentity(triggerKey)
+                        .withSchedule(scheduleBuilder).build();
+                JobDataMap jobData = new JobDataMap();
+                jobData.put(CprDirectPasswordUpdate.Task.DATA_CONFIGURATIONMANAGER, this.getCprConfigurationManager());
+                jobData.put(CprDirectPasswordUpdate.Task.DATA_DIRECTLOOKUP, this.directLookup);
+                JobDetail job = JobBuilder.newJob(CprDirectPasswordUpdate.Task.class).setJobData(jobData).build();
+                scheduler.scheduleJob(job, Collections.singleton(trigger), true);
+            } catch (SchedulerException e) {
+                log.error(e);
+            }
+        }
     }
 
 }
