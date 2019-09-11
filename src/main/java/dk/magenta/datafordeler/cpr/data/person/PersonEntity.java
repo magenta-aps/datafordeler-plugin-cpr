@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * An Entity representing a person. Bitemporal data is structured as
@@ -906,15 +907,14 @@ public class PersonEntity extends CprRecordEntity {
                             !Equality.equal(newItem.getEffectFrom(), newItem.getEffectTo())
                             && oldItem.getReplacedby() == null
                             ) {
+                        //I would expect that this case is wrong, why let a historic overwrite an nonhistoric
                         oldItem.setReplacedby(newItem);
                         oldItem.setRegistrationTo(newItem.getRegistrationFrom());
                         session.saveOrUpdate(oldItem);
                         return set.add((E) newItem);
 
 
-                    /*
-                    * Special case for addresses: Municipality codes may have changed without us getting a change record (AnnKor: Æ)
-                    * */
+                    //Special case for addresses: Municipality codes may have changed without us getting a change record (AnnKor: Æ)
                     } else if (newItem.getBitemporality().equals(oldItem.getBitemporality())) {
                         if (newItem instanceof AddressDataRecord) {
                             AddressDataRecord addressDataRecord = (AddressDataRecord) newItem;
@@ -1016,6 +1016,14 @@ public class PersonEntity extends CprRecordEntity {
                 }
             } else {
                 //log.info("nonmatching item, adding as new");
+                boolean hasAnyUnclosed = items.stream().anyMatch(item -> item.getRegistrationTo() == null && item.getEffectTo() == null);
+
+                //Does this person allready have a recordtype which is of same type, and which is unclosed, then close the old one
+                if(hasAnyUnclosed && newItem.getRegistrationTo()==null && newItem.getEffectTo()==null) {
+                    correctedRecord = items.stream().filter(i -> i.getRegistrationTo() == null && i.getEffectTo() == null).findAny().get();
+                    correctedRecord.setRegistrationTo(newItem.getRegistrationFrom());
+                }
+
                 return set.add((E) newItem);
             }
         }
