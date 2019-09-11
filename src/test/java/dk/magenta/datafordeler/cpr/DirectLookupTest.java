@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr;
 
 import dk.magenta.datafordeler.core.Application;
+import dk.magenta.datafordeler.core.exception.DataStreamException;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
 import dk.magenta.datafordeler.cpr.configuration.CprConfigurationManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
@@ -404,5 +405,10 @@ public class DirectLookupTest {
         CitizenshipDataRecord citizenshipDataRecord = entity.getCitizenship().iterator().next();
         Assert.assertEquals(5180, citizenshipDataRecord.getCountryCode());
         Assert.assertEquals(OffsetDateTime.from(ZonedDateTime.of(LocalDateTime.of(1962, 7, 6, 10, 29, 0), timezone)), citizenshipDataRecord.getEffectFrom());
+    }
+
+    @Test
+    public void loginTest() throws DataStreamException {
+        directLookup.login();
     }
 }

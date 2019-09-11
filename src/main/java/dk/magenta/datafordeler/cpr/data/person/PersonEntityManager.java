@@ -8,11 +8,14 @@ import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.Receipt;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
+import dk.magenta.datafordeler.cpr.direct.CprDirectLookup;
+import dk.magenta.datafordeler.cpr.direct.CprDirectPasswordUpdate;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthTimeDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.ChurchVerificationDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ParentDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.PersonEventDataRecord;
 import dk.magenta.datafordeler.cpr.records.service.PersonEntityRecordService;
@@ -20,6 +23,8 @@ import dk.magenta.datafordeler.cpr.synchronization.SubscribtionTimerTask;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,6 +53,9 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
     @Value("${dafo.cpr.person.customer-id:0}")
     private int customerId;
 
+    @Value("${dafo.cpr.person.direct.password-change-enabled:false}")
+    private boolean directPasswordChangeEnabled;
+
 
     @Autowired
     private PersonEntityRecordService personEntityService;
@@ -73,6 +81,9 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         subscribtionUploadTimer.schedule(new SubscribtionTimerTask(this), time, 1000 * 60 * 60 * 24);
     }
 
+
+    @Autowired
+    private CprDirectLookup directLookup;
 
     private static PersonEntityManager instance;
 
@@ -382,6 +393,27 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             e.printStackTrace();
         }
         return null;
+    }
+
+    @PostConstruct
+    public void setupDirectPasswordChange() {
+        if (this.directPasswordChangeEnabled) {
+            try {
+                Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+                ScheduleBuilder scheduleBuilder = CronScheduleBuilder.monthlyOnDayAndHourAndMinute(12, 0, 0);
+                TriggerKey triggerKey = TriggerKey.triggerKey("directPasswordChangeTrigger");
+                Trigger trigger = TriggerBuilder.newTrigger()
+                        .withIdentity(triggerKey)
+                        .withSchedule(scheduleBuilder).build();
+                JobDataMap jobData = new JobDataMap();
+                jobData.put(CprDirectPasswordUpdate.Task.DATA_CONFIGURATIONMANAGER, this.getCprConfigurationManager());
+                jobData.put(CprDirectPasswordUpdate.Task.DATA_DIRECTLOOKUP, this.directLookup);
+                JobDetail job = JobBuilder.newJob(CprDirectPasswordUpdate.Task.class).setJobData(jobData).build();
+                scheduler.scheduleJob(job, Collections.singleton(trigger), true);
+            } catch (SchedulerException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
