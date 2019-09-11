@@ -15,7 +15,6 @@ import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthTimeDataRecord;
-import dk.magenta.datafordeler.cpr.records.person.data.ChurchVerificationDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ParentDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.PersonEventDataRecord;
 import dk.magenta.datafordeler.cpr.records.service.PersonEntityRecordService;
@@ -23,9 +22,9 @@ import dk.magenta.datafordeler.cpr.synchronization.SubscribtionTimerTask;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -66,6 +65,9 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
     @Autowired
     private SessionManager sessionManager;
 
+    @Autowired
+    private CprDirectLookup directLookup;
+
     private Timer subscribtionUploadTimer = new Timer();
 
     /**
@@ -81,9 +83,6 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         subscribtionUploadTimer.schedule(new SubscribtionTimerTask(this), time, 1000 * 60 * 60 * 24);
     }
 
-
-    @Autowired
-    private CprDirectLookup directLookup;
 
     private static PersonEntityManager instance;
 
@@ -412,7 +411,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                 JobDetail job = JobBuilder.newJob(CprDirectPasswordUpdate.Task.class).setJobData(jobData).build();
                 scheduler.scheduleJob(job, Collections.singleton(trigger), true);
             } catch (SchedulerException e) {
-                e.printStackTrace();
+                log.error(e);
             }
         }
     }

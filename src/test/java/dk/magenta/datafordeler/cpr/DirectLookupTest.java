@@ -406,9 +406,4 @@ public class DirectLookupTest {
         Assert.assertEquals(5180, citizenshipDataRecord.getCountryCode());
         Assert.assertEquals(OffsetDateTime.from(ZonedDateTime.of(LocalDateTime.of(1962, 7, 6, 10, 29, 0), timezone)), citizenshipDataRecord.getEffectFrom());
     }
-
-    @Test
-    public void loginTest() throws DataStreamException {
-        directLookup.login();
-    }
 }
