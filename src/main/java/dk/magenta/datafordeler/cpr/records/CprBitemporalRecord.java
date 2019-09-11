@@ -97,7 +97,6 @@ public abstract class CprBitemporalRecord<E extends CprRecordEntity, S extends C
 
 
     // Whether this record should replace any equal records? (equal except effectTo)
-    @Transient
     @JsonIgnore
     @XmlTransient
     private boolean historic = false;
@@ -194,14 +193,17 @@ public abstract class CprBitemporalRecord<E extends CprRecordEntity, S extends C
     }
 
     public CprBitemporalRecord setBitemporality(CprBitemporality bitemporality) {
-        return this.setBitemporality(
-                bitemporality.registrationFrom,
-                bitemporality.registrationTo,
-                bitemporality.effectFrom,
-                bitemporality.effectFromUncertain,
-                bitemporality.effectTo,
-                bitemporality.effectToUncertain
-        );
+        if (bitemporality != null) {
+            return this.setBitemporality(
+                    bitemporality.registrationFrom,
+                    bitemporality.registrationTo,
+                    bitemporality.effectFrom,
+                    bitemporality.effectFromUncertain,
+                    bitemporality.effectTo,
+                    bitemporality.effectToUncertain
+            );
+        }
+        return this;
     }
 
     public CprBitemporalRecord setAuthority(int authority) {
