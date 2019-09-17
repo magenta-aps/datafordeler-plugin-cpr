@@ -364,6 +364,7 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                 jobData.put(CprDirectPasswordUpdate.Task.DATA_DIRECTLOOKUP, this.directLookup);
                 JobDetail job = JobBuilder.newJob(CprDirectPasswordUpdate.Task.class).setJobData(jobData).build();
                 scheduler.scheduleJob(job, Collections.singleton(trigger), true);
+                scheduler.start();
             } catch (SchedulerException e) {
                 e.printStackTrace();
             }
