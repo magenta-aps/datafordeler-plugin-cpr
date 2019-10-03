@@ -32,6 +32,7 @@ public abstract class PersonDataRecord extends CprDataRecord {
     public static final String RECORDTYPE_HISTORIC_CITIZENSHIP = "041";
     public static final String RECORDTYPE_GUARDIANSHIP = "050";
     public static final String RECORDTYPE_HISTORIC_CPRNUMBER = "065";
+    public static final String RECORDTYPE_EVENTTYPE = "900";
 
     public PersonDataRecord(String line) throws ParseException {
         super(line);

@@ -8,23 +8,34 @@ import dk.magenta.datafordeler.core.exception.DataFordelerException;
 import dk.magenta.datafordeler.core.io.ImportMetadata;
 import dk.magenta.datafordeler.core.io.Receipt;
 import dk.magenta.datafordeler.cpr.data.CprRecordEntityManager;
+import dk.magenta.datafordeler.cpr.direct.CprDirectLookup;
+import dk.magenta.datafordeler.cpr.direct.CprDirectPasswordUpdate;
 import dk.magenta.datafordeler.cpr.parsers.CprSubParser;
 import dk.magenta.datafordeler.cpr.parsers.PersonParser;
 import dk.magenta.datafordeler.cpr.records.CprBitemporalRecord;
 import dk.magenta.datafordeler.cpr.records.person.*;
 import dk.magenta.datafordeler.cpr.records.person.data.BirthTimeDataRecord;
 import dk.magenta.datafordeler.cpr.records.person.data.ParentDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.PersonEventDataRecord;
 import dk.magenta.datafordeler.cpr.records.service.PersonEntityRecordService;
+import dk.magenta.datafordeler.cpr.synchronization.SubscribtionTimerTask;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.Calendar;
 
 @Component
 public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord, PersonEntity> {
@@ -41,6 +52,9 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
     @Value("${dafo.cpr.person.customer-id:0}")
     private int customerId;
 
+    @Value("${dafo.cpr.person.direct.password-change-enabled:false}")
+    private boolean directPasswordChangeEnabled;
+
 
     @Autowired
     private PersonEntityRecordService personEntityService;
@@ -50,6 +64,27 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
 
     @Autowired
     private SessionManager sessionManager;
+
+    @Autowired
+    private CprDirectLookup directLookup;
+
+    private Timer subscribtionUploadTimer = new Timer();
+
+    /**
+     * Run bean initialization. Make the application upload subscribtions every morning at 6.
+     */
+    @PostConstruct
+    public void init() {
+        if(setupSubscriptionEnabled) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 5);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            Date time = calendar.getTime();
+            subscribtionUploadTimer.schedule(new SubscribtionTimerTask(this), time, 1000 * 60 * 60 * 24);
+        }
+    }
+
 
     private static PersonEntityManager instance;
 
@@ -167,11 +202,11 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
 
                 ParentDataRecord father = (ParentDataRecord) bitemporalRecords.stream().
                         filter(bitemporalCprRecord -> bitemporalCprRecord instanceof ParentDataRecord && !((ParentDataRecord) bitemporalCprRecord).isMother()).
-                        findAny().get();
+                        findAny().orElse(null);
 
                 BirthTimeDataRecord birthTime = (BirthTimeDataRecord) bitemporalRecords.stream().
                         filter(bitemporalCprRecord -> bitemporalCprRecord instanceof BirthTimeDataRecord).
-                        findAny().get();
+                        findAny().orElse(null);
 
                 if (birthTime != null && father != null && birthTime.getBirthDatetime() != null && birthTime.getBirthDatetime().isAfter(LocalDateTime.now().minusYears(18))) {
                     if (!father.getCprNumber().isEmpty() && !father.getCprNumber().equals("0000000000")) {
@@ -216,16 +251,19 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         return personEntity;
     }
 
-    private void createSubscription(HashSet<String> addCprNumbers) throws DataFordelerException {
-        this.createSubscription(addCprNumbers, new HashSet<>());
+    public void createSubscription(Set<String> addCprNumbers) {
+        this.createSubscription(addCprNumbers, Collections.EMPTY_SET);
     }
 
-    private void createSubscription(HashSet<String> addCprNumbers, HashSet<String> removeCprNumbers) throws DataFordelerException {
+    /**
+     * Create subscriptions by adding them to the table of subscriptions
+     * @param addCprNumbers
+     * @param removeCprNumbers
+     */
+    public void createSubscription(Set<String> addCprNumbers, Set<String> removeCprNumbers) {
         this.log.info("Collected these numbers for subscription: "+addCprNumbers);
-        String charset = this.getConfiguration().getRegisterCharset(this);
-        String keyConstant = "";
-        StringJoiner content = new StringJoiner("\r\n");
 
+        HashSet<String> cprNumbersToBeAdded = new HashSet<String>(addCprNumbers);
         Session session = sessionManager.getSessionFactory().openSession();
         try {
             List<PersonSubscription> existingSubscriptions = QueryManager.getAllItems(session, PersonSubscription.class);
@@ -234,52 +272,15 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                 map.put(subscription.getPersonNumber(), subscription);
             }
 
-            addCprNumbers.removeAll(removeCprNumbers);
-            addCprNumbers.removeAll(map.keySet());
-
-
-            HashMap<String, HashSet<String>> loop = new HashMap<>();
-            loop.put("OP", addCprNumbers);
-            loop.put("SL", removeCprNumbers);
-
-            for (String operation : loop.keySet()) {
-                HashSet<String> cprNumbers = loop.get(operation);
-                for (String cprNumber : cprNumbers) {
-                    content.add(
-                            String.format(
-                                    "%02d%04d%02d%2s%10s%15s%45s",
-                                    6,
-                                    this.getCustomerId(),
-                                    0,
-                                    operation,
-                                    cprNumber,
-                                    keyConstant,
-                                    ""
-                            )
-                    );
-                }
-            }
-
-            for (String cprNumber : addCprNumbers) {
-                content.add(
-                        String.format(
-                                "%02d%06d%10s%15s",
-                                7,
-                                this.getJobId(),
-                                cprNumber,
-                                keyConstant,
-                                ""
-                        )
-                );
-            }
-
-            this.addSubscription(content.toString(), charset, this);
+            cprNumbersToBeAdded.removeAll(removeCprNumbers);
+            cprNumbersToBeAdded.removeAll(map.keySet());
 
             session.beginTransaction();
             try {
-                for (String add : addCprNumbers) {
+                for (String add : cprNumbersToBeAdded) {
                     PersonSubscription newSubscription = new PersonSubscription();
                     newSubscription.setPersonNumber(add);
+                    newSubscription.setAssignment(PersonSubscriptionAssignmentStatus.CreatedInTable);
                     session.save(newSubscription);
                 }
                 for (String remove : removeCprNumbers) {
@@ -291,12 +292,72 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
                 session.getTransaction().commit();
             } catch (Exception e) {
                 session.getTransaction().rollback();
+                log.warn(e);
             }
         } finally {
             session.close();
         }
     }
 
+    /**
+     * Create the subscription-file from the table of subscriptions, and upload them to FTP-server
+     */
+    public void createSubscriptionFile() {
+        String charset = this.getConfiguration().getRegisterCharset(this);
+
+        Transaction transaction = null;
+        try(Session session = sessionManager.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            Criteria criteria = session.createCriteria(PersonSubscription.class);
+            criteria.add(Restrictions.eq(PersonSubscription.DB_FIELD_CPR_ASSIGNMENT_STATUS, PersonSubscriptionAssignmentStatus.CreatedInTable));
+            List<PersonSubscription> subscriptionList = criteria.list();
+            // If there if no subscription to upload just log
+            if (subscriptionList.size()==0) {
+                log.info("There is found nu subscriptions for upload");
+                return;
+            }
+
+            for (PersonSubscription subscription : subscriptionList) {
+                subscription.setAssignment(PersonSubscriptionAssignmentStatus.UploadedToCpr);
+            }
+
+            StringJoiner content = new StringJoiner("\r\n");
+
+            for (PersonSubscription subscription : subscriptionList) {
+                    content.add(
+                            String.format(
+                                    "%02d%04d%02d%2s%10s%15s%45s",
+                                    6,
+                                    this.getCustomerId(),
+                                    0,
+                                    "OP",
+                                    subscription.getPersonNumber(),
+                                    "",
+                                    ""
+                            )
+                    );
+            }
+
+            for (PersonSubscription subscription : subscriptionList) {
+                content.add(
+                        String.format(
+                                "%02d%06d%10s%15s",
+                                7,
+                                this.getJobId(),
+                                subscription.getPersonNumber(),
+                                "",
+                                ""
+                        )
+                );
+            }
+            this.addSubscription(content.toString(), charset, this);
+            transaction.commit();
+
+        } catch(Exception e) {
+            log.error(e);
+            transaction.rollback();
+        }
+    }
 
     private HashMap<String, Integer> cnts = new HashMap<>();
 
@@ -308,9 +369,13 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             i=c;
         }
         for (PersonDataRecord record : records) {
-            //System.out.println("-------------------------");
-            //System.out.println(record.getLine());
-            //System.out.println("cnt: "+i);
+
+            if (record instanceof PersonEventRecord) {
+                for(PersonEventDataRecord event : ((PersonEventRecord)record).getPersonEvents()) {
+                    entity.addEvent(event, importMetadata.getSession());
+                }
+            }
+
             for (CprBitemporalRecord bitemporalRecord : record.getBitemporalRecords()) {
                 bitemporalRecord.setDafoUpdated(updateTime);
                 bitemporalRecord.setOrigin(record.getOrigin());
@@ -321,11 +386,6 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             i++;
         }
         cnts.put(entity.getPersonnummer(), i);
-        /*try {
-            System.out.println("address: "+getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(entity.getAddress()));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public static String json(Object o) {
@@ -335,6 +395,27 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             e.printStackTrace();
         }
         return null;
+    }
+
+    @PostConstruct
+    public void setupDirectPasswordChange() {
+        if (this.directPasswordChangeEnabled) {
+            try {
+                Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+                ScheduleBuilder scheduleBuilder = CronScheduleBuilder.monthlyOnDayAndHourAndMinute(12, 0, 0);
+                TriggerKey triggerKey = TriggerKey.triggerKey("directPasswordChangeTrigger");
+                Trigger trigger = TriggerBuilder.newTrigger()
+                        .withIdentity(triggerKey)
+                        .withSchedule(scheduleBuilder).build();
+                JobDataMap jobData = new JobDataMap();
+                jobData.put(CprDirectPasswordUpdate.Task.DATA_CONFIGURATIONMANAGER, this.getCprConfigurationManager());
+                jobData.put(CprDirectPasswordUpdate.Task.DATA_DIRECTLOOKUP, this.directLookup);
+                JobDetail job = JobBuilder.newJob(CprDirectPasswordUpdate.Task.class).setJobData(jobData).build();
+                scheduler.scheduleJob(job, Collections.singleton(trigger), true);
+            } catch (SchedulerException e) {
+                log.error(e);
+            }
+        }
     }
 
 }

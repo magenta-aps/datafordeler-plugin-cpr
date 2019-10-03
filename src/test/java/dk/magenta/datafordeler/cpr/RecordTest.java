@@ -16,7 +16,9 @@ import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonRecordQuery;
 import dk.magenta.datafordeler.cpr.records.output.PersonRecordOutputWrapper;
+import dk.magenta.datafordeler.cpr.records.person.data.ChurchVerificationDataRecord;
 import org.hibernate.Session;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -38,6 +41,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class RecordTest {
 
     @Autowired
@@ -75,6 +79,13 @@ public class RecordTest {
         personEntityManager.parseData(testData, importMetadata);
         testData.close();
     }
+/*
+    @After
+    public void clean() {
+        Session session = sessionManager.getSessionFactory().openSession();
+
+        session.close();
+    }*/
 
     @Test
     public void testPerson() throws DataFordelerException, IOException {
@@ -185,20 +196,17 @@ public class RecordTest {
         ImportMetadata importMetadata = new ImportMetadata();
         importMetadata.setSession(session);
         this.loadPerson("/persondata.txt", importMetadata);
-        //this.loadPerson("/persondata2.txt", importMetadata);
+        this.loadPerson("/persondata2.txt", importMetadata);
         try {
             PersonRecordQuery query = new PersonRecordQuery();
             query.setPersonnummer("0101001234");
             List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
             PersonEntity personEntity = entities.get(0);
-
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(personEntity));
-
             Assert.assertEquals(1, personEntity.getConame().size());
             Assert.assertEquals(1, personEntity.getAddress().size());
             Assert.assertEquals(2, personEntity.getAddressName().size());
             Assert.assertEquals(1, personEntity.getBirthPlace().size());
-            Assert.assertEquals(1, personEntity.getBirthPlaceVerification().size());
+            Assert.assertEquals(0, personEntity.getBirthPlaceVerification().size());
             Assert.assertEquals(1, personEntity.getBirthTime().size());
             Assert.assertEquals(4, personEntity.getChurchRelation().size());
             Assert.assertEquals(3, personEntity.getChurchRelationVerification().size());
@@ -207,16 +215,16 @@ public class RecordTest {
             Assert.assertEquals(0, personEntity.getCivilstatusVerification().size());
             Assert.assertEquals(1, personEntity.getForeignAddress().size());
             Assert.assertEquals(1, personEntity.getEmigration().size());
-            Assert.assertEquals(1, personEntity.getMunicipalityMove().size());
+            Assert.assertEquals(0, personEntity.getMunicipalityMove().size());
             Assert.assertEquals(4, personEntity.getName().size());
-            Assert.assertEquals(4, personEntity.getNameAuthorityText().size());
+            Assert.assertEquals(3, personEntity.getNameAuthorityText().size());
             Assert.assertEquals(4, personEntity.getNameVerification().size());
             Assert.assertEquals(1, personEntity.getMother().size());
             Assert.assertEquals(1, personEntity.getMotherVerification().size());
             Assert.assertEquals(1, personEntity.getFather().size());
             Assert.assertEquals(1, personEntity.getFatherVerification().size());
             Assert.assertEquals(1, personEntity.getCore().size());
-            Assert.assertEquals(1, personEntity.getPosition().size());
+            Assert.assertEquals(0, personEntity.getPosition().size());
             Assert.assertEquals(3, personEntity.getStatus().size());
             Assert.assertEquals(3, personEntity.getProtection().size());
 
@@ -225,6 +233,96 @@ public class RecordTest {
         }
     }
 
+    /**
+     * Test that when new addresses is added to a person the former added adresses is bitemporally closed
+     * @throws IOException
+     * @throws DataFordelerException
+     */
+    @Test
+    public void testPersonAddressCloseLastActive() throws IOException, DataFordelerException {
+        Session session = sessionManager.getSessionFactory().openSession();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        this.loadPerson("/overwrite_cpr_import.txt", importMetadata);
+        try {
+            PersonRecordQuery query = new PersonRecordQuery();
+            query.setPersonnummer("0101010123");
+            OffsetDateTime time = OffsetDateTime.now();
+            query.setEffectToAfter(time);
+            query.setRegistrationToAfter(time);
+            query.applyFilters(session);
+            List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
+            PersonEntity personEntity = entities.get(0);
+            Assert.assertEquals(1, personEntity.getAddress().size());
+            Assert.assertEquals("F", personEntity.getAddress().iterator().next().getBuildingNumber());
+        } finally {
+            session.close();
+        }
+    }
+
+    /**
+     * Test that when new addresses is added to a person the former added adresses is bitemporally closed
+     * @throws IOException
+     * @throws DataFordelerException
+     */
+    @Test
+    public void testCivilstatePersonCloseLastActive() throws IOException, DataFordelerException {
+        Session session = sessionManager.getSessionFactory().openSession();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        this.loadPerson("/overwrite_civilstate.txt", importMetadata);
+
+        try {
+            PersonRecordQuery query = new PersonRecordQuery();
+            query.setPersonnummer("0101010123");
+            OffsetDateTime time = OffsetDateTime.now();
+            query.setEffectToAfter(time);
+            query.setRegistrationToAfter(time);
+            query.applyFilters(session);
+
+            List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
+            PersonEntity personEntity = entities.get(0);
+            Assert.assertEquals(1, personEntity.getCivilstatus().size());
+            Assert.assertEquals("0101010124", personEntity.getCivilstatus().iterator().next().getSpouseCpr());
+
+
+        } finally {
+            session.close();
+        }
+    }
+
+    /**
+     * Test that when new addresses is added to a person the former added adresses is bitemporally closed
+     * @throws IOException
+     * @throws DataFordelerException
+     */
+    @Test
+    public void testBirthPersonCloseLastActive() throws IOException, DataFordelerException {
+        Session session = sessionManager.getSessionFactory().openSession();
+        ImportMetadata importMetadata = new ImportMetadata();
+        importMetadata.setSession(session);
+        this.loadPerson("/overwrite_birth_import.txt", importMetadata);
+
+        try {
+            PersonRecordQuery query = new PersonRecordQuery();
+            query.setPersonnummer("0101010123");
+            OffsetDateTime time = OffsetDateTime.now();
+
+            query.setEffectToAfter(time);
+            query.setRegistrationToAfter(time);
+            query.applyFilters(session);
+
+            List<PersonEntity> entities = QueryManager.getAllEntities(session, query, PersonEntity.class);
+            PersonEntity personEntity = entities.get(0);
+            Assert.assertEquals(1, personEntity.getFather().size());
+            Assert.assertEquals(1, personEntity.getMother().size());
+            Assert.assertEquals("0101900125", personEntity.getFather().iterator().next().getCprNumber());
+            Assert.assertEquals("Bo", personEntity.getFather().iterator().next().getName());
+            Assert.assertEquals("0101900124", personEntity.getMother().iterator().next().getCprNumber());
+        } finally {
+            session.close();
+        }
+    }
 
     @Test
     public void testPersonIdempotence() throws Exception {

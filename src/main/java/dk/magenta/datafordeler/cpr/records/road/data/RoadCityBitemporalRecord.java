@@ -1,16 +1,21 @@
 package dk.magenta.datafordeler.cpr.records.road.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dk.magenta.datafordeler.core.database.DatabaseEntry;
 import dk.magenta.datafordeler.cpr.CprPlugin;
 
 import javax.persistence.Column;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @javax.persistence.Entity
-@Table(name=CprPlugin.DEBUG_TABLE_PREFIX + RoadCityBitemporalRecord.TABLE_NAME)
+@Table(name=CprPlugin.DEBUG_TABLE_PREFIX + RoadCityBitemporalRecord.TABLE_NAME, indexes = {
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + RoadCityBitemporalRecord.TABLE_NAME + RoadCityBitemporalRecord.DB_FIELD_ENTITY, columnList = CprBitemporalRoadRecord.DB_FIELD_ENTITY + DatabaseEntry.REF),
+        @Index(name = CprPlugin.DEBUG_TABLE_PREFIX + RoadCityBitemporalRecord.TABLE_NAME + RoadCityBitemporalRecord.DB_FIELD_REPLACED_BY, columnList = CprBitemporalRoadRecord.DB_FIELD_REPLACED_BY + DatabaseEntry.REF),
+})
 public class RoadCityBitemporalRecord extends CprBitemporalRoadRecord<RoadCityBitemporalRecord> {
 
     public static final String TABLE_NAME = "cpr_road_city_record";

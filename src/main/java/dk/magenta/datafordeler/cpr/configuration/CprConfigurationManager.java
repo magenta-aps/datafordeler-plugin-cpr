@@ -4,12 +4,16 @@ import dk.magenta.datafordeler.core.configuration.ConfigurationManager;
 import dk.magenta.datafordeler.core.database.ConfigurationSessionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 @Component
 public class CprConfigurationManager extends ConfigurationManager<CprConfiguration> {
@@ -56,6 +60,25 @@ public class CprConfigurationManager extends ConfigurationManager<CprConfigurati
         configuration.setPersonRegisterPasswordEncryptionFile(encryptionFile);
         configuration.setRoadRegisterPasswordEncryptionFile(encryptionFile);
         configuration.setResidenceRegisterPasswordEncryptionFile(encryptionFile);
+        configuration.setDirectPasswordPasswordEncryptionFile(encryptionFile);
         return configuration;
+    }
+
+    public void setDirectPassword(String password) throws GeneralSecurityException, IOException {
+        // Updates the encrypted password in the database
+        Session session = this.getSessionManager().getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            CprConfiguration cprConfiguration = session.createQuery("select c from " + CprConfiguration.class.getCanonicalName() + " c", CprConfiguration.class).getSingleResult();
+            cprConfiguration.setDirectPasswordPasswordEncryptionFile(new File(this.encryptionKeyFileName));
+            cprConfiguration.setDirectPassword(password);
+            session.saveOrUpdate(cprConfiguration);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
     }
 }

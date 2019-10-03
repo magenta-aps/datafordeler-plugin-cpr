@@ -225,8 +225,8 @@ public class QueryTest {
         this.applyAccess(testUserDetails);
 
         ParameterMap searchParameters = new ParameterMap();
-        searchParameters.add("registreringFra", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        searchParameters.add("recordAfter", now.plusSeconds(5).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("registreringFra", "2011-06-17T14:06:19.196");
+        searchParameters.add("recordAfter", "2011-06-17T14:06:24.196");
 
         ResponseEntity<String> response = restSearch(searchParameters, "person");
         Assert.assertEquals(200, response.getStatusCode().value());
@@ -239,8 +239,8 @@ public class QueryTest {
         Assert.assertEquals(4, results.get(0).size());
 
         searchParameters = new ParameterMap();
-        searchParameters.add("registreringFraFør", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        searchParameters.add("recordAfter", now.minusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchParameters.add("registreringFraFør", "2011-06-17T14:06:19.196");
+        searchParameters.add("recordAfter", "2011-06-16T14:06:19.196");
         searchParameters.add("fornavn", "Tester");
         searchParameters.add("fmt", "drv");
 
