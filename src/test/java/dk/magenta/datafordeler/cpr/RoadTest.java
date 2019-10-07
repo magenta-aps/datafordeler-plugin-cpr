@@ -37,7 +37,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -216,6 +215,38 @@ public class RoadTest extends TestBase {
             Assert.assertTrue(roadNode.get("navn").size() > 0);
         }
     }
+
+
+    @Test
+    public void testLookupServiceDk() throws Exception {
+        try (Session session = this.getSessionManager().getSessionFactory().openSession()) {
+            this.getSessionManager().getSessionFactory().openSession();
+            ImportMetadata importMetadata = new ImportMetadata();
+            importMetadata.setSession(session);
+            importMetadata.setTransactionInProgress(true);
+            Transaction transaction = session.beginTransaction();
+            loadRoad(importMetadata);
+            transaction.commit();
+
+            CprLookupService lookupService = new CprLookupService(session);
+
+            CprLookupDTO lookupDTO = lookupService.doLookup(730, 1, "18");
+
+            Assert.assertEquals("Randers", lookupDTO.getMunicipalityName());
+            Assert.assertEquals("Aage Beks Vej", lookupDTO.getRoadName());
+            Assert.assertEquals(8920, lookupDTO.getPostalCode());
+            Assert.assertEquals("Randers NV", lookupDTO.getPostalDistrict());
+
+            lookupDTO = lookupService.doLookup(730, 4, "18");
+
+            Assert.assertEquals("Randers", lookupDTO.getMunicipalityName());
+            Assert.assertEquals("Aalborggade", lookupDTO.getRoadName());
+            Assert.assertEquals(8940, lookupDTO.getPostalCode());
+            Assert.assertEquals("Randers SV", lookupDTO.getPostalDistrict());
+        }
+    }
+
+
 
     @Test
     public void pull() throws Exception {
