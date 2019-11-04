@@ -77,9 +77,9 @@ public class CprConfigurationManager extends ConfigurationManager<CprConfigurati
             cprConfiguration.setDirectPasswordPasswordEncryptionFile(new File(this.encryptionKeyFileName));
             cprConfiguration.setDirectPassword(password);
             CprConfiguration configuration = super.getConfiguration();
+            transaction.commit();
             Files.write(new File(encryptedPassword).toPath(), configuration.getEncryptedDirectPassword());
             session.saveOrUpdate(cprConfiguration);
-            transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
             throw e;
@@ -90,7 +90,14 @@ public class CprConfigurationManager extends ConfigurationManager<CprConfigurati
 
     @PostConstruct
     public void printDirectPassword() throws GeneralSecurityException, IOException {
-        CprConfiguration configuration = super.getConfiguration();
-        Files.write(new File(encryptedPassword).toPath(), configuration.getEncryptedDirectPassword());
+        try {
+            CprConfiguration configuration = super.getConfiguration();
+            File encryptedPasswordFile = new File(encryptedPassword);
+            if(encryptedPasswordFile.getParentFile().isDirectory()) {
+                Files.write(new File(encryptedPassword).toPath(), configuration.getEncryptedDirectPassword());
+            }
+        } catch(Exception ioe) {
+            log.error("Exception", ioe);
+        }
     }
 }
