@@ -30,6 +30,9 @@ import java.util.ArrayList;
 @Component
 public class CprDirectLookup {
 
+    //Documentation:
+    //https://cprdocs.atlassian.net/wiki/spaces/CPR/pages/51155340/Gr+nsefladebeskrivelse+til+offentlige+myndigheder+-+CPR+Direkte+PNR
+
     @Autowired
     private CprConfigurationManager configurationManager;
 
@@ -146,6 +149,10 @@ public class CprDirectLookup {
             if (errorCode == 0) {
                 // All ok, return response
                 return response;
+            } if (errorCode == 5) {
+                // Unknown cpr
+                log.error("cpr not fount " + pnr);
+                return "could not find cpr";
             } else if (errorCode == ERR_TOKEN_EXPIRED) {
                 // Login and try again
                 this.login();
