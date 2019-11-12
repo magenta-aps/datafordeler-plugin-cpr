@@ -2,6 +2,7 @@ package dk.magenta.datafordeler.cpr.direct;
 
 import dk.magenta.datafordeler.core.exception.ConfigurationException;
 import dk.magenta.datafordeler.core.exception.DataStreamException;
+import dk.magenta.datafordeler.core.exception.MissingEntityException;
 import dk.magenta.datafordeler.core.exception.ParseException;
 import dk.magenta.datafordeler.core.util.ListHashMap;
 import dk.magenta.datafordeler.cpr.configuration.CprConfiguration;
@@ -113,8 +114,13 @@ public class CprDirectLookup {
     }
 
     public PersonEntity getPerson(String pnr) throws DataStreamException {
-        String rawData = this.lookup(pnr);
-        return this.parseResponse(rawData);
+        String rawData = null;
+        rawData = this.lookup(pnr);
+        if(rawData!=null) {
+            return this.parseResponse(rawData);
+        } else {
+            return null;
+        }
     }
 
     public String lookup(String pnr) throws DataStreamException {
@@ -151,8 +157,8 @@ public class CprDirectLookup {
                 return response;
             } if (errorCode == 5) {
                 // Unknown cpr
-                log.error("cpr not fount " + pnr);
-                return "could not find cpr";
+                log.error("cpr not found " + pnr);
+                return null;
             } else if (errorCode == ERR_TOKEN_EXPIRED) {
                 // Login and try again
                 this.login();
