@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 
 @Component
@@ -23,6 +24,9 @@ public class CprConfigurationManager extends ConfigurationManager<CprConfigurati
 
     @Value("${cpr.encryption.keyfile:local/cpr/keyfile.json}")
     private String encryptionKeyFileName;
+
+    @Value("${cpr.encryption.keyfile:local/cpr/encryptedpassword.bin}")
+    private String encryptedPassword;
 
     private Logger log = LogManager.getLogger("CprConfigurationManager");
 
@@ -72,13 +76,28 @@ public class CprConfigurationManager extends ConfigurationManager<CprConfigurati
             CprConfiguration cprConfiguration = session.createQuery("select c from " + CprConfiguration.class.getCanonicalName() + " c", CprConfiguration.class).getSingleResult();
             cprConfiguration.setDirectPasswordPasswordEncryptionFile(new File(this.encryptionKeyFileName));
             cprConfiguration.setDirectPassword(password);
-            session.saveOrUpdate(cprConfiguration);
+            CprConfiguration configuration = super.getConfiguration();
             transaction.commit();
+            Files.write(new File(encryptedPassword).toPath(), configuration.getEncryptedDirectPassword());
+            session.saveOrUpdate(cprConfiguration);
         } catch (Exception e) {
             transaction.rollback();
             throw e;
         } finally {
             session.close();
+        }
+    }
+
+    @PostConstruct
+    public void printDirectPassword() throws GeneralSecurityException, IOException {
+        try {
+            CprConfiguration configuration = super.getConfiguration();
+            File encryptedPasswordFile = new File(encryptedPassword);
+            if(encryptedPasswordFile.getParentFile().isDirectory()) {
+                Files.write(new File(encryptedPassword).toPath(), configuration.getEncryptedDirectPassword());
+            }
+        } catch(Exception ioe) {
+            log.error("Exception", ioe);
         }
     }
 }
