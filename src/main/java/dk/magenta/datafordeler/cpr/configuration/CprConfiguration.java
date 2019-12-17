@@ -14,9 +14,12 @@ import org.apache.logging.log4j.Logger;*/
 
 import javax.persistence.*;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 
 @javax.persistence.Entity
@@ -511,6 +514,10 @@ public class CprConfiguration implements Configuration {
 
     public String getDirectUsername() {
         return this.directUsername;
+    }
+
+    public byte[] getEncryptedDirectPassword() throws GeneralSecurityException, IOException {
+        return this.directPasswordEncrypted;
     }
 
     public String getDirectPassword() throws GeneralSecurityException, IOException {
