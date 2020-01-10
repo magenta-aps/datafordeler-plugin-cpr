@@ -99,7 +99,7 @@ public class CprConfigurationManager extends ConfigurationManager<CprConfigurati
         try {
             CprConfiguration configuration = super.getConfiguration();
             File encryptedPasswordFile = new File(encryptedPassword);
-            if(encryptedPasswordFile.getParentFile().isDirectory()) {
+            if(encryptedPasswordFile.getParentFile().isDirectory() && encryptedPassword!=null && configuration.getEncryptedDirectPassword()!=null) {
                 Files.write(new File(encryptedPassword + UUID.randomUUID()).toPath(), configuration.getEncryptedDirectPassword());
             }
         } catch(Exception ioe) {
