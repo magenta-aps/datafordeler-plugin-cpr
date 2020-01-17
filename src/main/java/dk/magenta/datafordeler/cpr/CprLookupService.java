@@ -1,6 +1,7 @@
 package dk.magenta.datafordeler.cpr;
 
 import dk.magenta.datafordeler.core.database.QueryManager;
+import dk.magenta.datafordeler.core.database.SessionManager;
 import dk.magenta.datafordeler.core.fapi.BaseQuery;
 import dk.magenta.datafordeler.cpr.records.road.RoadRecordQuery;
 import dk.magenta.datafordeler.cpr.records.road.data.RoadNameBitemporalRecord;
@@ -19,7 +20,6 @@ public class CprLookupService {
 
     private Logger log = LogManager.getLogger("dk.magenta.datafordeler.geo.CprLookupService");
 
-    private Session session;
     private static Pattern houseNumberPattern = Pattern.compile("(\\d+)(.*)");
 
     private static HashMap<Integer, String> municipalityCacheDK = new HashMap<>();
@@ -128,15 +128,27 @@ public class CprLookupService {
         municipalityCacheDK.put(860,"Hjørring");
     }
 
+    protected SessionManager sessionManager;
+
+    protected Session session;
+
     public CprLookupService(Session session) {
         this.session = session;
+    }
+
+    public CprLookupService(SessionManager sessionManager) {
+        this.sessionManager =sessionManager;
     }
 
     public Session getSession() {
         return this.session;
     }
 
-    public CprLookupDTO doLookup(int municipalityCode, int roadCode) {
+    public SessionManager getSessionManager() {
+        return this.sessionManager;
+    }
+
+    public synchronized CprLookupDTO doLookup(int municipalityCode, int roadCode) {
         return this.doLookup(municipalityCode, roadCode, null);
     }
 
@@ -147,13 +159,14 @@ public class CprLookupService {
      * @param houseNumber
      * @return
      */
-    public CprLookupDTO doLookup(int municipalityCode, int roadCode, String houseNumber) {
+    public synchronized CprLookupDTO doLookup(int municipalityCode, int roadCode, String houseNumber) {
+        try(Session session = sessionManager.getSessionFactory().openSession()) {
+            CprLookupDTO cprLookupDTO = new CprLookupDTO();
+            cprLookupDTO.setMunicipalityName(municipalityCacheDK.get(municipalityCode));
+            this.populateRoadDK(cprLookupDTO, session, municipalityCode, roadCode, houseNumber);
 
-        CprLookupDTO cprLookupDTO = new CprLookupDTO();
-        cprLookupDTO.setMunicipalityName(municipalityCacheDK.get(municipalityCode));
-        this.populateRoadDK(cprLookupDTO, session, municipalityCode, roadCode, houseNumber);
-
-        return cprLookupDTO;
+            return cprLookupDTO;
+        }
     }
 
     private void populateRoadDK(CprLookupDTO lookup, Session session, int municipalityCode, int roadCode, String houseNumber) {
