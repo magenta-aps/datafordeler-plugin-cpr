@@ -130,18 +130,8 @@ public class CprLookupService {
 
     protected SessionManager sessionManager;
 
-    protected Session session;
-
-    public CprLookupService(Session session) {
-        this.session = session;
-    }
-
     public CprLookupService(SessionManager sessionManager) {
         this.sessionManager =sessionManager;
-    }
-
-    public Session getSession() {
-        return this.session;
     }
 
     public SessionManager getSessionManager() {
