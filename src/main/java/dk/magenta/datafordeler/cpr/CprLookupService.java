@@ -182,7 +182,9 @@ public class CprLookupService {
             roadQuery.setVejkode(roadCode);
             roadQuery.addKommunekode(municipalityCode);
             List<dk.magenta.datafordeler.cpr.records.road.data.RoadEntity> roadEntities = QueryManager.getAllEntities(session, roadQuery, dk.magenta.datafordeler.cpr.records.road.data.RoadEntity.class);
-            return roadEntities.get(0);
+            if(roadEntities.size()<1) {
+                return roadEntities.get(0);
+            }
         } catch (IndexOutOfBoundsException | NullPointerException e) {
             log.error("Failure parsing CPR adress-record", e);
         }
