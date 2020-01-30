@@ -11,9 +11,7 @@ import dk.magenta.datafordeler.core.util.LabeledSequenceInputStream;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntity;
 import dk.magenta.datafordeler.cpr.data.person.PersonEntityManager;
 import dk.magenta.datafordeler.cpr.data.person.PersonRecordQuery;
-import dk.magenta.datafordeler.cpr.records.person.data.AddressDataRecord;
-import dk.magenta.datafordeler.cpr.records.person.data.BirthTimeDataRecord;
-import dk.magenta.datafordeler.cpr.records.person.data.CivilStatusDataRecord;
+import dk.magenta.datafordeler.cpr.records.person.data.*;
 import org.hibernate.Session;
 import org.junit.After;
 import org.junit.Assert;
@@ -109,15 +107,29 @@ public class cprLoadTestdatasetTest {
             Assert.assertEquals(39, persons.size());
 
             for(PersonEntity person : persons) {
-                System.out.println(person.getPersonnummer());
+                System.out.print(person.getPersonnummer());
+                if(person.getName().size()>0) {
+                    NameDataRecord name = person.getName().iterator().next();
+                    System.out.println(" - "+name.getFirstNames()+" "+name.getMiddleName()+" "+name.getLastName());
+                }
+
+
                 if(person.getAddress().size()>0) {
                     AddressDataRecord add = person.getAddress().iterator().next();
-                    System.out.println("Kommunekode: "+add.getMunicipalityCode());
-                    System.out.println("Vejkode: "+add.getRoadCode());
-                    System.out.println("Husnummer: "+add.getHouseNumber());
-                    System.out.println("Land: "+ (add.getMunicipalityCode()<900 ? "DK" : "GL"));
+                    System.out.print("Kommunekode: "+add.getMunicipalityCode());
+                    System.out.print(" Vejkode: "+add.getRoadCode());
+                    System.out.println(" Husnummer: "+add.getHouseNumber());
 
                 }
+                if(person.getForeignAddress().size()>0) {
+                    ForeignAddressDataRecord add = person.getForeignAddress().iterator().next();
+                    System.out.print("Udenlandskadresse: "+add.getAddressLine1());
+                    System.out.print(" "+add.getAddressLine2());
+                    System.out.print(" "+add.getAddressLine3());
+                    System.out.println(" "+ add.getAddressLine5());
+
+                }
+
                 Assert.assertEquals(1, person.getCivilstatus().size());//ALWAYS 1
                 if(person.getCivilstatus().size()>0) {
                     CivilStatusDataRecord civil = person.getCivilstatus().iterator().next();
@@ -129,7 +141,6 @@ public class cprLoadTestdatasetTest {
                     System.out.println("Fødselstidspunkt: "+birth.getBirthDatetime());
                 }
 
-                System.out.println();
                 System.out.println("---------------------------------------------");
             }
         }
