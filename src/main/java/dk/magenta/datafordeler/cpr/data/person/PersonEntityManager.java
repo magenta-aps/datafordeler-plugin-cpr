@@ -55,6 +55,8 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
     @Value("${dafo.cpr.person.direct.password-change-enabled:false}")
     private boolean directPasswordChangeEnabled;
 
+    @Value("${dafo.cpr.testpersonList}")
+    private String testpersonList;
 
     @Autowired
     private PersonEntityRecordService personEntityService;
@@ -175,6 +177,29 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
             this.nonGreenlandicFatherCprNumbers.clear();
         }
     }
+
+
+    public void cleanData() {
+        try(Session session = sessionManager.getSessionFactory().openSession()) {
+            PersonRecordQuery personQuery = new PersonRecordQuery();
+            List<String> testPersonList = Arrays.asList(testpersonList.split(","));
+            for(String testPerson : testPersonList) {
+                personQuery.addPersonnummer(testPerson);
+            }
+            session.beginTransaction();
+            personQuery.setPageSize(1000);
+            personQuery.applyFilters(session);
+            List<PersonEntity> personEntities = QueryManager.getAllEntities(session, personQuery, PersonEntity.class);
+            for(PersonEntity personForDeletion : personEntities) {
+                session.delete(personForDeletion);
+            }
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            log.error("Failed cleaning data", e);
+        }
+    }
+
+
 
     /**
      * Handle parsing if records from cpr

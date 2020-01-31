@@ -15,8 +15,10 @@ import dk.magenta.datafordeler.cpr.records.person.data.*;
 import org.hibernate.Session;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -32,10 +34,14 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Test that it is possible to load and clear data which is dedicated for demopurpose
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class cprLoadTestdatasetTest {
 
 
@@ -77,7 +83,7 @@ public class cprLoadTestdatasetTest {
      * @throws URISyntaxException
      */
     @Test
-    public void testLoadingOfTestdataset() throws DataFordelerException, IOException, URISyntaxException {
+    public void test_A_LoadingOfTestdataset() throws DataFordelerException, IOException, URISyntaxException {
 
         try(Session session = sessionManager.getSessionFactory().openSession()) {
             ImportMetadata importMetadata = new ImportMetadata();
@@ -145,4 +151,46 @@ public class cprLoadTestdatasetTest {
             }
         }
     }
+
+
+
+    @Test
+    public void test_B_ReadingStuff() throws DataFordelerException, IOException, URISyntaxException {
+
+        try (Session session = sessionManager.getSessionFactory().openSession()) {
+            PersonRecordQuery query = new PersonRecordQuery();
+            query.setEffectToAfter(OffsetDateTime.now());
+            query.setEffectFromBefore(OffsetDateTime.now());
+            query.setRegistrationToAfter(OffsetDateTime.now());
+            query.setRegistrationFromBefore(OffsetDateTime.now());
+            query.applyFilters(session);
+            query.setPageSize(100);
+            List<PersonEntity> persons = QueryManager.getAllEntities(session, PersonEntity.class);
+            Assert.assertEquals(39, persons.size());
+        }
+    }
+
+
+    @Test
+    public void test_C_ClearingStuff() throws DataFordelerException, IOException, URISyntaxException {
+        personEntityManager.cleanData();
+    }
+
+
+    @Test
+    public void test_D_ReadingStuff() throws DataFordelerException, IOException, URISyntaxException {
+
+        try (Session session = sessionManager.getSessionFactory().openSession()) {
+            PersonRecordQuery query = new PersonRecordQuery();
+            query.setEffectToAfter(OffsetDateTime.now());
+            query.setEffectFromBefore(OffsetDateTime.now());
+            query.setRegistrationToAfter(OffsetDateTime.now());
+            query.setRegistrationFromBefore(OffsetDateTime.now());
+            query.applyFilters(session);
+            query.setPageSize(100);
+            List<PersonEntity> persons = QueryManager.getAllEntities(session, query, PersonEntity.class);
+            Assert.assertEquals(0, persons.size());
+        }
+    }
+
 }
