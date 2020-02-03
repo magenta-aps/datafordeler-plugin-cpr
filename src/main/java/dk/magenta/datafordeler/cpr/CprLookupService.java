@@ -182,7 +182,7 @@ public class CprLookupService {
             roadQuery.setVejkode(roadCode);
             roadQuery.addKommunekode(municipalityCode);
             List<dk.magenta.datafordeler.cpr.records.road.data.RoadEntity> roadEntities = QueryManager.getAllEntities(session, roadQuery, dk.magenta.datafordeler.cpr.records.road.data.RoadEntity.class);
-            if(roadEntities.size()<1) {
+            if(roadEntities.size()>0) {
                 return roadEntities.get(0);
             }
         } catch (IndexOutOfBoundsException | NullPointerException e) {
