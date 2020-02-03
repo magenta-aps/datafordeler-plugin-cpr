@@ -151,6 +151,12 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
     @Override
     public List<? extends Registration> parseData(InputStream registrationData, ImportMetadata importMetadata) throws DataFordelerException {
         try {
+            //With this flag true initiated testdata is cleared before initiation of new data is initiated
+            if(importMetadata.getImportConfiguration()!=null &&
+                    importMetadata.getImportConfiguration().has("cleantestdatafirst") &&
+                    importMetadata.getImportConfiguration().get("cleantestdatafirst").booleanValue()) {
+                cleanDemoData();
+            }
             List<? extends Registration> result = super.parseData(registrationData, importMetadata);
             if (this.isSetupSubscriptionEnabled() && !this.nonGreenlandicCprNumbers.isEmpty() && importMetadata.getImportConfiguration().size() == 0) {
                 this.createSubscription(this.nonGreenlandicCprNumbers);
@@ -178,8 +184,11 @@ public class PersonEntityManager extends CprRecordEntityManager<PersonDataRecord
         }
     }
 
-
-    public void cleanData() {
+    /**
+     * Clean demopersons which has been initiated in the database.
+     * Demopersons is used on the demoenvironment for demo and education purposes
+     */
+    public void cleanDemoData() {
         try(Session session = sessionManager.getSessionFactory().openSession()) {
             PersonRecordQuery personQuery = new PersonRecordQuery();
             List<String> testPersonList = Arrays.asList(testpersonList.split(","));

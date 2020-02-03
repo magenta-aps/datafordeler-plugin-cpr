@@ -63,9 +63,9 @@ public class cprLoadTestdatasetTest {
 
     private void loadPersonWithOrigin(ImportMetadata importMetadata) throws DataFordelerException, IOException, URISyntaxException {
         InputStream testData1 = cprLoadTestdatasetTest.class.getResourceAsStream("/GLBASETEST");
-        LabeledSequenceInputStream ll1 = new LabeledSequenceInputStream("GLBASETEST", new ByteArrayInputStream("GLBASETEST".getBytes()), "GLBASETEST", testData1);
-        ImportInputStream inp1 = new ImportInputStream(ll1);
-        personEntityManager.parseData(inp1, importMetadata);
+        LabeledSequenceInputStream labeledInputStream = new LabeledSequenceInputStream("GLBASETEST", new ByteArrayInputStream("GLBASETEST".getBytes()), "GLBASETEST", testData1);
+        ImportInputStream inputstream = new ImportInputStream(labeledInputStream);
+        personEntityManager.parseData(inputstream, importMetadata);
         testData1.close();
     }
 
@@ -83,7 +83,7 @@ public class cprLoadTestdatasetTest {
      * @throws URISyntaxException
      */
     @Test
-    public void test_A_LoadingOfTestdataset() throws DataFordelerException, IOException, URISyntaxException {
+    public void test_A_LoadingOfDemoDataset() throws DataFordelerException, IOException, URISyntaxException {
 
         try(Session session = sessionManager.getSessionFactory().openSession()) {
             ImportMetadata importMetadata = new ImportMetadata();
@@ -92,24 +92,17 @@ public class cprLoadTestdatasetTest {
             session.close();
         }
 
-
         try(Session session = sessionManager.getSessionFactory().openSession()) {
             PersonRecordQuery query = new PersonRecordQuery();
-
             query.setEffectToAfter(OffsetDateTime.now());
             query.setEffectFromBefore(OffsetDateTime.now());
-
             query.setRegistrationToAfter(OffsetDateTime.now());
             query.setRegistrationFromBefore(OffsetDateTime.now());
             /*query.addKommunekode(956);
             query.addKommunekode(960);*/
-
             query.applyFilters(session);
-
             query.setPageSize(100);
-
             List<PersonEntity> persons = QueryManager.getAllEntities(session, query, PersonEntity.class);
-
             Assert.assertEquals(39, persons.size());
 
             for(PersonEntity person : persons) {
@@ -118,8 +111,6 @@ public class cprLoadTestdatasetTest {
                     NameDataRecord name = person.getName().iterator().next();
                     System.out.println(" - "+name.getFirstNames()+" "+name.getMiddleName()+" "+name.getLastName());
                 }
-
-
                 if(person.getAddress().size()>0) {
                     AddressDataRecord add = person.getAddress().iterator().next();
                     System.out.print("Kommunekode: "+add.getMunicipalityCode());
@@ -133,9 +124,7 @@ public class cprLoadTestdatasetTest {
                     System.out.print(" "+add.getAddressLine2());
                     System.out.print(" "+add.getAddressLine3());
                     System.out.println(" "+ add.getAddressLine5());
-
                 }
-
                 Assert.assertEquals(1, person.getCivilstatus().size());//ALWAYS 1
                 if(person.getCivilstatus().size()>0) {
                     CivilStatusDataRecord civil = person.getCivilstatus().iterator().next();
@@ -146,7 +135,6 @@ public class cprLoadTestdatasetTest {
                     BirthTimeDataRecord birth = person.getBirthTime().iterator().next();
                     System.out.println("Fødselstidspunkt: "+birth.getBirthDatetime());
                 }
-
                 System.out.println("---------------------------------------------");
             }
         }
@@ -155,7 +143,7 @@ public class cprLoadTestdatasetTest {
 
 
     @Test
-    public void test_B_ReadingStuff() throws DataFordelerException, IOException, URISyntaxException {
+    public void test_B_ReadingDemoDataset() throws DataFordelerException, IOException, URISyntaxException {
 
         try (Session session = sessionManager.getSessionFactory().openSession()) {
             PersonRecordQuery query = new PersonRecordQuery();
@@ -172,13 +160,13 @@ public class cprLoadTestdatasetTest {
 
 
     @Test
-    public void test_C_ClearingStuff() throws DataFordelerException, IOException, URISyntaxException {
-        personEntityManager.cleanData();
+    public void test_C_ClearingDemoDataset() throws DataFordelerException, IOException, URISyntaxException {
+        personEntityManager.cleanDemoData();
     }
 
 
     @Test
-    public void test_D_ReadingStuff() throws DataFordelerException, IOException, URISyntaxException {
+    public void test_D_ReadingDemoDataset() throws DataFordelerException, IOException, URISyntaxException {
 
         try (Session session = sessionManager.getSessionFactory().openSession()) {
             PersonRecordQuery query = new PersonRecordQuery();
