@@ -140,7 +140,7 @@ public class cprLoadAndUnoPersonTest {
 
         try(Session session = sessionManager.getSessionFactory().openSession()) {
             PersonRecordQuery query = new PersonRecordQuery();
-            query.setPersonnummer("2901642837");
+            query.setPersonnummer("1111111111");
             OffsetDateTime now = Query.parseDateTime("2019-08-08");
 
             query.setEffectToAfter(now);
